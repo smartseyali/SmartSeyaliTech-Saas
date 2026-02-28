@@ -1,0 +1,171 @@
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { useTenant } from "./TenantContext";
+import { useAuth } from "./AuthContext";
+
+export interface Permission {
+    resource: string;
+    action: string;
+}
+
+interface PermissionsContextType {
+    availableModules: string[];
+    permissions: Permission[];
+    can: (action: string, resource: string) => boolean;
+    hasModule: (moduleName: string) => boolean;
+    isAdmin: boolean;
+    isSuperAdmin: boolean;
+    loading: boolean;
+    refreshPermissions: () => void;
+}
+
+const PermissionsContext = createContext<PermissionsContextType | undefined>(undefined);
+
+export function PermissionsProvider({ children }: { children: React.ReactNode }) {
+    const { activeCompany } = useTenant();
+    const { user } = useAuth();
+    const [availableModules, setAvailableModules] = useState<string[]>([]);
+    const [permissions, setPermissions] = useState<Permission[]>([]);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [refreshTick, setRefreshTick] = useState(0); // incrementing this triggers a reload
+
+    // Call this after subscribing/unsubscribing a module to instantly update the sidebar
+    const refreshPermissions = () => setRefreshTick(t => t + 1);
+
+    useEffect(() => {
+        const loadPermissions = async () => {
+            // Not logged in → reset everything
+            if (!user) {
+                setLoading(false);
+                setIsAdmin(false);
+                setIsSuperAdmin(false);
+                setPermissions([]);
+                setAvailableModules([]);
+                return;
+            }
+
+            try {
+                setLoading(true);
+
+                // 1. Fetch ALL system modules
+                const { data: systemModules } = await supabase
+                    .from("system_modules")
+                    .select("id, name, is_core");
+
+                const allModuleNames = systemModules?.map(sm => sm.name) || [];
+
+                // 2. Look up the user in public.users — check for super admin flag
+                const { data: localUser } = await supabase
+                    .from("users")
+                    .select("id, is_super_admin")
+                    .ilike("username", user.email || "")
+                    .maybeSingle();
+
+                // 3. SUPER ADMIN: is_super_admin = true → sees everything with no restrictions
+                if (localUser?.is_super_admin) {
+                    setIsAdmin(true);
+                    setIsSuperAdmin(true);
+                    setAvailableModules(allModuleNames);
+                    setPermissions([]);
+                    setLoading(false);
+                    return;
+                }
+
+                setIsSuperAdmin(false);
+
+                // 4. No active company → default to all modules visible (shouldn't happen post-onboarding)
+                if (!activeCompany) {
+                    setIsAdmin(false);
+                    setAvailableModules(["Ecommerce"]);
+                    setPermissions([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // 5. Check company_users mapping for this user in the active company
+                let companyMapping: any = null;
+                if (localUser) {
+                    const { data } = await supabase
+                        .from("company_users")
+                        .select("id, role")
+                        .eq("company_id", activeCompany.id)
+                        .eq("user_id", localUser.id)
+                        .maybeSingle();
+                    companyMapping = data;
+                }
+
+                // 6. Fetch the subscribed modules for this company
+                const { data: companyModules } = await supabase
+                    .from("company_modules")
+                    .select("module_id")
+                    .eq("company_id", activeCompany.id)
+                    .eq("is_active", true);
+
+                const purchasedModuleIds = new Set(companyModules?.map(tm => tm.module_id));
+                const subscribedModules = systemModules
+                    ?.filter(sm => sm.is_core || purchasedModuleIds.has(sm.id))
+                    .map(sm => sm.name) || [];
+
+                // 7. Determine tenant role
+                // Tenant owner or named Admin role → full access within subscribed modules
+                const isTenantAdmin =
+                    companyMapping && (
+                        companyMapping.role === "owner"
+                        || companyMapping.role === "admin"
+                    );
+
+                setIsAdmin(isTenantAdmin);
+
+                if (isTenantAdmin) {
+                    // Sees all subscribed modules, can do everything in them
+                    setAvailableModules(subscribedModules);
+                    setPermissions([]);
+                } else {
+                    // No admin role assigned → only core modules for now
+                    const coreModules = systemModules?.filter(sm => sm.is_core).map(sm => sm.name) || [];
+                    setAvailableModules(coreModules);
+                    setPermissions([]);
+                }
+
+            } catch (err) {
+                console.error("Error loading permissions:", err);
+                // Fail-open: if something breaks, keep user accessible
+                if (user) {
+                    setIsAdmin(true);
+                    setAvailableModules(["Sales", "Purchase", "Inventory", "Accounting", "HR", "Masters", "Ecommerce"]);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPermissions();
+    }, [activeCompany, user, refreshTick]); // refreshTick triggers re-fetch on demand
+
+    const can = (action: string, resource: string) => {
+        if (isAdmin) return true;
+        return (
+            permissions.some(p => p.action === action && p.resource === resource) ||
+            permissions.some(p => p.action === "manage" && p.resource === resource)
+        );
+    };
+
+    const hasModule = (moduleName: string) => availableModules.includes(moduleName);
+
+    return (
+        <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, isAdmin, isSuperAdmin, loading, refreshPermissions }}>
+            {children}
+        </PermissionsContext.Provider>
+    );
+}
+
+export function usePermissions() {
+    const context = useContext(PermissionsContext);
+    if (context === undefined) {
+        throw new Error("usePermissions must be used within a PermissionsProvider");
+    }
+    return context;
+}
+
