@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Storefront</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Utility Styles (Inline for speed) -->
+    <style>
+        .flex {
+            display: flex;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .gap-8 {
+            gap: 2rem;
+        }
+
+        .gap-10 {
+            gap: 2.5rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .py-16 {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+
+        .py-20 {
+            padding-top: 5rem;
+            padding-bottom: 5rem;
+        }
+
+        .py-24 {
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-12 {
+            margin-bottom: 3rem;
+        }
+
+        .mb-16 {
+            margin-bottom: 4rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-white {
+            color: white;
+        }
+
+        .text-slate-400 {
+            color: #94a3b8;
+        }
+
+        .text-slate-800 {
+            color: #1e293b;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-black {
+            font-weight: 900;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-3xl {
+            border-radius: 1.5rem;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .bg-white {
+            background-color: white;
+        }
+
+        .bg-slate-50 {
+            background-color: #f8fafc;
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .sticky {
+            position: sticky;
+        }
+
+        .top-0 {
+            top: 0;
+        }
+
+        .z-50 {
+            z-index: 50;
+        }
+
+        .transition-all {
+            transition: all 0.2s;
+        }
+
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+
+        .object-cover {
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+
+    <!-- Header -->
+    <header>
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
+                    style="text-decoration: none;">STORE</a>
+                <nav class="flex gap-6">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="shop.html" class="nav-link">Shop</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#" class="p-2 text-slate-400 hover:text-slate-800 transition-all"><i
+                        data-lucide="search"></i></a>
+                <a href="account.html" class="p-2 text-slate-400 hover:text-slate-800 transition-all"><i
+                        data-lucide="user"></i></a>
+                <a href="cart.html" class="cart-btn p-2 text-slate-400 hover:text-slate-800 transition-all">
+                    <i data-lucide="shopping-bag"></i>
+                    <span class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. Hero Banner Slider -->
+    <section class="hero bg-slate-900 overflow-hidden relative">
+        <div class="hero-slider h-full w-full">
+            <!-- Populated via home.js -->
+            <div class="flex items-center justify-center h-full text-slate-500 font-bold">
+                <div class="animate-pulse flex flex-col items-center gap-4">
+                    <div class="w-12 h-12 rounded-full border-4 border-slate-700 border-t-white animate-spin"></div>
+                    <span class="text-sm tracking-widest uppercase">Initializing...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Highlights -->
+    <section class="py-24 bg-white relative">
+        <div class="container">
+            <div class="highlights-grid grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+                <!-- Populated via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Top Categories -->
+    <section class="py-24 bg-slate-50">
+        <div class="container text-center mb-16">
+            <h2 class="text-5xl font-black text-slate-800 mb-4 animate-slide-up">Shop by Category</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Explore our curated collections of the freshest and most
+                sustainable products available.</p>
+        </div>
+        <div class="container">
+            <div class="categories-list flex gap-10 overflow-x-auto pb-12 no-scrollbar justify-center">
+                <!-- Populated via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Offer Zone -->
+    <section class="py-24">
+        <div class="container">
+            <div class="flex items-center justify-between mb-16">
+                <div>
+                    <h2 class="text-4xl font-black text-slate-800">Exclusive Offers</h2>
+                    <p class="text-slate-400 mt-2">Limited time deals for our premium members.</p>
+                </div>
+                <div style="width: 100px; height: 2px; background: var(--border);"></div>
+            </div>
+            <div class="offers-grid grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2.5rem;">
+                <!-- Populated via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Top Selling -->
+    <section class="py-32 bg-slate-900 text-white overflow-hidden relative">
+        <div class="container relative z-10">
+            <div class="flex flex-col items-center text-center mb-20">
+                <span
+                    class="px-5 py-2 bg-white/10 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest mb-6">Best
+                    Sellers</span>
+                <h2 class="text-6xl font-black mb-4">Customer Favorites</h2>
+                <p class="text-slate-400 max-w-xl">Our most loved products, sourced with care and delivered with
+                    passion.</p>
+            </div>
+            <div class="products-grid grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 3rem;">
+                <!-- Populated via home.js -->
+            </div>
+        </div>
+        <!-- Decorative bg -->
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-primary/20 blur-[120px] rounded-full translate-x-1/2"></div>
+    </section>
+
+    <!-- 6. Bottom Banners -->
+    <section class="py-32 bg-white">
+        <div class="container">
+            <div class="bottom-banners-row flex gap-8 overflow-x-auto pb-8 no-scrollbar">
+                <!-- Populated via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 bg-white border-top border-slate-100">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem;">
+                <div class="space-y-4">
+                    <h3 class="brand-font text-xl font-bold">STORE</h3>
+                    <p class="text-sm text-slate-400 max-w-xs">Premium quality products delivered to your doorstep.
+                        Experience the best of organic shopping.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="flex flex-col gap-2 list-none">
+                        <li><a href="shop.html" class="nav-link text-sm">Shop Catalog</a></li>
+                        <li><a href="about.html" class="nav-link text-sm">About Us</a></li>
+                        <li><a href="contact.html" class="nav-link text-sm">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-slate-50 text-center text-xs text-slate-400">
+                &copy; 2024 Storefront. All rights reserved. Powered by Ecommerce SaaS.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
+    <script>
+        // Init Lucide Icons
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            // Re-render icons after content injection
+            setTimeout(() => lucide.createIcons(), 2000);
+        });
+    </script>
+</body>
+
+</html>

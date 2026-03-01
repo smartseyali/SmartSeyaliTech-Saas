@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - Storefront</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Header -->
+    <header>
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
+                    style="text-decoration: none;">STORE</a>
+                <nav class="flex gap-6">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="shop.html" class="nav-link">Shop</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-24 flex items-center justify-center min-h-[80vh]">
+        <div
+            class="w-full max-w-md bg-white p-10 rounded-[40px] border border-slate-100 shadow-2xl space-y-8 animate-slide-up">
+
+            <div class="text-center space-y-2">
+                <h1 id="auth-title" class="text-4xl font-black text-slate-800">Welcome Back</h1>
+                <p id="auth-subtitle" class="text-slate-400">Login to track your orders and manage your profile.</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="name@example.com" required />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required />
+                </div>
+                <button type="submit" class="btn btn-primary w-full h-16 justify-center text-lg font-bold shadow-xl">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Signup Form (Hidden Initially) -->
+            <form id="signup-form" class="space-y-6" style="display: none;">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Full Name</label>
+                    <input type="text" id="full_name" class="form-input" placeholder="John Doe" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Email Address</label>
+                    <input type="email" id="signup-email" class="form-input" placeholder="name@example.com" required />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
+                    <input type="password" id="signup-password" class="form-input" placeholder="Minimum 6 characters"
+                        required minlength="6" />
+                </div>
+                <button type="submit" class="btn btn-primary w-full h-16 justify-center text-lg font-bold shadow-xl">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="text-center pt-4">
+                <button id="toggle-auth" class="text-sm font-bold text-primary hover:underline transition-all">
+                    Don't have an account? Sign Up
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    </script>
+</body>
+
+</html>

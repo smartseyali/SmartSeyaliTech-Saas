@@ -128,52 +128,6 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 .flat()
                 .filter(Boolean) as unknown as Company[];
 
-            // AUTO-ONBOARDING: If this is a merchant-intent session and no company exists, auto-create one
-            const isMerchantPath = window.location.pathname.startsWith('/ecommerce') ||
-                document.referrer.includes('ecommerce-login');
-
-            if (companiesData.length === 0 && isMerchantPath) {
-                const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || "Merchant";
-                const companyName = `${fullName}'s Store`;
-                const subdomain = (user.email?.split('@')[0] || 'shop').toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
-
-                // 1. Create Company
-                const { data: newCompany, error: cErr } = await supabase
-                    .from("companies")
-                    .insert([{
-                        name: companyName,
-                        subdomain: subdomain,
-                        contact_email: user.email,
-                        user_id: user.id,
-                        plan: 'starter'
-                    }])
-                    .select()
-                    .single();
-
-                if (!cErr && newCompany) {
-                    // 2. Create User Mapping as Admin
-                    await supabase
-                        .from("company_users")
-                        .insert([{
-                            company_id: newCompany.id,
-                            user_id: user.id,
-                            role: 'admin'
-                        }]);
-
-                    // 3. Initialize default settings 
-                    await supabase.from("ecom_settings").insert([{
-                        company_id: newCompany.id,
-                        store_name: companyName,
-                        store_tagline: `Premium Destinations`
-                    }]);
-
-                    // 4. Update user's default company
-                    await supabase.from('users').update({ company_id: newCompany.id }).eq('id', user.id);
-
-                    companiesData = [newCompany as Company];
-                }
-            }
-
             if (companiesData.length > 0) {
                 setCompanies(companiesData);
                 setActiveCompany(companiesData[0]);

@@ -22,6 +22,7 @@ interface Stats {
     activeCoupons: number;
     avgOrderValue: number;
     pendingReviews: number;
+    totalCustomers: number;
 }
 
 interface RecentOrder {
@@ -59,11 +60,12 @@ export default function EcomDashboard() {
         try {
             const today = new Date().toISOString().split("T")[0];
 
-            const [{ data: orders }, { data: refunds }, { data: coupons }, { data: reviews }] = await Promise.all([
+            const [{ data: orders }, { data: refunds }, { data: coupons }, { data: reviews }, { data: customers }] = await Promise.all([
                 supabase.from("ecom_orders").select("*").eq("company_id", activeCompany.id),
                 supabase.from("refunds").select("id, status").eq("company_id", activeCompany.id).eq("status", "pending"),
                 supabase.from("coupons").select("id").eq("company_id", activeCompany.id).eq("is_active", true),
                 supabase.from("product_reviews").select("id").eq("company_id", activeCompany.id).eq("status", "pending"),
+                supabase.from("ecom_customers").select("id").eq("company_id", activeCompany.id),
             ]);
 
             const all = orders || [];
@@ -84,6 +86,7 @@ export default function EcomDashboard() {
                 activeCoupons: (coupons || []).length,
                 avgOrderValue: all.length ? totalRev / all.length : 0,
                 pendingReviews: (reviews || []).length,
+                totalCustomers: (customers || []).length,
             });
 
             setRecentOrders(all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 8));
@@ -144,6 +147,7 @@ export default function EcomDashboard() {
                     { label: "Gross Revenue", value: fmt(stats?.totalRevenue || 0), sub: `${fmt(stats?.todayRevenue || 0)} contribution today`, icon: TrendingUp, color: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20" },
                     { label: "Volume of Sales", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} relative growth today`, icon: ShoppingBag, color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20" },
                     { label: "Basket Average", value: fmt(stats?.avgOrderValue || 0), sub: "standard ticket size", icon: BarChart3, color: "from-purple-500 to-fuchsia-600", shadow: "shadow-purple-500/20" },
+                    { label: "Customer Base", value: stats?.totalCustomers || 0, sub: "active storefront users", icon: Users, color: "from-teal-500 to-emerald-600", shadow: "shadow-teal-500/20" },
                     { label: "Marketing Hooks", value: stats?.activeCoupons || 0, sub: "active promotional codes", icon: Tag, color: "from-orange-500 to-amber-600", shadow: "shadow-orange-500/20" },
                 ].map(k => (
                     <div key={k.label} className={`relative group p-1 rounded-[2rem] bg-gradient-to-br ${k.color} ${k.shadow} hover:scale-105 transition-all duration-500 cursor-default`}>

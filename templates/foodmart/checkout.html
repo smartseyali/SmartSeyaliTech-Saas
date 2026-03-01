@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .flex {
+            display: flex;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .gap-8 {
+            gap: 2rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .py-12 {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .text-slate-400 {
+            color: #94a3b8;
+        }
+
+        .text-slate-500 {
+            color: #64748b;
+        }
+
+        .text-slate-800 {
+            color: #1e293b;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-black {
+            font-weight: 900;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-3xl {
+            border-radius: 1.5rem;
+        }
+
+        .bg-white {
+            background-color: white;
+        }
+
+        .bg-slate-50 {
+            background-color: #f8fafc;
+        }
+
+        .bg-primary {
+            background-color: var(--primary);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .border {
+            border: 1px solid #f1f5f9;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(20, 83, 45, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+
+    <!-- Header -->
+    <header>
+        <div class="container flex items-center justify-between">
+            <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
+                style="text-decoration: none;">STORE</a>
+            <div class="flex items-center gap-2 text-slate-400 font-bold text-sm">
+                <i data-lucide="shield-check" class="text-green-500"></i> Secure Checkout
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Content -->
+    <section class="py-12">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem;">
+
+                <!-- Left: Form -->
+                <div class="checkout-form space-y-10">
+                    <div>
+                        <h2 class="text-2xl font-black mb-6">Shipping Address</h2>
+                        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">First Name</label>
+                                <input type="text" id="ship-first-name" class="form-input" placeholder="John" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Last Name</label>
+                                <input type="text" id="ship-last-name" class="form-input" placeholder="Doe" />
+                            </div>
+                            <div class="flex flex-col gap-2" style="grid-column: span 2;">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Street Address</label>
+                                <input type="text" id="ship-address" class="form-input"
+                                    placeholder="Building, Street name" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">City</label>
+                                <input type="text" id="ship-city" class="form-input" placeholder="Mumbai" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">PIN Code</label>
+                                <input type="text" id="ship-pincode" class="form-input" placeholder="400001" />
+                            </div>
+                            <div class="flex flex-col gap-2" style="grid-column: span 2;">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Phone Number</label>
+                                <input type="tel" id="ship-phone" class="form-input" placeholder="+91 00000 00000" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-black mb-6">Payment Method</h2>
+                        <div class="space-y-4">
+                            <label
+                                class="flex items-center gap-4 p-4 border rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                                <input type="radio" name="payment" value="prepaid" checked />
+                                <div class="flex-1">
+                                    <div class="font-bold">Pay Online (Store Integrated)</div>
+                                    <div class="text-xs text-slate-400">Cards, UPI, Netbanking</div>
+                                </div>
+                                <i data-lucide="credit-card"></i>
+                            </label>
+                            <label
+                                class="flex items-center gap-4 p-4 border rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                                <input type="radio" name="payment" value="cod" />
+                                <div class="flex-1">
+                                    <div class="font-bold">Cash on Delivery</div>
+                                    <div class="text-xs text-slate-400">Pay at your doorstep</div>
+                                </div>
+                                <i data-lucide="truck"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Order Order Summary -->
+                <aside
+                    class="order-summary p-8 bg-slate-50 rounded-3xl border border-slate-100 shadow-lg h-fit sticky top-24">
+                    <h2 class="text-xl font-bold mb-6">Items In Order</h2>
+                    <div id="checkout-items" class="space-y-6 mb-8">
+                        <!-- Populated via script -->
+                    </div>
+
+                    <div class="space-y-4 border-t border-slate-200 pt-6 mb-8">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Shipping</span>
+                            <span class="text-green-600 font-bold uppercase">Free Delivery</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-lg">Amount to Pay</span>
+                            <span id="total-pay" class="font-black text-2xl text-primary">₹ 0.00</span>
+                        </div>
+                    </div>
+
+                    <button id="place-order-btn"
+                        class="btn btn-primary w-full h-16 justify-center text-lg font-bold shadow-xl">
+                        Confirm Purchase
+                    </button>
+                    <p
+                        class="text-[10px] text-center text-slate-400 mt-6 max-w-[250px] mx-auto uppercase font-bold tracking-widest">
+                        By clicking pay you agree to the terms of service.
+                    </p>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure storefront is initialized
+            if (!window.Storefront.tenant) {
+                await window.Storefront.init();
+            }
+
+            const cart = window.Storefront.cart;
+            const list = document.getElementById('checkout-items');
+            const totalPay = document.getElementById('total-pay');
+            const placeOrderBtn = document.getElementById('place-order-btn');
+
+            if (!cart || cart.length === 0) {
+                // If cart is empty, maybe it's not loaded yet, try loading it
+                window.Storefront.loadCart();
+                if (window.Storefront.cart.length === 0) {
+                    window.location.href = 'shop.html';
+                    return;
+                }
+            }
+
+            // Render Summary
+            list.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-4">
+                    <img src="${item.image_url}" class="w-16 h-16 rounded-xl object-cover bg-white" />
+                    <div class="flex-1 overflow-hidden">
+                        <div class="font-bold text-sm truncate">${item.name}</div>
+                        <div class="text-xs text-slate-400">Qty: ${item.quantity}</div>
+                    </div>
+                    <div class="font-bold text-sm">${window.Storefront.formatCurrency(item.price * item.quantity)}</div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPay.innerText = window.Storefront.formatCurrency(total);
+
+            // Place Order Handler
+            placeOrderBtn.addEventListener('click', async () => {
+                const firstName = document.getElementById('ship-first-name').value;
+                const lastName = document.getElementById('ship-last-name').value;
+                const address = document.getElementById('ship-address').value;
+                const city = document.getElementById('ship-city').value;
+                const pincode = document.getElementById('ship-pincode').value;
+                const phone = document.getElementById('ship-phone').value;
+                const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+                if (!firstName || !address || !phone) {
+                    alert("Please fill in all required shipping details.");
+                    return;
+                }
+
+                placeOrderBtn.innerText = "Processing...";
+                placeOrderBtn.disabled = true;
+
+                const orderData = {
+                    order_number: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                    customer_name: `${firstName} ${lastName}`,
+                    customer_phone: phone,
+                    shipping_address: { address, city, pincode },
+                    subtotal: total,
+                    grand_total: total,
+                    payment_method: paymentMethod
+                };
+
+                const { data, error } = await window.API.placeOrder(orderData);
+
+                if (error) {
+                    alert("Order failed: " + error);
+                    placeOrderBtn.innerText = "Confirm Purchase";
+                    placeOrderBtn.disabled = false;
+                } else {
+                    localStorage.removeItem('cart');
+                    document.body.innerHTML = `
+                        <div style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: sans-serif;">
+                            <div style="width: 80px; height: 80px; background: #14532d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; box-shadow: 0 10px 20px rgba(20,83,45,0.2);">
+                                <i data-lucide="check" style="width: 40px; height: 40px;"></i>
+                            </div>
+                            <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 1rem;">Order Placed!</h1>
+                            <p style="color: #64748b; margin-bottom: 2rem;">Your order <b>${data.order_number}</b> has been received and is being processed.</p>
+                            <a href="index.html" style="background: black; color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: bold; text-decoration: none;">Return to Store</a>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            });
+
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

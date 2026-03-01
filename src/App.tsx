@@ -37,6 +37,7 @@ import Analytics from "./pages/ecommerce/Analytics";
 import Reports from "./pages/ecommerce/Reports";
 import APIIntegrations from "./pages/ecommerce/APIIntegrations";
 import Settings from "./pages/ecommerce/Settings";
+import Customers from "./pages/ecommerce/Customers";
 
 import { StoreLayout } from "./components/storefront/StoreLayout";
 import StoreHome from "./pages/storefront/home/Index";
@@ -53,6 +54,7 @@ import StoreContact from "./pages/storefront/Contact";
 
 import SuperAdminDashboard from "./pages/super-admin/Dashboard";
 import HeadlessConsole from "./pages/super-admin/HeadlessConsole";
+import Onboarding from "./pages/ecommerce/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -63,8 +65,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!user) return <Navigate to="/login" replace />;
     if (loading) return null;
 
-    // Force onboarding if company doesn't exist
-    if (needsOnboarding) return <Navigate to="/ecommerce" replace />;
+    // Force onboarding if company doesn't exist AND we aren't already on the onboarding page
+    if (needsOnboarding && window.location.pathname !== "/onboarding") {
+        return <Navigate to="/onboarding" replace />;
+    }
 
     return <>{children}</>;
 };
@@ -129,6 +133,8 @@ const App = () => (
                                             <Route path="/super-admin/connectors" element={<SuperAdminRoute><HeadlessConsole /></SuperAdminRoute>} />
                                         </Route>
 
+                                        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+
                                         {/* Ecommerce Admin Routes (Protected) */}
                                         <Route element={<AppLayout />}>
                                             <Route path="/ecommerce" element={<ProtectedRoute><EcomDashboard /></ProtectedRoute>} />
@@ -136,6 +142,7 @@ const App = () => (
                                             <Route path="/ecommerce/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
                                             <Route path="/ecommerce/orders" element={<ProtectedRoute><EcomOrders /></ProtectedRoute>} />
                                             <Route path="/ecommerce/orders/:id" element={<ProtectedRoute><EcomOrderDetail /></ProtectedRoute>} />
+                                            <Route path="/ecommerce/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
                                             <Route path="/ecommerce/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
                                             <Route path="/ecommerce/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
                                             <Route path="/ecommerce/refunds" element={<ProtectedRoute><Refunds /></ProtectedRoute>} />

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Premium Experience</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Header -->
+    <header>
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
+                    style="text-decoration: none;">STORE</a>
+                <nav class="flex gap-6">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="shop.html" class="nav-link">Shop</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="cart.html" class="cart-btn p-2 text-slate-400 hover:text-slate-800 transition-all">
+                    <i data-lucide="shopping-bag"></i>
+                    <span class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Detail Section -->
+    <section class="py-24">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 6rem;">
+
+                <!-- Image Container -->
+                <div
+                    class="product-image-container aspect-square bg-slate-50 rounded-[40px] overflow-hidden shadow-2xl relative group">
+                    <img id="p-image" src="https://api.iconify.design/lucide:image.svg"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none">
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="flex flex-col justify-center space-y-8 animate-slide-up">
+                    <div class="space-y-4">
+                        <span id="p-category"
+                            class="inline-block px-4 py-1.5 bg-primary/10 text-primary text-xs font-black uppercase tracking-widest rounded-full">Category</span>
+                        <h1 id="p-name" class="text-5xl md:text-6xl font-black text-slate-800 leading-tight">Product
+                            Name</h1>
+                        <p id="p-price" class="text-4xl font-black text-primary">₹ 0.00</p>
+                    </div>
+
+                    <div id="p-description" class="text-slate-500 text-lg leading-relaxed max-w-xl">
+                        Loading detailed product information...
+                    </div>
+
+                    <div class="flex items-center gap-6">
+                        <div
+                            class="flex items-center gap-2 p-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+                            <button id="qty-minus"
+                                class="w-12 h-12 flex items-center justify-center hover:bg-white rounded-xl transition-all"><i
+                                    data-lucide="minus" class="w-4 h-4"></i></button>
+                            <span id="p-qty" class="font-bold text-xl px-4 min-w-[40px] text-center">1</span>
+                            <button id="qty-plus"
+                                class="w-12 h-12 flex items-center justify-center hover:bg-white rounded-xl transition-all"><i
+                                    data-lucide="plus" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+
+                    <button id="add-to-cart"
+                        class="btn btn-primary h-20 w-full md:w-fit px-12 rounded-3xl text-xl font-bold shadow-2xl flex items-center justify-center gap-4 group">
+                        <i data-lucide="shopping-bag" class="group-hover:rotate-12 transition-transform"></i>
+                        Add to Cart
+                    </button>
+
+                    <div class="pt-12 border-t border-slate-100 grid grid-cols-2 gap-8">
+                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-3xl">
+                            <div
+                                class="w-12 h-12 bg-white shadow-sm flex items-center justify-center rounded-2xl text-primary">
+                                <i data-lucide="truck"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Delivery</p>
+                                <p class="text-sm font-bold text-slate-800">Free Express</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-3xl">
+                            <div
+                                class="w-12 h-12 bg-white shadow-sm flex items-center justify-center rounded-2xl text-primary">
+                                <i data-lucide="shield-check"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Secure</p>
+                                <p class="text-sm font-bold text-slate-800">Encrypted Pay</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="py-32 bg-slate-50">
+        <div class="container">
+            <div class="flex items-center justify-between mb-16">
+                <h2 class="text-4xl font-black text-slate-800">You May Also Like</h2>
+                <div class="w-24 h-1 bg-primary/20 rounded-full"></div>
+            </div>
+            <div id="related-products" class="grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 3rem;">
+                <!-- Filled via product.js -->
+            </div>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/product.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setTimeout(() => lucide.createIcons(), 2000);
+        });
+    </script>
+</body>
+
+</html>

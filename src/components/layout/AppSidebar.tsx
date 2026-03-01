@@ -66,6 +66,7 @@ const navGroups: NavGroup[] = [
         icon: ShoppingBag,
         items: [
             { title: "Orders", url: "/ecommerce/orders", icon: EcomCart },
+            { title: "Customers", url: "/ecommerce/customers", icon: Users },
             { title: "Deliveries", url: "/ecommerce/deliveries", icon: Truck },
             { title: "Refunds", url: "/ecommerce/refunds", icon: RotateCcw },
             { title: "Abandoned Carts", url: "/ecommerce/abandoned-carts", icon: ShoppingBag },
