@@ -4,85 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login - Storefront</title>
+    <title>Authorized User | Premium Storefront</title>
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-white">
+<body class="bg-s-950" style="min-height: 100vh; display: flex; flex-direction: column;">
 
-    <!-- Header -->
-    <header>
+    <!-- Minimal Elite Header -->
+    <header style="background: transparent; position: relative;">
         <div class="container flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
-                    style="text-decoration: none;">STORE</a>
-                <nav class="flex gap-6">
-                    <a href="index.html" class="nav-link">Home</a>
-                    <a href="shop.html" class="nav-link">Shop</a>
-                </nav>
-            </div>
+            <a href="index.html" class="brand-font" style="color: white; font-size: 1.8rem;">STORE</a>
+            <a href="index.html" class="nav-link" style="color: var(--s-400);">Return to Store</a>
         </div>
     </header>
 
-    <main class="container py-24 flex items-center justify-center min-h-[80vh]">
-        <div
-            class="w-full max-w-md bg-white p-10 rounded-[40px] border border-slate-100 shadow-2xl space-y-8 animate-slide-up">
+    <!-- Professional Auth Architecture -->
+    <main class="flex-1 flex items-center justify-center py-20">
+        <div class="container" style="max-width: 550px;">
+            <div class="card p-16 animate-reveal"
+                style="border-radius: var(--radius-xl); box-shadow: var(--shadow-float); border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); backdrop-filter: blur(40px);">
 
-            <div class="text-center space-y-2">
-                <h1 id="auth-title" class="text-4xl font-black text-slate-800">Welcome Back</h1>
-                <p id="auth-subtitle" class="text-slate-400">Login to track your orders and manage your profile.</p>
-            </div>
+                <div class="text-center mb-16 space-y-6">
+                    <div
+                        class="w-24 h-24 bg-p-900 mx-auto flex items-center justify-center rounded-[32px] text-white shadow-2xl">
+                        <i data-lucide="lock" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h1 class="text-4xl font-black text-white" style="margin:0;">Authorized Access</h1>
+                    <p class="label" style="color: var(--s-400); text-transform: none; font-size: 1rem;">Enter your
+                        credentials to manage your archive selections.</p>
+                </div>
 
-            <!-- Login Form -->
-            <form id="login-form" class="space-y-6">
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Email Address</label>
-                    <input type="email" id="email" class="form-input" placeholder="name@example.com" required />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
-                    <input type="password" id="password" class="form-input" placeholder="••••••••" required />
-                </div>
-                <button type="submit" class="btn btn-primary w-full h-16 justify-center text-lg font-bold shadow-xl">
-                    Sign In
-                </button>
-            </form>
+                <form id="login-form" class="space-y-8">
+                    <div class="space-y-4">
+                        <label class="label" style="color: var(--p-400);">Archive Protocol ID (Email)</label>
+                        <div class="relative">
+                            <input type="email" id="email" class="input" placeholder="user@archive.com" required
+                                style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: white;" />
+                        </div>
+                    </div>
 
-            <!-- Signup Form (Hidden Initially) -->
-            <form id="signup-form" class="space-y-6" style="display: none;">
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Full Name</label>
-                    <input type="text" id="full_name" class="form-input" placeholder="John Doe" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Email Address</label>
-                    <input type="email" id="signup-email" class="form-input" placeholder="name@example.com" required />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
-                    <input type="password" id="signup-password" class="form-input" placeholder="Minimum 6 characters"
-                        required minlength="6" />
-                </div>
-                <button type="submit" class="btn btn-primary w-full h-16 justify-center text-lg font-bold shadow-xl">
-                    Create Account
-                </button>
-            </form>
+                    <div class="space-y-4">
+                        <label class="label" style="color: var(--p-400);">Passphrase Intelligence</label>
+                        <div class="relative">
+                            <input type="password" id="password" class="input" placeholder="••••••••" required
+                                style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: white;" />
+                        </div>
+                    </div>
 
-            <div class="text-center pt-4">
-                <button id="toggle-auth" class="text-sm font-bold text-primary hover:underline transition-all">
-                    Don't have an account? Sign Up
-                </button>
+                    <button type="submit" class="btn btn-primary w-full h-20 shadow-2xl"
+                        style="font-size: 1.1rem; border-radius: 20px;">
+                        Authenticate Session
+                    </button>
+
+                    <div class="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
+                        <a href="signup.html" class="label"
+                            style="color: var(--s-400); text-transform: none; opacity: 0.6; cursor: pointer;">Initialize
+                            New Profile Archives</a>
+                        <div class="flex items-center gap-4 text-s-600">
+                            <i data-lucide="shield-check" style="width: 16px;"></i>
+                            <span
+                                style="font-size: 9px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase;">TLS
+                                Secure Protocol</span>
+                        </div>
+                    </div>
+                </form>
+
             </div>
         </div>
     </main>
+
+    <!-- Bottom Aesthetic -->
+    <div style="height: 100px; opacity: 0.2; pointer-events: none;">
+        <div class="hero-glow" style="width: 100vw; height: 100vw; bottom: -50vw; top: auto; right: 0;"></div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
     </script>
 </body>
 

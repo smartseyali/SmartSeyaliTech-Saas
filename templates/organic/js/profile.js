@@ -1,240 +1,119 @@
+
 /**
- * Enhanced Customer Profile, Orders & Address Management
+ * Professional Dashboard & Profile Logic
  */
 
 (function () {
-    const profile = {
+    if (window.ProfileExperience) return;
+
+    window.ProfileExperience = {
+        user: null,
+        activeTab: 'details',
+
         async init() {
-            console.log("🛠️ Profile Logic Initializing...");
+            console.log("🏙️ Synching Profile Intelligence...");
 
-            // Early check for API availability
-            if (!window.API) {
-                console.error("❌ API not found in profile.js!");
+            // Wait for Engine
+            let tries = 0;
+            while (!window.API?.tenant && tries < 40) {
+                await new Promise(r => setTimeout(r, 100));
+                tries++;
+            }
+
+            if (!window.API?.tenant) return;
+
+            this.user = await window.API.getUser();
+            if (!this.user) {
+                location.href = 'login.html';
                 return;
             }
 
-            // Check auth session
-            const user = await window.API.getUser();
-            console.log("👤 Current User Session:", user);
-
-            if (!user) {
-                console.warn("⚠️ No active session, redirecting to login...");
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Initialize all UI modules
-            this.renderUserInfo(user);
-            this.setupTabs();
-            this.loadOrders();
-            this.loadAddresses();
-            this.loadReviews();
-            this.bindEvents(user);
-
-            console.log("✅ Profile Initialized Successfully.");
+            this.renderTab('details');
+            this.bindEvents();
         },
 
-        renderUserInfo(user) {
-            const emailEl = document.getElementById('user-email-display');
-            const nameEl = document.getElementById('user-name-display');
-            const prefName = document.getElementById('pref-name');
-            const prefEmail = document.getElementById('pref-email');
+        async renderTab(tabId) {
+            this.activeTab = tabId;
+            const content = document.getElementById('tab-content');
+            if (!content) return;
 
-            if (emailEl) emailEl.innerText = user.email;
-            if (nameEl) nameEl.innerText = user.user_metadata?.full_name || 'Customer Profile';
-
-            // Prefill form
-            if (prefEmail) prefEmail.value = user.email;
-            if (prefName) prefName.value = user.user_metadata?.full_name || '';
-        },
-
-        setupTabs() {
-            const btns = document.querySelectorAll('.profile-nav-btn');
-            const tabs = document.querySelectorAll('.profile-tab');
-
-            btns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabId = btn.dataset.tab;
-                    console.log(`📑 Switching to tab: ${tabId}`);
-
-                    btns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-
-                    tabs.forEach(t => {
-                        t.style.display = t.id === `tab-${tabId}` ? 'block' : 'none';
-                    });
-                });
+            // Highlight active button
+            document.querySelectorAll('.sidebar-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) btn.classList.add('active');
+                else btn.classList.remove('active');
             });
 
-            // Address Form Toggle
-            const addBtn = document.getElementById('add-address-btn');
-            const cancelBtn = document.getElementById('cancel-address');
-            const formContainer = document.getElementById('address-form-container');
+            if (tabId === 'details') {
+                content.innerHTML = `
+                    <div class="card p-12 animate-reveal">
+                        <h2 class="text-3xl font-black text-s-950 mb-10">Identity Intelligence</h2>
+                        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 3rem;">
+                            <div class="space-y-4">
+                                <label class="label">Legal Full Name</label>
+                                <p class="text-xl font-black text-s-800">${this.user.user_metadata?.full_name || 'Authorized User'}</p>
+                            </div>
+                            <div class="space-y-4">
+                                <label class="label">Protocol ID (Email)</label>
+                                <p class="text-xl font-black text-s-800">${this.user.email}</p>
+                            </div>
+                            <div class="space-y-4">
+                                <label class="label">Account Status</label>
+                                <span class="label" style="background: var(--p-50); color: var(--p-900); padding: 4px 12px; border-radius: 99px; width:fit-content; display:inline-block; font-size: 8px;">Active Archives</span>
+                            </div>
+                        </div>
+                        <div class="pt-12 border-t border-s-50 mt-12">
+                             <button class="btn btn-primary" style="padding: 1rem 3rem;">Update Intelligence</button>
+                        </div>
+                    </div>
+                `;
+            }
 
-            if (addBtn) addBtn.addEventListener('click', () => formContainer.style.display = 'block');
-            if (cancelBtn) cancelBtn.addEventListener('click', () => formContainer.style.display = 'none');
-        },
-
-        async loadOrders() {
-            const list = document.getElementById('orders-list');
-            if (!list) return;
-
-            try {
+            if (tabId === 'orders') {
                 const orders = await window.API.getOrders();
-
                 if (!orders || orders.length === 0) {
-                    list.innerHTML = `
-                        <div class="p-16 text-center space-y-4 bg-slate-50 rounded-[40px] border border-slate-100">
-                            <div class="w-16 h-16 bg-white mx-auto flex items-center justify-center rounded-2xl text-slate-300 shadow-sm">
-                                <i data-lucide="package-x" class="w-8 h-8"></i>
-                            </div>
-                            <p class="font-bold text-slate-400">No transactions recorded yet.</p>
-                            <a href="shop.html" class="btn btn-primary h-12 text-xs px-8">Start Shopping</a>
-                        </div>
-                    `;
-                } else {
-                    list.innerHTML = orders.map(o => `
-                        <div class="p-8 bg-white border border-slate-100 rounded-[40px] shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row justify-between items-center gap-6 group">
-                            <div class="flex items-center gap-6">
-                                <div class="w-14 h-14 bg-primary/5 text-primary flex items-center justify-center rounded-2xl group-hover:bg-primary group-hover:text-white transition-colors shadow-inner">
-                                    <i data-lucide="box" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order #${o.id.slice(0, 8)}</p>
-                                    <p class="text-xl font-black text-slate-800">${new Date(o.created_at).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <div class="text-center md:text-right px-6 border-x border-slate-50">
-                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fulfillment</p>
-                                 <span class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${o.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-amber-50 text-amber-600'}">
-                                    ${o.status}
-                                 </span>
-                            </div>
-                            <div class="text-center md:text-right">
-                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Paid</p>
-                                 <p class="text-2xl font-black text-primary">${window.Storefront.formatCurrency(o.total_amount)}</p>
-                            </div>
-                        </div>
-                    `).join('');
+                    content.innerHTML = `<div class="card p-20 text-center label">No previous acquisition history detected in the archive.</div>`;
+                    return;
                 }
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Error loading orders:", err);
-                list.innerHTML = `<p class="text-red-500 text-center font-bold">Failed to load orders.</p>`;
+                content.innerHTML = `
+                    <div class="card p-12 animate-reveal">
+                        <h2 class="text-3xl font-black text-s-950 mb-10">Transmitted Acquisitions</h2>
+                        <div class="space-y-8">
+                            ${orders.map(o => `
+                                <div class="p-8 border border-s-100 rounded-[32px] flex items-center justify-between card-hover">
+                                    <div class="space-y-2">
+                                        <p class="label" style="margin:0;">Ref: ${o.order_number}</p>
+                                        <h4 class="text-xl font-black text-s-900">Archived on ${new Date(o.created_at).toLocaleDateString()}</h4>
+                                    </div>
+                                    <div class="text-right space-y-2">
+                                         <p class="text-2xl font-black text-p-900">${window.StorefrontInstance.formatCurrency(o.grand_total)}</p>
+                                         <span class="label" style="font-size: 8px; color: var(--s-400);">${o.status || 'Fulfilled'}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             }
-        },
 
-        async loadAddresses() {
-            const list = document.getElementById('addresses-list');
-            if (!list) return;
-
-            try {
-                const addresses = await window.API.getAddresses();
-
-                if (!addresses || addresses.length === 0) {
-                    list.innerHTML = `<div class="col-span-full p-10 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200 text-center text-slate-400 font-bold uppercase tracking-widest">No shipping addresses saved.</div>`;
-                } else {
-                    list.innerHTML = addresses.map(a => `
-                        <div class="p-8 bg-white border border-slate-100 rounded-[40px] shadow-sm hover:shadow-lg transition-all space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-4 text-primary">
-                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                                    <span class="font-black uppercase tracking-widest text-[10px]">Shipping Destination</span>
-                                </div>
-                                <span class="text-[10px] font-black text-slate-200">#${a.id.slice(0, 4)}</span>
-                            </div>
-                            <div class="text-slate-800 font-bold text-lg leading-tight">
-                                <p>${a.address_line1}</p>
-                                <p class="text-sm text-slate-400">${a.city}, ${a.zip_code}</p>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Error loading addresses:", err);
+            if (tabId === 'addresses') {
+                content.innerHTML = `<div class="card p-20 text-center label">Destiny Logistics Archives coming soon.</div>`;
             }
+
+            if (window.lucide) lucide.createIcons();
         },
 
-        async loadReviews() {
-            const list = document.getElementById('reviews-list');
-            if (!list) return;
-            // Placeholder logic for reviews if stored in DB
-            console.log("Reviews module ready.");
-        },
+        bindEvents() {
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.sidebar-btn[data-tab]');
+                if (btn) this.renderTab(btn.dataset.tab);
 
-        bindEvents(user) {
-            // Logout
-            const logoutBtns = [
-                document.getElementById('logout-btn-header'),
-                document.getElementById('logout-btn-side')
-            ];
-
-            logoutBtns.forEach(btn => {
-                btn?.addEventListener('click', async () => {
-                    console.log("👋 Logging out...");
-                    await window.API.logout();
-                    window.location.href = 'index.html';
-                });
-            });
-
-            // Update Personal Details
-            document.getElementById('details-form')?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button');
-                const origText = btn.innerText;
-
-                btn.innerText = 'Synchronizing...';
-                btn.disabled = true;
-
-                const newName = document.getElementById('pref-name').value;
-                const newPhone = document.getElementById('pref-phone').value;
-
-                // Call API 
-                const { error } = await window.supabase.auth.updateUser({
-                    data: { full_name: newName, phone: newPhone }
-                });
-
-                if (error) {
-                    alert("Update error: " + error.message);
-                } else {
-                    alert("Profile updated successfully!");
-                    if (window.API.syncCustomer) {
-                        await window.API.syncCustomer({ ...user, user_metadata: { ...user.user_metadata, full_name: newName } });
-                    }
-                    location.reload();
+                if (e.target.id === 'logout-btn') {
+                    window.API.signOut().then(() => location.href = 'index.html');
                 }
-
-                btn.innerText = origText;
-                btn.disabled = false;
-            });
-
-            // Update Address Submit
-            document.getElementById('address-form')?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const address = {
-                    address_line1: document.getElementById('addr-1').value,
-                    city: document.getElementById('addr-city').value,
-                    zip_code: document.getElementById('addr-zip').value
-                };
-
-                const btn = e.target.querySelector('button[type="submit"]');
-                btn.disabled = true;
-
-                await window.API.saveAddress(address);
-                document.getElementById('address-form-container').style.display = 'none';
-                this.loadAddresses();
-
-                btn.disabled = false;
-                e.target.reset();
             });
         }
     };
 
-    // Ensure initialization happens
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => profile.init());
-    } else {
-        profile.init();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => window.ProfileExperience.init());
+    else window.ProfileExperience.init();
 })();

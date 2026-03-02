@@ -13,6 +13,30 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const TEMPLATES = [
     {
+        id: "viewfront",
+        name: "Elite Viewfront",
+        desc: "Precision built, luxury minimalist design for premium brands.",
+        color: "#020617",
+        icon: Layout,
+        preview: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"
+    },
+    {
+        id: "tech-cipher",
+        name: "Tech Cipher",
+        desc: "Cyberpunk, dark aesthetic for high-performance electronics.",
+        color: "#00ff41",
+        icon: Zap,
+        preview: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800"
+    },
+    {
+        id: "minimal-luxe",
+        name: "Minimal Luxe",
+        desc: "Elegant, whitespace-heavy design for high-end fashion & decor.",
+        color: "#fdfbf7",
+        icon: ShoppingBag,
+        preview: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800"
+    },
+    {
         id: "organic",
         name: "Organic Store",
         desc: "Fresh, clean, and nature-inspired for health brands.",
@@ -27,6 +51,14 @@ const TEMPLATES = [
         color: "#d97706",
         icon: Store,
         preview: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=800"
+    },
+    {
+        id: "ecom",
+        name: "Ecom Fit",
+        desc: "High-performance athletic aesthetic with bold typography.",
+        color: "#0066FF",
+        icon: Rocket,
+        preview: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
     },
     {
         id: "foodmart",
@@ -47,7 +79,41 @@ export default function Onboarding() {
     const [storeName, setStoreName] = useState("");
     const [selectedTemplate, setSelectedTemplate] = useState("organic");
     const [loading, setLoading] = useState(false);
+    const [initialChecking, setInitialChecking] = useState(true);
     const [error, setError] = useState("");
+    const [slug, setSlug] = useState("");
+
+    useEffect(() => {
+        const checkExistingStore = async () => {
+            if (!user) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from("companies")
+                    .select("subdomain")
+                    .eq("user_id", user.id)
+                    .maybeSingle();
+
+                if (data) {
+                    // Merchant already has a store
+                    navigate("/ecommerce");
+                }
+            } catch (err) {
+                console.error("Store check failed:", err);
+            } finally {
+                setInitialChecking(false);
+            }
+        };
+        checkExistingStore();
+    }, [user, navigate]);
+
+    if (initialChecking) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+            </div>
+        );
+    }
 
     const handleCreateStore = async () => {
         if (!storeName.trim()) {
@@ -59,14 +125,15 @@ export default function Onboarding() {
         setError("");
 
         try {
-            const slug = storeName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
+            const newSlug = storeName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
+            setSlug(newSlug);
 
             // 1. Create in Supabase (Database Registration)
             const { data: newCompany, error: cErr } = await supabase
                 .from("companies")
                 .insert([{
                     name: storeName,
-                    subdomain: slug,
+                    subdomain: newSlug,
                     contact_email: user?.email,
                     user_id: user?.id,
                     plan: 'starter'
@@ -78,17 +145,21 @@ export default function Onboarding() {
 
             // 2. Call Provisioning API (Folder Creation)
             // Note: In real setup, you'd replace 'localhost:8000' with your server URL
-            const response = await fetch("http://localhost:8000/api/provision", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    merchant_slug: slug,
-                    template: selectedTemplate
-                })
-            });
+            try {
+                const response = await fetch("http://localhost:8000/api/provision", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        merchant_slug: newSlug,
+                        template: selectedTemplate
+                    })
+                });
 
-            if (!response.ok) {
-                console.error("Local folder provisioning failed, but DB record created.");
+                if (!response.ok) {
+                    console.error("Local folder provisioning failed, but DB record created.");
+                }
+            } catch (e) {
+                console.warn("Provisioning server not reachable - database record only.");
             }
 
             // 3. User Mapping & Default Settings in DB
@@ -107,6 +178,12 @@ export default function Onboarding() {
             // 4. Finalize
             await refreshTenant();
             setStep(3); // Success Screen
+
+            // Auto-redirect after 3 seconds
+            setTimeout(() => {
+                const storeUrl = `${window.location.origin}/stores/${newSlug}/index.html`;
+                window.location.href = storeUrl;
+            }, 3000);
 
         } catch (err: any) {
             setError(err.message || "Failed to create store. Try again.");
@@ -219,14 +296,23 @@ export default function Onboarding() {
                             <Check className="w-10 h-10" />
                         </div>
                         <h2 className="text-3xl font-black mb-2 tracking-tight">Success!</h2>
-                        <p className="text-slate-400 mb-10 text-sm">Your store <b>{storeName}</b> is now live at <u>/stores/{selectedTemplate}/index.html</u>.</p>
+                        <p className="text-slate-400 mb-10 text-sm">Your store <b>{storeName}</b> is ready. Redirecting to your live storefront...</p>
 
-                        <Button
-                            onClick={() => navigate("/ecommerce")}
-                            className="w-full h-14 bg-black hover:bg-black/90 text-white rounded-xl font-bold"
-                        >
-                            Enter Dashboard
-                        </Button>
+                        <div className="space-y-4">
+                            <Button
+                                onClick={() => window.location.href = `/stores/${slug}/index.html`}
+                                className="w-full h-14 bg-black hover:bg-black/90 text-white rounded-xl font-bold"
+                            >
+                                View My Store
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={() => navigate("/ecommerce")}
+                                className="w-full h-14 text-slate-500 font-bold"
+                            >
+                                Enter Merchant Hub
+                            </Button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

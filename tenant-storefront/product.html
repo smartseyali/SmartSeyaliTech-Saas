@@ -4,228 +4,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details</title>
+    <title>Product Details | Premium Storefront</title>
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .flex {
-            display: flex;
-        }
-
-        .grid {
-            display: grid;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .gap-4 {
-            gap: 1rem;
-        }
-
-        .gap-6 {
-            gap: 1.5rem;
-        }
-
-        .gap-8 {
-            gap: 2rem;
-        }
-
-        .gap-10 {
-            gap: 2.5rem;
-        }
-
-        .p-4 {
-            padding: 1rem;
-        }
-
-        .p-6 {
-            padding: 1.5rem;
-        }
-
-        .py-12 {
-            padding-top: 3rem;
-            padding-bottom: 3rem;
-        }
-
-        .py-20 {
-            padding-top: 5rem;
-            padding-bottom: 5rem;
-        }
-
-        .mb-2 {
-            margin-bottom: 0.5rem;
-        }
-
-        .mb-4 {
-            margin-bottom: 1rem;
-        }
-
-        .mb-6 {
-            margin-bottom: 1.5rem;
-        }
-
-        .text-slate-400 {
-            color: #94a3b8;
-        }
-
-        .text-slate-800 {
-            color: #1e293b;
-        }
-
-        .text-sm {
-            font-size: 0.875rem;
-        }
-
-        .text-lg {
-            font-size: 1.125rem;
-        }
-
-        .text-3xl {
-            font-size: 1.875rem;
-        }
-
-        .text-4xl {
-            font-size: 2.25rem;
-        }
-
-        .font-bold {
-            font-weight: 700;
-        }
-
-        .font-black {
-            font-weight: 900;
-        }
-
-        .rounded-2xl {
-            border-radius: 1rem;
-        }
-
-        .rounded-3xl {
-            border-radius: 1.5rem;
-        }
-
-        .bg-white {
-            background-color: white;
-        }
-
-        .bg-slate-50 {
-            background-color: #f8fafc;
-        }
-
-        .bg-primary {
-            background-color: var(--primary);
-        }
-
-        .shadow-lg {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .w-full {
-            width: 100%;
-        }
-
-        .h-full {
-            height: 100%;
-        }
-
-        .transition-all {
-            transition: all 0.2s;
-        }
-
-        .aspect-square {
-            aspect-ratio: 1 / 1;
-        }
-
-        .object-cover {
-            object-fit: cover;
-        }
-
-        .product-image-container {
-            position: relative;
-            overflow: hidden;
-        }
-    </style>
 </head>
 
 <body class="bg-white">
 
-    <!-- Header -->
-    <header>
+    <!-- Common Header -->
+    <header id="main-header" class="scrolled">
         <div class="container flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
-                    style="text-decoration: none;">STORE</a>
-                <nav class="flex gap-6">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font"
+                    style="text-decoration: none; font-size: 1.5rem; color: var(--slate-900);">STORE</a>
+                <nav class="flex gap-4 desktop-nav">
                     <a href="index.html" class="nav-link">Home</a>
                     <a href="shop.html" class="nav-link">Shop</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
                 </nav>
             </div>
             <div class="flex items-center gap-4">
-                <a href="cart.html" class="cart-btn p-2 text-slate-400 hover:text-slate-800 transition-all">
-                    <i data-lucide="shopping-bag"></i>
-                    <span class="cart-badge">0</span>
+                <button class="nav-link" aria-label="Search"><i data-lucide="search"
+                        style="width:20px; height:20px;"></i></button>
+                <a href="profile.html" class="nav-link auth-trigger" aria-label="Account"><i data-lucide="user"
+                        style="width:20px; height:20px;"></i></a>
+                <a href="cart.html" class="nav-link" style="position: relative;" aria-label="Cart">
+                    <i data-lucide="shopping-bag" style="width:20px; height:20px;"></i>
+                    <span id="cart-counter" class="absolute"
+                        style="top:-2px; right:-2px; background:var(--primary); color:white; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; display: none;">0</span>
                 </a>
             </div>
         </div>
     </header>
 
     <!-- Product Detail Section -->
-    <section class="py-12 md:py-20">
+    <section class="py-32">
         <div class="container">
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem;">
+            <div class="grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 8rem; align-items: center;">
 
-                <!-- Image Slider/Static -->
-                <div class="product-image-container aspect-square bg-slate-50 rounded-3xl overflow-hidden shadow-lg">
-                    <img id="p-image" src="https://api.iconify.design/lucide:image.svg"
-                        class="w-full h-full object-cover" />
+                <!-- High-End Image Container -->
+                <div class="animate-reveal" style="position: relative;">
+                    <div class="aspect-square bg-slate-50 rounded-[48px] overflow-hidden shadow-2xl group card-hover">
+                        <img id="p-image" src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200"
+                            class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Product Info -->
-                <div class="flex flex-col justify-center">
-                    <span id="p-category"
-                        class="inline-block px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold uppercase rounded-full mb-4 w-fit">Category</span>
-                    <h1 id="p-name" class="text-3xl md:text-5xl font-black text-slate-800 mb-4">Product Name</h1>
-                    <div id="p-description" class="text-slate-400 text-lg mb-8 leading-relaxed">
-                        Loading detailed description...
-                    </div>
+                <!-- Product Info Console -->
+                <div class="space-y-10 animate-reveal" style="animation-delay: 0.1s;">
+                    <nav class="flex items-center gap-3 label" style="color: var(--slate-400); margin-bottom: 2rem;">
+                        <a href="index.html" style="text-decoration:none; color:inherit;">Home</a>
+                        <i data-lucide="chevron-right" style="width:12px;"></i>
+                        <a href="shop.html" style="text-decoration:none; color:inherit;">Catalog</a>
+                        <i data-lucide="chevron-right" style="width:12px;"></i>
+                        <span id="p-category" style="color: var(--primary);">Organic Essentials</span>
+                    </nav>
 
-                    <div class="flex items-center gap-6 mb-10">
-                        <span id="p-price" class="text-3xl font-black text-primary">₹ 0.00</span>
-                        <div class="flex items-center gap-4 p-2 bg-slate-50 rounded-xl border border-slate-100">
-                            <button id="qty-minus" class="p-2 hover:bg-white rounded-lg transition-all"><i
-                                    data-lucide="minus" class="w-4 h-4"></i></button>
-                            <span id="p-qty" class="font-bold px-4">1</span>
-                            <button id="qty-plus" class="p-2 hover:bg-white rounded-lg transition-all"><i
-                                    data-lucide="plus" class="w-4 h-4"></i></button>
+                    <div class="space-y-6">
+                        <h1 id="p-name" class="text-6xl md:text-7xl font-black text-slate-800 leading-tight">Product
+                        </h1>
+                        <div class="flex items-center gap-6">
+                            <p id="p-price" class="text-5xl font-black text-primary">₹ 0.00</p>
+                            <span class="label"
+                                style="background: var(--primary-soft); color: var(--primary); padding: 4px 12px; border-radius: 99px;">In
+                                Stock</span>
                         </div>
                     </div>
 
-                    <button id="add-to-cart"
-                        class="btn btn-primary h-16 rounded-2xl text-lg font-bold shadow-xl flex items-center justify-center gap-3">
-                        <i data-lucide="shopping-cart"></i>
-                        Add to Shopping Bag
-                    </button>
+                    <p id="p-description" class="section-subtitle"
+                        style="text-align: left; line-height: 1.8; font-size: 1.125rem;">
+                        Synchronizing detailed catalog specifications for this premium selection. Our team is fetching
+                        the latest quality assurance data.
+                    </p>
 
-                    <div class="mt-12 pt-12 border-t border-slate-100 grid grid-cols-2 gap-8">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-slate-50 rounded-xl text-primary"><i data-lucide="truck"></i></div>
-                            <span class="text-xs font-bold text-slate-600">Pan India Delivery</span>
+                    <div class="flex flex-col sm:flex-row items-center gap-6 pt-6">
+                        <div
+                            class="flex items-center gap-4 p-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
+                            <button id="qty-minus" class="btn btn-ghost"
+                                style="width:50px; height:50px; border-radius:15px;"><i
+                                    data-lucide="minus"></i></button>
+                            <span id="p-qty" class="text-xl font-black px-4 min-w-[50px] text-center">1</span>
+                            <button id="qty-plus" class="btn btn-ghost"
+                                style="width:50px; height:50px; border-radius:15px;"><i data-lucide="plus"></i></button>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-slate-50 rounded-xl text-primary"><i data-lucide="shield-check"></i>
+                        <button id="add-to-cart"
+                            class="btn btn-primary h-20 grow shadow-xl flex items-center justify-center gap-4 group"
+                            style="padding: 0 4rem; border-radius: 24px;">
+                            <i data-lucide="shopping-bag" class="group-hover:-translate-y-1 transition-transform"></i>
+                            Archive Item to Cart
+                        </button>
+                    </div>
+
+                    <div class="pt-16 border-t border-slate-50 grid grid-cols-2 gap-8">
+                        <div class="flex items-center gap-4 p-6 bg-slate-50 rounded-[32px] card-hover">
+                            <div
+                                class="w-14 h-14 bg-white shadow-sm flex items-center justify-center rounded-2xl text-primary">
+                                <i data-lucide="truck"></i>
                             </div>
-                            <span class="text-xs font-bold text-slate-600">Secure Checkout</span>
+                            <div>
+                                <p class="label">Logistics</p>
+                                <p class="text-sm font-black text-slate-800">Priority Express</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-6 bg-slate-50 rounded-[32px] card-hover">
+                            <div
+                                class="w-14 h-14 bg-white shadow-sm flex items-center justify-center rounded-2xl text-primary">
+                                <i data-lucide="award"></i>
+                            </div>
+                            <div>
+                                <p class="label">Assurance</p>
+                                <p class="text-sm font-black text-slate-800">Certified Organic</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -234,24 +131,62 @@
         </div>
     </section>
 
-    <!-- Same category logic -->
-    <section class="py-20 bg-slate-50">
+    <!-- Professional Footer -->
+    <footer
+        style="background: var(--slate-900); color: white; padding: 80px 0 60px; border-radius: 40px 40px 0 0; margin-top: 80px;">
         <div class="container">
-            <h2 class="text-2xl font-bold mb-10">You May Also Like</h2>
-            <div id="related-products" class="grid"
-                style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2rem;">
-                <!-- Filled via product.js -->
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem;">
+                <div class="space-y-6">
+                    <h3 id="footer-logo" class="brand-font" style="color: white; font-size: 2rem;">STORE</h3>
+                    <p class="text-sm text-slate-400 leading-relax" style="max-width: 300px;">Redefining the organic
+                        shopping experience with quality, sustainability, and elegance at its core.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+                <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Explore</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="index.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Home</a></li>
+                            <li><a href="shop.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Catalog</a></li>
+                            <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Our Story</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Support</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Returns</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">FAQ</a></li>
+                            <li><a href="contact.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-20 pt-10 border-t border-white/5 text-center">
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; 2026 Storefront. Precision
+                    Built.</p>
             </div>
         </div>
-    </section>
+    </footer>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/product.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            setTimeout(() => lucide.createIcons(), 2000);
+            if (window.lucide) {
+                lucide.createIcons();
+                setTimeout(() => lucide.createIcons(), 2000);
+            }
         });
     </script>
 </body>

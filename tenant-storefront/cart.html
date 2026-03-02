@@ -4,198 +4,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Cart</title>
+    <title>Shopping Bag | Premium Storefront</title>
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .flex {
-            display: flex;
-        }
-
-        .grid {
-            display: grid;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .flex-col {
-            flex-direction: column;
-        }
-
-        .gap-4 {
-            gap: 1rem;
-        }
-
-        .gap-6 {
-            gap: 1.5rem;
-        }
-
-        .py-12 {
-            padding-top: 3rem;
-            padding-bottom: 3rem;
-        }
-
-        .text-slate-400 {
-            color: #94a3b8;
-        }
-
-        .text-slate-800 {
-            color: #1e293b;
-        }
-
-        .text-sm {
-            font-size: 0.875rem;
-        }
-
-        .text-lg {
-            font-size: 1.125rem;
-        }
-
-        .text-3xl {
-            font-size: 1.875rem;
-        }
-
-        .font-bold {
-            font-weight: 700;
-        }
-
-        .font-black {
-            font-weight: 900;
-        }
-
-        .rounded-2xl {
-            border-radius: 1rem;
-        }
-
-        .rounded-3xl {
-            border-radius: 1.5rem;
-        }
-
-        .bg-white {
-            background-color: white;
-        }
-
-        .bg-slate-50 {
-            background-color: #f8fafc;
-        }
-
-        .bg-primary {
-            background-color: var(--primary);
-        }
-
-        .w-full {
-            width: 100%;
-        }
-
-        .h-full {
-            height: 100%;
-        }
-
-        .transition-all {
-            transition: all 0.2s;
-        }
-
-        .shadow-lg {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .cart-item {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 1.5rem 0;
-            display: grid;
-            grid-template-columns: 100px 1fr auto;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .cart-item-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 1rem;
-            object-fit: cover;
-            background: #f8fafc;
-        }
-    </style>
 </head>
 
 <body class="bg-white">
 
-    <!-- Header -->
-    <header>
+    <!-- Common Header -->
+    <header id="main-header" class="scrolled">
         <div class="container flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
-                    style="text-decoration: none;">STORE</a>
-                <nav class="flex gap-6">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font"
+                    style="text-decoration: none; font-size: 1.5rem; color: var(--slate-900);">STORE</a>
+                <nav class="flex gap-4 desktop-nav">
                     <a href="index.html" class="nav-link">Home</a>
                     <a href="shop.html" class="nav-link">Shop</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
                 </nav>
             </div>
             <div class="flex items-center gap-4">
-                <a href="cart.html" class="cart-btn p-2 text-slate-400 hover:text-slate-800 transition-all">
-                    <i data-lucide="shopping-bag"></i>
-                    <span class="cart-badge">0</span>
+                <button class="nav-link" aria-label="Search"><i data-lucide="search"
+                        style="width:20px; height:20px;"></i></button>
+                <a href="profile.html" class="nav-link auth-trigger" aria-label="Account"><i data-lucide="user"
+                        style="width:20px; height:20px;"></i></a>
+                <a href="cart.html" class="nav-link active" style="position: relative;" aria-label="Cart">
+                    <i data-lucide="shopping-bag" style="width:20px; height:20px;"></i>
+                    <span id="cart-counter" class="absolute"
+                        style="top:-2px; right:-2px; background:var(--primary); color:white; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; display: none;">0</span>
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Cart Content -->
-    <section class="py-12">
+    <!-- Page Title Extension -->
+    <section class="py-24 bg-slate-50 border-b border-slate-100">
         <div class="container">
-            <h1 class="text-3xl font-black mb-12">Shopping Bag</h1>
+            <span class="label" style="display: block; margin-bottom: 1rem; color: var(--primary);">Secure
+                Checkout</span>
+            <h1 class="section-title" style="text-align: left; margin: 0;">Shopping Bag</h1>
+            <p class="section-subtitle" style="text-align: left; margin: 1rem 0 0;">Review your selected items before
+                proceeding to secure checkout.</p>
+        </div>
+    </section>
 
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem;">
+    <!-- Cart Content -->
+    <section class="py-24">
+        <div class="container">
+            <div class="dashboard-layout" style="grid-template-columns: 1fr 380px;">
 
                 <!-- Items List -->
-                <div class="cart-items-container">
-                    <div id="cart-list" class="flex flex-col">
+                <main>
+                    <div id="cart-list" class="flex flex-col gap-8">
                         <!-- Populated via cart.js -->
+                        <div class="card p-20 text-center" style="border: 2px dashed var(--slate-100);">
+                            <i data-lucide="loader" class="animate-spin w-10 h-10 mx-auto mb-4 text-slate-200"></i>
+                            <p class="label">Synchronizing secure cart...</p>
+                        </div>
                     </div>
-                </div>
+                </main>
 
-                <!-- Summary Sidebar -->
-                <aside
-                    class="cart-summary sticky top-24 h-fit p-8 bg-slate-50 rounded-3xl border border-slate-100 shadow-lg">
-                    <h2 class="text-xl font-bold mb-6">Order Summary</h2>
+                <!-- Professional Summary Sidebar -->
+                <aside class="dashboard-sidebar" style="position: sticky; top: 120px;">
+                    <h2 class="label" style="margin-bottom: 2rem;">Order Summary</h2>
                     <div class="space-y-4 mb-8">
                         <div class="flex justify-between items-center">
-                            <span class="text-slate-400">Subtotal</span>
-                            <span id="subtotal" class="font-bold">₹ 0.00</span>
+                            <span class="text-sm font-bold text-slate-500">Subtotal</span>
+                            <span id="subtotal" class="text-sm font-black">₹ 0.00</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-slate-400">Shipping</span>
-                            <span class="text-green-600 font-bold">FREE</span>
+                            <span class="text-sm font-bold text-slate-500">Logistics</span>
+                            <span class="text-xs font-black text-primary uppercase tracking-widest">Complimentary</span>
                         </div>
-                        <div class="pt-4 border-t border-slate-200 flex justify-between items-center">
-                            <span class="font-black text-lg">Total</span>
-                            <span id="total" class="font-black text-2xl text-primary">₹ 0.00</span>
+                        <div style="margin: 1.5rem 0; height: 1px; background: var(--slate-100);"></div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-black text-slate-900">Total</span>
+                            <span id="total" class="text-2xl font-black text-primary">₹ 0.00</span>
                         </div>
                     </div>
 
-                    <a href="checkout.html" class="btn btn-primary w-full h-14 justify-center text-lg">
+                    <a href="checkout.html" class="btn btn-primary w-full" style="height: 60px; font-size: 1.1rem;">
                         Proceed to Checkout
                     </a>
+
+                    <div class="mt-6 flex items-center justify-center gap-3 text-slate-400">
+                        <i data-lucide="shield-check" style="width: 16px;"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Secure TLS Encryption</span>
+                    </div>
                 </aside>
 
             </div>
         </div>
     </section>
 
+    <!-- Common Footer -->
+    <footer
+        style="background: var(--slate-900); color: white; padding: 80px 0 60px; border-radius: 40px 40px 0 0; margin-top: 80px;">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem;">
+                <div class="space-y-6">
+                    <h3 id="footer-logo" class="brand-font" style="color: white; font-size: 2rem;">STORE</h3>
+                    <p class="text-sm text-slate-400 leading-relax" style="max-width: 300px;">Redefining the organic
+                        shopping experience with quality, sustainability, and elegance at its core.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+                <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Explore</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="index.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Home</a></li>
+                            <li><a href="shop.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Catalog</a></li>
+                            <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Our Story</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Support</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Returns</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">FAQ</a></li>
+                            <li><a href="contact.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-20 pt-10 border-t border-white/5 text-center">
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; 2026 Storefront. Precision
+                    Built.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/cart.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            setTimeout(() => lucide.createIcons(), 2000);
+            if (window.lucide) {
+                lucide.createIcons();
+                setTimeout(() => lucide.createIcons(), 2000);
+            }
         });
     </script>
 </body>

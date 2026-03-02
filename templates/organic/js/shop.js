@@ -1,106 +1,127 @@
 
 /**
- * Shop Page specific logic
+ * Professional Catalog Logic
  */
 
 (function () {
-    if (window.Shoppage) return;
+    if (window.CatalogExperience) return;
 
-    window.Shoppage = {
+    window.CatalogExperience = {
+        products: [],
+        filtered: [],
+        categories: [],
+
         async init() {
-            if (this._initialized) return;
-            this._initialized = true;
+            console.log("🏙️ Synching Catalog Dashboard...");
 
-            console.log("Initializing Shop Page...");
-
-            // Wait for tenant to be set
+            // Wait for Engine
             let tries = 0;
-            while (!window.API?.tenant && tries < 50) {
+            while (!window.API?.tenant && tries < 40) {
                 await new Promise(r => setTimeout(r, 100));
                 tries++;
             }
 
             if (!window.API?.tenant) return;
 
-            // Check for category filter in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const activeCategory = urlParams.get('category');
-
-            this.renderCategories(activeCategory);
-            this.renderProducts(activeCategory);
+            this.loadData();
+            this.bindEvents();
         },
 
-        async renderCategories(active = null) {
-            const cats = await window.API.getDynamicContent('top_categories');
-            const filters = document.getElementById('categories-filters');
-            if (!filters) return;
+        async loadData() {
+            const data = await window.API.getProducts();
+            this.products = data || [];
+            this.filtered = [...this.products];
 
-            filters.innerHTML = `
-                <label class="filter-item">
-                    <input type="radio" name="category" value="all" ${!active || active === 'all' ? 'checked' : ''} /> 
-                    All Products
-                </label>
-                ${cats.map(c => `
-                    <label class="filter-item">
-                        <input type="radio" name="category" value="${c.name}" ${active === c.name ? 'checked' : ''} /> 
-                        ${c.name}
-                    </label>
-                `).join('')}
+            // Extract categories
+            const cats = new Set(this.products.map(p => p.category_name).filter(Boolean));
+            this.categories = Array.from(cats);
+
+            this.renderCategories();
+            this.renderProducts();
+        },
+
+        renderCategories() {
+            const container = document.getElementById('category-filter');
+            if (!container) return;
+
+            const html = this.categories.map(c => `
+                <button class="sidebar-btn" data-category="${c}">
+                    <i data-lucide="circle" style="width: 14px; opacity: 0.3;"></i>
+                    ${c}
+                </button>
+            `).join('');
+
+            // Keep the "All" button
+            const allBtn = `
+                <button class="sidebar-btn active" data-category="all">
+                    <i data-lucide="layout-grid" style="width: 18px;"></i>
+                    Full Archive
+                </button>
             `;
-
-            // Add filter listeners
-            filters.querySelectorAll('input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const val = e.target.value === 'all' ? null : e.target.value;
-                    this.renderProducts(val);
-                    // Update URL without reloading
-                    const url = new URL(window.location);
-                    if (val) url.searchParams.set('category', val);
-                    else url.searchParams.delete('category');
-                    window.history.pushState({}, '', url);
-                });
-            });
+            container.innerHTML = allBtn + html;
+            if (window.lucide) lucide.createIcons();
         },
 
-        async renderProducts(category = null) {
-            const grid = document.querySelector('.products-grid');
-            const count = document.getElementById('results-count');
+        renderProducts() {
+            const grid = document.getElementById('catalog-grid');
             if (!grid) return;
 
-            grid.innerHTML = `<div class="col-span-full h-40 flex items-center justify-center text-slate-300">Filtering...</div>`;
-
-            const products = await window.API.getProducts(category);
-            if (count) count.innerText = `Showing ${products.length} products`;
-
-            if (products.length === 0) {
-                grid.innerHTML = `<div class="col-span-full h-40 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl text-slate-400">No products found.</div>`;
+            if (this.filtered.length === 0) {
+                grid.innerHTML = `<div class="p-20 text-center w-full col-span-full label">No matching archival intelligence found.</div>`;
                 return;
             }
 
-            grid.innerHTML = products.map(p => `
-                <div class="group">
-                    <a href="product.html?id=${p.id}" class="block space-y-4">
-                        <div class="aspect-square relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100">
-                            <img src="${p.image_url || 'https://api.iconify.design/lucide:package.svg'}" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+            grid.innerHTML = this.filtered.map(p => `
+                <article class="product-card card-hover group cursor-pointer animate-reveal shadow-subtle p-6" onclick="location.href='product.html?id=${p.id}'">
+                    <div class="product-image-container rounded-[24px]">
+                        <img src="${p.image_url || 'https://api.iconify.design/lucide:package.svg'}" loading="lazy" />
+                        <div class="absolute top-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                             <button class="w-12 h-12 bg-white flex items-center justify-center rounded-full shadow-xl hover:bg-p-900 hover:text-white transition-colors" 
+                                     onclick="event.stopPropagation(); window.StorefrontInstance.addToCart({id:'${p.id}', name:'${p.name}', price:${p.price || p.rate || 0}, image_url:'${p.image_url}'})">
+                                <i data-lucide="plus" style="width:18px;"></i>
+                             </button>
                         </div>
-                    </a>
-                    <div class="mt-4 space-y-1">
-                        <h3 class="font-bold text-slate-800">${p.name}</h3>
-                        <p class="text-sm text-slate-400">${p.category_name || 'General'}</p>
-                        <p class="text-lg font-bold text-primary">${window.Storefront.formatCurrency(p.price || p.rate || 0)}</p>
-                        <button class="add-to-cart-btn btn btn-primary mt-4 w-full text-xs font-bold"
-                            data-id="${p.id}" data-name="${p.name}" data-price="${p.price || p.rate || 0}" data-image="${p.image_url}">
-                            Add to Cart
-                        </button>
                     </div>
-                </div>
+                    <div class="mt-8 space-y-4">
+                        <div class="flex justify-between items-start">
+                             <div class="space-y-1">
+                                <h3 class="text-lg font-black text-s-950">${p.name}</h3>
+                                <p class="label" style="font-size: 8px; opacity: 0.5;">${p.category_name || 'Archive'}</p>
+                             </div>
+                             <p class="text-lg font-black text-p-900">${window.StorefrontInstance.formatCurrency(p.price || p.rate || 0)}</p>
+                        </div>
+                    </div>
+                </article>
             `).join('');
+            if (window.lucide) lucide.createIcons();
+        },
+
+        bindEvents() {
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.sidebar-btn[data-category]');
+                if (btn) {
+                    const cat = btn.dataset.category;
+                    document.querySelectorAll('.sidebar-btn[data-category]').forEach(el => el.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    if (cat === 'all') this.filtered = [...this.products];
+                    else this.filtered = this.products.filter(p => p.category_name === cat);
+
+                    this.renderProducts();
+                }
+
+                if (e.target.id === 'sort-price-low') {
+                    this.filtered.sort((a, b) => (a.price || a.rate || 0) - (b.price || b.rate || 0));
+                    this.renderProducts();
+                }
+                if (e.target.id === 'sort-price-high') {
+                    this.filtered.sort((a, b) => (b.price || b.rate || 0) - (a.price || a.rate || 0));
+                    this.renderProducts();
+                }
+            });
         }
     };
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => window.Shoppage.init());
-    } else {
-        window.Shoppage.init();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => window.CatalogExperience.init());
+    else window.CatalogExperience.init();
 })();

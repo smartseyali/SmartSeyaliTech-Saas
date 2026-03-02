@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BASIK FIT | Premium Performance E-commerce Specialist</title>
+    <meta name="description" content="Premium footwear and sports performance gear. Shop the latest collections.">
+
+    <!-- External Links -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+</head>
+
+<body>
+
+    <!-- Header will load here -->
+    <div id="header-root"></div>
+
+    <main>
+        <!-- Full-Width Video/Image Hero -->
+        <section class="hero-home">
+            <div class="hero-bg">
+                <img src="assets/images/hero.png" alt="Hero Athlete">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <span class="hero-subtitle">NEW SEASON REVEAL</span>
+                    <h1 class="hero-title">REACH YOUR <br><span class="accent">PEAK LIMITS.</span></h1>
+                    <p class="hero-desc">Discover the next level of bio-engineered footwear with our all-new Performance
+                        Series. Designed for speed, built for endurance.</p>
+                    <div class="hero-cta">
+                        <a href="shop.html" class="btn btn-primary">SHOP COLLECTION</a>
+                        <a href="about.html" class="btn btn-outline" style="color:#fff; border-color:#fff;">LEARN
+                            TECH</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar container">
+                <div class="stat-item">
+                    <span class="stat-number">12k+</span>
+                    <span class="stat-label">Active Runners</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">4.9/5</span>
+                    <span class="stat-label">Customer Rating</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24hr</span>
+                    <span class="stat-label">Fast Delivery</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Category Carousel -->
+        <section class="section categories-preview">
+            <div class="container">
+                <div class="section-title-wrapper">
+                    <h2>Shop by Purpose</h2>
+                    <a href="categories.html" class="view-all">View All <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div id="home-categories-grid" class="category-grid">
+                    <!-- Categories dynamically injected here -->
+                    <p style="text-align:center;color:var(--text-muted);padding:2rem;">Loading categories...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Arrivals - Dynamic Section -->
+        <section class="section bg-section">
+            <div class="container">
+                <div class="section-title-wrapper">
+                    <h2>Top Sellers</h2>
+                    <div class="filter-controls">
+                        <button class="filter-link active" data-filter="all">All</button>
+                        <button class="filter-link" data-filter="Running Shoes">Running</button>
+                    </div>
+                </div>
+                <div id="new-arrivals-grid" class="product-grid">
+                    <!-- Products dynamically injected -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Banner - Brand Vision -->
+        <section class="vision-banner">
+            <div class="container vision-content">
+                <div class="vision-card">
+                    <h2>Built for the <span>Pro-Athlete</span> in you.</h2>
+                    <p>Every pair is tested in extreme conditions to ensure durability and comfort. Sustainability is at
+                        our core.</p>
+                    <a href="shop.html" class="btn btn-primary">EXPLORE THE TECH</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer will load here -->
+    <div id="footer-root"></div>
+
+    <!-- Core Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    // Default category imagery
+    const defaultCatImages = [
+    'assets/images/aqua.png',
+    'assets/images/red.png',
+    'assets/images/yellow.png',
+    'assets/images/green.png'
+    ];
+
+    async function loadHomeCategories() {
+    // Wait for API
+    let retries = 0;
+    while ((!window.API || !window.API.tenant) && retries < 50) { await new Promise(r=> setTimeout(r, 100));
+        retries++;
+        }
+        if (!window.API || !window.API.tenant) return;
+
+        const grid = document.getElementById('home-categories-grid');
+        if (!grid) return;
+
+        try {
+        const client = window.supabaseClient;
+        if (client) {
+        const { data: categories } = await client
+        .from('ecom_categories')
+        .select('*')
+        .eq('company_id', window.API.tenant.id)
+        .limit(4);
+
+        if (categories && categories.length > 0) {
+        grid.innerHTML = categories.map((cat, i) => {
+        const img = cat.image_url || defaultCatImages[i % defaultCatImages.length];
+        return `<a href="shop.html?cat=${encodeURIComponent(cat.name)}" class="cat-card">
+            <img src="${img}" alt="${cat.name}">
+            <span class="cat-name">${cat.name.toUpperCase()}</span>
+        </a>`;
+        }).join('');
+        return;
+        }
+        }
+        } catch (e) {
+        console.log('ecom_categories might not exist, using fallback');
+        }
+
+        // Fallback to products table
+        const products = await window.API.getProducts();
+        const catNames = [...new Set((products || []).map(p => p.category_name).filter(Boolean))].slice(0, 4);
+
+        if (catNames.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:2rem;">No categories found.</p>';
+        return;
+        }
+
+        grid.innerHTML = catNames.map((name, i) => {
+        const img = defaultCatImages[i % defaultCatImages.length];
+        return `<a href="shop.html?cat=${encodeURIComponent(name)}" class="cat-card">
+            <img src="${img}" alt="${name}">
+            <span class="cat-name">${name.toUpperCase()}</span>
+        </a>`;
+        }).join('');
+        }
+
+        // Load products from Supabase DB
+        async function loadHomeProducts() {
+        let retries = 0;
+        while ((!window.API || !window.API.tenant) && retries < 50) { await new Promise(r=> setTimeout(r, 100));
+            retries++;
+            }
+            if (!window.API || !window.API.tenant) return;
+
+            const products = await window.API.getProducts();
+            const grid = document.getElementById('new-arrivals-grid');
+            if (!grid) return;
+            const homeProducts = (products || []).slice(0, 8);
+            if (homeProducts.length === 0) {
+            grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">No
+                products found. Add products from the admin panel.</p>';
+            return;
+            }
+            grid.innerHTML = '';
+            homeProducts.forEach(p => {
+            const imgSrc = p.image_url || p.image || 'assets/images/placeholder.png';
+            const html = `
+            <div class="product-card">
+                <div class="card-img-wrapper" onclick="window.location.href='product.html?id=${p.id}'">
+                    <img src="${imgSrc}" alt="${p.name}">
+                    <div class="card-badges">
+                        <span class="badge badge-new">New</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="action-btn"
+                        onclick="event.stopPropagation(); window.StorefrontInstance && window.StorefrontInstance.addToCart({id:'${p.id}', name:decodeURIComponent('${encodeURIComponent(p.name)}'), price:${p.price || 0}, image_url:'${imgSrc}'})"><i
+                            class="fa-solid fa-cart-plus"></i></button>
+                </div>
+                <div class="card-info" onclick="window.location.href='product.html?id=${p.id}'">
+                    <span class="card-cat">${p.category_name || ''}</span>
+                    <h3 class="card-title">${p.name}</h3>
+                    <div class="card-price">
+                        ${p.old_price ? '<span class="old">$' + p.old_price.toFixed(2) + '</span>' : ''}
+                        <span class="current">$${p.price ? p.price.toFixed(2) : '0.00'}</span>
+                    </div>
+                </div>
+            </div>`;
+            grid.insertAdjacentHTML('beforeend', html);
+            });
+            }
+            document.addEventListener('DOMContentLoaded', () => {
+            loadHomeCategories();
+            loadHomeProducts();
+            });
+</body>
+
+</html>

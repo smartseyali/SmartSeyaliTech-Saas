@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | BASIK FIT Personal Hub</title>
+    <!-- Common Libs -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/merchant.css">
+</head>
+
+<body>
+
+    <div id="header-root"></div>
+
+    <main class="container section">
+        <div class="m-main" style="padding: 0;">
+            <header class="m-header" style="margin-bottom: 3rem;">
+                <div class="m-header-left">
+                    <h1 id="user-greeting">Hello, Guest</h1>
+                    <p>Manage your orders, profile, and preferences here.</p>
+                </div>
+                <div class="m-header-right">
+                    <button class="btn btn-outline" onclick="logout()">Sign Out</button>
+                    <button class="btn btn-primary" onclick="window.location.href='shop.html'">Keep Shopping</button>
+                </div>
+            </header>
+
+            <div class="m-stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="m-stat-card">
+                    <span class="m-stat-label">Member Points</span>
+                    <h3 class="m-stat-val">2,450 <i class="fa-solid fa-crown"
+                            style="font-size: 1rem; color: #f59e0b;"></i></h3>
+                </div>
+                <div class="m-stat-card">
+                    <span class="m-stat-label">Wishlist Items</span>
+                    <h3 class="m-stat-val" id="wishlist-count">0</h3>
+                </div>
+            </div>
+
+            <section class="m-table-section">
+                <div class="table-header">
+                    <h3>My Recent Orders</h3>
+                </div>
+                <table class="m-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#BK-1052</td>
+                            <td><span class="m-status shipped">Delivered</span></td>
+                            <td>Feb 20, 2026</td>
+                            <td>$124.00</td>
+                            <td><button class="btn btn-outline btn-sm">View Details</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('basik_store_auth'));
+            if (user) {
+                document.getElementById('user-greeting').textContent = `Hello, ${user.name}`;
+            } else {
+                window.location.href = 'login.html';
+            }
+
+            const wishlist = JSON.parse(localStorage.getItem('basik_store_wishlist')) || [];
+            document.getElementById('wishlist-count').textContent = wishlist.length;
+        });
+
+        function logout() {
+            localStorage.removeItem('basik_store_auth');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

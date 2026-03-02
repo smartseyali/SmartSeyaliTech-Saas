@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | BASIK FIT Premium</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+
+<body class="auth-main">
+
+    <div id="header-root"></div>
+    <div class="auth-bg-blob"></div>
+
+    <div class="auth-wrapper">
+        <main class="auth-container">
+            <header class="auth-header">
+                <div class="logo">
+                    <a href="index.html">BASIK <span>FIT</span></a>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>New to BASIK FIT? <a href="register.html">Create an Account</a></p>
+            </header>
+
+            <form id="login-form">
+                <div class="auth-form-group">
+                    <label>Email Address</label>
+                    <div class="auth-input-wrapper">
+                        <input type="email" placeholder="e.g. natesh@example.com" required>
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="auth-form-group">
+                    <label>Password</label>
+                    <div class="auth-input-wrapper">
+                        <input type="password" id="password-field" placeholder="••••••••" required>
+                        <i class="fa-solid fa-eye" onclick="togglePass()"></i>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <label><input type="checkbox"> Remember for 30 days</label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full auth-btn">Sign In to Dashboard</button>
+
+                <div class="social-login">
+                    <div class="social-btns">
+                        <button type="button" class="social-btn"><i class="fa-brands fa-google"></i> Google</button>
+                        <button type="button" class="social-btn"><i class="fa-brands fa-apple"></i> Apple</button>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <div id="footer-root"></div>
+
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        function togglePass() {
+            const field = document.getElementById('password-field');
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+
+        document.getElementById('login-form').onsubmit = (e) => {
+            e.preventDefault();
+            // Mock Login
+            const user = { name: "Natesh R.", email: "natesh@example.com", role: "customer" };
+            localStorage.setItem('basik_store_auth', JSON.stringify(user));
+            showNotification("Success! Redirecting...");
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    </script>
+</body>
+
+</html>

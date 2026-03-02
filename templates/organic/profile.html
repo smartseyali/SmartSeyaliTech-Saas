@@ -4,211 +4,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - Storefront</title>
+    <title>User Profile | Premium Storefront</title>
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .profile-nav-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.2);
-        }
-    </style>
 </head>
 
-<body class="bg-white">
+<body class="bg-slate-50">
 
-    <!-- Header -->
-    <header id="main-header">
-        <div class="container flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="index.html" id="store-logo" class="brand-font text-2xl font-black text-slate-800"
-                    style="text-decoration: none;">STORE</a>
-                <nav class="flex gap-6">
+    <!-- Elite Header -->
+    <header id="main-header" class="scrolled">
+        <div class="container flex items-center justify-between w-full">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font"
+                    style="text-decoration: none; font-size: 1.8rem; color: var(--s-950);">STORE</a>
+                <nav class="flex gap-4">
                     <a href="index.html" class="nav-link">Home</a>
                     <a href="shop.html" class="nav-link">Shop</a>
                 </nav>
             </div>
-            <div class="flex items-center gap-4">
-                <button id="logout-btn-header"
-                    class="text-xs font-black text-slate-400 hover:text-red-500 uppercase tracking-widest border-none bg-transparent cursor-pointer">
-                    Logout
-                </button>
+            <div class="flex items-center gap-6">
+                <a href="profile.html" class="nav-link active" aria-label="Account"><i data-lucide="user"
+                        style="width:20px;"></i></a>
+                <a href="cart.html" class="nav-link" style="position: relative;" aria-label="Cart">
+                    <i data-lucide="shopping-bag" style="width:20px;"></i>
+                    <span id="cart-counter"
+                        style="position: absolute; top: -5px; right: -5px; background: var(--p-900); color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff;">0</span>
+                </a>
             </div>
         </div>
     </header>
 
-    <main class="container py-20">
-        <div class="flex flex-col lg:flex-row gap-12">
-
-            <!-- Sidebar Navigation -->
-            <aside class="w-full lg:w-1/4 space-y-6">
-                <div class="p-8 bg-slate-50 rounded-[40px] border border-slate-100 space-y-8">
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div
-                            class="w-24 h-24 bg-primary text-white flex items-center justify-center rounded-[32px] shadow-2xl">
-                            <i data-lucide="user" class="w-12 h-12"></i>
-                        </div>
-                        <div>
-                            <h2 id="user-name-display" class="text-2xl font-black text-slate-800">My Profile</h2>
-                            <p id="user-email-display" class="text-sm font-bold text-slate-400">customer@example.com</p>
-                        </div>
-                    </div>
-
-                    <nav class="flex flex-col gap-3">
-                        <button
-                            class="profile-nav-btn active flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left"
-                            data-tab="details">
-                            <i data-lucide="user-cog" class="w-5 h-5"></i> Personal Details
-                        </button>
-                        <button
-                            class="profile-nav-btn flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left"
-                            data-tab="orders">
-                            <i data-lucide="package" class="w-5 h-5"></i> My Orders
-                        </button>
-                        <button
-                            class="profile-nav-btn flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left"
-                            data-tab="addresses">
-                            <i data-lucide="map-pin" class="w-5 h-5"></i> Shipping Addresses
-                        </button>
-                        <button
-                            class="profile-nav-btn flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left"
-                            data-tab="payments">
-                            <i data-lucide="credit-card" class="w-5 h-5"></i> Payment Methods
-                        </button>
-                        <button
-                            class="profile-nav-btn flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left"
-                            data-tab="reviews">
-                            <i data-lucide="star" class="w-5 h-5"></i> My Reviews
-                        </button>
-                        <button id="logout-btn-side"
-                            class="flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-left text-red-500 hover:bg-red-50">
-                            <i data-lucide="log-out" class="w-5 h-5"></i> Logout
-                        </button>
-                    </nav>
-                </div>
-            </aside>
-
-            <!-- Main Content Area -->
-            <section class="flex-1 space-y-8 animate-slide-up">
-
-                <!-- Personal Details Tab -->
-                <div id="tab-details" class="profile-tab space-y-8">
-                    <h1 class="text-4xl font-black text-slate-800 tracking-tight">Personal Details</h1>
-                    <div class="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm space-y-8">
-                        <form id="details-form" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Full
-                                    Name</label>
-                                <input type="text" id="pref-name" class="form-input" placeholder="Display Name" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Email
-                                    Address</label>
-                                <input type="email" id="pref-email" class="form-input bg-slate-50 text-slate-400"
-                                    readonly />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Phone
-                                    Number</label>
-                                <input type="tel" id="pref-phone" class="form-input" placeholder="+1 (555) 000-0000" />
-                            </div>
-                            <div class="col-span-1 md:col-span-2 pt-4">
-                                <button type="submit" class="btn btn-primary h-14 px-10">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Orders Tab (Hidden) -->
-                <div id="tab-orders" class="profile-tab space-y-8" style="display: none;">
-                    <h1 class="text-4xl font-black text-slate-800 tracking-tight">Order History</h1>
-                    <div id="orders-list" class="space-y-6">
-                        <div
-                            class="p-12 text-center text-slate-300 font-bold uppercase tracking-widest border-4 border-dashed border-slate-50 rounded-[40px]">
-                            Loading your transactions...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Addresses Tab (Hidden) -->
-                <div id="tab-addresses" class="profile-tab space-y-8" style="display: none;">
-                    <div class="flex justify-between items-center">
-                        <h1 class="text-4xl font-black text-slate-800 tracking-tight">Addresses</h1>
-                        <button id="add-address-btn" class="btn btn-primary h-12 text-xs">
-                            <i data-lucide="plus"></i> New Address
-                        </button>
-                    </div>
-
-                    <div id="address-form-container" style="display: none;"
-                        class="bg-slate-50 p-10 rounded-[40px] border border-slate-100 space-y-6">
-                        <h3 class="text-xl font-black text-slate-800">Add New Shipping Address</h3>
-                        <form id="address-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="col-span-1 md:col-span-2 space-y-2">
-                                <label class="text-xs font-black uppercase text-slate-400 tracking-widest">Address Line
-                                    1</label>
-                                <input type="text" id="addr-1" class="form-input" required
-                                    placeholder="Street, Apartment, Suite" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black uppercase text-slate-400 tracking-widest">City</label>
-                                <input type="text" id="addr-city" class="form-input" required />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black uppercase text-slate-400 tracking-widest">Zip
-                                    Code</label>
-                                <input type="text" id="addr-zip" class="form-input" required />
-                            </div>
-                            <div class="col-span-1 md:col-span-2 flex gap-4 pt-4">
-                                <button type="submit" class="btn btn-primary h-14 flex-1 justify-center">Save
-                                    Address</button>
-                                <button type="button" id="cancel-address"
-                                    class="btn bg-white border border-slate-200 h-14 flex-1 justify-center text-slate-600">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="addresses-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Populated by profile.js -->
-                    </div>
-                </div>
-
-                <!-- Payments Tab (Hidden) -->
-                <div id="tab-payments" class="profile-tab space-y-8" style="display: none;">
-                    <h1 class="text-4xl font-black text-slate-800 tracking-tight">Payment Methods</h1>
-                    <div
-                        class="bg-slate-50 p-12 text-center rounded-[40px] border border-dashed border-slate-200 space-y-4">
-                        <div
-                            class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto text-slate-300">
-                            <i data-lucide="shield-check" class="w-8 h-8"></i>
-                        </div>
-                        <p class="text-slate-500 font-bold">Secure payment methods are managed at checkout.</p>
-                        <p class="text-xs text-slate-400">No cards saved yet.</p>
-                    </div>
-                </div>
-
-                <!-- Reviews Tab (Hidden) -->
-                <div id="tab-reviews" class="profile-tab space-y-8" style="display: none;">
-                    <h1 class="text-4xl font-black text-slate-800 tracking-tight">My Reviews</h1>
-                    <div id="reviews-list" class="space-y-6">
-                        <div
-                            class="p-16 text-center text-slate-300 font-bold uppercase tracking-widest bg-slate-50 rounded-[40px]">
-                            No reviews submitted yet.
-                        </div>
-                    </div>
-                </div>
-
-            </section>
+    <!-- Page Title Panel -->
+    <section class="py-24 bg-white border-b border-slate-100">
+        <div class="container flex justify-between items-end">
+            <div>
+                <span class="label">Identity Archive</span>
+                <h1 class="section-title" style="margin:0;">Personal Dashboard</h1>
+                <p class="section-subtitle" style="margin-top: 1.5rem; color: var(--s-400);">Managing your professional
+                    organic commerce relationship.</p>
+            </div>
+            <button id="logout-btn" class="btn btn-ghost" style="padding: 1rem 2rem; border-radius: 99px;">Terminate
+                Session</button>
         </div>
-    </main>
+    </section>
+
+    <!-- Profile Dashboard -->
+    <section class="py-24">
+        <div class="container">
+            <div class="dashboard-layout" style="grid-template-columns: 320px 1fr; gap: 4rem;">
+
+                <!-- Advanced Intelligence Sidebar -->
+                <aside class="dashboard-sidebar" style="position: sticky; top: 124px;">
+                    <div class="space-y-10">
+                        <section>
+                            <h3 class="label">Personal Menu</h3>
+                            <div class="grid gap-2 mt-6">
+                                <button class="sidebar-btn active" data-tab="details">
+                                    <i data-lucide="user-circle" style="width: 18px;"></i>
+                                    Identity Data
+                                </button>
+                                <button class="sidebar-btn" data-tab="orders">
+                                    <i data-lucide="package" style="width: 18px;"></i>
+                                    Purchase History
+                                </button>
+                                <button class="sidebar-btn" data-tab="addresses">
+                                    <i data-lucide="map-pin" style="width: 18px;"></i>
+                                    Destinations
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </aside>
+
+                <!-- Dynamic Content Panel -->
+                <main id="tab-content" class="space-y-12">
+                    <!-- Populated via profile.js -->
+                    <div class="card p-20 text-center label animate-pulse">Syncing personal intelligence...</div>
+                </main>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Elite Footer -->
+    <footer>
+        <div class="container mt-24 pt-8 border-t border-white/5 text-center">
+            <p class="label" style="color: var(--s-600);">&copy; 2026 Storefront. Precision Built.</p>
+        </div>
+    </footer>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/profile.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
-    </script>
 </body>
 
 </html>

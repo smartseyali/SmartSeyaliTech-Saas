@@ -1,78 +1,61 @@
+
 /**
- * Customer Authentication Logic
+ * Professional Authentication Logic
  */
 
 (function () {
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const toggleBtn = document.getElementById('toggle-auth');
-    const title = document.getElementById('auth-title');
-    const subtitle = document.getElementById('auth-subtitle');
+    if (window.AuthExperience) return;
 
-    let isLogin = true;
+    window.AuthExperience = {
+        async init() {
+            console.log("🏙️ Synching Authentication Protocol...");
 
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            isLogin = !isLogin;
-            if (isLogin) {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-                title.innerText = 'Welcome Back';
-                subtitle.innerText = 'Login to track your orders and manage your profile.';
-                toggleBtn.innerText = "Don't have an account? Sign Up";
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
-                title.innerText = 'Join Us';
-                subtitle.innerText = 'Create an account to start shopping and save addresses.';
-                toggleBtn.innerText = "Already have an account? Sign In";
+            // Wait for Engine
+            let tries = 0;
+            while (!window.API?.tenant && tries < 40) {
+                await new Promise(r => setTimeout(r, 100));
+                tries++;
             }
-        });
-    }
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            if (!window.API?.tenant) return;
 
-            const btn = e.target.querySelector('button');
-            btn.innerText = 'Signing in...';
-            btn.disabled = true;
-
-            const { data, error } = await window.API.login(email, password);
-
-            if (error) {
-                alert("Login Error: " + error.message);
-                btn.innerText = 'Sign In';
-                btn.disabled = false;
-            } else {
-                window.location.href = 'profile.html';
+            const user = await window.API.getUser();
+            if (user) {
+                location.href = 'profile.html';
+                return;
             }
-        });
-    }
 
-    if (signupForm) {
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('full_name').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+            this.bindEvents();
+        },
 
-            const btn = e.target.querySelector('button');
-            btn.innerText = 'Creating account...';
-            btn.disabled = true;
+        bindEvents() {
+            const form = document.getElementById('login-form');
+            if (form) {
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
 
-            const { data, error } = await window.API.signup(email, password, { full_name: name });
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const btn = form.querySelector('button[type="submit"]');
 
-            if (error) {
-                alert("Signup Error: " + error.message);
-                btn.innerText = 'Create Account';
-                btn.disabled = false;
-            } else {
-                alert("Success! Check your email for verification if required, or sign in now.");
-                location.reload(); // Switch back to login
+                    btn.innerText = "Transmitting Credentials...";
+                    btn.disabled = true;
+
+                    const { data, error } = await window.API.signIn(email, password);
+
+                    if (error) {
+                        alert("Authentication Denied: " + error);
+                        btn.innerText = "Authenticate Session";
+                        btn.disabled = false;
+                    } else {
+                        window.StorefrontInstance.pushNotification("Authentication Successful.");
+                        location.href = 'profile.html';
+                    }
+                };
             }
-        });
-    }
+        }
+    };
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => window.AuthExperience.init());
+    else window.AuthExperience.init();
 })();

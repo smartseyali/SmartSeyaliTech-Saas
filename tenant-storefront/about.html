@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story | Premium Storefront</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Common Header -->
+    <header id="main-header" class="scrolled">
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font"
+                    style="text-decoration: none; font-size: 1.5rem; color: var(--slate-900);">STORE</a>
+                <nav class="flex gap-4 desktop-nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="shop.html" class="nav-link">Shop</a>
+                    <a href="about.html" class="nav-link active">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="nav-link" aria-label="Search"><i data-lucide="search"
+                        style="width:20px; height:20px;"></i></button>
+                <a href="profile.html" class="nav-link auth-trigger" aria-label="Account"><i data-lucide="user"
+                        style="width:20px; height:20px;"></i></a>
+                <a href="cart.html" class="nav-link" style="position: relative;" aria-label="Cart">
+                    <i data-lucide="shopping-bag" style="width:20px; height:20px;"></i>
+                    <span id="cart-counter" class="absolute"
+                        style="top:-2px; right:-2px; background:var(--primary); color:white; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; display: none;">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title Extension -->
+    <section class="py-24 bg-slate-50 border-b border-slate-100">
+        <div class="container">
+            <span class="label" style="display: block; margin-bottom: 1rem; color: var(--primary);">Heritage &
+                Vision</span>
+            <h1 class="section-title" style="text-align: left; margin: 0;">Our Story</h1>
+            <p class="section-subtitle" style="text-align: left; margin: 1rem 0 0;">Forging the future of ethical
+                commerce with a commitment to uncompromised quality.</p>
+        </div>
+    </section>
+
+    <main class="container py-32">
+        <div class="max-w-4xl mx-auto space-y-24">
+
+            <div class="grid md:grid-cols-2 gap-16 items-center animate-reveal">
+                <div class="space-y-6">
+                    <h2 class="text-4xl font-black text-slate-900">Where Quality Meets Integrity.</h2>
+                    <p class="section-subtitle" style="text-align: left;">We believe that superior products should be
+                        accessible without compromising on the health of our planet or our communities.</p>
+                </div>
+                <div class="rounded-[40px] overflow-hidden shadow-2xl card-hover">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800"
+                        class="w-full h-full object-cover" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 animate-reveal" style="animation-delay: 0.1s;">
+                <div class="card p-10 space-y-6 card-hover">
+                    <div
+                        class="w-16 h-16 bg-primary/5 text-primary rounded-2xl flex items-center justify-center shadow-inner">
+                        <i data-lucide="shield-check" style="width:28px; height:28px;"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">Verified Quality</h3>
+                    <p class="label" style="text-transform: none; color: var(--slate-400);">Every selection undergoes
+                        rigorous certification to meet our elite standards.</p>
+                </div>
+
+                <div class="card p-10 space-y-6 card-hover">
+                    <div
+                        class="w-16 h-16 bg-primary/5 text-primary rounded-2xl flex items-center justify-center shadow-inner">
+                        <i data-lucide="truck" style="width:28px; height:28px;"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">Elite Logistics</h3>
+                    <p class="label" style="text-transform: none; color: var(--slate-400);">Global sourcing coupled with
+                        localized precision delivery systems.</p>
+                </div>
+
+                <div class="card p-10 space-y-6 card-hover">
+                    <div
+                        class="w-16 h-16 bg-primary/5 text-primary rounded-2xl flex items-center justify-center shadow-inner">
+                        <i data-lucide="heart" style="width:28px; height:28px;"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">Ethical Sourcing</h3>
+                    <p class="label" style="text-transform: none; color: var(--slate-400);">Direct-to-grower
+                        relationships ensuring fair compensation and sustainability.</p>
+                </div>
+            </div>
+
+            <div class="card p-16 text-center animate-reveal"
+                style="background: var(--slate-900); color: white; border-radius: 48px; position: relative; overflow: hidden; animation-delay: 0.2s;">
+                <div class="relative z-10 space-y-8">
+                    <h2 class="text-4xl font-black">Experience the Future of Shopping.</h2>
+                    <p class="section-subtitle" style="color: var(--slate-400); max-width: 600px; margin: 0 auto;">Join
+                        our elite member base and gain access to exclusive harvests and curated health essentials.</p>
+                    <a href="shop.html" class="btn btn-primary h-16 px-12"
+                        style="width: fit-content; margin: 2rem auto 0;">Explore the Catalog</a>
+                </div>
+                <!-- Light glow -->
+                <div class="absolute"
+                    style="top: -50px; right: -50px; width: 200px; height: 200px; background: var(--primary); filter: blur(100px); opacity: 0.2;">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Common Footer -->
+    <footer
+        style="background: var(--slate-900); color: white; padding: 80px 0 60px; border-radius: 40px 40px 0 0; margin-top: 80px;">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem;">
+                <div class="space-y-6">
+                    <h3 id="footer-logo" class="brand-font" style="color: white; font-size: 2rem;">STORE</h3>
+                    <p class="text-sm text-slate-400 leading-relax" style="max-width: 300px;">Redefining the organic
+                        shopping experience with quality, sustainability, and elegance at its core.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="nav-link" style="padding:0; color:white;"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+                <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Explore</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="index.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Home</a></li>
+                            <li><a href="shop.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Catalog</a></li>
+                            <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Our Story</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="label" style="color: white; margin-bottom: 1.5rem;">Support</h4>
+                        <ul class="flex flex-col gap-3" style="list-style: none; padding: 0;">
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Returns</a></li>
+                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">FAQ</a></li>
+                            <li><a href="contact.html" class="text-sm text-slate-400 hover:text-white transition-all"
+                                    style="text-decoration:none;">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-20 pt-10 border-t border-white/5 text-center">
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">&copy; 2026 Storefront. Precision
+                    Built.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) {
+                lucide.createIcons();
+                setTimeout(() => lucide.createIcons(), 1500);
+            }
+        });
+    </script>
+</body>
+
+</html>

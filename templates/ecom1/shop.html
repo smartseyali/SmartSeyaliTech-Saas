@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop All | BASIK FIT Premium Performance</title>
+    <!-- Common Libs -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/shop.css">
+</head>
+
+<body>
+
+    <div id="header-root"></div>
+
+    <main class="shop-main container">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <div class="filter-header">
+                <h3>Filters</h3>
+                <button class="clear-filters" onclick="clearFilters()">Clear All</button>
+            </div>
+
+            <div class="filter-group">
+                <h4>Categories</h4>
+                <ul class="filter-list">
+                    <li><label><input type="checkbox" class="cat-filter" value="Running Shoes"> Running Shoes</label>
+                    </li>
+                    <li><label><input type="checkbox" class="cat-filter" value="Sports Shoes"> Sports Shoes</label></li>
+                    <li><label><input type="checkbox" class="cat-filter" value="Casual Shoes"> Casual Shoes</label></li>
+                    <li><label><input type="checkbox" class="cat-filter" value="Limited Edition"> Limited
+                            Edition</label></li>
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Price Range</h4>
+                <div class="price-inputs">
+                    <input type="number" id="min-price" placeholder="Min">
+                    <span>-</span>
+                    <input type="number" id="max-price" placeholder="Max">
+                </div>
+                <button class="btn btn-outline apply-price" onclick="applyFilters()">Apply</button>
+            </div>
+
+            <div class="filter-group">
+                <h4>Color</h4>
+                <div class="color-options">
+                    <button class="color-dot bg-aqua" data-color="Aqua"></button>
+                    <button class="color-dot bg-red" data-color="Red"></button>
+                    <button class="color-dot bg-green" data-color="Green"></button>
+                    <button class="color-dot bg-yellow" data-color="Yellow"></button>
+                </div>
+            </div>
+
+            <div class="promo-card">
+                <h3>JOIN THE PRO CLUB</h3>
+                <p>Get exclusive early access to new releases.</p>
+                <a href="register.html" class="btn btn-dark btn-full">Join Now</a>
+            </div>
+        </aside>
+
+        <!-- Product Listing -->
+        <section class="products-section">
+            <header class="products-topbar">
+                <span class="found-count"><span id="product-count">0</span> products found</span>
+                <div class="sort-by">
+                    <label>Sort By:</label>
+                    <select id="sort-order" onchange="applyFilters()">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="shop-grid" class="product-grid">
+                <!-- Data injected here -->
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <span>...</span>
+                <button class="page-btn">Next <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <script src="assets/js/products.js" type="module"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script type="module">
+        import products from './assets/js/products.js';
+        window.allProducts = products;
+
+        function renderShop(filtered) {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+            document.getElementById('product-count').textContent = filtered.length;
+
+            filtered.forEach(p => {
+                const html = `
+                    <div class="product-card" style="opacity:0">
+                        <div class="card-img-wrapper" onclick="window.location.href='product.html?id=${p.id}'">
+                            <img src="${p.image}" alt="${p.name}">
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn" title="Add to Wishlist" onclick="toggleWishlist(${p.id})"><i class="fa-regular fa-heart"></i></button>
+                            <button class="action-btn" title="Quick Add" onclick="addToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i></button>
+                        </div>
+                        <div class="card-info" onclick="window.location.href='product.html?id=${p.id}'">
+                             <span class="card-cat">${p.category}</span>
+                             <h3 class="card-title">${p.name}</h3>
+                             <div class="card-price">
+                                <span class="current">$${p.price.toFixed(2)}</span>
+                             </div>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Re-run GSAP if available
+            if (window.gsap) {
+                gsap.to('.product-card', { opacity: 1, y: 0, duration: 0.5, stagger: 0.05 });
+            } else {
+                document.querySelectorAll('.product-card').forEach(card => card.style.opacity = '1');
+            }
+        }
+
+        window.applyFilters = () => {
+            let filtered = [...products];
+
+            // Category Filter
+            const activeCats = Array.from(document.querySelectorAll('.cat-filter:checked')).map(cb => cb.value);
+            if (activeCats.length > 0) {
+                filtered = filtered.filter(p => activeCats.includes(p.category));
+            }
+
+            // Price Filter
+            const min = parseFloat(document.getElementById('min-price').value) || 0;
+            const max = parseFloat(document.getElementById('max-price').value) || Infinity;
+            filtered = filtered.filter(p => p.price >= min && p.price <= max);
+
+            // Sort
+            const sort = document.getElementById('sort-order').value;
+            if (sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
+            if (sort === 'price-high') filtered.sort((a, b) => b.price - a.price);
+
+            renderShop(filtered);
+        };
+
+        window.onload = () => {
+            applyFilters();
+        };
+    </script>
+</body>
+
+</html>

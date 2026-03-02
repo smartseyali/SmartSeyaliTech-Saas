@@ -51,13 +51,17 @@ function provisionStore(merchantSlug, templateName = 'organic') {
     copyFolderSync(templatesDir, storeDir);
 
     // 4. Injected "Zero-Config" - Update main.js to hardcode this tenant
-    const mainJsPath = path.join(storeDir, 'js', 'main.js');
+    let mainJsPath = path.join(storeDir, 'js', 'main.js');
+    if (!fs.existsSync(mainJsPath)) {
+        mainJsPath = path.join(storeDir, 'assets', 'js', 'main.js');
+    }
+
     if (fs.existsSync(mainJsPath)) {
         let content = fs.readFileSync(mainJsPath, 'utf8');
-        // Replace dynamic slug detection with hardcoded slug
+        // Replace dynamic slug detection or previous hardcoded slug
         content = content.replace(
-            /let slug = urlParams\.get\('tenant'\) \|\| localStorage\.getItem\('last_tenant'\);/g,
-            `let slug = "${merchantSlug}"; // Hardcoded for this instance`
+            /const slug = "[^"]*";/g,
+            `const slug = "${merchantSlug}";`
         );
         fs.writeFileSync(mainJsPath, content);
     }

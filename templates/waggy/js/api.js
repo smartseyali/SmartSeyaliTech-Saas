@@ -1,24 +1,16 @@
 
 /**
- * API Integration Layer for Storefront
- * Handles Supabase communication and tenant scoping
+ * Professional API Integration Layer
+ * Robust Supabase & Tenant Intelligence
  */
 
-// Use an IIFE to scope variables and avoid redeclaration errors
 (function () {
     const SUPABASE_URL = "https://vxwjfonhadjjbdmkdrjc.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2pmb25oYWRqamJkbWtkcmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NTg0OTIsImV4cCI6MjA4NzIzNDQ5Mn0.lKrOXOLQtHDBhRgH6kz_t8admjaA_WR1bs_pIIwq0wM";
 
-    /**
-     * Lazy Client Initializer
-     * Ensures we always have a client even if CDN loads slow
-     */
     function getClient() {
         if (window.supabaseClient) return window.supabaseClient;
-        if (!window.supabase) {
-            console.warn("Supabase library not found on window yet.");
-            return null;
-        }
+        if (!window.supabase) return null;
         window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         return window.supabaseClient;
     }
@@ -28,22 +20,14 @@
 
         async setTenant(slug) {
             const client = getClient();
-            if (!slug || !client) {
-                console.error("API Error: Missing slug or client", { slug, client: !!client });
-                return null;
-            }
+            if (!slug || !client) return null;
             try {
-                const { data, error } = await client
-                    .from('companies')
-                    .select('*')
-                    .eq('subdomain', slug)
-                    .single();
-
+                const { data, error } = await client.from('companies').select('*').eq('subdomain', slug).single();
                 if (error || !data) throw error || new Error("Tenant Not Found");
                 this.tenant = data;
                 return data;
             } catch (err) {
-                console.error("Error setting tenant:", err);
+                console.error("🏙️ API: Tenant Resolution Failed", err);
                 return null;
             }
         },
@@ -75,39 +59,25 @@
                 if (error) throw error;
                 return data || [];
             } catch (err) {
-                console.error(`Error fetching ${sectionId}:`, err);
                 return [];
             }
         },
 
-        async login(email, password) {
+        async signIn(email, password) {
             const client = getClient();
             if (!client) return { error: { message: "Supabase client not initialized" } };
-
             const { data, error } = await client.auth.signInWithPassword({ email, password });
-            if (!error && data.user) {
-                await this.syncCustomer(data.user);
-            }
+            if (!error && data.user) await this.syncCustomer(data.user);
             return { data, error };
         },
 
-        async signup(email, password, metadata = {}) {
+        async signUp(email, password, metadata = {}) {
             const client = getClient();
-            if (!client) return { error: { message: "Supabase client not initialized" } };
-
+            if (!client) return { error: "Client null" };
             const { data, error } = await client.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        ...metadata,
-                        company_id: this.tenant?.id
-                    }
-                }
+                email, password, options: { data: { ...metadata, company_id: this.tenant?.id } }
             });
-            if (!error && data.user) {
-                await this.syncCustomer(data.user);
-            }
+            if (!error && data.user) await this.syncCustomer(data.user);
             return { data, error };
         },
 
@@ -116,16 +86,11 @@
             if (!user || !this.tenant || !client) return;
             try {
                 await client.from('ecom_customers').upsert([{
-                    id: user.id,
-                    user_id: user.id,
-                    company_id: this.tenant.id,
-                    email: user.email,
-                    full_name: user.user_metadata?.full_name || 'Customer',
+                    id: user.id, user_id: user.id, company_id: this.tenant.id,
+                    email: user.email, full_name: user.user_metadata?.full_name || 'Authorized User',
                     last_login: new Date().toISOString()
                 }]);
-            } catch (err) {
-                console.error("Sync error:", err);
-            }
+            } catch (err) { /* Silent fail */ }
         },
 
         async getUser() {
@@ -135,7 +100,7 @@
             return user;
         },
 
-        async logout() {
+        async signOut() {
             const client = getClient();
             if (!client) return;
             return await client.auth.signOut();
@@ -155,20 +120,20 @@
             }
         },
 
+        async getProduct(id) {
+            const client = getClient();
+            if (!this.tenant || !client) return null;
+            const { data } = await client.from('products').select('*').eq('id', id).single();
+            return data;
+        },
+
         async placeOrder(orderData) {
             const client = getClient();
-            if (!this.tenant || !client) return { error: "Tenant not set" };
-            try {
-                const { data, error } = await client.from('ecom_orders').insert([{
-                    ...orderData,
-                    company_id: this.tenant.id,
-                    status: 'pending'
-                }]).select().single();
-                if (error) throw error;
-                return { data };
-            } catch (err) {
-                return { error: err.message };
-            }
+            if (!this.tenant || !client) return { error: "Tenant null" };
+            const { data, error } = await client.from('ecom_orders').insert([{
+                ...orderData, company_id: this.tenant.id, status: 'pending'
+            }]).select().single();
+            return { data, error };
         },
 
         async getOrders() {
@@ -177,22 +142,6 @@
             if (!user || !this.tenant || !client) return [];
             const { data } = await client.from('ecom_orders').select('*').eq('company_id', this.tenant.id).eq('customer_email', user.email).order('created_at', { ascending: false });
             return data || [];
-        },
-
-        async getAddresses() {
-            const client = getClient();
-            const user = await this.getUser();
-            if (!user || !this.tenant || !client) return [];
-            const { data } = await client.from('ecom_addresses').select('*').eq('company_id', this.tenant.id).eq('user_id', user.id);
-            return data || [];
-        },
-
-        async saveAddress(address) {
-            const client = getClient();
-            const user = await this.getUser();
-            if (!user || !this.tenant || !client) return { error: "Not logged in" };
-            const { data, error } = await client.from('ecom_addresses').upsert([{ ...address, user_id: user.id, company_id: this.tenant.id }]).select();
-            return { data, error };
         }
     };
 })();

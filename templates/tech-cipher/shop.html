@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mainframe | Tech Cipher Catalog</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body style="background: var(--s-950);">
+
+    <header id="main-header" class="scrolled">
+        <div class="container flex justify-between items-center w-full">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font">CIPHER.SYS</a>
+                <nav class="flex gap-4">
+                    <a href="index.html" class="nav-link">Terminal</a>
+                    <a href="shop.html" class="nav-link active">Mainframe</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="profile.html" class="nav-link"><i data-lucide="cpu" style="width:18px;"></i></a>
+                <a href="cart.html" class="nav-link" style="position: relative;">
+                    <i data-lucide="terminal" style="width:18px;"></i>
+                    <span id="cart-counter"
+                        style="position: absolute; top: -5px; right: -5px; background: var(--acc-500); color: #000; font-size: 10px; font-weight: 900; width: 16px; height: 16px; border-radius: 2px; display: none; align-items: center; justify-content: center;">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-24" style="border-bottom: 1px solid var(--border-dim); background: #000;">
+        <div class="container">
+            <span class="label">System Catalog</span>
+            <h1 style="font-size: 4rem;">MAINFRAME DATA</h1>
+            <p style="color: var(--text-muted); max-width: 500px;">Index of available tactical tech and high-performance
+                electronics.</p>
+        </div>
+    </section>
+
+    <section class="py-24">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 260px 1fr; gap: 4rem;">
+                <aside>
+                    <div style="position: sticky; top: 120px;">
+                        <h3 class="label">Partitions</h3>
+                        <div id="category-filter" class="grid" style="gap: 0.5rem; margin-top: 1.5rem;">
+                            <!-- Data via shop.js -->
+                        </div>
+
+                        <div style="margin-top: 4rem;">
+                            <h3 class="label">Priority Sort</h3>
+                            <div class="grid" style="gap: 0.5rem; margin-top: 1.5rem;">
+                                <button class="btn"
+                                    style="width: 100%; border-color: var(--border-dim); color: var(--text-muted);"
+                                    onclick="window.sortProducts('low')">ASCENDING_PRICE</button>
+                                <button class="btn"
+                                    style="width: 100%; border-color: var(--border-dim); color: var(--text-muted);"
+                                    onclick="window.sortProducts('high')">DESCENDING_PRICE</button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <main>
+                    <div id="catalog-grid" class="catalog-grid grid">
+                        <div class="label" style="padding: 100px; text-align: center; width: 100%; grid-column: 1/-1;">
+                            Decrypting inventory...</div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container" style="text-align: center;">
+            <p style="font-size: 0.7rem; color: var(--text-muted);">&copy; 2026 TECH CIPHER. ALL PRIVILEGES RESERVED.
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/shop.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

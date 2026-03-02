@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Viewfront | Premium Storefront</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-white">
+
+    <!-- Elite Header -->
+    <header id="main-header">
+        <div class="container flex justify-between w-full" style="align-items: center;">
+            <div class="flex items-center gap-10">
+                <a href="index.html" id="store-logo" class="brand-font"
+                    style="text-decoration: none; font-size: 1.8rem; color: var(--s-950);">STORE</a>
+                <nav class="flex gap-4">
+                    <a href="index.html" class="nav-link active">Home</a>
+                    <a href="shop.html" class="nav-link">Shop</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="profile.html" class="nav-link" aria-label="Account"><i data-lucide="user"
+                        style="width:20px;"></i></a>
+                <a href="cart.html" class="nav-link" style="position: relative;" aria-label="Cart">
+                    <i data-lucide="shopping-bag" style="width:20px;"></i>
+                    <span id="cart-counter"
+                        style="position: absolute; top: -5px; right: -5px; background: var(--p-900); color: white; font-size: 10px; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff;">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Visual Hero -->
+    <section class="hero-section py-32"
+        style="background: var(--s-50); min-height: 90vh; display: flex; align-items: center; padding-top: 160px;">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;">
+                <div class="animate-reveal space-y-10" style="display: flex; flex-direction: column; gap: 2rem;">
+                    <span class="label">Curated Selections 2026</span>
+                    <h1 class="section-title">The Quintessence of Elite Luxury.</h1>
+                    <p class="section-subtitle">Redefining the shopping experience with a focus on purity,
+                        sustainability, and uncompromising quality.</p>
+                    <div class="flex gap-6 pt-4">
+                        <a href="shop.html" class="btn btn-primary">Discover Catalog</a>
+                        <a href="about.html" class="btn">Our Vision</a>
+                    </div>
+                </div>
+                <div class="animate-reveal" style="animation-delay: 0.2s;">
+                    <div
+                        style="border-radius: var(--radius-xl); overflow: hidden; height: 600px; box-shadow: var(--shadow-float);">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200"
+                            style="width:100%; height:100%; object-fit:cover;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Highlights -->
+    <section class="py-32">
+        <div class="container">
+            <div id="highlights-container" class="grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem;">
+                <!-- Filled via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Elite -->
+    <section class="py-32 bg-slate-50">
+        <div class="container text-center mb-24">
+            <span class="label">Exploration</span>
+            <h2 class="section-title">Browse Specialized Archives</h2>
+        </div>
+        <div class="container">
+            <div id="categories-container" class="flex gap-8 overflow-x-auto pb-8 no-scrollbar justify-center">
+                <!-- Filled via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Sellers -->
+    <section class="py-32">
+        <div class="container mb-24 flex items-end justify-between">
+            <div class="space-y-4">
+                <span class="label">Member Favorites</span>
+                <h2 class="section-title" style="margin:0;">Elite Harvesting</h2>
+            </div>
+            <a href="shop.html" class="nav-link"
+                style="padding: 1rem 2rem; border: 1px solid var(--s-200); border-radius: 99px;">View All</a>
+        </div>
+        <div class="container">
+            <div id="best-sellers-container" class="grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 3rem;">
+                <!-- Filled via home.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Elite Footer -->
+    <footer>
+        <div class="container grid" style="grid-template-columns: 2fr 1fr 1fr; gap: 8rem;">
+            <div class="space-y-8">
+                <h3 id="footer-logo" class="brand-font" style="color: white; font-size: 2.5rem;">STORE</h3>
+                <p class="section-subtitle" style="color: var(--s-400); font-size: 1rem; max-width: 400px;">Experience
+                    the pinnacle of sustainable commerce. Our products are sourced from certified growers.</p>
+            </div>
+            <div class="space-y-8">
+                <h4 class="label" style="color: white;">Information</h4>
+                <ul style="list-style:none; display: flex; flex-direction: column; gap: 1rem;">
+                    <li><a href="about.html" class="footer-link">Our Legacy</a></li>
+                    <li><a href="contact.html" class="footer-link">Contact Concierge</a></li>
+                </ul>
+            </div>
+            <div class="space-y-8">
+                <h4 class="label" style="color: white;">Support</h4>
+                <ul style="list-style:none; display: flex; flex-direction: column; gap: 1rem;">
+                    <li><a href="#" class="footer-link">Logistics Status</a></li>
+                    <li><a href="#" class="footer-link">Returns Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mt-24 pt-8 border-t border-white/5 text-center">
+            <p class="label" style="color: var(--s-600);">&copy; 2026 Storefront. Precision Built.</p>
+        </div>
+    </footer>
+
+
+    <!-- Core Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
+    <script>
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) {
+                lucide.createIcons();
+                setTimeout(() => lucide.createIcons(), 2000);
+            }
+        });
+    </script>
+</body>
+
+</html>

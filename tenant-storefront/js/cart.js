@@ -1,79 +1,95 @@
 
 /**
- * Cart page specific logic
+ * Professional Cart Management Logic
  */
 
-const CartPage = {
-    async init() {
-        console.log("Initializing Cart Details...");
-        this.renderCart();
-    },
+(function () {
+    if (window.CartPageInstance) return;
 
-    renderCart() {
-        const cart = window.Storefront.cart;
-        const list = document.getElementById('cart-list');
-        const subtotalEl = document.getElementById('subtotal');
-        const totalEl = document.getElementById('total');
+    window.CartPageInstance = {
+        async init() {
+            console.log("🛠️ Initializing Secure Cart Review...");
+            this.render();
+        },
 
-        if (!list) return;
+        render() {
+            const cart = window.StorefrontInstance.cart || [];
+            const container = document.getElementById('cart-list');
+            const subtotalEl = document.getElementById('subtotal');
+            const totalEl = document.getElementById('total');
 
-        if (cart.length === 0) {
-            list.innerHTML = `
-                <div class="py-20 text-center flex flex-col items-center gap-6">
-                    <div class="p-8 bg-slate-50 text-slate-300 rounded-full w-24 h-24 flex items-center justify-center">
-                        <i data-lucide="shopping-bag" class="w-12 h-12"></i>
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="card p-20 text-center flex flex-col items-center gap-6" style="border: 2px dashed var(--slate-100);">
+                        <div class="w-20 h-20 bg-slate-50 text-slate-200 rounded-3xl flex items-center justify-center">
+                            <i data-lucide="shopping-bag" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-slate-900">Your bag is currently empty</h2>
+                        <p class="section-subtitle">Discover our premium organic selections and start building your collection.</p>
+                        <a href="shop.html" class="btn btn-primary px-10 h-14 mt-4">Discover Products</a>
                     </div>
-                    <h2 class="text-2xl font-black text-slate-400">Your bag is empty</h2>
-                    <p class="text-slate-400 mt-2">Looks like you haven't added anything yet.</p>
-                    <a href="shop.html" class="btn btn-primary px-10 h-14 mt-6">Continue Shopping</a>
-                </div>
-            `;
-            if (subtotalEl) subtotalEl.innerText = "₹ 0.00";
-            if (totalEl) totalEl.innerText = "₹ 0.00";
-            return;
-        }
+                `;
+                if (subtotalEl) subtotalEl.innerText = "₹ 0.00";
+                if (totalEl) totalEl.innerText = "₹ 0.00";
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
 
-        list.innerHTML = cart.map(item => `
-            <div class="cart-item border-b border-slate-50 py-8 grid" style="grid-template-columns: 120px 1fr auto; gap: 2.5rem; align-items: center;">
-                <img src="${item.image_url || 'https://api.iconify.design/lucide:package.svg'}" class="w-[124px] h-[124px] rounded-3xl object-cover bg-slate-50" />
-                <div class="flex flex-col gap-2">
-                    <h3 class="text-lg font-bold text-slate-800">${item.name}</h3>
-                    <div class="text-primary font-black text-xl">${window.Storefront.formatCurrency(item.price)}</div>
+            container.innerHTML = cart.map(item => `
+                <div class="card flex flex-col md:flex-row items-center gap-8 p-6 card-hover" style="border-radius: 24px;">
+                    <div style="width: 140px; height: 140px; border-radius: 20px; overflow: hidden; background: var(--slate-50);">
+                        <img src="${item.image_url || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400'}" 
+                             style="width: 100%; height: 100%; object-fit: cover;" />
+                    </div>
                     
-                    <div class="flex items-center gap-4 mt-4 p-1.5 bg-slate-50 rounded-xl border border-slate-100 w-fit">
-                        <button class="p-2 hover:bg-white rounded-lg transition-all" onclick="window.CartPage.updateQty('${item.id}', ${item.quantity - 1})">
-                            <i data-lucide="minus" class="w-3 h-3"></i>
-                        </button>
-                        <span class="font-bold px-3 text-sm">${item.quantity}</span>
-                        <button class="p-2 hover:bg-white rounded-lg transition-all" onclick="window.CartPage.updateQty('${item.id}', ${item.quantity + 1})">
-                            <i data-lucide="plus" class="w-3 h-3"></i>
-                        </button>
+                    <div class="flex-1 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-black text-slate-900">${item.name}</h3>
+                                <p class="label" style="text-transform: none; color: var(--slate-400); margin-top: 2px;">Premium Quality Certified</p>
+                            </div>
+                            <p class="text-xl font-black text-primary">${window.StorefrontInstance.formatCurrency(item.price)}</p>
+                        </div>
+                        
+                        <div class="flex items-center justify-between pt-4">
+                            <div class="flex items-center gap-4 p-1 bg-slate-100/50 rounded-xl border border-slate-100 w-fit">
+                                <button class="btn btn-ghost" style="padding: 6px; border-radius: 8px;" onclick="window.CartPageInstance.updateQty('${item.id}', ${item.quantity - 1})">
+                                    <i data-lucide="minus" style="width:14px; height:14px;"></i>
+                                </button>
+                                <span class="font-black px-2 text-sm text-slate-700">${item.quantity}</span>
+                                <button class="btn btn-ghost" style="padding: 6px; border-radius: 8px;" onclick="window.CartPageInstance.updateQty('${item.id}', ${item.quantity + 1})">
+                                    <i data-lucide="plus" style="width:14px; height:14px;"></i>
+                                </button>
+                            </div>
+                            
+                            <button class="btn btn-ghost" style="color: var(--slate-300); padding: 8px;" onclick="window.CartPageInstance.remove('${item.id}')">
+                                <i data-lucide="trash-2" style="width:18px; height:18px;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <button class="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all rounded-xl" onclick="window.CartPage.removeItem('${item.id}')">
-                    <i data-lucide="trash-2"></i>
-                </button>
-            </div>
-        `).join('');
+            `).join('');
 
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        if (subtotalEl) subtotalEl.innerText = window.Storefront.formatCurrency(subtotal);
-        if (totalEl) totalEl.innerText = window.Storefront.formatCurrency(subtotal);
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if (subtotalEl) subtotalEl.innerText = window.StorefrontInstance.formatCurrency(subtotal);
+            if (totalEl) totalEl.innerText = window.StorefrontInstance.formatCurrency(subtotal);
 
-        // Re-init icons
-        if (window.lucide) lucide.createIcons();
-    },
+            if (window.lucide) lucide.createIcons();
+        },
 
-    updateQty(id, qty) {
-        window.Storefront.updateQuantity(id, qty);
-        this.renderCart();
-    },
+        updateQty(id, qty) {
+            window.StorefrontInstance.updateQuantity(id, qty);
+            this.render();
+        },
 
-    removeItem(id) {
-        window.Storefront.removeFromCart(id);
-        this.renderCart();
-    }
-};
+        remove(id) {
+            window.StorefrontInstance.removeFromCart(id);
+            this.render();
+        }
+    };
 
-window.CartPage = CartPage;
-document.addEventListener('DOMContentLoaded', () => CartPage.init());
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => window.CartPageInstance.init());
+    else window.CartPageInstance.init();
+})();

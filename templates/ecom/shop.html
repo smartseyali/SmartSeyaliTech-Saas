@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop All | BASIK FIT Premium Performance</title>
+    <!-- Common Libs -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/shop.css">
+</head>
+
+<body>
+
+    <div id="header-root"></div>
+
+    <main class="shop-main container">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <div class="filter-header">
+                <h3>Filters</h3>
+                <button class="clear-filters" onclick="clearFilters()">Clear All</button>
+            </div>
+
+            <div class="filter-group" id="category-filters">
+                <h4>Categories</h4>
+                <ul class="filter-list" id="cat-filter-list">
+                    <!-- Categories will be loaded dynamically from DB -->
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Price Range</h4>
+                <div class="price-inputs">
+                    <input type="number" id="min-price" placeholder="Min">
+                    <span>-</span>
+                    <input type="number" id="max-price" placeholder="Max">
+                </div>
+                <button class="btn btn-outline apply-price" onclick="applyFilters()">Apply</button>
+            </div>
+
+            <div class="promo-card">
+                <h3>JOIN THE PRO CLUB</h3>
+                <p>Get exclusive early access to new releases.</p>
+                <a href="register.html" class="btn btn-dark btn-full">Join Now</a>
+            </div>
+        </aside>
+
+        <!-- Product Listing -->
+        <section class="products-section">
+            <header class="products-topbar">
+                <span class="found-count"><span id="product-count">0</span> products found</span>
+                <div class="sort-by">
+                    <label>Sort By:</label>
+                    <select id="sort-order" onchange="applyFilters()">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="shop-grid" class="product-grid">
+                <p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">Loading products...
+                </p>
+            </div>
+
+            <div class="pagination" id="pagination-controls">
+                <!-- Pagination will be dynamic -->
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <!-- Core Scripts: Supabase + API + Main Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        window.allProducts = [];
+
+        function renderShop(filtered) {
+            const grid = document.getElementById('shop-grid');
+            if (!grid) return;
+            const countEl = document.getElementById('product-count');
+            if (countEl) countEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">No products found. Add products from the admin panel.</p>';
+                return;
+            }
+            grid.innerHTML = filtered.map(p => {
+                const imgSrc = p.image_url || p.image || 'assets/images/placeholder.png';
+                return `
+                <div class="product-card">
+                    <div class="card-img-wrapper" onclick="window.location.href='product.html?id=${p.id}'">
+                        <img src="${imgSrc}" alt="${p.name}">
+                        <div class="card-badges">
+                            <span class="badge badge-new">New</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" title="Quick Add" onclick="event.stopPropagation(); window.StorefrontInstance && window.StorefrontInstance.addToCart({id:'${p.id}', name:'${p.name}', price:${p.price || 0}, image_url:'${imgSrc}'})"><i class="fa-solid fa-cart-plus"></i></button>
+                    </div>
+                    <div class="card-info" onclick="window.location.href='product.html?id=${p.id}'">
+                         <span class="card-cat">${p.category_name || ''}</span>
+                         <h3 class="card-title">${p.name}</h3>
+                         <div class="card-price">
+                            ${p.old_price ? '<span class="old">$' + p.old_price.toFixed(2) + '</span>' : ''}
+                            <span class="current">$${p.price ? p.price.toFixed(2) : '0.00'}</span>
+                         </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Animate cards in
+            if (window.gsap) {
+                gsap.from('.product-card', { opacity: 0, y: 20, duration: 0.4, stagger: 0.05 });
+            }
+        }
+
+        // Build category filter checkboxes from DB data
+        function buildCategoryFilters(products) {
+            const categories = [...new Set(products.map(p => p.category_name).filter(Boolean))];
+            const list = document.getElementById('cat-filter-list');
+            if (!list) return;
+            list.innerHTML = categories.map(cat => `
+                <li><label><input type="checkbox" class="cat-filter" value="${cat}" onchange="applyFilters()"> ${cat}</label></li>
+            `).join('');
+
+            // Pre-check category from URL param
+            const urlCat = new URLSearchParams(window.location.search).get('cat');
+            if (urlCat) {
+                const cb = list.querySelector(`input[value="${urlCat}"]`);
+                if (cb) cb.checked = true;
+            }
+        }
+
+        async function loadShop() {
+            // Wait for API/tenant to be ready
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) {
+                console.warn('API not ready');
+                return;
+            }
+            const products = await window.API.getProducts();
+            window.allProducts = products || [];
+            buildCategoryFilters(window.allProducts);
+            applyFilters();
+        }
+
+        window.applyFilters = () => {
+            let filtered = [...window.allProducts];
+
+            // Category Filter
+            const activeCats = Array.from(document.querySelectorAll('.cat-filter:checked')).map(cb => cb.value);
+            if (activeCats.length > 0) {
+                filtered = filtered.filter(p => activeCats.includes(p.category_name));
+            }
+
+            // Price Filter
+            const min = parseFloat(document.getElementById('min-price').value) || 0;
+            const max = parseFloat(document.getElementById('max-price').value) || Infinity;
+            filtered = filtered.filter(p => (p.price || 0) >= min && (p.price || 0) <= max);
+
+            // Sort
+            const sort = document.getElementById('sort-order').value;
+            if (sort === 'price-low') filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+            if (sort === 'price-high') filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+
+            renderShop(filtered);
+        };
+
+        window.clearFilters = () => {
+            document.querySelectorAll('.cat-filter').forEach(cb => cb.checked = false);
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            document.getElementById('sort-order').value = 'featured';
+            applyFilters();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => loadShop());
+    </script>
+</body>
+
+</html>

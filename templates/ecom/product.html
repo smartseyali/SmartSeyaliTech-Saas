@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | BASIK FIT</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/product.css">
+</head>
+
+<body>
+
+    <div id="header-root"></div>
+
+    <main class="product-detail-main container section">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="index.html">Home</a> <i class="fa-solid fa-chevron-right"></i>
+            <a href="shop.html">Shop</a> <i class="fa-solid fa-chevron-right"></i>
+            <span id="breadcrumb-current">Product Name</span>
+        </nav>
+
+        <div class="product-hero">
+            <!-- Image Gallery -->
+            <div class="product-gallery">
+                <div class="main-img-card">
+                    <img id="main-image" src="" alt="Product">
+                    <button class="zoom-btn"><i class="fa-solid fa-expand"></i></button>
+                </div>
+                <!-- Thumbnails placeholder (Amazon style) -->
+                <div class="thumbnails" id="thumbs-list">
+                    <!-- thumbnails here -->
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info-panel">
+                <div class="info-header">
+                    <span id="p-category" class="info-badge">CATEGORY</span>
+                    <h1 id="p-name">Loading...</h1>
+                    <div class="p-rating">
+                        <div class="stars">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                        <span>(124 Reviews)</span>
+                    </div>
+                    <div class="p-pricing">
+                        <h2 id="p-price">$0.00</h2>
+                        <span id="p-old-price" class="old-price">$0.00</span>
+                        <span class="save-badge" id="p-save-badge" style="display:none;">SAVE 20%</span>
+                    </div>
+                </div>
+
+                <div class="p-specs">
+                    <div class="spec-group">
+                        <label>Select Size (UK)</label>
+                        <div class="size-options" id="size-options">
+                            <button class="size-box active">7</button>
+                            <button class="size-box">8</button>
+                            <button class="size-box">9</button>
+                            <button class="size-box">10</button>
+                            <button class="size-box">11</button>
+                        </div>
+                    </div>
+
+                    <div class="spec-group">
+                        <label>Available Colors</label>
+                        <div class="color-options">
+                            <button class="color-circ active" style="background:#0066FF"></button>
+                            <button class="color-circ" style="background:#EB5757"></button>
+                            <button class="color-circ" style="background:#10B981"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-cta">
+                    <div class="qty-selector">
+                        <button onclick="changeDetailQty(-1)">-</button>
+                        <input type="number" id="detail-qty" value="1">
+                        <button onclick="changeDetailQty(1)">+</button>
+                    </div>
+                    <button class="btn btn-primary add-to-cart-btn" onclick="addCurrentToCart()">ADD TO BAG <i
+                            class="fa-solid fa-bag-shopping"></i></button>
+                    <button class="btn btn-outline wishlist-btn" onclick="toggleWishlistOnPage()"><i
+                            class="fa-regular fa-heart"></i></button>
+                </div>
+
+                <div class="delivery-info">
+                    <div class="delivery-item">
+                        <i class="fa-solid fa-truck"></i>
+                        <div>
+                            <strong>Free Fast Delivery</strong>
+                            <p>Enter your pincode for availability.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs (Description, Reviews, etc.) -->
+                <div class="product-tabs">
+                    <div class="tab-header">
+                        <button class="tab-btn active" onclick="showTab('desc')">Description</button>
+                        <button class="tab-btn" onclick="showTab('details')">Details</button>
+                        <button class="tab-btn" onclick="showTab('reviews')">Reviews</button>
+                    </div>
+                    <div class="tab-content" id="tab-desc">
+                        <p id="p-desc">Loading product description...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="section related-products">
+            <h2>Complete the Look</h2>
+            <div id="related-list" class="product-grid"></div>
+        </section>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <!-- Core Scripts: Supabase + API + Main Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        let currentProduct = null;
+
+        async function loadProductDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const pid = parseInt(params.get('id'));
+            if (!pid) { window.location.href = 'shop.html'; return; }
+
+            // Wait for API/tenant
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) {
+                console.warn('API not ready');
+                return;
+            }
+
+            const product = await window.API.getProduct(pid);
+            if (!product) {
+                window.location.href = 'shop.html';
+                return;
+            }
+            currentProduct = product;
+            const imgSrc = product.image_url || product.image || 'assets/images/placeholder.png';
+
+            document.getElementById('p-name').textContent = product.name;
+            document.getElementById('breadcrumb-current').textContent = product.name;
+            document.getElementById('p-category').textContent = product.category_name || product.category || '';
+            document.getElementById('p-price').textContent = `$${product.price ? product.price.toFixed(2) : '0.00'}`;
+            document.getElementById('main-image').src = imgSrc;
+            document.getElementById('p-desc').textContent = product.description || 'No description available.';
+            document.title = `${product.name} | BASIK FIT`;
+
+            if (product.old_price) {
+                document.getElementById('p-old-price').textContent = `$${product.old_price.toFixed(2)}`;
+                const savings = Math.round(((product.old_price - product.price) / product.old_price) * 100);
+                const badge = document.getElementById('p-save-badge');
+                badge.textContent = `SAVE ${savings}%`;
+                badge.style.display = 'inline-block';
+            } else {
+                document.getElementById('p-old-price').style.display = 'none';
+            }
+
+            // Load related products (same category)
+            const catName = product.category_name || product.category;
+            if (catName) {
+                const allProducts = await window.API.getProducts(catName);
+                const related = (allProducts || []).filter(p => p.id !== pid).slice(0, 4);
+                const rGrid = document.getElementById('related-list');
+                related.forEach(p => {
+                    const rImg = p.image_url || p.image || 'assets/images/placeholder.png';
+                    rGrid.insertAdjacentHTML('beforeend', `
+                        <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+                             <div class="card-img-wrapper"><img src="${rImg}" alt="${p.name}"></div>
+                             <div class="card-info">
+                                 <h3 class="card-title">${p.name}</h3>
+                                 <div class="card-price">
+                                    <span class="current">$${p.price ? p.price.toFixed(2) : '0.00'}</span>
+                                 </div>
+                             </div>
+                        </div>
+                     `);
+                });
+            }
+        }
+
+        window.addCurrentToCart = () => {
+            if (!currentProduct) return;
+            const qty = parseInt(document.getElementById('detail-qty').value) || 1;
+            const imgSrc = currentProduct.image_url || currentProduct.image || '';
+            if (window.StorefrontInstance) {
+                window.StorefrontInstance.addToCart({
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price || 0,
+                    image_url: imgSrc
+                }, qty);
+            }
+        };
+
+        window.changeDetailQty = (d) => {
+            const input = document.getElementById('detail-qty');
+            let v = parseInt(input.value) + d;
+            if (v > 0) input.value = v;
+        };
+
+        window.showTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductDetail();
+            // Size selector logic
+            document.querySelectorAll('.size-box').forEach(box => {
+                box.onclick = () => {
+                    document.querySelectorAll('.size-box').forEach(b => b.classList.remove('active'));
+                    box.classList.add('active');
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

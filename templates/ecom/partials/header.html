@@ -1,0 +1,43 @@
+<div class="header">
+    <div class="container">
+        <nav class="nav-main">
+            <div class="logo">
+                <a href="index.html">BASIK <span>FIT</span></a>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="shop.html" class="nav-link">Shop</a></li>
+                <li><a href="categories.html" class="nav-link">Categories</a></li>
+                <li><a href="account.html" class="nav-link">Account</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <div class="auth-menu">
+                    <a href="login.html" class="nav-link" id="account-link">Sign In</a>
+                </div>
+                <a href="cart.html" class="nav-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+                <div class="nav-total-wrapper">
+                    <span class="currency">$</span><span id="nav-total">0.00</span>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<!-- Search Overlay -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-modal">
+        <button class="close-search" onclick="toggleSearch()">&times;</button>
+        <div class="search-input-wrapper">
+            <input type="text" id="global-search" placeholder="Search for products, brands and more...">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div id="search-results" class="search-results"></div>
+    </div>
+</div>

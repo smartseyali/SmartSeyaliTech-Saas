@@ -1,0 +1,164 @@
+.shop-main {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+}
+
+.sidebar {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.filter-group {
+    margin-bottom: 2rem;
+}
+
+.filter-group h4 {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-list li {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.filter-list label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.filter-list label:hover {
+    color: var(--primary);
+}
+
+.cat-filter {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.price-inputs input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.apply-price {
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+}
+
+/* Sorting */
+.products-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.found-count {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.sort-by {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sort-by label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.sort-by select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 4rem;
+}
+
+.page-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.page-btn.active,
+.page-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* Promo Card */
+.promo-card {
+    background: #1F2937;
+    color: #fff;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin-top: 3rem;
+}
+
+.promo-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.promo-card p {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    margin-bottom: 1.5rem;
+}

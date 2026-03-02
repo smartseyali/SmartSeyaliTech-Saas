@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart | BASIK FIT</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/cart.css">
+</head>
+
+<body>
+
+    <div id="header-root"></div>
+
+    <main class="cart-main container section">
+        <header class="cart-title">
+            <h1>Shopping Cart</h1>
+            <p id="total-items-desc">0 items in your bag</p>
+        </header>
+
+        <div class="cart-grid">
+            <!-- Left Side: Items -->
+            <section class="cart-items-wrapper">
+                <div id="cart-list" class="cart-list">
+                    <!-- Items go here -->
+                </div>
+
+                <div class="cart-actions">
+                    <a href="shop.html" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Continue
+                        Shopping</a>
+                    <button class="btn btn-outline" onclick="clearFullCart()">Clear Bag</button>
+                </div>
+            </section>
+
+            <!-- Right Side: Order Summary -->
+            <aside class="order-summary-sidebar">
+                <div class="summary-card">
+                    <h3>Order Summary</h3>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span class="free">Free</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (Estimated)</span>
+                        <span id="summary-tax">$0.00</span>
+                    </div>
+
+                    <div class="coupon-section">
+                        <input type="text" placeholder="Promo Code">
+                        <button class="btn btn-dark">Apply</button>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="summary-total">$0.00</span>
+                    </div>
+
+                    <a href="checkout.html" class="btn btn-primary btn-full checkout-btn">Proceed to Checkout</a>
+
+                    <div class="trust-badges">
+                        <div class="badge-item"><i class="fa-solid fa-shield-halved"></i> <span>Secure Checkout</span>
+                        </div>
+                        <div class="badge-item"><i class="fa-solid fa-truck-fast"></i> <span>Free Fast Delivery</span>
+                        </div>
+                        <div class="badge-item"><i class="fa-solid fa-rotate-left"></i> <span>30-Day Returns</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Recommendations -->
+        <section class="recommendations">
+            <h3>You Might Also Like</h3>
+            <div id="rec-grid" class="product-grid"></div>
+        </section>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <!-- Core Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        function renderCartPage() {
+            // Use StorefrontInstance cart (synced with localStorage)
+            const cart = window.StorefrontInstance ? window.StorefrontInstance.cart : [];
+            const list = document.getElementById('cart-list');
+            list.innerHTML = '';
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <h2>Your bag is currently empty.</h2>
+                        <a href="shop.html" class="btn btn-primary">Start Shopping</a>
+                    </div>
+                `;
+                updateSummary(0, 0);
+                return;
+            }
+
+            cart.forEach(item => {
+                const imgSrc = item.image_url || item.image || 'assets/images/placeholder.png';
+                const html = `
+                    <div class="cart-item-row" data-id="${item.id}">
+                        <div class="item-img" onclick="window.location.href='product.html?id=${item.id}'">
+                            <img src="${imgSrc}" alt="${item.name}">
+                        </div>
+                        <div class="item-details">
+                            <h4 onclick="window.location.href='product.html?id=${item.id}'">${item.name}</h4>
+                            <div class="item-meta">
+                                <span>Ref: #BASE-${item.id}</span>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="removeCartItem('${item.id}')"><i class="fa-solid fa-trash-can"></i> Remove</button>
+                            </div>
+                        </div>
+                        <div class="item-qty">
+                            <button onclick="changeQty('${item.id}', -1)">-</button>
+                            <input type="number" value="${item.quantity}" readonly>
+                            <button onclick="changeQty('${item.id}', 1)">+</button>
+                        </div>
+                        <div class="item-price">
+                            $${((item.price || 0) * item.quantity).toFixed(2)}
+                        </div>
+                    </div>
+                `;
+                list.insertAdjacentHTML('beforeend', html);
+            });
+
+            const subtotal = cart.reduce((sum, i) => sum + ((i.price || 0) * i.quantity), 0);
+            updateSummary(subtotal, cart.length);
+        }
+
+        function updateSummary(subtotal, count) {
+            const tax = subtotal * 0.08;
+            const total = subtotal + tax;
+            document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('total-items-desc').textContent = `${count || 0} items in your bag`;
+        }
+
+        window.changeQty = (id, delta) => {
+            if (!window.StorefrontInstance) return;
+            const item = window.StorefrontInstance.cart.find(i => String(i.id) === String(id));
+            if (item) {
+                const newQty = item.quantity + delta;
+                if (newQty < 1) return;
+                window.StorefrontInstance.updateQuantity(item.id, newQty);
+                renderCartPage();
+            }
+        };
+
+        window.removeCartItem = (id) => {
+            if (!window.StorefrontInstance) return;
+            window.StorefrontInstance.removeFromCart(id);
+            renderCartPage();
+        };
+
+        window.clearFullCart = () => {
+            if (confirm("Are you sure you want to empty your cart?")) {
+                if (window.StorefrontInstance) {
+                    window.StorefrontInstance.cart = [];
+                    window.StorefrontInstance.saveCart();
+                }
+                renderCartPage();
+            }
+        };
+
+        // Load recommendations from DB
+        async function loadRecommendations() {
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) return;
+            const products = await window.API.getProducts();
+            const recGrid = document.getElementById('rec-grid');
+            const recs = (products || []).slice(0, 4);
+            recs.forEach(p => {
+                const imgSrc = p.image_url || p.image || 'assets/images/placeholder.png';
+                recGrid.insertAdjacentHTML('beforeend', `
+                    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+                        <div class="card-img-wrapper"><img src="${imgSrc}" alt="${p.name}"></div>
+                        <div class="card-info">
+                            <h3 class="card-title">${p.name}</h3>
+                            <div class="card-price"><span class="current">$${p.price ? p.price.toFixed(2) : '0.00'}</span></div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit for StorefrontInstance to init
+            setTimeout(() => {
+                renderCartPage();
+                loadRecommendations();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
