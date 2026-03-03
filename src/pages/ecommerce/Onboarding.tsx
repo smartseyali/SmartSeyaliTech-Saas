@@ -4,71 +4,26 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
-import {
-    Layout, ShoppingBag, Utensils, Zap, Check, ArrowRight,
-    Loader2, Rocket, Store, Globe, Palette
-} from "lucide-react";
+import { Check, ArrowRight, Loader2, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
-const TEMPLATES = [
-    {
-        id: "viewfront",
-        name: "Elite Viewfront",
-        desc: "Precision built, luxury minimalist design for premium brands.",
-        color: "#020617",
-        icon: Layout,
-        preview: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"
-    },
-    {
-        id: "tech-cipher",
-        name: "Tech Cipher",
-        desc: "Cyberpunk, dark aesthetic for high-performance electronics.",
-        color: "#00ff41",
-        icon: Zap,
-        preview: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800"
-    },
-    {
-        id: "minimal-luxe",
-        name: "Minimal Luxe",
-        desc: "Elegant, whitespace-heavy design for high-end fashion & decor.",
-        color: "#fdfbf7",
-        icon: ShoppingBag,
-        preview: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800"
-    },
-    {
-        id: "organic",
-        name: "Organic Store",
-        desc: "Fresh, clean, and nature-inspired for health brands.",
-        color: "#14532d",
-        icon: ShoppingBag,
-        preview: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800"
-    },
-    {
-        id: "waggy",
-        name: "Waggy Pets",
-        desc: "Playful, colorful, and fun for pet shops.",
-        color: "#d97706",
-        icon: Store,
-        preview: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=800"
-    },
-    {
-        id: "ecom",
-        name: "Ecom Fit",
-        desc: "High-performance athletic aesthetic with bold typography.",
-        color: "#0066FF",
-        icon: Rocket,
-        preview: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
-    },
-    {
-        id: "foodmart",
-        name: "Food Mart",
-        desc: "Fast, appetizing, and bold for restaurants.",
-        color: "#ef4444",
-        icon: Utensils,
-        preview: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800"
-    }
-];
+// ── Template registry type ──────────────────────────────────
+interface TemplateEntry {
+    id: string;
+    name: string;
+    desc?: string;
+    description?: string;
+    color?: string;
+    preview_image?: string;
+    preview?: string;
+    tags?: string[];
+    folder: string;
+    version?: string;
+    is_active?: boolean;
+}
+
+// No hardcoded templates — loaded from /templates/templates-registry.json
 
 export default function Onboarding() {
     const { user } = useAuth();
@@ -77,27 +32,64 @@ export default function Onboarding() {
 
     const [step, setStep] = useState(1);
     const [storeName, setStoreName] = useState("");
-    const [selectedTemplate, setSelectedTemplate] = useState("organic");
+    const [selectedTemplate, setSelectedTemplate] = useState("");
+    const [templates, setTemplates] = useState<TemplateEntry[]>([]);
+    const [templatesLoading, setTemplatesLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [initialChecking, setInitialChecking] = useState(true);
     const [error, setError] = useState("");
     const [slug, setSlug] = useState("");
 
+    // ── Load templates from ecom_templates (Supabase DB) ──────
+    useEffect(() => {
+        async function loadTemplates() {
+            setTemplatesLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from("ecom_templates")
+                    .select("folder, name, description, version, preview_image, color, tags")
+                    .eq("is_active", true)
+                    .order("sort_order", { ascending: true });
+
+                if (error) throw error;
+
+                const mapped: TemplateEntry[] = (data || []).map(row => ({
+                    id: row.folder,
+                    folder: row.folder,
+                    name: row.name,
+                    description: row.description,
+                    version: row.version,
+                    preview_image: row.preview_image,
+                    color: row.color,
+                    tags: row.tags || [],
+                }));
+
+                setTemplates(mapped);
+                if (mapped.length > 0) setSelectedTemplate(mapped[0].id);
+            } catch (err) {
+                console.error("Failed to load templates from ecom_templates:", err);
+                setTemplates([]);
+            } finally {
+                setTemplatesLoading(false);
+            }
+        }
+        loadTemplates();
+    }, []);
+
+
+    // ── Check if merchant already has a store ─────────────────
     useEffect(() => {
         const checkExistingStore = async () => {
             if (!user) return;
 
             try {
-                const { data, error } = await supabase
+                const { data } = await supabase
                     .from("companies")
                     .select("subdomain")
                     .eq("user_id", user.id)
                     .maybeSingle();
 
-                if (data) {
-                    // Merchant already has a store
-                    navigate("/ecommerce");
-                }
+                if (data) navigate("/ecommerce");
             } catch (err) {
                 console.error("Store check failed:", err);
             } finally {
@@ -116,19 +108,19 @@ export default function Onboarding() {
     }
 
     const handleCreateStore = async () => {
-        if (!storeName.trim()) {
-            setError("Please name your store");
-            return;
-        }
+        if (!storeName.trim()) { setError("Please name your store"); return; }
+        if (!selectedTemplate) { setError("Please choose a template"); return; }
 
         setLoading(true);
         setError("");
+
+        const selectedTmpl = templates.find(t => t.id === selectedTemplate);
 
         try {
             const newSlug = storeName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
             setSlug(newSlug);
 
-            // 1. Create in Supabase (Database Registration)
+            // 1. Create company record in Supabase
             const { data: newCompany, error: cErr } = await supabase
                 .from("companies")
                 .insert([{
@@ -143,26 +135,23 @@ export default function Onboarding() {
 
             if (cErr) throw cErr;
 
-            // 2. Call Provisioning API (Folder Creation)
-            // Note: In real setup, you'd replace 'localhost:8000' with your server URL
+            // 2. Call Provisioning API to generate physical store folder
             try {
                 const response = await fetch("http://localhost:8000/api/provision", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        merchant_slug: newSlug,
-                        template: selectedTemplate
+                        store_name: newSlug,
+                        company_id: newCompany.id,
+                        template: selectedTmpl?.folder || selectedTemplate
                     })
                 });
-
-                if (!response.ok) {
-                    console.error("Local folder provisioning failed, but DB record created.");
-                }
+                if (!response.ok) console.warn("Provisioning API returned non-OK.");
             } catch (e) {
-                console.warn("Provisioning server not reachable - database record only.");
+                console.warn("Provisioning server unreachable — run: node provision_store.cjs", newSlug, newCompany.id, selectedTmpl?.folder);
             }
 
-            // 3. User Mapping & Default Settings in DB
+            // 3. User role + ecom settings
             await supabase.from("company_users").insert([{
                 company_id: newCompany.id,
                 user_id: user?.id,
@@ -172,17 +161,14 @@ export default function Onboarding() {
             await supabase.from("ecom_settings").insert([{
                 company_id: newCompany.id,
                 store_name: storeName,
-                primary_color: TEMPLATES.find(t => t.id === selectedTemplate)?.color || "#14532d"
+                primary_color: selectedTmpl?.color || "#14532d"
             }]);
 
             // 4. Finalize
             await refreshTenant();
-            setStep(3); // Success Screen
-
-            // Auto-redirect after 3 seconds
+            setStep(3);
             setTimeout(() => {
-                const storeUrl = `${window.location.origin}/stores/${newSlug}/index.html`;
-                window.location.href = storeUrl;
+                window.location.href = `${window.location.origin}/stores/${newSlug}/index.html`;
             }, 3000);
 
         } catch (err: any) {
@@ -244,26 +230,52 @@ export default function Onboarding() {
                         <h2 className="text-3xl font-black mb-2 tracking-tight">Choose Your Theme</h2>
                         <p className="text-slate-400 mb-10 text-sm">Select a starting template for your storefront.</p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                            {TEMPLATES.map((tmpl) => (
-                                <div
-                                    key={tmpl.id}
-                                    onClick={() => setSelectedTemplate(tmpl.id)}
-                                    className={`relative cursor-pointer transition-all duration-300 group ${selectedTemplate === tmpl.id ? 'ring-4 ring-black scale-105' : 'hover:scale-102'}`}
-                                >
-                                    <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 mb-4 shadow-md">
-                                        <img src={tmpl.preview} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt={tmpl.name} />
+                        {templatesLoading ? (
+                            <div className="flex items-center justify-center py-16 mb-10">
+                                <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+                                <span className="ml-3 text-slate-400 text-sm">Loading templates…</span>
+                            </div>
+                        ) : templates.length === 0 ? (
+                            <div className="text-center py-16 mb-10 text-slate-400">
+                                <p className="font-semibold">No templates found.</p>
+                                <p className="text-xs mt-1">Add entries to <code className="bg-slate-100 px-1 rounded">/templates/templates-registry.json</code></p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                                {templates.map((tmpl) => (
+                                    <div
+                                        key={tmpl.id}
+                                        onClick={() => setSelectedTemplate(tmpl.id)}
+                                        className={`relative cursor-pointer transition-all duration-300 group rounded-2xl overflow-hidden border-2 ${selectedTemplate === tmpl.id
+                                            ? 'border-black ring-4 ring-black/10 scale-105'
+                                            : 'border-transparent hover:border-slate-200'
+                                            }`}
+                                    >
+                                        <div className="aspect-[4/3] overflow-hidden bg-slate-100 shadow-md">
+                                            <img
+                                                src={tmpl.preview_image || tmpl.preview || ''}
+                                                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                                alt={tmpl.name}
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                        <div className="space-y-1 p-3 bg-white">
+                                            <h3 className="font-bold flex items-center gap-2">
+                                                {tmpl.name}
+                                                {tmpl.version && <span className="text-[10px] text-slate-400 font-normal">v{tmpl.version}</span>}
+                                                {selectedTemplate === tmpl.id && <Check className="w-4 h-4 text-green-500 ml-auto" />}
+                                            </h3>
+                                            <div className="flex gap-1 flex-wrap">
+                                                {(tmpl.tags || []).map(tag => (
+                                                    <span key={tag} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-semibold uppercase">{tag}</span>
+                                                ))}
+                                            </div>
+                                            <p className="text-xs text-slate-400 leading-tight">{tmpl.desc || tmpl.description}</p>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1 p-2">
-                                        <h3 className="font-bold flex items-center gap-2">
-                                            {tmpl.name}
-                                            {selectedTemplate === tmpl.id && <Check className="w-4 h-4 text-green-500" />}
-                                        </h3>
-                                        <p className="text-xs text-slate-400 leading-tight">{tmpl.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
 
                         <div className="flex gap-4">
                             <Button

@@ -32,7 +32,8 @@ export function ProductVariantDialog({
 }) {
     const { toast } = useToast();
     const [variants, setVariants] = useState<Variant[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);   // fetching existing variants
+    const [saving, setSaving] = useState(false);   // saving/inserting variants
 
     useEffect(() => {
         if (open && productId) {
@@ -42,12 +43,30 @@ export function ProductVariantDialog({
 
     const loadVariants = async () => {
         setLoading(true);
-        const { data } = await supabase
-            .from("product_variants")
-            .select("*")
-            .eq("product_id", productId);
-        setVariants(data || []);
-        setLoading(false);
+        try {
+            const { data } = await supabase
+                .from("product_variants")
+                .select("id, sku, price, stock_qty, image_url, attributes_summary")
+                .eq("product_id", productId);
+
+            const mapped = (data || []).map((row: any) => {
+                let opts = { color: "", size: "" };
+                try { opts = JSON.parse(row.attributes_summary || '{}'); } catch { }
+                return {
+                    id: row.id,
+                    sku: row.sku || "",
+                    options: opts,
+                    price: row.price || 0,
+                    stock: row.stock_qty || 0,
+                    image_url: row.image_url || ""
+                };
+            });
+            setVariants(mapped);
+        } catch (err: any) {
+            console.warn("loadVariants error:", err.message);
+        } finally {
+            setLoading(false);  // ← always resets regardless of success/error
+        }
     };
 
     const addVariant = () => {
@@ -62,34 +81,50 @@ export function ProductVariantDialog({
         setVariants(variants.filter((_, i) => i !== index));
     };
 
+    // Map UI Variant shape → DB product_variants columns
+    const toDbRow = (v: Variant, extra: Record<string, any> = {}) => ({
+        sku: v.sku,
+        price: v.price,
+        stock_qty: v.stock,           // stock → stock_qty
+        image_url: v.image_url,
+        attributes_summary: JSON.stringify(v.options), // options → attributes_summary (JSON string)
+        name: [v.options.color, v.options.size].filter(Boolean).join(' / ') || v.sku || 'Variant',
+        ...extra
+    });
+
     const handleSave = async () => {
         try {
-            setLoading(true);
-            const toInsert = variants.filter(v => !v.id).map(v => ({ ...v, product_id: productId, company_id: companyId }));
+            setSaving(true);
+
+            const toInsert = variants.filter(v => !v.id);
             const toUpdate = variants.filter(v => v.id);
 
             if (toInsert.length > 0) {
-                const { error } = await supabase.from("product_variants").insert(toInsert);
+                const rows = toInsert.map(v => toDbRow(v, { product_id: productId, company_id: companyId }));
+                const { error } = await supabase.from("product_variants").insert(rows);
                 if (error) throw error;
             }
 
             for (const v of toUpdate) {
-                const { error } = await supabase.from("product_variants").update(v).eq("id", v.id);
+                const { error } = await supabase
+                    .from("product_variants")
+                    .update(toDbRow(v))
+                    .eq("id", v.id);
                 if (error) throw error;
             }
 
-            toast({ title: "Variants saved successfully" });
+            toast({ title: "Variants saved successfully ✅" });
             onOpenChange(false);
         } catch (err: any) {
             toast({ variant: "destructive", title: "Save failed", description: err.message });
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 rounded-3xl border-none shadow-2xl">
+            <DialogContent className="max-w-4xl h-[85vh] flex flex-col overflow-hidden p-0 rounded-3xl border-none shadow-2xl">
                 <div className="bg-primary/5 p-6 border-b border-primary/10 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
@@ -100,7 +135,7 @@ export function ProductVariantDialog({
                     </div>
                 </div>
 
-                <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-4 custom-scrollbar">
+                <div className="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar min-h-0">
                     {variants.length === 0 && (
                         <div className="text-center py-12 border-2 border-dashed border-border/60 rounded-3xl bg-secondary/5">
                             <ShoppingBag className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
@@ -191,8 +226,8 @@ export function ProductVariantDialog({
 
                 <div className="bg-secondary/40 p-5 border-t border-border flex gap-3">
                     <Button variant="ghost" className="flex-1 h-12 rounded-2xl font-bold" onClick={() => onOpenChange(false)}>Discard Changes</Button>
-                    <Button onClick={handleSave} className="flex-[2] h-12 rounded-2xl font-bold shadow-lg shadow-primary/20" disabled={loading}>
-                        {loading ? "Processing..." : "Save All Variants"}
+                    <Button onClick={handleSave} className="flex-[2] h-12 rounded-2xl font-bold shadow-lg shadow-primary/20" disabled={saving}>
+                        {saving ? "Saving..." : "Save All Variants"}
                     </Button>
                 </div>
             </DialogContent>
