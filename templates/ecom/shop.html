@@ -110,7 +110,7 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="action-btn" title="Quick Add" onclick="event.stopPropagation(); window.StorefrontInstance && window.StorefrontInstance.addToCart({id:'${p.id}', name:'${p.name}', price:${p.price || 0}, image_url:'${imgSrc}'})"><i class="fa-solid fa-cart-plus"></i></button>
+                        <button class="action-btn" title="Quick Add" onclick="event.stopPropagation(); window.StorefrontInstance && window.StorefrontInstance.addToCart({id:'${p.id}', name:decodeURIComponent('${encodeURIComponent(p.name)}'), price:${p.price || 0}, image_url:'${imgSrc}'})"><i class="fa-solid fa-cart-plus"></i></button>
                     </div>
                     <div class="card-info" onclick="window.location.href='product.html?id=${p.id}'">
                          <span class="card-cat">${p.category_name || ''}</span>

@@ -3,7 +3,7 @@ const headerHTML = `
     <div class="container">
         <nav class="nav-main">
             <div class="logo">
-                <a href="index.html">BASIK <span>FIT</span></a>
+                <a href="index.html" id="store-logo">BASIK <span>FIT</span></a>
             </div>
 
             <ul class="nav-links">
@@ -21,7 +21,7 @@ const headerHTML = `
                 </div>
                 <a href="cart.html" class="nav-btn">
                     <i class="fa-solid fa-bag-shopping"></i>
-                    <span class="cart-count" id="cart-counter">0</span>
+                    <span class="cart-count" id="cart-counter" style="display:none;">0</span>
                 </a>
             </div>
         </nav>
@@ -36,7 +36,7 @@ const footerHTML = `
         <div class="footer-grid">
             <div class="footer-col">
                 <div class="logo" style="color:#fff; margin-bottom: 1.5rem;">
-                    <a href="index.html">BASIK <span>FIT</span></a>
+                    <a href="index.html" id="footer-logo">BASIK <span>FIT</span></a>
                 </div>
                 <p style="font-size: 0.9rem; margin-bottom: 2rem; max-width: 300px;">Experience the perfect fusion of architectural design and athletic performance. Reach your peak limits with BASIK FIT.</p>
                 <div class="social-links" style="display:flex; gap: 1rem;">

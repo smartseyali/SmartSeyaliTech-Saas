@@ -110,7 +110,7 @@
             const client = getClient();
             if (!this.tenant || !client) return [];
             try {
-                let query = client.from('products').select('*').eq('company_id', this.tenant.id).eq('status', 'active');
+                let query = client.from('products').select('*').eq('company_id', this.tenant.id).eq('status', 'active').eq('is_ecommerce', true);
                 if (category) query = query.eq('category_name', category);
                 const { data, error } = await query;
                 if (error) throw error;
@@ -123,17 +123,34 @@
         async getProduct(id) {
             const client = getClient();
             if (!this.tenant || !client) return null;
-            const { data } = await client.from('products').select('*').eq('id', id).single();
+            const { data } = await client.from('products').select('*').eq('id', id).eq('is_ecommerce', true).single();
             return data;
         },
 
-        async placeOrder(orderData) {
+        async placeOrder(orderData, items = []) {
             const client = getClient();
             if (!this.tenant || !client) return { error: "Tenant null" };
-            const { data, error } = await client.from('ecom_orders').insert([{
+
+            const { data: order, error } = await client.from('ecom_orders').insert([{
                 ...orderData, company_id: this.tenant.id, status: 'pending'
             }]).select().single();
-            return { data, error };
+
+            if (error || !order) return { data: order, error };
+
+            if (items && items.length > 0) {
+                const orderItems = items.map(item => ({
+                    order_id: order.id,
+                    company_id: this.tenant.id,
+                    product_id: item.id,
+                    product_name: item.name,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                    amount: item.price * item.quantity
+                }));
+                await client.from('ecom_order_items').insert(orderItems);
+            }
+
+            return { data: order, error: null };
         },
 
         async getOrders() {

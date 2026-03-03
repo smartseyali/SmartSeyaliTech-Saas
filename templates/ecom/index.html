@@ -29,16 +29,17 @@
         <!-- Full-Width Video/Image Hero -->
         <section class="hero-home">
             <div class="hero-bg">
-                <img src="assets/images/hero.png" alt="Hero Athlete">
+                <img src="assets/images/hero.png" alt="Hero Athlete" id="hero-img">
                 <div class="hero-overlay"></div>
             </div>
             <div class="container hero-container">
                 <div class="hero-content">
-                    <span class="hero-subtitle">NEW SEASON REVEAL</span>
-                    <h1 class="hero-title">REACH YOUR <br><span class="accent">PEAK LIMITS.</span></h1>
-                    <p class="hero-desc">Discover the next level of bio-engineered footwear with our all-new Performance
+                    <span class="hero-subtitle" id="hero-subtitle">NEW SEASON REVEAL</span>
+                    <h1 class="hero-title" id="hero-title">REACH YOUR <br><span class="accent">PEAK LIMITS.</span></h1>
+                    <p class="hero-desc" id="hero-desc">Discover the next level of bio-engineered footwear with our
+                        all-new Performance
                         Series. Designed for speed, built for endurance.</p>
-                    <div class="hero-cta">
+                    <div class="hero-cta" id="hero-cta-box">
                         <a href="shop.html" class="btn btn-primary">SHOP COLLECTION</a>
                         <a href="about.html" class="btn btn-outline" style="color:#fff; border-color:#fff;">LEARN
                             TECH</a>
@@ -94,13 +95,16 @@
         </section>
 
         <!-- Banner - Brand Vision -->
-        <section class="vision-banner">
+        <section class="vision-banner" id="bottom-banner-bg">
             <div class="container vision-content">
                 <div class="vision-card">
-                    <h2>Built for the <span>Pro-Athlete</span> in you.</h2>
-                    <p>Every pair is tested in extreme conditions to ensure durability and comfort. Sustainability is at
+                    <h2 id="bottom-title">Built for the <span>Pro-Athlete</span> in you.</h2>
+                    <p id="bottom-desc">Every pair is tested in extreme conditions to ensure durability and comfort.
+                        Sustainability is at
                         our core.</p>
-                    <a href="shop.html" class="btn btn-primary">EXPLORE THE TECH</a>
+                    <div id="bottom-cta-box">
+                        <a href="shop.html" class="btn btn-primary">EXPLORE THE TECH</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -116,72 +120,128 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/layout.js"></script>
-    // Default category imagery
-    const defaultCatImages = [
-    'assets/images/aqua.png',
-    'assets/images/red.png',
-    'assets/images/yellow.png',
-    'assets/images/green.png'
-    ];
+    <script>
+        // Default category imagery
+        const defaultCatImages = [
+            'assets/images/aqua.png',
+            'assets/images/red.png',
+            'assets/images/yellow.png',
+            'assets/images/green.png'
+        ];
 
-    async function loadHomeCategories() {
-    // Wait for API
-    let retries = 0;
-    while ((!window.API || !window.API.tenant) && retries < 50) { await new Promise(r=> setTimeout(r, 100));
-        retries++;
-        }
-        if (!window.API || !window.API.tenant) return;
+        async function loadHomeCategories() {
+            // Wait for API
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) return;
 
-        const grid = document.getElementById('home-categories-grid');
-        if (!grid) return;
+            const grid = document.getElementById('home-categories-grid');
+            if (!grid) return;
 
-        try {
-        const client = window.supabaseClient;
-        if (client) {
-        const { data: categories } = await client
-        .from('ecom_categories')
-        .select('*')
-        .eq('company_id', window.API.tenant.id)
-        .limit(4);
+            try {
+                const client = window.supabaseClient;
+                if (client) {
+                    const { data: categories } = await client
+                        .from('ecom_categories')
+                        .select('*')
+                        .eq('company_id', window.API.tenant.id)
+                        .limit(4);
 
-        if (categories && categories.length > 0) {
-        grid.innerHTML = categories.map((cat, i) => {
-        const img = cat.image_url || defaultCatImages[i % defaultCatImages.length];
-        return `<a href="shop.html?cat=${encodeURIComponent(cat.name)}" class="cat-card">
+                    if (categories && categories.length > 0) {
+                        grid.innerHTML = categories.map((cat, i) => {
+                            const img = cat.image_url || defaultCatImages[i % defaultCatImages.length];
+                            return `<a href="shop.html?cat=${encodeURIComponent(cat.name)}" class="cat-card">
             <img src="${img}" alt="${cat.name}">
             <span class="cat-name">${cat.name.toUpperCase()}</span>
         </a>`;
-        }).join('');
-        return;
-        }
-        }
-        } catch (e) {
-        console.log('ecom_categories might not exist, using fallback');
-        }
+                        }).join('');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log('ecom_categories might not exist, using fallback');
+            }
 
-        // Fallback to products table
-        const products = await window.API.getProducts();
-        const catNames = [...new Set((products || []).map(p => p.category_name).filter(Boolean))].slice(0, 4);
+            // Fallback to products table
+            const products = await window.API.getProducts();
+            const catNames = [...new Set((products || []).map(p => p.category_name).filter(Boolean))].slice(0, 4);
 
-        if (catNames.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:2rem;">No categories found.</p>';
-        return;
-        }
+            if (catNames.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:2rem;">No categories found.</p>';
+                return;
+            }
 
-        grid.innerHTML = catNames.map((name, i) => {
-        const img = defaultCatImages[i % defaultCatImages.length];
-        return `<a href="shop.html?cat=${encodeURIComponent(name)}" class="cat-card">
+            grid.innerHTML = catNames.map((name, i) => {
+                const img = defaultCatImages[i % defaultCatImages.length];
+                return `<a href="shop.html?cat=${encodeURIComponent(name)}" class="cat-card">
             <img src="${img}" alt="${name}">
             <span class="cat-name">${name.toUpperCase()}</span>
         </a>`;
-        }).join('');
+            }).join('');
+        }
+
+        // Dynamic Hero Banner
+        async function loadHeroBanner() {
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) return;
+
+            const banners = await window.API.getDynamicContent('hero_banners');
+            if (banners && banners.length > 0) {
+                const b = banners[0]; // Just use first active hero banner
+                const imgEl = document.getElementById('hero-img');
+                const subEl = document.getElementById('hero-subtitle');
+                const titleEl = document.getElementById('hero-title');
+                if (imgEl) imgEl.src = b.image_url || 'assets/images/hero.png';
+                if (subEl) subEl.textContent = b.subtitle || 'NEW SEASON REVEAL';
+                if (titleEl) titleEl.innerHTML = b.title || 'REACH YOUR <br><span class="accent">PEAK LIMITS.</span>';
+
+                // If it has buttons:
+                const ctaEl = document.getElementById('hero-cta-box');
+                if (ctaEl && b.button_text) {
+                    ctaEl.innerHTML = `<a href="${b.button_link || 'shop.html'}" class="btn btn-primary">${b.button_text}</a>`;
+                }
+            }
+        }
+
+        // Dynamic Bottom Banner
+        async function loadBottomBanner() {
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+            if (!window.API || !window.API.tenant) return;
+
+            const banners = await window.API.getDynamicContent('bottom_banners');
+            if (banners && banners.length > 0) {
+                const b = banners[0]; // first active
+                const bgEl = document.getElementById('bottom-banner-bg');
+                const titleEl = document.getElementById('bottom-title');
+                const descEl = document.getElementById('bottom-desc');
+                const ctaBox = document.getElementById('bottom-cta-box');
+
+                if (bgEl && b.image_url) bgEl.style.backgroundImage = `url('${b.image_url}')`;
+                if (titleEl && b.title) titleEl.innerHTML = b.title;
+                if (descEl && b.subtitle) descEl.textContent = b.subtitle;
+                if (ctaBox && b.button_text) {
+                    ctaBox.innerHTML = `<a href="${b.button_link || 'shop.html'}" class="btn btn-primary">${b.button_text}</a>`;
+                }
+            }
         }
 
         // Load products from Supabase DB
         async function loadHomeProducts() {
-        let retries = 0;
-        while ((!window.API || !window.API.tenant) && retries < 50) { await new Promise(r=> setTimeout(r, 100));
-            retries++;
+            let retries = 0;
+            while ((!window.API || !window.API.tenant) && retries < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
             }
             if (!window.API || !window.API.tenant) return;
 
@@ -190,14 +250,13 @@
             if (!grid) return;
             const homeProducts = (products || []).slice(0, 8);
             if (homeProducts.length === 0) {
-            grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">No
-                products found. Add products from the admin panel.</p>';
-            return;
+                grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">No products found. Add products from the admin panel.</p>';
+                return;
             }
             grid.innerHTML = '';
             homeProducts.forEach(p => {
-            const imgSrc = p.image_url || p.image || 'assets/images/placeholder.png';
-            const html = `
+                const imgSrc = p.image_url || p.image || 'assets/images/placeholder.png';
+                const html = `
             <div class="product-card">
                 <div class="card-img-wrapper" onclick="window.location.href='product.html?id=${p.id}'">
                     <img src="${imgSrc}" alt="${p.name}">
@@ -219,13 +278,16 @@
                     </div>
                 </div>
             </div>`;
-            grid.insertAdjacentHTML('beforeend', html);
+                grid.insertAdjacentHTML('beforeend', html);
             });
-            }
-            document.addEventListener('DOMContentLoaded', () => {
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHeroBanner();
+            loadBottomBanner();
             loadHomeCategories();
             loadHomeProducts();
-            });
+        });
+    </script>
 </body>
 
 </html>
