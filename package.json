@@ -14,7 +14,8 @@
     "supabase:login": "npx supabase login",
     "supabase:link": "npx supabase link --project-ref twymipaywjufnluuzpug",
     "supabase:push": "npx supabase db push",
-    "supabase:types": "npx supabase gen types typescript --project-id twymipaywjufnluuzpug --schema public > src/types/supabase.ts"
+    "supabase:types": "npx supabase gen types typescript --project-id twymipaywjufnluuzpug --schema public > src/types/supabase.ts",
+    "provision": "node provision_server.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

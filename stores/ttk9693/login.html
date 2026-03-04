@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .auth-section {
+            padding: 40px 0 60px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .10);
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--bg);
+            margin-bottom: 28px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all .2s;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border .2s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            font-family: inherit;
+            transition: opacity .2s;
+        }
+
+        .auth-btn:hover {
+            opacity: .88;
+        }
+
+        .auth-btn:disabled {
+            opacity: .5;
+            cursor: default;
+        }
+
+        .auth-msg {
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .auth-msg.error {
+            background: #fef2f2;
+            color: #c0392b;
+            border: 1px solid #fecaca;
+        }
+
+        .auth-msg.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .forgot-link {
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 16px;
+        }
+
+        .forgot-link a {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .page-title h1 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .page-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Standard header — injected by ui.js -->
+    <header id="main-header"></header>
+
+    <main class="container auth-section">
+        <div class="page-title">
+            <h1>Welcome Back</h1>
+            <p>Login or create a new account to continue</p>
+        </div>
+
+        <div class="auth-card scale-in">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</div>
+            </div>
+
+            <div id="auth-msg" style="display:none" class="auth-msg"></div>
+
+            <!-- LOGIN -->
+            <div id="form-login">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input id="l-email" type="email" class="form-input" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input id="l-pass" type="password" class="form-input" placeholder="••••••••">
+                </div>
+                <div class="forgot-link"><a onclick="switchTab('forgot')">Forgot password?</a></div>
+                <button class="auth-btn" id="login-btn" onclick="handleLogin()">Login to My Account</button>
+            </div>
+
+            <!-- SIGN UP -->
+            <div id="form-signup" style="display:none">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input id="s-name" type="text" class="form-input" placeholder="Your Name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input id="s-email" type="email" class="form-input" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input id="s-pass" type="password" class="form-input" placeholder="Minimum 6 characters">
+                </div>
+                <button class="auth-btn" id="signup-btn" onclick="handleSignup()">Create My Account</button>
+            </div>
+
+            <!-- FORGOT PASSWORD -->
+            <div id="form-forgot" style="display:none">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Enter your email and we'll send a
+                    password reset link.</p>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input id="f-email" type="email" class="form-input" placeholder="you@example.com">
+                </div>
+                <button class="auth-btn" id="forgot-btn" onclick="handleForgot()">Send Reset Link</button>
+                <p style="text-align:center;margin-top:16px">
+                    <a onclick="switchTab('login')"
+                        style="color:var(--primary);font-size:13px;font-weight:600;cursor:pointer">← Back to Login</a>
+                </p>
+            </div>
+
+            <!-- RESET PASSWORD (mode=reset in URL) -->
+            <div id="form-reset" style="display:none">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Enter your new password below.</p>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input id="r-pass" type="password" class="form-input" placeholder="Minimum 6 characters">
+                </div>
+                <button class="auth-btn" id="reset-btn" onclick="handleReset()">Update Password</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import ui from './js/ui.js';
+        import auth from './js/auth.js';
+        import api from './js/api.js';
+
+        // Inject header + footer on login page too
+        try { await ui.init(); } catch (e) { }
+
+        const params = new URLSearchParams(location.search);
+        const nextUrl = params.get('next') || 'index.html';
+        const mode = params.get('mode');
+
+        // Already logged in → redirect away
+        try {
+            if (mode !== 'reset') {
+                const session = await auth.getSession();
+                if (session) window.location.href = nextUrl;
+            }
+        } catch (e) { }
+
+        // Reset-password mode
+        if (mode === 'reset') {
+            document.querySelector('.auth-tabs').style.display = 'none';
+            document.querySelector('.page-title h1').textContent = 'Set New Password';
+            showOnly('form-reset');
+        }
+
+        // ── Tab switcher ────────────────────────────────────
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            clearMsg();
+            const map = { login: 'form-login', signup: 'form-signup', forgot: 'form-forgot' };
+            showOnly(map[tab] || 'form-login');
+            if (tab === 'login') document.getElementById('tab-login')?.classList.add('active');
+            if (tab === 'signup') document.getElementById('tab-signup')?.classList.add('active');
+        };
+
+        function showOnly(id) {
+            ['form-login', 'form-signup', 'form-forgot', 'form-reset']
+                .forEach(f => document.getElementById(f).style.display = f === id ? 'block' : 'none');
+        }
+
+        function showMsg(text, type = 'error') {
+            const el = document.getElementById('auth-msg');
+            el.textContent = text;
+            el.className = `auth-msg ${type}`;
+            el.style.display = 'block';
+        }
+
+        function clearMsg() {
+            const el = document.getElementById('auth-msg');
+            el.style.display = 'none';
+        }
+
+        function setBusy(btnId, busy, label) {
+            const btn = document.getElementById(btnId);
+            btn.disabled = busy;
+            if (busy) { btn.dataset.orig = btn.textContent; btn.textContent = 'Please wait...'; }
+            else btn.textContent = label || btn.dataset.orig || btn.textContent;
+        }
+
+        // ── Handlers ────────────────────────────────────────
+        window.handleLogin = async () => {
+            const email = document.getElementById('l-email').value.trim();
+            const pass = document.getElementById('l-pass').value;
+            if (!email || !pass) return showMsg('Please enter email and password.');
+            setBusy('login-btn', true);
+            try {
+                await auth.signIn(email, pass);
+                window.location.href = nextUrl;
+            } catch (e) { showMsg(e.message); setBusy('login-btn', false); }
+        };
+
+        window.handleSignup = async () => {
+            const name = document.getElementById('s-name').value.trim();
+            const email = document.getElementById('s-email').value.trim();
+            const pass = document.getElementById('s-pass').value;
+            if (!name || !email || !pass) return showMsg('All fields are required.');
+            if (pass.length < 6) return showMsg('Password must be at least 6 characters.');
+            setBusy('signup-btn', true);
+            try {
+                await auth.signUp(email, pass, name);
+                showMsg('Account created! Please check your email to confirm, then login.', 'success');
+                switchTab('login');
+            } catch (e) { showMsg(e.message); }
+            setBusy('signup-btn', false);
+        };
+
+        window.handleForgot = async () => {
+            const email = document.getElementById('f-email').value.trim();
+            if (!email) return showMsg('Please enter your email address.');
+            setBusy('forgot-btn', true);
+            try {
+                await auth.forgotPassword(email);
+                showMsg('Reset link sent! Check your inbox.', 'success');
+            } catch (e) { showMsg(e.message); }
+            setBusy('forgot-btn', false);
+        };
+
+        window.handleReset = async () => {
+            const pass = document.getElementById('r-pass').value;
+            if (pass.length < 6) return showMsg('Password must be at least 6 characters.');
+            setBusy('reset-btn', true);
+            try {
+                await auth.updatePassword(pass);
+                showMsg('Password updated! Redirecting...', 'success');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } catch (e) { showMsg(e.message); setBusy('reset-btn', false); }
+        };
+
+        // Enter key shortcut
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Enter') return;
+            const vis = ['form-login', 'form-signup', 'form-forgot', 'form-reset']
+                .find(id => document.getElementById(id).style.display !== 'none');
+            const map = { 'form-login': handleLogin, 'form-signup': handleSignup, 'form-forgot': handleForgot, 'form-reset': handleReset };
+            map[vis]?.();
+        });
+    </script>
+</body>
+
+</html>

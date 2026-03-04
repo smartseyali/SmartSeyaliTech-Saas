@@ -1,17 +1,3 @@
-/**
- * provision_server.cjs
- * Lightweight HTTP server that receives onboarding webhook
- * from Onboarding.tsx and runs provision_store.cjs automatically.
- *
- * Start this BEFORE npm run dev:
- *   node provision_server.cjs
- *
- * Runs on port 8000 → called by Onboarding.tsx at:
- *   POST http://localhost:8000/api/provision
- *
- * Request body (sent by Onboarding.tsx):
- *   { store_name, company_id, template }
- */
 
 const http = require('http');
 const { exec } = require('child_process');
@@ -19,30 +5,8 @@ const path = require('path');
 
 const PORT = 8000;
 
-// ── Read Supabase credentials from .env ──────────────────────
-// Simple manual parser — no dotenv dependency needed
-const fs = require('fs');
-let SUPABASE_URL = '';
-let SUPABASE_ANON_KEY = '';
-
-try {
-    const envFile = fs.readFileSync(path.join(__dirname, '.env'), 'utf8');
-    envFile.split('\n').forEach(line => {
-        const [key, ...rest] = line.split('=');
-        const val = rest.join('=').trim().replace(/^["']|["']$/g, '');
-        if (key?.trim() === 'VITE_SUPABASE_URL') SUPABASE_URL = val;
-        if (key?.trim() === 'VITE_SUPABASE_ANON_KEY') SUPABASE_ANON_KEY = val;
-    });
-    console.log('✅  Supabase credentials loaded from .env');
-} catch {
-    console.warn('⚠️   Could not read .env — using fallback credentials');
-    SUPABASE_URL = 'http://localhost:54321';
-    SUPABASE_ANON_KEY = 'your_anon_key';
-}
-
-// ── HTTP Server ───────────────────────────────────────────────
 const server = http.createServer((req, res) => {
-    // CORS headers — needed because Vite dev server is on :8080
+    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -58,83 +22,35 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', () => {
             try {
-                const payload = JSON.parse(body);
+                const { store_name, company_id, template } = JSON.parse(body);
+                console.log(`🚀 Provisioning requested: ${store_name} (ID: ${company_id})`);
 
-                // Accept both field naming conventions:
-                //   Onboarding.tsx sends:  { store_name, company_id, template }
-                //   Legacy sends:          { merchant_slug, template }
-                const storeName = (payload.store_name || payload.merchant_slug || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
-                const companyId = payload.company_id || '0';
-                const template = (payload.template || 'modern-shop').replace(/[^a-z0-9-]/g, '').toLowerCase();
+                const scriptPath = path.join(__dirname, 'provision_store.cjs');
+                const cmd = `node "${scriptPath}" ${store_name} ${company_id} ${template || 'modern-shop'} https://vxwjfonhadjjbdmkdrjc.supabase.co eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2pmb25oYWRqamJkbWtkcmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NTg0OTIsImV4cCI6MjA4NzIzNDQ5Mn0.lKrOXOLQtHDBhRgH6kz_t8admjaA_WR1bs_pIIwq0wM`;
 
-                if (!storeName) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ status: 'error', message: 'store_name is required' }));
-                    return;
-                }
-
-                console.log(`\n🚀  Provisioning: ${storeName}  (company_id=${companyId}, template=${template})`);
-
-                // Build the full CLI command with all 5 args
-                const cmd = [
-                    'node provision_store.cjs',
-                    `"${storeName}"`,
-                    `"${companyId}"`,
-                    `"${template}"`,
-                    `"${SUPABASE_URL}"`,
-                    `"${SUPABASE_ANON_KEY}"`
-                ].join(' ');
-
-                console.log(`    Running: node provision_store.cjs ${storeName} ${companyId} ${template} <url> <key>`);
-
-                exec(cmd, { cwd: __dirname }, (error, stdout, stderr) => {
+                exec(cmd, (error, stdout, stderr) => {
                     if (error) {
-                        console.error(`❌  Failed: ${error.message}`);
+                        console.error(`Error: ${error.message}`);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ status: 'error', message: error.message, stderr }));
+                        res.end(JSON.stringify({ error: error.message }));
                         return;
                     }
-
                     console.log(stdout);
-                    console.log(`✅  Store ready → stores/${storeName}/`);
-
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({
-                        status: 'success',
-                        message: `Store "${storeName}" created for company #${companyId}`,
-                        store_path: `stores/${storeName}/`,
-                        store_url: `/stores/${storeName}/index.html`
-                    }));
+                    res.end(JSON.stringify({ success: true, message: 'Store provisioned successfully' }));
                 });
-
-            } catch (err) {
-                console.error('❌  Invalid request body:', err.message);
+            } catch (e) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'error', message: 'Invalid JSON body' }));
+                res.end(JSON.stringify({ error: 'Invalid JSON body' }));
             }
         });
-
-    } else if (req.method === 'GET' && req.url === '/health') {
-        // Health check endpoint
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ok', port: PORT, supabaseUrl: SUPABASE_URL }));
-
     } else {
         res.writeHead(404);
-        res.end(JSON.stringify({ error: 'Not found. Use POST /api/provision' }));
+        res.end();
     }
 });
 
 server.listen(PORT, () => {
-    console.log(`
-  ┌─────────────────────────────────────────────────────┐
-  │  🌐  EcomSuite Provisioning Server                   │
-  │  Port    : ${PORT}                                      │
-  │  Endpoint: http://localhost:${PORT}/api/provision       │
-  │  Health  : http://localhost:${PORT}/health              │
-  │                                                     │
-  │  Accepts: POST { store_name, company_id, template } │
-  │  Creates: stores/<store_name>/ with config.js       │
-  └─────────────────────────────────────────────────────┘
-    `);
+    console.log(`\n✅ Provisioning Server running at http://localhost:${PORT}`);
+    console.log(`Ready to create physical storefronts for new merchants.\n`);
 });

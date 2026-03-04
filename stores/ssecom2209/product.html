@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .product-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 24px 0;
+        }
+
+        .product-image-main {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: contain;
+            max-height: 420px;
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .product-meta h1 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .price-block {
+            margin: 16px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .price-main {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .price-mrp {
+            font-size: 16px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .price-off {
+            font-size: 14px;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 16px 0;
+        }
+
+        .variant-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .variant-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 6px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            background: white;
+        }
+
+        .chip.selected {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(40, 116, 240, .06);
+        }
+
+        .chip:hover {
+            border-color: var(--primary);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-control button {
+            width: 38px;
+            height: 42px;
+            border: none;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: background .15s;
+        }
+
+        .qty-control button:hover {
+            background: var(--border);
+        }
+
+        .qty-control span {
+            padding: 0 16px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* Reviews */
+        .reviews-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 16px 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .review-card {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .review-card:last-child {
+            border: none;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .review-name {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .review-stars {
+            color: #f59e0b;
+            font-size: 13px;
+        }
+
+        .review-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .no-reviews {
+            color: var(--text-muted);
+            font-size: 13px;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        @media(max-width:768px) {
+            .product-detail-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="main-header"></header>
+
+    <main class="container">
+        <div id="product-container" style="min-height:300px">
+            <!-- Skeleton loader -->
+            <div class="product-detail-grid" id="skeleton">
+                <div class="skeleton" style="height:400px;border-radius:12px"></div>
+                <div style="display:flex;flex-direction:column;gap:12px;padding-top:20px">
+                    <div class="skeleton" style="height:28px;width:70%;border-radius:6px"></div>
+                    <div class="skeleton" style="height:40px;width:40%;border-radius:6px"></div>
+                    <div class="skeleton" style="height:80px;border-radius:6px"></div>
+                    <div class="skeleton" style="height:44px;width:60%;border-radius:8px"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviews-container"></div>
+    </main>
+
+    <div id="cart-drawer" class="drawer"></div>
+    <div id="drawer-overlay" class="drawer-overlay" onclick="closeCart()"></div>
+
+    <script type="module">
+        import ui from './js/ui.js';
+        import api from './js/api.js';
+        import { mapper } from './js/mapper.js';
+        import { cartStore } from './js/cart.js';
+
+        const productId = new URLSearchParams(location.search).get('id');
+        let selectedVariantId = null;
+        let qty = 1;
+        let currentProduct = null;
+
+        // ── Close cart helper ───────────────────────────────────
+        window.closeCart = () => {
+            document.getElementById('cart-drawer').classList.remove('open');
+            document.getElementById('drawer-overlay').classList.remove('show');
+        };
+
+        async function init() {
+            try { await ui.init(); } catch (e) { }
+
+            if (!productId) {
+                document.getElementById('product-container').innerHTML =
+                    '<p style="text-align:center;padding:60px;color:var(--text-muted)">Product not found.</p>';
+                return;
+            }
+
+            const product = await api.getProductDetails(productId);
+
+            // Remove skeleton
+            document.getElementById('skeleton')?.remove();
+
+            if (!product) {
+                document.getElementById('product-container').innerHTML =
+                    '<p style="text-align:center;padding:60px;color:var(--text-muted)">Product not found or unavailable.</p>';
+                return;
+            }
+
+            currentProduct = product;
+            const m = mapper.mapProduct(product);
+            const variants = product.product_variants || [];
+
+            // Pre-select first variant
+            if (variants.length) selectedVariantId = variants[0].id;
+
+            // ── Render variant chips ──────────────────────────────
+            const renderChips = () => {
+                if (!variants.length) return '';
+                // Parse options JSON from attributes_summary
+                const parsed = variants.map(v => {
+                    let opts = {};
+                    try { opts = JSON.parse(v.attributes_summary || '{}'); } catch { }
+                    return { ...v, opts };
+                });
+
+                // Color chips
+                const colors = [...new Set(parsed.map(v => v.opts.color).filter(Boolean))];
+                const sizes = [...new Set(parsed.map(v => v.opts.size).filter(Boolean))];
+
+                let html = '';
+                if (colors.length) html += `
+                    <div class="variant-label">Color</div>
+                    <div class="variant-chips">
+                        ${colors.map((c, i) => `<button class="chip ${i === 0 ? 'selected' : ''}" onclick="selectChip(this, 'color', '${c}')">${c}</button>`).join('')}
+                    </div>`;
+                if (sizes.length) html += `
+                    <div class="variant-label">Size</div>
+                    <div class="variant-chips">
+                        ${sizes.map((s, i) => `<button class="chip ${i === 0 ? 'selected' : ''}" onclick="selectChip(this, 'size', '${s}')">${s}</button>`).join('')}
+                    </div>`;
+                return html;
+            };
+
+            // ── Build product HTML ───────────────────────────────
+            document.getElementById('product-container').innerHTML = `
+                <div class="product-detail-grid fade-in">
+                    <div>
+                        <img src="${m.image}" class="product-image-main" alt="${m.name}" id="main-img">
+                    </div>
+                    <div class="product-meta">
+                        <h1>${m.name}</h1>
+                        <div class="price-block">
+                            <span class="price-main" id="variant-price">${mapper.formatCurrency(m.price)}</span>
+                            ${m.comparePrice ? `<span class="price-mrp">${mapper.formatCurrency(m.comparePrice)}</span>` : ''}
+                            ${m.discountLabel ? `<span class="price-off">${m.discountLabel}</span>` : ''}
+                        </div>
+                        <p class="description">${m.description || 'No description available.'}</p>
+
+                        ${renderChips()}
+
+                        <div class="action-row">
+                            <div class="qty-control">
+                                <button onclick="changeQty(-1)">−</button>
+                                <span id="qty-display">1</span>
+                                <button onclick="changeQty(1)">+</button>
+                            </div>
+                            <button class="btn btn-primary" style="flex:1" onclick="addToCart()">
+                                Add to Cart
+                            </button>
+                            <button class="btn btn-secondary" style="flex:1" onclick="buyNow()">
+                                Buy Now
+                            </button>
+                        </div>
+                        <p style="font-size:11px;color:var(--text-muted);margin-top:12px">
+                            ✅ In Stock &nbsp;|&nbsp; 🚚 Free delivery on orders above ₹499
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            // ── Render reviews ───────────────────────────────────
+            const reviews = product.product_reviews || [];
+            document.getElementById('reviews-container').innerHTML = `
+                <div class="reviews-section">
+                    <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">
+                        Customer Reviews ${reviews.length ? `<span style="font-size:14px;font-weight:500;color:var(--text-muted)">(${reviews.length})</span>` : ''}
+                    </h2>
+                    ${reviews.length ? reviews.map(r => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-name">${r.customer_name || 'Anonymous'}</span>
+                                <span class="review-stars">${'★'.repeat(r.rating || 5)}${'☆'.repeat(5 - (r.rating || 5))}</span>
+                            </div>
+                            <p class="review-text">${r.review || ''}</p>
+                        </div>
+                    `).join('') : '<p class="no-reviews">No reviews yet. Be the first to review!</p>'}
+                </div>
+            `;
+        }
+
+        // Variant selection
+        window.selectChip = (el, type, val) => {
+            el.closest('.variant-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            // Update price from matched variant
+            const variants = currentProduct?.product_variants || [];
+            const match = variants.find(v => {
+                try { const o = JSON.parse(v.attributes_summary || '{}'); return o[type] === val; } catch { return false; }
+            });
+            if (match) {
+                selectedVariantId = match.id;
+                document.getElementById('variant-price').textContent = mapper.formatCurrency(match.price || currentProduct.price);
+            }
+        };
+
+        // Quantity control
+        window.changeQty = (delta) => {
+            qty = Math.max(1, qty + delta);
+            document.getElementById('qty-display').textContent = qty;
+        };
+
+        // Add to cart
+        window.addToCart = () => {
+            if (!currentProduct) return;
+            const m = mapper.mapProduct(currentProduct);
+            cartStore.addItem(currentProduct.id, selectedVariantId, qty, m);
+            document.getElementById('cart-drawer').classList.add('open');
+            document.getElementById('drawer-overlay').classList.add('show');
+        };
+
+        // Buy now — add to cart then redirect to checkout
+        window.buyNow = () => {
+            window.addToCart();
+            window.location.href = 'checkout.html';
+        };
+
+        init();
+    </script>
+</body>
+
+</html>

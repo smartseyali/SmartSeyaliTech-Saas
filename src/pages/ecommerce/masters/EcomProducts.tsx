@@ -12,42 +12,53 @@ const ecomProductColumns = [
     { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><Box className="w-4 h-4 text-muted-foreground" /></div> },
     { key: "sku", label: "SKU" },
     { key: "name", label: "Product Name" },
-    { key: "category", label: "Category" },
+    {
+        key: "ecom_categories",
+        label: "Category",
+        render: (val: any) => val?.name || <span className="text-muted-foreground italic">Uncategorized</span>
+    },
     { key: "price", label: "Price", align: "right" as const, render: (val: any) => `₹ ${Number(val || 0).toLocaleString('en-IN')}` },
     { key: "is_featured", label: "Featured", render: (val: boolean) => val ? <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" /> : <Star className="w-4 h-4 text-muted-foreground/20" /> },
     { key: "status", label: "Status" },
 ];
 
-const ecomProductFields: FieldConfig[] = [
-    { key: "image_url", label: "Primary Image", type: "image", folder: "products" },
-    { key: "name", label: "Display Name (for Site)", required: true },
-    { key: "sku", label: "SKU / Model" },
-    { key: "category", label: "Category", type: "text" },
-    { key: "rate", label: "Sale Price (MRP)", type: "number" },
-    { key: "description", label: "Web Description", type: "textarea" },
-    {
-        key: "is_featured", label: "Feature on Home Page", type: "select", options: [
-            { label: "Hide", value: "false" },
-            { label: "Show in Featured section", value: "true" }
-        ]
-    },
-    {
-        key: "is_best_seller", label: "Mark as Best Seller", type: "select", options: [
-            { label: "No", value: "false" },
-            { label: "Yes", value: "true" }
-        ]
-    },
-    { key: "meta_title", label: "SEO Title", ph: "Enter title for Google search" },
-    { key: "meta_description", label: "SEO Description", type: "textarea" },
-];
-
 export const EcomProducts = () => {
-    const { data, loading, createItem, updateItem, deleteItem } = useCrud("products");
+    const { data, loading, createItem, updateItem, deleteItem } = useCrud("products", "*, ecom_categories(id, name)");
+    const { data: categories } = useCrud("ecom_categories");
     const { activeCompany } = useTenant();
     const navigate = useNavigate();
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
     const [variantDialogOpen, setVariantDialogOpen] = useState(false);
+
+    // Dynamic fields with category options
+    const ecomProductFields: FieldConfig[] = [
+        { key: "image_url", label: "Primary Image", type: "image", folder: "products" },
+        { key: "name", label: "Display Name (for Site)", required: true },
+        { key: "sku", label: "SKU / Model" },
+        {
+            key: "category_id",
+            label: "Product Category",
+            type: "select",
+            options: (categories || []).map(c => ({ label: c.name, value: String(c.id) }))
+        },
+        { key: "rate", label: "Sale Price (MRP)", type: "number" },
+        { key: "description", label: "Web Description", type: "textarea" },
+        {
+            key: "is_featured", label: "Feature on Home Page", type: "select", options: [
+                { label: "Hide", value: "false" },
+                { label: "Show in Featured section", value: "true" }
+            ]
+        },
+        {
+            key: "is_best_seller", label: "Mark as Best Seller", type: "select", options: [
+                { label: "No", value: "false" },
+                { label: "Yes", value: "true" }
+            ]
+        },
+        { key: "meta_title", label: "SEO Title", ph: "Enter title for Google search" },
+        { key: "meta_description", label: "SEO Description", type: "textarea" },
+    ];
 
     // Filter only ecom products if needed, but for now we show all
     const ecomData = data.filter(p => (p as any).is_ecommerce !== false);
@@ -58,7 +69,12 @@ export const EcomProducts = () => {
     };
 
     const handleEdit = (item: any) => {
-        setEditingItem(item);
+        // Convert category_id to string for the select component
+        const editData = {
+            ...item,
+            category_id: item.category_id ? String(item.category_id) : ""
+        };
+        setEditingItem(editData);
         setFormOpen(true);
     };
 
@@ -67,7 +83,11 @@ export const EcomProducts = () => {
             ...formData,
             is_ecommerce: true,
             is_featured: formData.is_featured === "true",
-            is_best_seller: formData.is_best_seller === "true"
+            is_best_seller: formData.is_best_seller === "true",
+            // Correct mapping for bigint relation
+            category_id: formData.category_id ? parseInt(formData.category_id) : null,
+            // Sync legacy field for compatibility
+            category: categories.find(c => String(c.id) === formData.category_id)?.name || ""
         };
         if (editingItem) {
             await updateItem(editingItem.id, payload);

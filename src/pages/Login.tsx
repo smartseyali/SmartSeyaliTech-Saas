@@ -16,7 +16,8 @@ export default function Login() {
     const navigate = useNavigate();
     const { toast } = useToast();
 
-    const isMerchantLogin = window.location.pathname === "/ecommerce-login";
+    // SaaS is for merchants by default
+    const isMerchantLogin = window.location.pathname === "/login" || window.location.pathname === "/ecommerce-login";
     const [mode, setMode] = useState<"login" | "signup" | "forgot-password">("login");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -125,9 +126,9 @@ export default function Login() {
                 <div className="relative z-10 h-full flex flex-col justify-between">
                     <Link to="/" className="flex items-center gap-3 group">
                         <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-all">
-                            <ShoppingBag className="w-6 h-6 text-white" />
+                            <ShieldCheck className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-white font-black text-2xl uppercase tracking-tighter">BeliBeli</span>
+                        <span className="text-white font-black text-2xl uppercase tracking-tighter">Merchant Hub</span>
                     </Link>
 
                     <div className="space-y-6">
@@ -139,14 +140,14 @@ export default function Login() {
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-white/60 text-sm font-medium">Joined by <span className="text-white font-bold">10,000+</span> shoppers today</p>
+                            <p className="text-white/60 text-sm font-medium">Powering <span className="text-white font-bold">500+</span> e-commerce stores</p>
                         </div>
                         <h2 className="text-5xl font-black text-white leading-tight uppercase tracking-tight">
-                            Elevate Your <br />
-                            <span className="text-primary italic font-normal">Everyday</span> Style
+                            Scale Your <br />
+                            <span className="text-primary italic font-normal">Business</span> Today
                         </h2>
                         <p className="text-white/40 max-w-sm text-lg leading-relaxed">
-                            Discover curated collections and exclusive deals designed for the modern trendsetter.
+                            The all-in-one SaaS platform for modern merchants to manage inventory, orders, and growth.
                         </p>
                     </div>
 
@@ -167,11 +168,7 @@ export default function Login() {
                         <p className="text-muted-foreground font-medium">
                             {isMerchantLogin
                                 ? "Administrative Access for Merchant Partners"
-                                : (mode === 'login'
-                                    ? "Enter your details to continue your journey."
-                                    : mode === 'signup'
-                                        ? "Join the community and start shopping."
-                                        : "We'll help you get back into your account.")}
+                                : "Join the community and start shopping."}
                         </p>
                     </div>
 
@@ -279,23 +276,23 @@ export default function Login() {
                                 className="text-sm font-medium text-muted-foreground"
                             >
                                 {mode === 'login'
-                                    ? <>New to BeliBeli? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Create Account</span></>
-                                    : <>Already have an account? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Sign In</span></>}
+                                    ? <>New Merchant? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Apply for Account</span></>
+                                    : <>Already a Partner? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Sign In</span></>}
                             </button>
                         </div>
                     </div>
 
-                    {mode === 'login' && (
+                    {isMerchantLogin && (
                         <div className="pt-10 border-t border-border flex flex-col items-center gap-4">
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                {isMerchantLogin ? "Looking for your orders?" : "Are you a merchant?"}
+                                Technical support needed?
                             </p>
-                            <Link
-                                to={isMerchantLogin ? "/login" : "/ecommerce-login"}
+                            <a
+                                href="mailto:support@merchanthub.com"
                                 className="text-xs font-bold px-6 py-2 rounded-full border border-border hover:bg-secondary transition-all"
                             >
-                                {isMerchantLogin ? "Customer Login" : "Merchant Portal"}
-                            </Link>
+                                Contact Support
+                            </a>
                         </div>
                     )}
                 </div>

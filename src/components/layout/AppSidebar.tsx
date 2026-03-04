@@ -37,6 +37,7 @@ interface NavItem {
     title: string;
     url: string;
     icon: React.ElementType;
+    resource?: string;
 }
 
 interface NavGroup {
@@ -52,12 +53,12 @@ const navGroups: NavGroup[] = [
         module: "Ecommerce",
         icon: Library,
         items: [
-            { title: "Products", url: "/ecommerce/masters/products", icon: Boxes },
-            { title: "Categories", url: "/ecommerce/masters/categories", icon: LayoutGrid },
-            { title: "Brands", url: "/ecommerce/masters/brands", icon: Award },
-            { title: "Collections", url: "/ecommerce/masters/collections", icon: Library },
-            { title: "Hero Banners", url: "/ecommerce/banners", icon: Layout },
-            { title: "Media Gallery", url: "/ecommerce/gallery", icon: ImageIcon },
+            { title: "Products", url: "/ecommerce/masters/products", icon: Boxes, resource: "products" },
+            { title: "Categories", url: "/ecommerce/masters/categories", icon: LayoutGrid, resource: "products" },
+            { title: "Brands", url: "/ecommerce/masters/brands", icon: Award, resource: "products" },
+            { title: "Collections", url: "/ecommerce/masters/collections", icon: Library, resource: "products" },
+            { title: "Hero Banners", url: "/ecommerce/banners", icon: Layout, resource: "marketing" },
+            { title: "Media Gallery", url: "/ecommerce/gallery", icon: ImageIcon, resource: "products" },
         ],
     },
     {
@@ -65,11 +66,11 @@ const navGroups: NavGroup[] = [
         module: "Ecommerce",
         icon: ShoppingBag,
         items: [
-            { title: "Orders", url: "/ecommerce/orders", icon: EcomCart },
-            { title: "Customers", url: "/ecommerce/customers", icon: Users },
-            { title: "Deliveries", url: "/ecommerce/deliveries", icon: Truck },
-            { title: "Refunds", url: "/ecommerce/refunds", icon: RotateCcw },
-            { title: "Abandoned Carts", url: "/ecommerce/abandoned-carts", icon: ShoppingBag },
+            { title: "Orders", url: "/ecommerce/orders", icon: EcomCart, resource: "orders" },
+            { title: "Customers", url: "/ecommerce/customers", icon: Users, resource: "customers" },
+            { title: "Deliveries", url: "/ecommerce/deliveries", icon: Truck, resource: "orders" },
+            { title: "Refunds", url: "/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
+            { title: "Abandoned Carts", url: "/ecommerce/abandoned-carts", icon: ShoppingBag, resource: "orders" },
         ],
     },
     {
@@ -77,9 +78,9 @@ const navGroups: NavGroup[] = [
         module: "Ecommerce",
         icon: Zap,
         items: [
-            { title: "Coupons", url: "/ecommerce/coupons", icon: Tag },
-            { title: "Offers", url: "/ecommerce/offers", icon: Zap },
-            { title: "Reviews", url: "/ecommerce/reviews", icon: Star },
+            { title: "Coupons", url: "/ecommerce/coupons", icon: Tag, resource: "marketing" },
+            { title: "Offers", url: "/ecommerce/offers", icon: Zap, resource: "marketing" },
+            { title: "Reviews", url: "/ecommerce/reviews", icon: Star, resource: "marketing" },
         ],
     },
     {
@@ -87,8 +88,8 @@ const navGroups: NavGroup[] = [
         module: "Ecommerce",
         icon: BarChart3,
         items: [
-            { title: "Analytics", url: "/ecommerce/analytics", icon: Zap },
-            { title: "Reports", url: "/ecommerce/reports", icon: BarChart3 },
+            { title: "Analytics", url: "/ecommerce/analytics", icon: Zap, resource: "analytics" },
+            { title: "Reports", url: "/ecommerce/reports", icon: BarChart3, resource: "analytics" },
         ],
     },
     {
@@ -96,17 +97,26 @@ const navGroups: NavGroup[] = [
         module: "Ecommerce",
         icon: Settings,
         items: [
-            { title: "Website Manager", url: "/ecommerce/website", icon: Globe2 },
-            { title: "Billing & Plans", url: "/ecommerce/billing", icon: CreditCard },
-            { title: "Team Management", url: "/ecommerce/team", icon: Users },
-            { title: "Payment Gateways", url: "/ecommerce/payment-gateways", icon: ShieldCheck },
-            { title: "Shipping Zones", url: "/ecommerce/shipping-zones", icon: MapPin },
-            { title: "API & Integrations", url: "/ecommerce/api-integrations", icon: Zap },
-            { title: "General Settings", url: "/ecommerce/settings", icon: Settings },
+            { title: "Website Manager", url: "/ecommerce/website", icon: Globe2, resource: "settings" },
+            { title: "Billing & Plans", url: "/ecommerce/billing", icon: CreditCard, resource: "settings" },
+            { title: "Team Management", url: "/ecommerce/team", icon: Users, resource: "team" },
+            { title: "Payment Gateways", url: "/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },
+            { title: "Shipping Zones", url: "/ecommerce/shipping-zones", icon: MapPin, resource: "settings" },
+            { title: "API & Integrations", url: "/ecommerce/api-integrations", icon: Zap, resource: "settings" },
+            { title: "General Settings", url: "/ecommerce/settings", icon: Settings, resource: "settings" },
             { title: "View Storefront", url: "STOREFRONT", icon: ExternalLink },
         ],
     }
 ];
+
+export const getRequiredResource = (pathname: string): string | undefined => {
+    for (const group of navGroups) {
+        const match = group.items.find(item => pathname.startsWith(item.url));
+        if (match) return match.resource;
+    }
+    return undefined;
+};
+
 
 interface AppSidebarProps {
     collapsed: boolean;
@@ -115,7 +125,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const location = useLocation();
-    const { hasModule, isSuperAdmin } = usePermissions();
+    const { hasModule, isSuperAdmin, can } = usePermissions();
     const { activeCompany, companies, setCompany } = useTenant();
     const [openGroups, setOpenGroups] = useState<string[]>(["Ecommerce"]);
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
@@ -140,7 +150,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     {!collapsed && (
                         <div className="flex flex-col">
                             <span className="font-bold text-white tracking-tight text-lg">
-                                SmartSaaS
+                                Merchant Hub
                             </span>
                         </div>
                     )}
@@ -204,6 +214,9 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 {navGroups
                     .filter((group) => hasModule(group.module || group.label))
                     .map((group) => {
+                        const visibleItems = group.items.filter(item => !item.resource || can('manage', item.resource));
+                        if (visibleItems.length === 0) return null;
+
                         return (
                             <div key={group.label} className="space-y-1">
                                 {!collapsed && (
@@ -211,7 +224,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#f97316]">{group.label}</p>
                                     </div>
                                 )}
-                                {group.items.map((item) => {
+                                {visibleItems.map((item) => {
                                     const isExternal = item.url === "STOREFRONT";
                                     if (isExternal) {
                                         return (

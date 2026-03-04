@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .tracking-wrap {
+            max-width: 700px;
+            margin: 32px auto;
+        }
+
+        .track-panel {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 16px;
+        }
+
+        .track-panel h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .detail-row:last-child {
+            border: none;
+        }
+
+        .detail-row .label {
+            color: var(--text-muted);
+        }
+
+        .detail-row .val {
+            font-weight: 700;
+        }
+
+        /* Timeline */
+        .timeline {
+            padding: 8px 0;
+        }
+
+        .tl-item {
+            display: flex;
+            gap: 16px;
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .tl-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: 13px;
+            top: 26px;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .tl-item:last-child::before {
+            display: none;
+        }
+
+        .tl-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            background: white;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .tl-dot.done {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .tl-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 116, 240, .4)
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(40, 116, 240, 0)
+            }
+        }
+
+        .tl-dot svg {
+            width: 14px;
+            height: 14px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .tl-label {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .tl-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .tl-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .s-pending {
+            background: #fef3c7;
+            color: #b45309
+        }
+
+        .s-confirmed {
+            background: #d1fae5;
+            color: #065f46
+        }
+
+        .s-shipped {
+            background: #dbeafe;
+            color: #1e40af
+        }
+
+        .s-delivered {
+            background: #dcfce7;
+            color: #166534
+        }
+
+        .s-cancelled {
+            background: #fee2e2;
+            color: #b91c1c
+        }
+
+        .cancel-btn {
+            background: none;
+            border: 1.5px solid var(--danger);
+            color: var(--danger);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .cancel-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Lookup form */
+        .lookup-form {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            max-width: 480px;
+            margin: 60px auto;
+            text-align: center;
+        }
+
+        .lookup-form h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .lookup-form p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .lookup-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lookup-input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .lookup-input:focus {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <header id="main-header"></header>
+    <main class="container" id="main-content">
+        <div style="text-align:center;padding:80px;color:var(--text-muted)">Loading...</div>
+    </main>
+
+    <script type="module">
+        import ui from './js/ui.js';
+        import api from './js/api.js';
+        import { mapper } from './js/mapper.js';
+        import { supabase } from './js/supabaseClient.js';
+        import { COMPANY_ID } from './js/config.js';
+
+        try { await ui.init(); } catch (e) { }
+
+        const params = new URLSearchParams(location.search);
+        const orderId = params.get('id');
+
+        if (!orderId) {
+            renderLookupForm();
+        } else {
+            await renderTracking(orderId);
+        }
+
+        // ── Lookup form (no order ID in URL) ─────────────────
+        function renderLookupForm() {
+            document.getElementById('main-content').innerHTML = `
+                <div class="lookup-form fade-in">
+                    <h2>Track Your Order</h2>
+                    <p>Enter your Order ID to check delivery status</p>
+                    <div class="lookup-row">
+                        <input class="lookup-input" id="track-input" placeholder="e.g. A1B2C3D4">
+                        <button class="btn btn-primary" onclick="doLookup()">Track</button>
+                    </div>
+                    <div id="lookup-error" style="margin-top:12px;font-size:13px;color:var(--danger)"></div>
+                </div>
+            `;
+        }
+
+        window.doLookup = async () => {
+            const val = document.getElementById('track-input').value.trim();
+            if (!val) return;
+            window.location.href = `order-tracking.html?id=${val}`;
+        };
+
+        // ── Full tracking view ────────────────────────────────
+        async function renderTracking(id) {
+            const order = await api.getOrder(id);
+            const main = document.getElementById('main-content');
+
+            if (!order) {
+                main.innerHTML = `
+                    <div class="lookup-form fade-in">
+                        <h2>Order Not Found</h2>
+                        <p>We couldn't find order <strong>${id}</strong>. Check the ID and try again.</p>
+                        <a href="order-tracking.html" class="btn btn-outline" style="display:inline-block;margin-top:16px">Try Again</a>
+                    </div>`;
+                return;
+            }
+
+            const addr = order.shipping_address || {};
+            const timeline = order.ecom_order_timeline || [];
+            const isCancellable = ['pending', 'confirmed'].includes(order.status?.toLowerCase());
+
+            // Build standard progress steps
+            const steps = [
+                { key: 'pending', label: 'Order Placed', icon: '📋', note: 'Your order is received' },
+                { key: 'confirmed', label: 'Order Confirmed', icon: '✅', note: 'Seller confirmed your order' },
+                { key: 'shipped', label: 'Shipped', icon: '🚚', note: 'Out for delivery' },
+                { key: 'delivered', label: 'Delivered', icon: '🏠', note: 'Package delivered!' }
+            ];
+
+            const statusOrder = ['pending', 'confirmed', 'shipped', 'delivered'];
+            const currentIdx = statusOrder.indexOf(order.status?.toLowerCase());
+
+            main.innerHTML = `
+                <div class="tracking-wrap fade-in">
+                    <!-- Header -->
+                    <div class="track-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+                            <div>
+                                <h2 style="margin-bottom:4px">Order #${order.order_number || id.slice(0, 8).toUpperCase()}</h2>
+                                <p style="font-size:13px;color:var(--text-muted)">Placed on ${new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            </div>
+                            <span class="status-badge s-${order.status?.toLowerCase()}">${order.status || 'Pending'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Timeline -->
+                    ${order.status?.toLowerCase() !== 'cancelled' ? `
+                    <div class="track-panel">
+                        <h2>Delivery Progress</h2>
+                        <div class="timeline">
+                            ${steps.map((step, i) => {
+                const done = i < currentIdx;
+                const active = i === currentIdx;
+                const cls = done ? 'done' : active ? 'active' : '';
+                // Find matching timeline event
+                const event = timeline.find(t => t.status?.toLowerCase() === step.key);
+                return `
+                                    <div class="tl-item">
+                                        <div class="tl-dot ${cls}">
+                                            ${done || active ? `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+                                        </div>
+                                        <div>
+                                            <div class="tl-label" style="color:${active ? 'var(--primary)' : done ? 'var(--text)' : 'var(--text-muted)'}">${step.icon} ${step.label}</div>
+                                            <div class="tl-note">${event?.note || step.note}</div>
+                                            ${event?.created_at ? `<div class="tl-time">${new Date(event.created_at).toLocaleString('en-IN')}</div>` : ''}
+                                        </div>
+                                    </div>`;
+            }).join('')}
+                        </div>
+                    </div>` : `
+                    <div class="track-panel">
+                        <h2>❌ Order Cancelled</h2>
+                        <p style="color:var(--text-muted);font-size:14px">This order has been cancelled. If you were charged, a refund will be processed within 5–7 business days.</p>
+                    </div>`}
+
+                    <!-- Delivery Address -->
+                    <div class="track-panel">
+                        <h2>📍 Delivery Address</h2>
+                        <p style="font-weight:700">${addr.name || '—'}</p>
+                        <p style="color:var(--text-muted);font-size:13px;margin-top:6px;line-height:1.7">
+                            ${addr.address || ''}, ${addr.city || ''}<br>
+                            ${addr.state || ''} - ${addr.pincode || ''}<br>
+                            📞 ${addr.phone || ''}
+                        </p>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="track-panel">
+                        <div class="detail-row"><span class="label">Payment Method</span><span class="val">${(order.payment_method || 'COD').toUpperCase()}</span></div>
+                        <div class="detail-row"><span class="label">Grand Total</span><span class="val">${mapper.formatCurrency(order.grand_total || 0)}</span></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap">
+                        ${isCancellable ? `<button class="cancel-btn" onclick="cancelOrder('${id}')">Cancel Order</button>` : ''}
+                        ${order.status === 'delivered' ? `<a href="refund-request.html?id=${id}" class="btn btn-outline">Request Refund</a>` : ''}
+                        <a href="profile.html" class="btn btn-secondary" style="margin-left:auto">← My Orders</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ── Cancel order ──────────────────────────────────────
+        window.cancelOrder = async (id) => {
+            if (!confirm('Are you sure you want to cancel this order?')) return;
+            try {
+                const { error } = await supabase
+                    .from('ecom_orders')
+                    .update({ status: 'cancelled' })
+                    .eq('id', id)
+                    .eq('company_id', COMPANY_ID);
+                if (error) throw error;
+                alert('Order cancelled successfully.');
+                window.location.reload();
+            } catch (e) {
+                alert('Failed to cancel: ' + e.message);
+            }
+        };
+    </script>
+</body>
+
+</html>

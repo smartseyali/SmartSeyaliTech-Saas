@@ -6,6 +6,7 @@ const auth = {
 
     // ── Get current session ─────────────────────────────────
     async getSession() {
+        if (!supabase) return null;
         const { data: { session } } = await supabase.auth.getSession();
         return session;
     },
@@ -18,6 +19,10 @@ const auth = {
 
     // ── Require login — redirect to login page if not authed ─
     async requireAuth(redirectBack = true) {
+        if (!supabase) {
+            console.error('Auth unavailable: Supabase not initialized');
+            return null;
+        }
         const session = await this.getSession();
         if (!session) {
             const next = redirectBack ? encodeURIComponent(location.href) : '';

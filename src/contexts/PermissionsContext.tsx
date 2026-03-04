@@ -109,7 +109,6 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     .map(sm => sm.name) || [];
 
                 // 7. Determine tenant role
-                // Tenant owner or named Admin role → full access within subscribed modules
                 const isTenantAdmin =
                     companyMapping && (
                         companyMapping.role === "owner"
@@ -123,10 +122,20 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     setAvailableModules(subscribedModules);
                     setPermissions([]);
                 } else {
-                    // No admin role assigned → only core modules for now
+                    // STAFF MEMBER: Fetch granular permissions
                     const coreModules = systemModules?.filter(sm => sm.is_core).map(sm => sm.name) || [];
                     setAvailableModules(coreModules);
-                    setPermissions([]);
+
+                    if (companyMapping) {
+                        const { data: userPerms } = await supabase
+                            .from('user_permissions')
+                            .select('resource, action')
+                            .eq('company_user_id', companyMapping.id);
+
+                        if (userPerms) setPermissions(userPerms);
+                    } else {
+                        setPermissions([]);
+                    }
                 }
 
             } catch (err) {

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .cat-hero {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cat-hero img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .cat-hero h1 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .cat-hero p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .cat-hero .count {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header injected by ui.js -->
+    <header id="main-header"></header>
+
+    <main class="container">
+        <!-- Category hero banner -->
+        <div class="cat-hero fade-in" id="cat-hero">
+            <div>
+                <h1 id="cat-name">Loading...</h1>
+                <p id="cat-desc"></p>
+                <span class="count" id="cat-count"></span>
+            </div>
+        </div>
+
+        <!-- Products grid -->
+        <div class="section">
+            <div id="cat-products" class="product-grid">
+                <!-- Static skeletons -->
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+                <div class="skeleton" style="height:280px;border-radius:var(--radius)"></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import ui from './js/ui.js';
+        import api from './js/api.js';
+        import { mapper } from './js/mapper.js';
+        import { supabase } from './js/supabaseClient.js';
+        import { COMPANY_ID } from './js/config.js';
+
+        try { await ui.init(); } catch (e) { }
+
+        const categoryId = new URLSearchParams(location.search).get('id');
+
+        if (!categoryId) {
+            window.location.href = 'shop.html';
+        }
+
+        // Load category details
+        try {
+            const { data: cat } = await supabase
+                .from('ecom_categories')
+                .select('id, name, description, image_url')
+                .eq('id', categoryId)
+                .eq('company_id', COMPANY_ID)
+                .maybeSingle();
+
+            if (cat) {
+                document.getElementById('cat-name').textContent = cat.name;
+                document.getElementById('cat-desc').textContent = cat.description || '';
+                document.title = cat.name + ' | Products';
+
+                if (cat.image_url) {
+                    const hero = document.getElementById('cat-hero');
+                    hero.innerHTML = `
+                        <img src="${cat.image_url}" alt="${cat.name}">
+                        <div>
+                            <h1>${cat.name}</h1>
+                            <p>${cat.description || ''}</p>
+                            <span class="count" id="cat-count"></span>
+                        </div>`;
+                }
+            }
+        } catch (e) { }
+
+        // Load products in this category
+        try {
+            const products = await api.getProducts({ category_id: categoryId });
+            const grid = document.getElementById('cat-products');
+            const countEl = document.getElementById('cat-count');
+
+            if (countEl) countEl.textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+
+            grid.innerHTML = products.length
+                ? products.map(p => {
+                    const m = mapper.mapProduct(p);
+                    return `
+                    <div class="product-card fade-in" onclick="location.href='product.html?id=${m.id}'">
+                        ${m.discountLabel ? `<span class="offer-label">${m.discountLabel}</span>` : ''}
+                        <img src="${m.image}" class="product-image" alt="${m.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
+                        <h3 class="product-title">${m.name}</h3>
+                        <div class="product-price-row">
+                            <span class="current-price">${mapper.formatCurrency(m.price)}</span>
+                            ${m.comparePrice ? `<span class="compare-price">${mapper.formatCurrency(m.comparePrice)}</span>` : ''}
+                        </div>
+                    </div>`;
+                }).join('')
+                : '<p class="empty-msg" style="grid-column:1/-1">No products in this category yet.</p>';
+        } catch (e) {
+            document.getElementById('cat-products').innerHTML =
+                '<p class="empty-msg" style="grid-column:1/-1">Failed to load products.</p>';
+        }
+    </script>
+</body>
+
+</html>

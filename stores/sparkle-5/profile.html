@@ -214,6 +214,7 @@
                 <nav class="sidebar-nav">
                     <div class="nav-item active" onclick="showTab('orders', this)">📦 My Orders</div>
                     <div class="nav-item" onclick="showTab('profile', this)">👤 Profile</div>
+                    <div class="nav-item" onclick="showTab('addresses', this)">📍 Addresses</div>
                     <div class="nav-item" onclick="showTab('refunds', this)">↩️ Refunds</div>
                     <div class="nav-item" style="color:var(--danger)" onclick="doLogout()">🚪 Logout</div>
                 </nav>
@@ -232,24 +233,53 @@
         import auth from './js/auth.js';
         import { mapper } from './js/mapper.js';
 
-        try { await ui.init(); } catch (e) { }
+        let user = null;
+        let name = 'User';
 
-        const session = await auth.requireAuth();
-        if (!session) return;
+        async function init() {
+            try {
+                // Initialize UI (header/footer)
+                try { await ui.init(); } catch (e) { console.warn('UI init failed:', e); }
 
-        const user = session.user;
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
-        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                // Check auth
+                const session = await auth.requireAuth();
+                if (!session) return; // Will redirect in requireAuth
 
-        document.getElementById('user-avatar').textContent = initials;
-        document.getElementById('user-name').textContent = name;
-        document.getElementById('user-email').textContent = user.email;
+                user = session.user;
+                name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+                // Update sidebar info
+                const avatarEl = document.getElementById('user-avatar');
+                const nameEl = document.getElementById('user-name');
+                const emailEl = document.getElementById('user-email');
+
+                if (avatarEl) avatarEl.textContent = initials;
+                if (nameEl) nameEl.textContent = name;
+                if (emailEl) emailEl.textContent = user.email;
+
+                // Load default tab (Orders)
+                await renderOrders();
+
+            } catch (err) {
+                console.error('Profile Init Error:', err);
+                document.getElementById('profile-panel').innerHTML = `
+                    <div style="text-align:center;padding:40px;color:var(--danger)">
+                        <p>Something went wrong while loading your profile.</p>
+                        <p style="font-size:12px;margin-top:10px">${err.message}</p>
+                        <button class="btn btn-outline" style="margin-top:20px" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+            }
+        }
 
         window.showTab = (tab, el) => {
+            if (!user) return;
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             if (tab === 'orders') renderOrders();
             if (tab === 'profile') renderProfileForm();
+            if (tab === 'addresses') renderAddresses();
             if (tab === 'refunds') renderRefunds();
         };
 
@@ -257,7 +287,7 @@
             if (confirm('Are you sure you want to logout?')) await auth.signOut();
         };
 
-        // ── Orders ─────────────────────────────────────────────
+        // ── Tabs ───────────────────────────────────────────────
         async function renderOrders() {
             const panel = document.getElementById('profile-panel');
             panel.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Loading orders...</div>';
@@ -286,7 +316,6 @@
             }
         }
 
-        // ── Profile form ───────────────────────────────────────
         function renderProfileForm() {
             document.getElementById('profile-panel').innerHTML = `
                 <h2>My Profile</h2>
@@ -302,7 +331,6 @@
 
         window.saveProfile = async () => {
             const msgEl = document.getElementById('pf-msg');
-            const updates = {};
             const newPass = document.getElementById('pf-pass').value;
             if (newPass && newPass.length < 6) return msgEl.innerHTML = '<span style="color:var(--danger)">Password must be at least 6 characters.</span>';
             if (newPass) {
@@ -311,16 +339,118 @@
             msgEl.innerHTML = '<span style="color:var(--success)">✅ Profile updated!</span>';
         };
 
-        // ── Refunds ────────────────────────────────────────────
+        async function renderAddresses() {
+            const panel = document.getElementById('profile-panel');
+            panel.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Loading addresses...</div>';
+            try {
+                const { data: addresses } = await (await import('./js/supabaseClient.js')).supabase
+                    .from('ecom_customer_addresses')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('is_default', { ascending: false });
+
+                panel.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+                        <h2 style="margin:0">Saved Addresses</h2>
+                        <button class="btn btn-outline" onclick="showAddressForm()">+ Add New</button>
+                    </div>
+                    <div id="address-list">
+                        ${addresses?.length ? addresses.map(a => `
+                            <div class="order-card">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                                    <div>
+                                        <div style="font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px">
+                                            ${a.name} 
+                                            ${a.is_default ? '<span style="font-size:10px;background:var(--primary);color:white;padding:2px 6px;border-radius:4px">DEFAULT</span>' : ''}
+                                        </div>
+                                        <div style="font-size:13px;color:var(--text-muted);margin-top:6px;line-height:1.6">
+                                            ${a.address}, ${a.city}<br>
+                                            ${a.state} - ${a.pincode}<br>
+                                            📞 ${a.phone}
+                                        </div>
+                                    </div>
+                                    <button class="remove-btn" onclick="deleteAddress('${a.id}')" title="Delete">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('') : '<p style="text-align:center;padding:40px;color:var(--text-muted)">No saved addresses.</p>'}
+                    </div>
+                `;
+            } catch (e) {
+                panel.innerHTML = '<p style="padding:40px;color:var(--text-muted)">Failed to load addresses.</p>';
+            }
+        }
+
+        window.showAddressForm = () => {
+            const panel = document.getElementById('profile-panel');
+            panel.innerHTML = `
+                <h2>Add New Address</h2>
+                <div class="form-grid">
+                    <div class="fg" style="grid-column:1/-1"><label>Full Name</label><input class="fi" id="addr-name" placeholder="John Doe"></div>
+                    <div class="fg" style="grid-column:1/-1"><label>Address</label><input class="fi" id="addr-line" placeholder="Flat, House no, Building, Company, Apartment"></div>
+                    <div class="fg"><label>City</label><input class="fi" id="addr-city" placeholder="Coimbatore"></div>
+                    <div class="fg"><label>State</label><input class="fi" id="addr-state" placeholder="Tamil Nadu"></div>
+                    <div class="fg"><label>Pincode</label><input class="fi" id="addr-pin" placeholder="641001"></div>
+                    <div class="fg"><label>Phone</label><input class="fi" id="addr-phone" placeholder="9876543210"></div>
+                </div>
+                <div style="margin-top:16px;display:flex;gap:12px">
+                    <button class="btn btn-primary" onclick="saveAddress()">Save Address</button>
+                    <button class="btn btn-outline" onclick="renderAddresses()">Cancel</button>
+                </div>
+                <div id="addr-msg" style="margin-top:12px;font-size:13px"></div>
+            `;
+        }
+
+        window.saveAddress = async () => {
+            const nameField = document.getElementById('addr-name').value;
+            const addressField = document.getElementById('addr-line').value;
+            const cityField = document.getElementById('addr-city').value;
+            const stateField = document.getElementById('addr-state').value;
+            const pincodeField = document.getElementById('addr-pin').value;
+            const phoneField = document.getElementById('addr-phone').value;
+            const msgEl = document.getElementById('addr-msg');
+
+            if (!nameField || !addressField || !cityField || !stateField || !pincodeField || !phoneField) {
+                return msgEl.innerHTML = '<span style="color:var(--danger)">Please fill all fields.</span>';
+            }
+
+            try {
+                const { COMPANY_ID } = await import('./js/config.js');
+                const { supabase } = await import('./js/supabaseClient.js');
+                const { error } = await supabase.from('ecom_customer_addresses').insert([{
+                    user_id: user.id,
+                    company_id: COMPANY_ID,
+                    name: nameField, address: addressField, city: cityField, state: stateField, pincode: pincodeField, phone: phoneField
+                }]);
+                if (error) throw error;
+                await renderAddresses();
+            } catch (e) {
+                msgEl.innerHTML = `<span style="color:var(--danger)">${e.message}</span>`;
+            }
+        };
+
+        window.deleteAddress = async (id) => {
+            if (!confirm('Delete this address?')) return;
+            try {
+                const { supabase } = await import('./js/supabaseClient.js');
+                const { error } = await supabase.from('ecom_customer_addresses').delete().eq('id', id);
+                if (error) throw error;
+                await renderAddresses();
+            } catch (e) { alert(e.message); }
+        };
+
         async function renderRefunds() {
             const panel = document.getElementById('profile-panel');
             panel.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">Loading refunds...</div>';
             try {
-                const { data: refunds } = await (await import('./js/supabaseClient.js')).supabase
+                const { data: refunds, error } = await (await import('./js/supabaseClient.js')).supabase
                     .from('refunds')
                     .select('id, amount, reason, status, created_at, order_id')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
+
+                if (error) throw error;
 
                 panel.innerHTML = `
                     <h2>Refund Requests</h2>
@@ -328,7 +458,7 @@
                         <div class="order-card">
                             <div class="order-head">
                                 <div>
-                                    <div class="order-id">Refund #${String(r.id)}</div>
+                                    <div class="order-id">Refund #${String(r.id).slice(0, 8)}</div>
                                     <div class="order-date">${new Date(r.created_at).toLocaleDateString('en-IN')}</div>
                                 </div>
                                 <span class="order-status s-${r.status}">${r.status || 'Requested'}</span>
@@ -345,8 +475,7 @@
             }
         }
 
-        // Show orders by default
-        renderOrders();
+        init();
     </script>
 </body>
 

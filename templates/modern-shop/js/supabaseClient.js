@@ -1,5 +1,8 @@
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
-const { createClient } = window.supabase;
+const lib = window.supabase;
+if (!lib) {
+    console.error('Supabase library not found! Ensure the CDN script is loaded.');
+}
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const supabase = lib ? lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
