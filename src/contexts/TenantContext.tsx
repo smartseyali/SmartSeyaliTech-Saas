@@ -13,6 +13,7 @@ interface Company {
     address?: string;
     city?: string;
     state?: string;
+    user_id?: string;
 }
 
 interface TenantContextType {
@@ -46,7 +47,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (potentialSlug && !reserved.includes(potentialSlug)) {
             const { data: companyBySlug } = await supabase
                 .from('companies')
-                .select('id, name, subdomain, industry_type')
+                .select('id, name, subdomain, industry_type, user_id')
                 .eq('subdomain', potentialSlug)
                 .maybeSingle();
 
@@ -64,9 +65,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             } else {
                 const { data: defaultComp } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, industry_type')
+                    .select('id, name, subdomain, industry_type, user_id')
                     .limit(1)
-                    .single();
+                    .maybeSingle();
 
                 if (defaultComp) {
                     setActiveCompany(defaultComp as Company);
@@ -103,7 +104,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             if (localUser?.is_super_admin) {
                 const { data: allCompanies } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, industry_type')
+                    .select('id, name, subdomain, industry_type, user_id')
                     .order('name');
 
                 const companiesData = (allCompanies || []) as Company[];
@@ -121,13 +122,26 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             // 3. Regular user: load only companies they belong to via company_users
             const { data: mappings } = await supabase
                 .from('company_users')
-                .select('company_id, companies(id, name, subdomain, industry_type)')
+                .select('company_id, companies(id, name, subdomain, industry_type, user_id)')
+                .eq('user_id', user.id);
+
+            // FALLBACK: Also check if they are the direct owner of any company
+            const { data: ownedCompanies } = await supabase
+                .from('companies')
+                .select('id, name, subdomain, industry_type, user_id')
                 .eq('user_id', user.id);
 
             let companiesData = (mappings || [])
                 .map(m => m.companies)
                 .flat()
                 .filter(Boolean) as unknown as Company[];
+
+            // Merge with owned companies (deduplicate by ID)
+            (ownedCompanies || []).forEach(oc => {
+                if (!companiesData.find(c => c.id === oc.id)) {
+                    companiesData.push(oc as Company);
+                }
+            });
 
             if (companiesData.length > 0) {
                 setCompanies(companiesData);
@@ -142,7 +156,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 if (detectedCompany) {
                     setActiveCompany(detectedCompany);
                 } else {
-                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, industry_type').limit(1).single();
+                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, industry_type, user_id').limit(1).maybeSingle();
                     if (defaultComp) setActiveCompany(defaultComp as Company);
                 }
             }

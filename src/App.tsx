@@ -99,7 +99,7 @@ const App = () => (
                     <TenantProvider>
                         <PermissionsProvider>
                             <CartProvider>
-                                <BrowserRouter>
+                                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                                     <Routes>
                                         {/* Storefront Routes (Dynamic Path-based Multi-tenancy) */}
                                         <Route path="/:companySlug" element={<StoreLayout />}>

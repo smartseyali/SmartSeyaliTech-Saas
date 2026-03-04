@@ -27,7 +27,7 @@ interface TemplateEntry {
 
 export default function Onboarding() {
     const { user } = useAuth();
-    const { refreshTenant } = useTenant();
+    const { refreshTenant, needsOnboarding, loading: loadingTenant } = useTenant();
     const navigate = useNavigate();
 
     const [step, setStep] = useState(1);
@@ -80,25 +80,13 @@ export default function Onboarding() {
 
     // ── Check if merchant already has a store ─────────────────
     useEffect(() => {
-        const checkExistingStore = async () => {
-            if (!user) return;
-
-            try {
-                const { data } = await supabase
-                    .from("companies")
-                    .select("subdomain")
-                    .eq("user_id", user.id)
-                    .maybeSingle();
-
-                if (data) navigate("/ecommerce");
-            } catch (err) {
-                console.error("Store check failed:", err);
-            } finally {
-                setInitialChecking(false);
-            }
-        };
-        checkExistingStore();
-    }, [user, navigate]);
+        if (!loadingTenant && !needsOnboarding) {
+            navigate("/ecommerce");
+        }
+        if (!loadingTenant) {
+            setInitialChecking(false);
+        }
+    }, [needsOnboarding, loadingTenant, navigate]);
 
     if (initialChecking) {
         return (

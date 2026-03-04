@@ -56,14 +56,20 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
 
                 const allModuleNames = systemModules?.map(sm => sm.name) || [];
 
-                // 2. Look up the user in public.users — check for super admin flag
-                const { data: localUser } = await supabase
-                    .from("users")
-                    .select("id, is_super_admin")
-                    .ilike("username", user.email || "")
-                    .maybeSingle();
+                // 3. Look up the user in public.users — check for super admin flag
+                let localUser = null;
+                try {
+                    const { data } = await supabase
+                        .from("users")
+                        .select("id, is_super_admin")
+                        .ilike("username", user.email || "")
+                        .maybeSingle();
+                    if (data) localUser = data;
+                } catch (e) {
+                    console.warn("User lookup failed, ignoring:", e);
+                }
 
-                // 3. SUPER ADMIN: is_super_admin = true → sees everything with no restrictions
+                // 4. SUPER ADMIN: is_super_admin = true → sees everything with no restrictions
                 if (localUser?.is_super_admin) {
                     setIsAdmin(true);
                     setIsSuperAdmin(true);
@@ -110,16 +116,20 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
 
                 // 7. Determine tenant role
                 const isTenantAdmin =
-                    companyMapping && (
+                    (companyMapping && (
                         companyMapping.role === "owner"
                         || companyMapping.role === "admin"
-                    );
+                    )) || (activeCompany as any).user_id === user.id;
 
                 setIsAdmin(isTenantAdmin);
 
                 if (isTenantAdmin) {
                     // Sees all subscribed modules, can do everything in them
-                    setAvailableModules(subscribedModules);
+                    // Ensure Ecommerce is always there if list is empty
+                    const finalModules = allModuleNames.length > 0 ? allModuleNames : ["Ecommerce", "Masters", "Sales", "Marketing", "Analytics", "Settings"];
+                    if (!finalModules.includes("Ecommerce")) finalModules.push("Ecommerce");
+
+                    setAvailableModules(finalModules);
                     setPermissions([]);
                 } else {
                     // STAFF MEMBER: Fetch granular permissions
