@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
+import { useDictionary } from "@/hooks/useDictionary";
 import { useToast } from "@/hooks/use-toast";
 import {
     Search, Filter, Plus, User, Mail, Phone, Calendar,
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Customers() {
     const { activeCompany } = useTenant();
+    const { t } = useDictionary();
     const { toast } = useToast();
     const [customers, setCustomers] = useState<any[]>([]);
     const [filtered, setFiltered] = useState<any[]>([]);
@@ -42,8 +44,8 @@ export default function Customers() {
         } catch (err: any) {
             console.error("Error loading customers:", err);
             toast({
-                title: "Error loading customers",
-                description: "Make sure the ecom_customers table exists in your database.",
+                title: `Error loading ${t("Customers").toLowerCase()}`,
+                description: `Make sure the ecom_customers table exists in your database.`,
                 variant: "destructive",
             });
         } finally {
@@ -73,7 +75,7 @@ export default function Customers() {
                 .eq("id", customer.id);
 
             if (error) throw error;
-            toast({ title: `Customer ${next === 'active' ? 'Activated' : 'Blocked'}` });
+            toast({ title: `${t("Customer")} ${next === 'active' ? 'Activated' : 'Blocked'}` });
             load();
         } catch (err: any) {
             toast({ title: "Operation failed", variant: "destructive" });
@@ -85,7 +87,7 @@ export default function Customers() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-[#14532d]">Storefront Customers</h1>
+                    <h1 className="text-2xl font-black tracking-tight text-[#14532d]">Storefront {t("Customers")}</h1>
                     <p className="text-sm text-muted-foreground mt-1">
                         Manage users who registered on your website.
                     </p>
@@ -107,7 +109,7 @@ export default function Customers() {
                         <User className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Total Customers</p>
+                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Total {t("Customers")}</p>
                         <p className="text-2xl font-black">{customers.length}</p>
                     </div>
                 </div>
@@ -141,7 +143,7 @@ export default function Customers() {
                         type="text"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        placeholder="Search customers by name, email or phone..."
+                        placeholder={`Search ${t("Customers").toLowerCase()} by name, email or phone...`}
                         className="w-full h-11 pl-10 pr-4 rounded-xl border-none bg-secondary/40 text-sm focus:ring-2 focus:ring-primary/20"
                     />
                 </div>
@@ -156,7 +158,7 @@ export default function Customers() {
                     <table className="w-full text-sm">
                         <thead className="bg-secondary/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                             <tr>
-                                <th className="px-6 py-4 text-left">Customer</th>
+                                <th className="px-6 py-4 text-left">{t("Customer")}</th>
                                 <th className="px-6 py-4 text-left">Contact</th>
                                 <th className="px-6 py-4 text-left">Status</th>
                                 <th className="px-6 py-4 text-left">Joined</th>
@@ -165,9 +167,9 @@ export default function Customers() {
                         </thead>
                         <tbody className="divide-y divide-border/40">
                             {loading ? (
-                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground animate-pulse">Loading customer directory...</td></tr>
+                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground animate-pulse">Loading {t("Customer").toLowerCase()} directory...</td></tr>
                             ) : filtered.length === 0 ? (
-                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground">No customers found.</td></tr>
+                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground">No {t("Customers").toLowerCase()} found.</td></tr>
                             ) : (
                                 filtered.map(c => (
                                     <tr key={c.id} className="hover:bg-secondary/10 transition-colors group">
@@ -177,7 +179,7 @@ export default function Customers() {
                                                     {c.full_name?.charAt(0) || <User className="w-4 h-4" />}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-slate-800">{c.full_name || 'Unnamed Customer'}</p>
+                                                    <p className="font-bold text-slate-800">{c.full_name || `Unnamed ${t("Customer")}`}</p>
                                                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ID: {c.id.slice(0, 8)}</p>
                                                 </div>
                                             </div>
@@ -212,7 +214,7 @@ export default function Customers() {
                                                     size="sm"
                                                     className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
                                                     onClick={() => toggleStatus(c)}
-                                                    title={c.status === 'active' ? 'Block Customer' : 'Activate Customer'}
+                                                    title={c.status === 'active' ? `Block ${t("Customer")}` : `Activate ${t("Customer")}`}
                                                 >
                                                     {c.status === 'active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                                                 </Button>

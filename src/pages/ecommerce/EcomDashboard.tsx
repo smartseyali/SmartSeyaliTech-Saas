@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
+import { useDictionary } from "@/hooks/useDictionary";
 import { Link } from "react-router-dom";
 import {
     ShoppingBag, TrendingUp, Package, RefreshCw, AlertCircle,
@@ -48,6 +49,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
 
 export default function EcomDashboard() {
     const { activeCompany } = useTenant();
+    const { t } = useDictionary();
     const [stats, setStats] = useState<Stats | null>(null);
     const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
     const [loading, setLoading] = useState(true);
@@ -136,7 +138,7 @@ export default function EcomDashboard() {
                     </button>
                     <Link to="/ecommerce/orders/new"
                         className="h-12 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25 flex items-center gap-3">
-                        <Plus className="w-4 h-4" /> Create Order
+                        <Plus className="w-4 h-4" /> Create {t("Order")}
                     </Link>
                 </div>
             </div>
@@ -145,9 +147,9 @@ export default function EcomDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                     { label: "Gross Revenue", value: fmt(stats?.totalRevenue || 0), sub: `${fmt(stats?.todayRevenue || 0)} contribution today`, icon: TrendingUp, color: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20" },
-                    { label: "Volume of Sales", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} relative growth today`, icon: ShoppingBag, color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20" },
-                    { label: "Basket Average", value: fmt(stats?.avgOrderValue || 0), sub: "standard ticket size", icon: BarChart3, color: "from-purple-500 to-fuchsia-600", shadow: "shadow-purple-500/20" },
-                    { label: "Customer Base", value: stats?.totalCustomers || 0, sub: "active storefront users", icon: Users, color: "from-teal-500 to-emerald-600", shadow: "shadow-teal-500/20" },
+                    { label: "Volume of Sales", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} ${t("Orders").toLowerCase()} today`, icon: ShoppingBag, color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20" },
+                    { label: "Basket Average", value: fmt(stats?.avgOrderValue || 0), sub: `standard ${t("Order").toLowerCase()} size`, icon: BarChart3, color: "from-purple-500 to-fuchsia-600", shadow: "shadow-purple-500/20" },
+                    { label: `${t("Customer")} Base`, value: stats?.totalCustomers || 0, sub: `active ${t("Customers").toLowerCase()}`, icon: Users, color: "from-teal-500 to-emerald-600", shadow: "shadow-teal-500/20" },
                     { label: "Marketing Hooks", value: stats?.activeCoupons || 0, sub: "active promotional codes", icon: Tag, color: "from-orange-500 to-amber-600", shadow: "shadow-orange-500/20" },
                 ].map(k => (
                     <div key={k.label} className={`relative group p-1 rounded-[2rem] bg-gradient-to-br ${k.color} ${k.shadow} hover:scale-105 transition-all duration-500 cursor-default`}>
@@ -211,7 +213,7 @@ export default function EcomDashboard() {
                                     <thead>
                                         <tr className="bg-secondary/20 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/20">
                                             <th className="px-6 py-4 text-left">Internal Ref</th>
-                                            <th className="px-6 py-4 text-left">Customer</th>
+                                            <th className="px-6 py-4 text-left">{t("Customer")}</th>
                                             <th className="px-6 py-4 text-right">Value</th>
                                             <th className="px-6 py-4 text-center">Fulfillment</th>
                                             <th className="px-6 py-4 text-left">Time</th>

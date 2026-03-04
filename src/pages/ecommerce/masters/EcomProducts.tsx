@@ -1,28 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ModuleListPage } from "@/components/modules/ModuleListPage";
 import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
 import { useCrud } from "@/hooks/useCrud";
 import { useTenant } from "@/contexts/TenantContext";
+import { useDictionary } from "@/hooks/useDictionary";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Box, Tag, Star, LayoutGrid, Building2, Upload } from "lucide-react";
 import { ProductVariantDialog } from "@/components/masters/ProductVariantDialog";
-
-const ecomProductColumns = [
-    { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><Box className="w-4 h-4 text-muted-foreground" /></div> },
-    { key: "sku", label: "SKU" },
-    { key: "name", label: "Product Name" },
-    {
-        key: "ecom_categories",
-        label: "Category",
-        render: (val: any) => val?.name || <span className="text-muted-foreground italic">Uncategorized</span>
-    },
-    { key: "price", label: "Price", align: "right" as const, render: (val: any) => `₹ ${Number(val || 0).toLocaleString('en-IN')}` },
-    { key: "is_featured", label: "Featured", render: (val: boolean) => val ? <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" /> : <Star className="w-4 h-4 text-muted-foreground/20" /> },
-    { key: "status", label: "Status" },
-];
-
 export const EcomProducts = () => {
+    const { t } = useDictionary();
     const { data, loading, createItem, updateItem, deleteItem } = useCrud("products", "*, ecom_categories(id, name)");
     const { data: categories } = useCrud("ecom_categories");
     const { activeCompany } = useTenant();
@@ -31,18 +18,32 @@ export const EcomProducts = () => {
     const [editingItem, setEditingItem] = useState<any>(null);
     const [variantDialogOpen, setVariantDialogOpen] = useState(false);
 
+    const ecomProductColumns = useMemo(() => [
+        { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><Box className="w-4 h-4 text-muted-foreground" /></div> },
+        { key: "sku", label: t("SKU") },
+        { key: "name", label: `${t("Product")} Name` },
+        {
+            key: "ecom_categories",
+            label: t("Category"),
+            render: (val: any) => val?.name || <span className="text-muted-foreground italic">Uncategorized</span>
+        },
+        { key: "price", label: t("Price"), align: "right" as const, render: (val: any) => `₹ ${Number(val || 0).toLocaleString('en-IN')}` },
+        { key: "is_featured", label: "Featured", render: (val: boolean) => val ? <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" /> : <Star className="w-4 h-4 text-muted-foreground/20" /> },
+        { key: "status", label: "Status" },
+    ], [t]);
+
     // Dynamic fields with category options
     const ecomProductFields: FieldConfig[] = [
         { key: "image_url", label: "Primary Image", type: "image", folder: "products" },
         { key: "name", label: "Display Name (for Site)", required: true },
-        { key: "sku", label: "SKU / Model" },
+        { key: "sku", label: `${t("SKU")} / Model` },
         {
             key: "category_id",
-            label: "Product Category",
+            label: `${t("Product")} ${t("Category")}`,
             type: "select",
             options: (categories || []).map(c => ({ label: c.name, value: String(c.id) }))
         },
-        { key: "rate", label: "Sale Price (MRP)", type: "number" },
+        { key: "rate", label: `Sale ${t("Price")} (MRP)`, type: "number" },
         { key: "description", label: "Web Description", type: "textarea" },
         {
             key: "is_featured", label: "Feature on Home Page", type: "select", options: [
@@ -97,7 +98,7 @@ export const EcomProducts = () => {
     };
 
     const handleDelete = async (item: any) => {
-        if (confirm("Move this product to archive (Remove from E-commerce)?")) {
+        if (confirm(`Move this ${t("Product").toLowerCase()} to archive (Remove from E-commerce)?`)) {
             await updateItem(item.id, { is_ecommerce: false });
         }
     };
@@ -105,7 +106,7 @@ export const EcomProducts = () => {
     return (
         <>
             <ModuleListPage
-                title="Store Products"
+                title={`Store ${t("Products")}`}
                 subtitle="High-performance management of your digital shelf"
                 columns={ecomProductColumns}
                 data={ecomData}
@@ -144,7 +145,7 @@ export const EcomProducts = () => {
             <DynamicFormDialog
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                title={editingItem ? "Refine Product" : "Launch New Product"}
+                title={editingItem ? `Refine ${t("Product")}` : `Launch New ${t("Product")}`}
                 fields={ecomProductFields}
                 initialData={editingItem}
                 onSubmit={handleSubmit}

@@ -83,7 +83,7 @@ export default function About() {
                     </div>
                     <div className="relative group p-4 bg-white rounded-[48px] border border-slate-100 shadow-xl overflow-hidden">
                         <div className="aspect-square rounded-[40px] overflow-hidden relative">
-                            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1000" className="w-full h-full object-cover transition-all duration-[2s] group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1000" className="w-full h-full object-cover transition-all duration-[2000ms] group-hover:scale-110" />
                             <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
                         </div>
                         <div className="absolute top-12 left-12 flex items-center gap-3 px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg">

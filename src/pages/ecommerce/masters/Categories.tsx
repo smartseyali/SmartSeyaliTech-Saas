@@ -1,32 +1,36 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ModuleListPage } from "@/components/modules/ModuleListPage";
 import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
 import { useCrud } from "@/hooks/useCrud";
 import { LayoutGrid, Image as ImageIcon } from "lucide-react";
-
-const categoryColumns = [
-    { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><LayoutGrid className="w-4 h-4 text-muted-foreground" /></div> },
-    { key: "name", label: "Category Name" },
-    { key: "description", label: "Description" },
-    { key: "is_active", label: "Status", render: (val: boolean) => val ? 'Live' : 'Hidden' },
-];
-
-const categoryFields: FieldConfig[] = [
-    { key: "image_url", label: "Category Image", type: "image", folder: "categories" },
-    { key: "name", label: "Category Name", required: true },
-    { key: "description", label: "Description", type: "textarea" },
-    {
-        key: "is_active", label: "Status", type: "select", options: [
-            { label: "Public", value: "true" },
-            { label: "Private", value: "false" }
-        ]
-    }
-];
+import { useDictionary } from "@/hooks/useDictionary";
 
 export const Categories = () => {
+    const { t } = useDictionary();
     const { data, loading, createItem, updateItem, deleteItem } = useCrud("ecom_categories");
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+
+    const categoryColumns = useMemo(() => [
+        { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><LayoutGrid className="w-4 h-4 text-muted-foreground" /></div> },
+        { key: "name", label: `${t("Category")} Name` },
+        { key: "description", label: "Description" },
+        { key: "is_active", label: "Status", render: (val: boolean) => val ? 'Live' : 'Hidden' },
+    ], [t]);
+
+    const categoryFields: FieldConfig[] = useMemo(() => [
+        { key: "image_url", label: `${t("Category")} Image`, type: "image", folder: "categories" },
+        { key: "name", label: `${t("Category")} Name`, required: true },
+        { key: "description", label: "Description", type: "textarea" },
+        {
+            key: "is_active", label: "Status", type: "select", options: [
+                { label: "Public", value: "true" },
+                { label: "Private", value: "false" }
+            ]
+        }
+    ], [t]);
+
+
 
     const handleNew = () => {
         setEditingItem(null);
@@ -51,7 +55,7 @@ export const Categories = () => {
     };
 
     const handleDelete = async (item: any) => {
-        if (confirm("Delete this category? This might affect products using it.")) {
+        if (confirm(`Delete this ${t("Category").toLowerCase()}? This might affect ${t("Products").toLowerCase()} using it.`)) {
             await deleteItem(item.id);
         }
     };
@@ -59,7 +63,7 @@ export const Categories = () => {
     return (
         <>
             <ModuleListPage
-                title="Product Categories"
+                title={t("Categories")}
                 subtitle="Organize your shop's inventory for easy discovery"
                 columns={categoryColumns}
                 data={data}
@@ -71,7 +75,7 @@ export const Categories = () => {
             <DynamicFormDialog
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                title={editingItem ? "Edit Category" : "Build New Category"}
+                title={editingItem ? `Edit ${t("Category")}` : `Build New ${t("Category")}`}
                 fields={categoryFields}
                 initialData={editingItem}
                 onSubmit={handleSubmit}

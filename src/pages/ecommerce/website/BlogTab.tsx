@@ -116,7 +116,7 @@ export function BlogTab({ companyId }: { companyId: any }) {
                             <img
                                 src={b.image_url || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800"}
                                 alt={b.title}
-                                className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-[2s]"
+                                className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-[2000ms]"
                             />
                             <span className="absolute top-4 left-4 px-3 py-1 bg-[#14532d] rounded-full text-[9px] font-bold uppercase text-white tracking-widest z-10 shadow-lg shadow-[#14532d]/20">
                                 {b.category || "General"}

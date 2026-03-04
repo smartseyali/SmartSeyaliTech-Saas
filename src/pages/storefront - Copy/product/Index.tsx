@@ -110,7 +110,7 @@ export default function ProductDetail() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.8 }}
                                 src={product.image_url || `https://source.unsplash.com/1200x1600/?organic,${product.category}`}
-                                className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                 alt={product.name}
                             />
                             <div className="absolute top-8 right-8 flex flex-col gap-4">

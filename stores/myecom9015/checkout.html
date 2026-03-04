@@ -376,7 +376,7 @@
         try { await ui.init(); } catch (e) { }
 
         // Must be logged in for checkout
-        const session = await auth.requireAuth();
+        let session; try { session = await auth.requireAuth(); } catch(e) {}
         if (!session) return; // will redirect
 
         const user = session.user;
