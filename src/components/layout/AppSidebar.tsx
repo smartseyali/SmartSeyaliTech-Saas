@@ -47,7 +47,36 @@ interface NavGroup {
     module?: string;
 }
 
-const navGroups: NavGroup[] = [
+const INDUSTRY_MAP: Record<string, any> = {
+    education: {
+        labels: {
+            "Catalog & Media": "Academic Content",
+            "Sales & Logistics": "Student Records",
+            "Marketing & Growth": "Student Success"
+        },
+        items: {
+            "/ecommerce/masters/products": "Academic Courses",
+            "/ecommerce/masters/categories": "Departmental Units",
+            "/ecommerce/orders": "Student Enrollments",
+            "/ecommerce/customers": "Student Database",
+            "/ecommerce/masters/collections": "Course Faculty",
+            "/ecommerce/delivery": "Study Material Ops"
+        }
+    },
+    services: {
+        labels: {
+            "Catalog & Media": "Service Portfolio",
+            "Sales & Logistics": "Booking Ops",
+        },
+        items: {
+            "/ecommerce/masters/products": "Available Services",
+            "/ecommerce/orders": "Booked Appointments",
+            "/ecommerce/customers": "Client Records"
+        }
+    }
+};
+
+const baseNavGroups: NavGroup[] = [
     {
         label: "Catalog & Media",
         module: "Ecommerce",
@@ -110,7 +139,7 @@ const navGroups: NavGroup[] = [
 ];
 
 export const getRequiredResource = (pathname: string): string | undefined => {
-    for (const group of navGroups) {
+    for (const group of baseNavGroups) {
         const match = group.items.find(item => pathname.startsWith(item.url));
         if (match) return match.resource;
     }
@@ -129,6 +158,19 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const { activeCompany, companies, setCompany } = useTenant();
     const [openGroups, setOpenGroups] = useState<string[]>(["Ecommerce"]);
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
+
+    // Dynamic Navigation Generation based on Industry
+    const industry = activeCompany?.industry_type || 'retail';
+    const overrides = INDUSTRY_MAP[industry] || { labels: {}, items: {} };
+
+    const navGroups = baseNavGroups.map(group => ({
+        ...group,
+        label: overrides.labels[group.label] || group.label,
+        items: group.items.map(item => ({
+            ...item,
+            title: overrides.items[item.url] || item.title
+        }))
+    }));
 
     const isGroupActive = (group: NavGroup) =>
         group.items.some((item) => location.pathname.startsWith(item.url));

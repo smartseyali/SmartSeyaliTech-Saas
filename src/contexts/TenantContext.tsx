@@ -7,6 +7,7 @@ interface Company {
     id: number;
     name: string;
     subdomain: string;
+    industry_type: 'retail' | 'education' | 'services' | 'hospitality';
     contact_phone?: string;
     contact_email?: string;
     address?: string;
@@ -45,7 +46,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (potentialSlug && !reserved.includes(potentialSlug)) {
             const { data: companyBySlug } = await supabase
                 .from('companies')
-                .select('id, name, subdomain')
+                .select('id, name, subdomain, industry_type')
                 .eq('subdomain', potentialSlug)
                 .maybeSingle();
 
@@ -63,7 +64,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             } else {
                 const { data: defaultComp } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain')
+                    .select('id, name, subdomain, industry_type')
                     .limit(1)
                     .single();
 
@@ -102,7 +103,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             if (localUser?.is_super_admin) {
                 const { data: allCompanies } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain')
+                    .select('id, name, subdomain, industry_type')
                     .order('name');
 
                 const companiesData = (allCompanies || []) as Company[];
@@ -120,7 +121,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             // 3. Regular user: load only companies they belong to via company_users
             const { data: mappings } = await supabase
                 .from('company_users')
-                .select('company_id, companies(id, name, subdomain)')
+                .select('company_id, companies(id, name, subdomain, industry_type)')
                 .eq('user_id', user.id);
 
             let companiesData = (mappings || [])
@@ -141,7 +142,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 if (detectedCompany) {
                     setActiveCompany(detectedCompany);
                 } else {
-                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain').limit(1).single();
+                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, industry_type').limit(1).single();
                     if (defaultComp) setActiveCompany(defaultComp as Company);
                 }
             }

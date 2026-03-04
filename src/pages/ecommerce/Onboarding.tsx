@@ -39,6 +39,7 @@ export default function Onboarding() {
     const [initialChecking, setInitialChecking] = useState(true);
     const [error, setError] = useState("");
     const [slug, setSlug] = useState("");
+    const [industryType, setIndustryType] = useState<'retail' | 'education' | 'services'>('retail');
 
     // ── Load templates from ecom_templates (Supabase DB) ──────
     useEffect(() => {
@@ -128,6 +129,7 @@ export default function Onboarding() {
                     subdomain: newSlug,
                     contact_email: user?.email,
                     user_id: user?.id,
+                    industry_type: industryType,
                     plan: 'starter'
                 }])
                 .select()
@@ -166,7 +168,7 @@ export default function Onboarding() {
 
             // 4. Finalize
             await refreshTenant();
-            setStep(3);
+            setStep(4);
             setTimeout(() => {
                 window.location.href = `${window.location.origin}/stores/${newSlug}/index.html`;
             }, 3000);
@@ -222,6 +224,61 @@ export default function Onboarding() {
                 {step === 2 && (
                     <motion.div
                         key="step2"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="max-w-2xl w-full bg-white p-10 rounded-3xl shadow-2xl border border-white"
+                    >
+                        <h2 className="text-3xl font-black text-center mb-2 tracking-tight">Define Your Industry</h2>
+                        <p className="text-slate-400 text-center mb-10 text-sm">This optimizes your Command Center with the right business engines.</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                            {[
+                                { id: 'retail', title: 'E-commerce Retail', desc: 'Sell physical products, manage stock & shipping', icon: '🛍️' },
+                                { id: 'education', title: 'Education / LMS', desc: 'Manage courses, students & enrollments', icon: '🎓' },
+                                { id: 'services', title: 'Professional Services', desc: 'Book appointments & professional services', icon: '🛠️' }
+                            ].map((ind) => (
+                                <div
+                                    key={ind.id}
+                                    onClick={() => setIndustryType(ind.id as any)}
+                                    className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center text-center gap-4 ${industryType === ind.id
+                                        ? 'border-black bg-black text-white shadow-xl scale-105'
+                                        : 'border-slate-100 bg-slate-50 hover:bg-slate-100 text-slate-900'
+                                        }`}
+                                >
+                                    <span className="text-4xl">{ind.icon}</span>
+                                    <div>
+                                        <h3 className="font-bold text-sm uppercase mb-1">{ind.title}</h3>
+                                        <p className={`text-[10px] font-medium leading-relaxed ${industryType === ind.id ? 'text-white/60' : 'text-slate-400'}`}>
+                                            {ind.desc}
+                                        </p>
+                                    </div>
+                                    {industryType === ind.id && <Check className="w-5 h-5 text-green-400" />}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setStep(1)}
+                                className="h-14 px-8 border-slate-200 rounded-xl font-bold"
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                onClick={() => setStep(3)}
+                                className="flex-1 h-14 bg-black hover:bg-black/90 text-white rounded-xl font-bold flex items-center justify-center gap-4 transition-all"
+                            >
+                                Select Theme <ArrowRight className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {step === 3 && (
+                    <motion.div
+                        key="step3"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -280,7 +337,7 @@ export default function Onboarding() {
                         <div className="flex gap-4">
                             <Button
                                 variant="outline"
-                                onClick={() => setStep(1)}
+                                onClick={() => setStep(2)}
                                 className="h-14 px-8 border-slate-200 rounded-xl font-bold"
                             >
                                 Back
@@ -297,9 +354,9 @@ export default function Onboarding() {
                     </motion.div>
                 )}
 
-                {step === 3 && (
+                {step === 4 && (
                     <motion.div
-                        key="step3"
+                        key="step4"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl border border-white text-center"
