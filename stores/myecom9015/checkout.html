@@ -377,7 +377,7 @@
 
         // Must be logged in for checkout
         let session; try { session = await auth.requireAuth(); } catch(e) {}
-        if (!session) return; // will redirect
+        if (!session) throw new Error("Redirecting"); // will redirect
 
         const user = session.user;
         const cart = cartStore.get();

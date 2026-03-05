@@ -154,7 +154,7 @@
         try { await ui.init(); } catch (e) { }
 
         let session; try { session = await auth.requireAuth(); } catch(e) {}
-        if (!session) return;
+        if (!session) throw new Error("Redirecting");
         const user = session.user;
 
         // Pre-fill order ID from URL param

@@ -186,7 +186,7 @@
 
         if (!order) {
             wrap.innerHTML = '<div style="text-align:center;padding:80px">Order not found.</div>';
-            return;
+            throw new Error("Not found");
         }
 
         const addr = order.shipping_address || {};
