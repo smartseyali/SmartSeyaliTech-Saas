@@ -77,50 +77,65 @@ export function MediaUpload({
     const isVideo = type === "video" || value.toLowerCase().match(/\.(mp4|webm|ogg)$/);
 
     return (
-        <div className={cn("space-y-2", className)}>
+        <div className={cn("space-y-3", className)}>
             {label && (
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">
                     {label}
                 </Label>
             )}
 
             <div className="relative group/media">
                 {value ? (
-                    <div className="relative rounded-2xl overflow-hidden border border-border bg-secondary/20 aspect-video sm:aspect-square flex items-center justify-center">
+                    <div className="relative rounded-[32px] overflow-hidden border border-slate-200 bg-slate-50 aspect-video sm:aspect-square flex items-center justify-center group/preview">
                         {isVideo ? (
                             <video src={value} className="w-full h-full object-cover" controls />
                         ) : (
-                            <img src={value} alt="Preview" className="w-full h-full object-cover" />
+                            <img src={value} alt="Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover/preview:scale-110" />
                         )}
-                        <button
-                            type="button"
-                            onClick={removeMedia}
-                            className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/60 text-white opacity-0 group-hover/media:opacity-100 transition-opacity hover:bg-red-500"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="h-10 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-100 tracking-tight"
+                            >
+                                Replace
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={removeMedia}
+                                className="h-10 rounded-xl bg-rose-500 hover:bg-rose-600 font-bold"
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                 ) : (
                     <div
                         onClick={() => fileInputRef.current?.click()}
                         className={cn(
-                            "flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-border/60 rounded-2xl bg-secondary/5 cursor-pointer hover:bg-secondary/10 hover:border-primary/30 transition-all",
+                            "flex flex-col items-center justify-center gap-6 p-12 border-2 border-dashed border-slate-200 rounded-[32px] bg-slate-50/50 cursor-pointer hover:bg-white hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 group/upload",
                             uploading && "opacity-50 pointer-events-none"
                         )}
                     >
-                        {uploading ? (
-                            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        ) : type === "video" ? (
-                            <Film className="w-8 h-8 text-muted-foreground/30" />
-                        ) : (
-                            <FileImage className="w-8 h-8 text-muted-foreground/30" />
-                        )}
-                        <div className="text-center">
-                            <p className="text-xs font-bold text-muted-foreground">
-                                {uploading ? "Uploading..." : `Upload ${type}`}
+                        <div className="w-20 h-20 rounded-[28px] bg-white shadow-sm flex items-center justify-center group-hover/upload:scale-110 group-hover/upload:rotate-3 transition-all duration-500 border border-slate-100">
+                            {uploading ? (
+                                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                            ) : type === "video" ? (
+                                <Film className="w-8 h-8 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                            ) : (
+                                <Upload className="w-8 h-8 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                            )}
+                        </div>
+                        <div className="text-center space-y-2">
+                            <p className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+                                {uploading ? "Transferring Data..." : `Register ${type}`}
                             </p>
-                            <p className="text-[10px] text-muted-foreground/60 mt-1">
-                                Click to select file
+                            <p className="text-[10px] font-medium text-slate-400 italic">
+                                Select from local repository or drag/drop
                             </p>
                         </div>
                     </div>

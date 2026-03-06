@@ -25,7 +25,8 @@ import {
     ExternalLink,
     Crown,
     Award,
-    Layout
+    Layout,
+    Rocket
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -178,21 +179,20 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     return (
         <aside
             className={cn(
-                "fixed left-0 top-0 min-h-screen h-full flex flex-col z-50 transition-all duration-300 ease-in-out border-r border-[#14532d]/20 shadow-xl overflow-y-auto overflow-x-hidden text-white/80 select-none",
-                "bg-gradient-to-b from-[#0a2e18] to-[#14532d]",
+                "fixed left-0 top-0 min-h-screen h-full flex flex-col z-50 transition-all duration-300 ease-in-out border-r border-slate-200 shadow-sm overflow-y-auto overflow-x-hidden select-none bg-white",
                 collapsed ? "w-[80px]" : "w-[260px]"
             )}
         >
             {/* Header / Logo Section */}
-            <div className="flex items-center h-20 px-6 shrink-0 relative bg-black/10 backdrop-blur-sm z-10 border-b border-white/10">
-                <div className="flex items-center gap-3 overflow-hidden cursor-pointer">
-                    <div className="w-10 h-10 rounded-xl bg-[#f97316] flex items-center justify-center shrink-0 shadow-lg shadow-[#f97316]/20">
-                        <span className="text-white font-black text-xl leading-none">S</span>
+            <div className="flex items-center h-16 md:h-20 px-6 shrink-0 z-10">
+                <div className="flex items-center gap-3 overflow-hidden cursor-pointer group">
+                    <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shrink-0">
+                        <Rocket className="text-white w-5 h-5" />
                     </div>
                     {!collapsed && (
                         <div className="flex flex-col">
-                            <span className="font-bold text-white tracking-tight text-lg">
-                                Merchant Hub
+                            <span className="font-bold text-slate-900 tracking-tight text-lg">
+                                LiteAdmin
                             </span>
                         </div>
                     )}
@@ -201,34 +201,34 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
             {/* Tenant Switcher */}
             {!collapsed && activeCompany && (
-                <div className="px-4 py-4 shrink-0">
+                <div className="px-4 py-2 shrink-0">
                     <button
                         onClick={() => setShowCompanySwitcher(!showCompanySwitcher)}
-                        className="w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 group text-left relative"
+                        className="w-full flex items-center gap-3 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all border border-slate-200 group text-left relative"
                     >
-                        <Crown className="w-4 h-4 text-[#f97316] shrink-0" />
-                        <span className="flex-1 font-semibold truncate text-sm text-white/90">{activeCompany.name}</span>
+                        <Crown className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span className="flex-1 font-semibold truncate text-[13px] text-slate-700">{activeCompany.name}</span>
                         {(companies.length > 1) && (
-                            <ChevronDown className={cn("w-4 h-4 text-white/50 transition-transform", showCompanySwitcher && "rotate-180")} />
+                            <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showCompanySwitcher && "rotate-180")} />
                         )}
                     </button>
 
                     {showCompanySwitcher && companies.length > 1 && (
-                        <div className="absolute left-4 right-4 mt-2 bg-[#092212] border border-[#f97316]/20 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                        <div className="absolute left-4 right-4 mt-2 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-50">
                             {companies.map((c: any) => (
                                 <button
                                     key={c.id}
                                     onClick={() => { setCompany(c.id); setShowCompanySwitcher(false); }}
                                     className={cn(
-                                        "w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0",
-                                        activeCompany.id === c.id && "bg-[#f97316]/10 text-white"
+                                        "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0",
+                                        activeCompany.id === c.id && "bg-blue-50 text-blue-600"
                                     )}
                                 >
-                                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                                        <span className="text-[10px] font-bold text-white">{c.name.charAt(0)}</span>
+                                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                                        <span className="text-[10px] font-bold text-slate-600">{c.name.charAt(0).toUpperCase()}</span>
                                     </div>
                                     <span className="flex-1 truncate font-medium">{c.name}</span>
-                                    {activeCompany.id === c.id && <Check className="w-4 h-4 text-[#f97316]" />}
+                                    {activeCompany.id === c.id && <Check className="w-4 h-4 text-blue-600" />}
                                 </button>
                             ))}
                         </div>
@@ -237,16 +237,16 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
 
             {/* Navigation Sections */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 px-3 space-y-6 scrollbar-hide pb-4">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 px-3 space-y-4 pb-4">
                 <div className="space-y-1">
                     <NavLink
                         to="/ecommerce"
                         className={cn(
-                            "group flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-[13px]",
+                            "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm",
                             collapsed ? "justify-center" : "",
-                            "text-white/60 hover:text-white hover:bg-white/10"
+                            "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                         )}
-                        activeClassName="text-white bg-[#f97316] font-bold shadow-md shadow-[#f97316]/20"
+                        activeClassName="text-blue-600 bg-blue-50 font-semibold"
                     >
                         <LayoutDashboard className="w-5 h-5 shrink-0" />
                         {!collapsed && <span className="flex-1 truncate">Dashboard</span>}
@@ -262,8 +262,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                         return (
                             <div key={group.label} className="space-y-1">
                                 {!collapsed && (
-                                    <div className="px-4 py-2">
-                                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#f97316]">{group.label}</p>
+                                    <div className="px-4 py-2 mt-2">
+                                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{group.label}</p>
                                     </div>
                                 )}
                                 {visibleItems.map((item) => {
@@ -276,11 +276,11 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={cn(
-                                                    "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all font-medium text-[13px] text-white/60 hover:text-white hover:bg-white/10",
+                                                    "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50",
                                                     collapsed ? "justify-center" : ""
                                                 )}
                                             >
-                                                <item.icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110 text-white/50 group-hover:text-white" />
+                                                <item.icon className="w-4 h-4 shrink-0" />
                                                 {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
                                             </a>
                                         );
@@ -290,10 +290,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                             key={item.url}
                                             to={item.url}
                                             className={cn(
-                                                "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all font-medium text-[13px] text-white/60 hover:text-white hover:bg-white/10",
+                                                "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50",
                                                 collapsed ? "justify-center" : ""
                                             )}
-                                            activeClassName="text-white bg-white/15 font-bold border border-white/10 shadow-sm"
+                                            activeClassName="text-blue-600 bg-blue-50 font-semibold"
                                         >
                                             <item.icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
                                             {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
@@ -306,15 +306,15 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             </div>
 
             {/* Bottom Utilities */}
-            <div className="p-4 space-y-2 border-t border-white/10 shrink-0 bg-black/10 backdrop-blur-sm">
+            <div className="p-4 space-y-1 border-t border-slate-100 bg-slate-50/50 shrink-0">
                 {isSuperAdmin && (
                     <NavLink
                         to="/super-admin"
                         className={cn(
-                            "group flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-[13px] font-medium text-[#f97316] hover:bg-[#f97316]/10 border border-[#f97316]/20",
+                            "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all text-sm font-semibold text-blue-600 hover:bg-blue-100/50",
                             collapsed ? "justify-center" : ""
                         )}
-                        activeClassName="bg-[#f97316]/20 font-bold"
+                        activeClassName="bg-blue-100"
                     >
                         <ShieldCheck className="w-5 h-5 shrink-0" />
                         {!collapsed && <span className="flex-1 truncate">Platform Admin</span>}
@@ -324,7 +324,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 <button
                     onClick={onToggle}
                     className={cn(
-                        "group flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/10",
+                        "group flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100",
                         collapsed ? "justify-center" : ""
                     )}
                 >

@@ -74,63 +74,63 @@ export default function Billing() {
     return (
         <div className="p-8 space-y-12 animate-in fade-in duration-700">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+                <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
-                            <CreditCard className="w-6 h-6" />
+                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                            <CreditCard className="w-5 h-5" />
                         </div>
-                        <h1 className="text-3xl font-black tracking-tight uppercase text-foreground">Billing & <span className="text-primary italic">Subscription</span></h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Billing & Plans</h1>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60 ml-1">Manage institutional commerce tier</p>
+                    <p className="text-sm font-medium text-slate-500">Manage your subscription and billing details</p>
                 </div>
 
                 {subscription && (
-                    <div className="px-6 py-3 bg-card border border-border rounded-2xl flex items-center gap-4 shadow-sm">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Calendar className="w-5 h-5 text-primary" />
+                    <div className="px-5 py-3 bg-white border border-slate-200 rounded-xl flex items-center gap-4 shadow-sm">
+                        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                            <Calendar className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Next Renewal</p>
-                            <p className="text-xs font-bold">{new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleDateString()}</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Next Renewal</p>
+                            <p className="text-sm font-bold text-slate-900">{new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleDateString()}</p>
                         </div>
                     </div>
                 )}
             </div>
 
             {/* Current Status Card */}
-            <div className="relative overflow-hidden bg-black rounded-[2.5rem] p-10 text-white shadow-2xl shadow-primary/20">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] -mr-32 -mt-32" />
+            <div className="relative overflow-hidden bg-slate-900 rounded-2xl p-10 text-white shadow-xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[100px] -mr-32 -mt-32" />
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                     <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary">
-                            <ShieldCheck className="w-4 h-4" /> Fully Protected System
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-blue-400">
+                            <ShieldCheck className="w-4 h-4" /> Secure Billing
                         </div>
                         <div className="space-y-2">
-                            <h2 className="text-4xl font-black tracking-tight tracking-tighter uppercase">
+                            <h2 className="text-3xl font-bold tracking-tight">
                                 {subscription?.subscription_plans?.name || 'Starter Plan'}
                             </h2>
-                            <p className="text-sm font-medium opacity-60 max-w-sm">
-                                Your marketplace is currently running on the {subscription?.subscription_plans?.name || 'Starter'} tier with all core commerce features active.
+                            <p className="text-sm font-medium text-slate-400 max-w-sm">
+                                Your store is currently running on the {subscription?.subscription_plans?.name || 'Starter'} tier.
                             </p>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-6">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Status</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Status</p>
                                 <div className="font-bold flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Active
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Active
                                 </div>
                             </div>
                             <div className="w-px h-10 bg-white/10" />
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Monthly Charge</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Monthly Cost</p>
                                 <p className="font-bold">₹ {subscription?.subscription_plans?.price_monthly?.toLocaleString() || '0'}</p>
                             </div>
                         </div>
                     </div>
                     <div className="hidden md:block">
-                        <div className="aspect-video bg-white/5 rounded-[2rem] border border-white/10 p-8 flex items-center justify-center">
-                            <History className="w-12 h-12 opacity-10 animate-spin-slow" />
+                        <div className="aspect-video bg-white/5 rounded-xl border border-white/10 p-8 flex items-center justify-center">
+                            <History className="w-12 h-12 text-slate-700 animate-spin-slow" />
                         </div>
                     </div>
                 </div>
@@ -139,8 +139,8 @@ export default function Billing() {
             {/* Plans Grid */}
             <div className="space-y-8">
                 <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-black tracking-tight uppercase">Expansion Tiers</h2>
-                    <p className="text-sm text-muted-foreground font-medium">Switch between institutional plans as your brand grows.</p>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">Expansion Plans</h2>
+                    <p className="text-sm text-slate-500 font-medium">Switch between plans as your business grows.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -150,39 +150,39 @@ export default function Billing() {
 
                         return (
                             <div key={plan.id} className={cn(
-                                "relative bg-card rounded-[2.5rem] border p-8 space-y-8 flex flex-col justify-between transition-all duration-500 hover:shadow-2xl hover:shadow-black/5",
-                                isCurrent && "border-primary ring-1 ring-primary/20 shadow-xl shadow-primary/10"
+                                "relative bg-white rounded-2xl border border-slate-200 p-8 space-y-8 flex flex-col justify-between transition-all duration-300 hover:shadow-lg",
+                                isCurrent && "border-blue-600 ring-1 ring-blue-50"
                             )}>
                                 {isCurrent && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full shadow-lg">
-                                        Current Logic
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                                        Current Plan
                                     </div>
                                 )}
 
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
-                                        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", plan.id === 'enterprise' ? "bg-amber-500/10 text-amber-500" : "bg-primary/10 text-primary")}>
+                                        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", plan.id === 'enterprise' ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600")}>
                                             <Icon className="w-6 h-6" />
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-2xl font-black tracking-tight">₹ {plan.price_monthly.toLocaleString()}</p>
-                                            <p className="text-[10px] font-black uppercase opacity-40">per month</p>
+                                            <p className="text-2xl font-bold tracking-tight text-slate-900">₹ {plan.price_monthly.toLocaleString()}</p>
+                                            <p className="text-[10px] font-bold uppercase text-slate-400">per month</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <h3 className="text-lg font-black tracking-tight uppercase">{plan.name}</h3>
-                                        <p className="text-xs text-muted-foreground font-medium leading-relaxed">
-                                            {plan.id === 'free' ? "Institutional starter kit for emerging brands." :
-                                                plan.id === 'pro' ? "Professional commerce engine for scaling businesses." :
-                                                    "Enterprise grade infrastructure for large institutions."}
+                                        <h3 className="text-lg font-bold text-slate-900">{plan.name}</h3>
+                                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                            {plan.id === 'free' ? "Perfect for small stores starting out." :
+                                                plan.id === 'pro' ? "Best for growing stores with more traffic." :
+                                                    "Full power for large scale operations."}
                                         </p>
                                     </div>
 
-                                    <ul className="space-y-3 pt-4 border-t border-border/50">
+                                    <ul className="space-y-3 pt-6 border-t border-slate-100">
                                         {(plan.features || []).map((feature: string) => (
-                                            <li key={feature} className="flex items-center gap-3 text-[11px] font-bold text-muted-foreground">
-                                                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                            <li key={feature} className="flex items-center gap-3 text-xs font-semibold text-slate-600">
+                                                <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                                                 {feature}
                                             </li>
                                         ))}
@@ -193,12 +193,12 @@ export default function Billing() {
                                     disabled={isCurrent || updating}
                                     onClick={() => handleSwitchPlan(plan.id)}
                                     className={cn(
-                                        "h-14 w-full rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 transition-all mt-8",
-                                        isCurrent ? "bg-secondary text-muted-foreground opacity-50 cursor-default" : "shadow-xl shadow-primary/10 hover:scale-[1.02]"
+                                        "h-11 w-full rounded-lg font-bold uppercase tracking-wider text-[10px] gap-2 transition-all mt-8",
+                                        isCurrent ? "bg-slate-100 text-slate-400 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/10"
                                     )}
                                 >
                                     {updating ? <Loader2 className="w-4 h-4 animate-spin" /> :
-                                        isCurrent ? "Active Tier" : "Migrate Logic"}
+                                        isCurrent ? "Active Plan" : "Switch Plan"}
                                     {!updating && !isCurrent && <ArrowRight className="w-3.5 h-3.5" />}
                                 </Button>
                             </div>
@@ -208,17 +208,17 @@ export default function Billing() {
             </div>
 
             {/* Assistance Card */}
-            <div className="bg-secondary/30 rounded-[2.5rem] p-8 border border-border/50 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm">
-                        <AlertCircle className="w-6 h-6 text-muted-foreground" />
+                        <AlertCircle className="w-6 h-6 text-slate-400" />
                     </div>
                     <div>
-                        <p className="font-bold text-sm">Need a custom institutional plan?</p>
-                        <p className="text-xs text-muted-foreground">Contact our architecture team for tailored marketplace solutions.</p>
+                        <p className="font-bold text-slate-900">Need a custom plan?</p>
+                        <p className="text-sm text-slate-500 font-medium">Contact our team for enterprise solutions tailored to your brand.</p>
                     </div>
                 </div>
-                <Button variant="outline" className="h-12 rounded-xl font-bold px-8">Talk to Architecture</Button>
+                <Button variant="outline" className="h-11 rounded-lg font-bold px-8 border-slate-200 hover:bg-white transition-all">Contact Us</Button>
             </div>
         </div>
     );

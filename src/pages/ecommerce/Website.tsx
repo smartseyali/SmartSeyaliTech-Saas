@@ -86,19 +86,18 @@ export default function Website() {
         <button
             onClick={() => setActiveTab(id)}
             className={cn(
-                "flex flex-col items-start gap-3 p-6 rounded-2xl border-2 transition-all duration-300 group/tab relative overflow-hidden",
+                "flex flex-col items-start gap-3 p-6 rounded-xl border transition-all duration-200 group/tab relative overflow-hidden",
                 activeTab === id
-                    ? "bg-[#14532d] text-white border-[#14532d] shadow-lg shadow-[#14532d]/20 scale-[1.02] z-20"
-                    : "bg-white text-slate-400 border-border hover:border-[#14532d]/20 hover:text-[#14532d] hover:bg-slate-50/50"
+                    ? "bg-blue-600 text-white border-blue-600 shadow-md scale-[1.02] z-20"
+                    : "bg-white text-slate-500 border-slate-200 hover:border-blue-200 hover:text-blue-600 hover:bg-slate-50"
             )}
         >
             <div className="flex items-center justify-between w-full">
-                <Icon className={cn("w-5 h-5 transition-transform duration-300", activeTab === id ? "scale-110" : "group-hover/tab:scale-110")} />
-                {activeTab === id && <div className="w-1.5 h-1.5 rounded-full bg-[#f97316] shadow-[0_0_8px_#f97316]" />}
+                <Icon className={cn("w-5 h-5 transition-transform duration-200", activeTab === id ? "scale-110" : "group-hover/tab:scale-110")} />
             </div>
             <div className="text-left">
                 <p className="text-sm font-bold tracking-tight">{label}</p>
-                <p className={cn("text-[10px] font-medium opacity-60", activeTab === id ? "text-white/60" : "text-slate-400")}>{sub}</p>
+                <p className={cn("text-[10px] font-medium opacity-60", activeTab === id ? "text-white/80" : "text-slate-400")}>{sub}</p>
             </div>
         </button>
     );
@@ -109,34 +108,36 @@ export default function Website() {
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-border">
-                    <div className="space-y-4 animate-in slide-in-from-left-4 duration-500">
+                    <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Globe className="w-4 h-4 text-[#f97316]" />
-                            <span className="text-[#14532d] font-bold uppercase tracking-widest text-[10px]">Website Management</span>
+                            <Globe className="w-4 h-4 text-blue-600" />
+                            <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Website Management</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#14532d]">Storefront <span className="text-[#f97316]">Builder</span></h1>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-border w-fit shadow-sm">
-                            <Globe className="w-3.5 h-3.5 text-[#14532d]/40" />
-                            <span className="text-xs font-bold text-[#14532d]/60 tracking-tight">domain.com/{activeCompany?.subdomain}</span>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Storefront Builder</h1>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-200 w-fit shadow-sm">
+                            <Globe className="w-3.5 h-3.5 text-slate-300" />
+                            <span className="text-xs font-semibold text-slate-500 tracking-tight">domain.com/{activeCompany?.subdomain}</span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4 animate-in slide-in-from-right-4 duration-500">
-                        <Button
-                            variant="outline"
-                            className="h-12 px-6 rounded-xl border-border bg-white text-[#14532d] font-bold text-sm shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2"
-                            onClick={() => window.open(`/${activeCompany?.subdomain?.toLowerCase()}`, '_blank')}
-                        >
-                            <ExternalLink className="w-4 h-4" /> View Site
-                        </Button>
-                        <Button
-                            onClick={handleSave}
-                            disabled={loading}
-                            className="h-12 px-8 rounded-xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold text-sm shadow-lg shadow-[#14532d]/20 transition-all flex items-center gap-2"
-                        >
-                            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            {loading ? "Saving..." : "Save Changes"}
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="outline"
+                                className="h-10 px-4 rounded-md border-slate-200 bg-white text-slate-700 font-bold text-sm shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2"
+                                onClick={() => window.open(`/${activeCompany?.subdomain?.toLowerCase()}`, '_blank')}
+                            >
+                                <ExternalLink className="w-4 h-4" /> View Site
+                            </Button>
+                            <Button
+                                onClick={handleSave}
+                                disabled={loading}
+                                className="h-10 px-6 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all flex items-center gap-2"
+                            >
+                                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                {loading ? "Saving..." : "Save Changes"}
+                            </Button>
+                        </div>
                     </div>
                 </div>
 

@@ -5,8 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useParams, Link } from "react-router-dom";
 import {
     ArrowLeft, Package, Truck, CheckCircle2, Clock, XCircle,
-    RotateCcw, MapPin, Phone, Mail, CreditCard, Printer, Copy, ShoppingBag, Tag, Leaf
+    RotateCcw, MapPin, Phone, Mail, CreditCard, Printer, Copy, ShoppingBag, Tag, Leaf, RefreshCw
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const ORDER_STAGES = ["pending", "confirmed", "packed", "shipped", "out_for_delivery", "delivered"];
@@ -91,12 +92,22 @@ export default function EcomOrderDetail() {
 
     const fmt = (n: number) => `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 
-    if (loading) return <div className="p-20 text-center text-muted-foreground animate-pulse font-sans">Decoding order sequence...</div>;
+    if (loading) return (
+        <div className="flex flex-col items-center justify-center p-20 gap-4">
+            <RefreshCw className="w-10 h-10 text-blue-600 animate-spin opacity-40" />
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Loading order sequence...</p>
+        </div>
+    );
     if (!order) return (
-        <div className="p-20 text-center space-y-4 font-sans">
-            <h1 className="text-2xl font-black text-slate-300 uppercase tracking-tighter">Order Not Found</h1>
-            <p className="text-sm text-slate-400">The requested record does not exist or belongs to another workspace.</p>
-            <Button variant="outline" className="rounded-xl" onClick={() => window.history.back()}>Go Back</Button>
+        <div className="flex flex-col items-center justify-center p-20 gap-6 text-center">
+            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center">
+                <XCircle className="w-10 h-10 text-rose-300" />
+            </div>
+            <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Order Not Found</h1>
+                <p className="text-sm font-medium text-slate-500 max-w-md">The requested record does not exist or belongs to another workspace. Please check the URL or return to the order list.</p>
+            </div>
+            <Button variant="outline" className="h-11 px-8 rounded-lg font-bold border-slate-200 text-slate-600" onClick={() => window.history.back()}>Return to Dashboard</Button>
         </div>
     );
 
@@ -106,52 +117,57 @@ export default function EcomOrderDetail() {
     const addr = order.shipping_address || {};
 
     return (
-        <div className="w-full space-y-12 pb-20 animate-in slide-in-from-bottom-4 duration-500 font-sans">
+        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 bg-white p-8 md:p-10 rounded-[32px] border border-border shadow-sm">
-                <div className="flex items-start gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100 relative">
+                <div className="flex items-center gap-8">
                     <Link to="/ecommerce/orders"
-                        className="bg-[#f8fafc] h-14 w-14 rounded-2xl flex items-center justify-center border border-border shadow-sm hover:bg-white hover:border-[#14532d]/40 transition-all group">
-                        <ArrowLeft className="w-6 h-6 text-slate-400 group-hover:text-[#14532d] transition-colors" />
+                        className="h-16 w-16 rounded-[24px] flex items-center justify-center border border-slate-100 bg-white shadow-sm hover:bg-slate-50 transition-all text-slate-300 hover:text-blue-600 active:scale-90">
+                        <ArrowLeft className="w-6 h-6" />
                     </Link>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-4 flex-wrap">
-                            <h1 className="text-3xl font-black text-[#14532d] tracking-tight">{order.order_number}</h1>
-                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm border ${isCancelled ? "bg-red-50 text-red-600 border-red-100" :
-                                order.status === "delivered" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                    "bg-[#14532d]/5 text-[#14532d] border-[#14532d]/10"
-                                }`}>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <ShoppingBag className="w-6 h-6 text-blue-600" />
+                            <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 italic">Trans-Logistic Engine</span>
+                        </div>
+                        <div className="flex items-center gap-6 flex-wrap">
+                            <h1 className="text-4xl font-black tracking-tighter text-slate-950 uppercase italic leading-none">{order.order_number}</h1>
+                            <div className={cn(
+                                "px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm",
+                                isCancelled ? "bg-rose-50 text-rose-600 border-rose-100" :
+                                    order.status === "delivered" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                        "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-600/20"
+                            )}>
                                 {STAGE_LABELS[order.status] || order.status}
                             </div>
-                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm border ${order.payment_status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                "bg-amber-50 text-amber-600 border-amber-100"
-                                }`}>
+                            <div className={cn(
+                                "px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm",
+                                order.payment_status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                    "bg-amber-50 text-amber-600 border-amber-100"
+                            )}>
                                 {order.payment_status}
                             </div>
                         </div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <Clock className="w-3.5 h-3.5" /> Placed on {new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}
-                        </p>
                     </div>
                 </div>
 
-                <div className="flex gap-4 h-14">
-                    <Button variant="outline" className="h-full px-6 rounded-2xl font-bold bg-white text-[#14532d] border-slate-200 hover:border-[#14532d]/40 flex items-center gap-2" onClick={() => window.print()}>
-                        <Printer className="w-4 h-4" /> Print Invoice
+                <div className="flex items-center gap-4">
+                    <Button variant="outline" className="h-14 px-8 rounded-2xl bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all gap-3 shadow-sm active:scale-95" onClick={() => window.print()}>
+                        <Printer className="w-5 h-5" /> Export Artifact
                     </Button>
                     {nextStatus && !isCancelled && (
-                        <Button className="h-full px-8 rounded-2xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-[#14532d]/20 transition-all" onClick={advanceStatus} disabled={updating}>
-                            {updating ? "Processing..." : `Mark as ${STAGE_LABELS[nextStatus]}`}
+                        <Button className="h-14 px-10 rounded-2xl bg-blue-600 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-blue-600/20 transition-all active:scale-95" onClick={advanceStatus} disabled={updating}>
+                            {updating ? "Committing..." : `Commit to ${STAGE_LABELS[nextStatus]}`}
                         </Button>
                     )}
                 </div>
             </div>
 
-            {/* Progress Tracker */}
+            {/* Premium Progress Pipe */}
             {!isCancelled && (
-                <div className="relative overflow-hidden bg-white rounded-[40px] border border-border p-12 shadow-sm">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.05] pointer-events-none text-[#14532d]">
-                        <Package className="w-32 h-32" />
+                <div className="bg-white rounded-[48px] border border-slate-100 p-12 shadow-sm overflow-hidden relative hover:shadow-2xl transition-all duration-500">
+                    <div className="absolute -top-10 -right-10 p-8 opacity-[0.03] pointer-events-none text-blue-600">
+                        <Package className="w-64 h-64 -rotate-12" />
                     </div>
                     <div className="flex items-start justify-between relative w-full">
                         {ORDER_STAGES.map((stage, i) => {
@@ -159,26 +175,34 @@ export default function EcomOrderDetail() {
                             const done = i <= stageIdx;
                             const current = i === stageIdx;
                             return (
-                                <div key={stage} className="flex flex-col items-center gap-4 z-10 flex-1 relative">
-                                    {/* Connector Line */}
+                                <div key={stage} className="flex flex-col items-center gap-6 z-10 flex-1 relative group/state">
+                                    {/* Advanced Connector Line */}
                                     {i < ORDER_STAGES.length - 1 && (
-                                        <div className="absolute left-[50%] top-6 w-full h-[2px] bg-[#f8fafc]">
-                                            <div className={`h-full transition-all duration-1000 ${i < stageIdx ? "w-full bg-[#14532d]" : "w-0"}`} />
+                                        <div className="absolute left-[50%] top-8 w-full h-[4px] bg-slate-50">
+                                            <div className={cn(
+                                                "h-full transition-all duration-1000",
+                                                i < stageIdx ? "w-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]" : "w-0"
+                                            )} />
                                         </div>
                                     )}
 
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-sm ${done ? "bg-[#14532d] border-[#14532d] text-white scale-110 shadow-lg shadow-[#14532d]/20" :
-                                        "bg-white border-slate-100 text-slate-200"
-                                        } ${current ? "ring-8 ring-[#14532d]/5" : ""}`}>
-                                        <Icon className="w-5 h-5" />
+                                    <div className={cn(
+                                        "w-16 h-16 rounded-[24px] flex items-center justify-center border-4 transition-all duration-700 shadow-sm",
+                                        done ? "bg-blue-600 border-white text-white scale-110 shadow-2xl shadow-blue-600/30" : "bg-white border-slate-50 text-slate-200",
+                                        current && "ring-[12px] ring-blue-500/5 bg-blue-600 animate-in zoom-in duration-500"
+                                    )}>
+                                        <Icon className={cn("w-7 h-7", current && "animate-pulse")} />
                                     </div>
 
                                     <div className="flex flex-col items-center gap-1">
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest text-center max-w-[80px] leading-tight ${done ? "text-[#14532d]" : "text-slate-300"}`}>
+                                        <span className={cn(
+                                            "text-[9px] font-black uppercase tracking-[0.3em] text-center transition-colors px-4",
+                                            done ? "text-slate-900" : "text-slate-200"
+                                        )}>
                                             {STAGE_LABELS[stage]}
                                         </span>
                                         {current && (
-                                            <span className="text-[10px] font-black text-[#f97316] uppercase mt-1">Active</span>
+                                            <div className="h-1 w-8 bg-blue-600 rounded-full animate-pulse" />
                                         )}
                                     </div>
                                 </div>
@@ -188,50 +212,54 @@ export default function EcomOrderDetail() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-8 space-y-8">
-                    {/* Order Items */}
-                    <div className="bg-white rounded-[32px] border border-border shadow-sm overflow-hidden">
-                        <div className="px-8 py-6 border-b border-border bg-[#f8fafc] flex items-center justify-between">
-                            <h2 className="text-xl font-black text-[#14532d] flex items-center gap-3">
-                                <ShoppingBag className="w-5 h-5 text-[#f97316]" />
-                                Order Items <span className="text-xs font-bold text-slate-300 border-l border-slate-200 pl-4">{items.length} Product(s)</span>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                <div className="lg:col-span-8 space-y-12">
+                    {/* Shipment Inventory Ledger */}
+                    <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden hover:shadow-2xl transition-all duration-500">
+                        <div className="px-10 py-8 border-b border-slate-50 bg-white flex items-center justify-between relative">
+                            <div className="absolute top-0 left-0 w-24 h-1.5 bg-blue-600 rounded-full ml-10" />
+                            <h2 className="text-xl font-black text-slate-950 uppercase italic flex items-center gap-4">
+                                <ShoppingBag className="w-6 h-6 text-blue-600" />
+                                Inventory Ledger
                             </h2>
+                            <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-5 py-2 rounded-2xl uppercase tracking-[0.2em] border border-blue-100">{items.length} Discrete Entities</span>
                         </div>
 
-                        <div className="p-0 overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead className="bg-[#f8fafc] text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-border">
-                                    <tr>
-                                        <th className="px-8 py-5 text-left">Product Details</th>
-                                        <th className="px-4 py-5 text-center">Qty</th>
-                                        <th className="px-4 py-5 text-right">Unit Price</th>
-                                        <th className="px-8 py-5 text-right">Subtotal</th>
+                        <div className="p-0">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="bg-slate-50/50 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 border-b border-slate-50">
+                                        <th className="px-10 py-6 text-left">Internal Article Matrix</th>
+                                        <th className="px-8 py-6 text-center">Qty</th>
+                                        <th className="px-8 py-6 text-right">Unit Val</th>
+                                        <th className="px-10 py-6 text-right">Net Res.</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
                                     {items.map(item => (
-                                        <tr key={item.id} className="hover:bg-[#f8fafc]/50 transition-colors group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-14 h-14 rounded-2xl bg-[#f8fafc] border border-slate-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform overflow-hidden font-black text-[#14532d]/10 text-xl">
+                                        <tr key={item.id} className="hover:bg-slate-50/50 transition-all group">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-20 h-20 rounded-[28px] bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:bg-white group-hover:shadow-2xl group-hover:scale-105 transition-all duration-500 overflow-hidden text-3xl font-black text-slate-200 uppercase italic">
                                                         {item.product_name[0]}
                                                     </div>
-                                                    <div>
-                                                        <p className="font-bold text-[#14532d] text-base leading-none mb-2">{item.product_name}</p>
-                                                        <div className="flex items-center gap-2">
-                                                            {item.variant_label && <span className="px-2 py-0.5 bg-[#f97316]/10 rounded-md text-[9px] font-bold text-[#f97316] uppercase tracking-wider">{item.variant_label}</span>}
-                                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter opacity-60">SKU: {item.sku}</span>
+                                                    <div className="space-y-2">
+                                                        <p className="font-black text-slate-950 text-lg tracking-tight leading-none group-hover:text-blue-600 transition-colors uppercase italic">{item.product_name}</p>
+                                                        <div className="flex items-center gap-3">
+                                                            {item.variant_label && <span className="px-3 py-1 bg-slate-900 rounded-lg text-[8px] font-black text-white uppercase tracking-[0.2em]">{item.variant_label}</span>}
+                                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] font-mono">#{item.sku}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-6 text-center">
-                                                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 font-black text-[#14532d] border border-slate-100">{item.quantity}</span>
+                                            <td className="px-8 py-8 text-center">
+                                                <span className="inline-flex h-12 w-12 items-center justify-center rounded-[18px] bg-white border border-slate-100 font-black text-slate-950 shadow-sm group-hover:border-blue-200 transition-all">{item.quantity}</span>
                                             </td>
-                                            <td className="px-4 py-6 text-right font-bold text-slate-400 tabular-nums">{fmt(item.unit_price)}</td>
-                                            <td className="px-8 py-6 text-right">
-                                                <span className="text-base font-black text-[#14532d] tabular-nums">{fmt(item.amount)}</span>
+                                            <td className="px-8 py-8 text-right">
+                                                <p className="font-black text-slate-300 text-xs tracking-widest">{fmt(item.unit_price)}</p>
+                                            </td>
+                                            <td className="px-10 py-8 text-right">
+                                                <span className="text-xl font-black text-slate-950 tracking-tighter">{fmt(item.amount)}</span>
                                             </td>
                                         </tr>
                                     ))}
@@ -240,100 +268,112 @@ export default function EcomOrderDetail() {
                         </div>
 
                         {/* Totals Section */}
-                        <div className="p-8 space-y-4 bg-[#f8fafc] border-t border-border">
-                            <div className="flex justify-between items-center text-sm font-bold text-slate-400">
-                                <span className="uppercase tracking-widest text-[10px]">Net Total</span>
-                                <span className="tabular-nums">{fmt(order.subtotal || 0)}</span>
+                        <div className="p-12 space-y-6 bg-slate-900 border-t border-slate-100 text-white relative overflow-hidden group">
+                            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] group-hover:bg-blue-600/20 transition-all duration-1000" />
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 relative z-10">
+                                <span>Article Subtotal</span>
+                                <span className="font-mono text-white/60">{fmt(order.subtotal || 0)}</span>
                             </div>
                             {Number(order.coupon_discount) > 0 && (
-                                <div className="flex justify-between items-center text-sm font-bold text-emerald-600">
-                                    <div className="flex items-center gap-2 uppercase tracking-widest text-[10px]">
-                                        <Tag className="w-4 h-4" /> Discount ({order.coupon_code})
+                                <div className="flex justify-between items-center text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] relative z-10">
+                                    <div className="flex items-center gap-3">
+                                        <Tag className="w-5 h-5" /> Promo Discount [{order.coupon_code}]
                                     </div>
-                                    <span className="tabular-nums">−{fmt(order.coupon_discount)}</span>
+                                    <span className="bg-emerald-500/20 px-4 py-2 rounded-xl border border-emerald-500/30">−{fmt(order.coupon_discount)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between items-center text-sm font-bold text-slate-400">
-                                <span className="uppercase tracking-widest text-[10px]">Taxes</span>
-                                <span className="tabular-nums">{fmt(order.tax_amount || 0)}</span>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 relative z-10">
+                                <span>Regulatory Impost (GST)</span>
+                                <span className="font-mono text-white/60">{fmt(order.tax_amount || 0)}</span>
                             </div>
-                            <div className="flex justify-between items-center text-sm font-bold text-slate-400 border-b border-slate-200 pb-6">
-                                <span className="uppercase tracking-widest text-[10px]">Shipping</span>
-                                <span className="tabular-nums">{Number(order.shipping_amount) === 0 ? "FREE" : fmt(order.shipping_amount)}</span>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 border-b border-white/5 pb-10 relative z-10">
+                                <span>Logistic Surcharge</span>
+                                <span className="text-blue-400">{Number(order.shipping_amount) === 0 ? "FREE_TIER" : fmt(order.shipping_amount)}</span>
                             </div>
-                            <div className="flex justify-between items-end pt-4">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f97316]">Grand Total</span>
-                                    <span className="text-[10px] text-slate-400 font-bold italic opacity-60">Settlement Amount</span>
+                            <div className="flex justify-between items-end pt-10 relative z-10">
+                                <div className="space-y-3">
+                                    <span className="text-[11px] font-black uppercase tracking-[0.5em] text-blue-500 animate-pulse">Total Settlement</span>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest italic opacity-50">Inclusive of core & peripheral taxes</p>
                                 </div>
-                                <span className="text-4xl font-black text-[#14532d] tabular-nums tracking-tighter">{fmt(order.grand_total || 0)}</span>
+                                <span className="text-7xl font-black text-white tracking-tighter italic">{fmt(order.grand_total || 0).replace('₹', '')}<span className="text-2xl ml-2 not-italic text-slate-600 font-light">INR</span></span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Fulfillment */}
-                        <div className="bg-white rounded-[32px] border border-border p-8 shadow-sm">
-                            <h2 className="text-lg font-black text-[#14532d] mb-6 flex items-center gap-3">
-                                <Truck className="w-5 h-5 text-[#f97316]" />
-                                Shipping Info
-                            </h2>
-                            <div className="space-y-5">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-300 ml-1">Courier Partner</label>
-                                    <input value={courierInput} onChange={e => setCourierInput(e.target.value)}
-                                        placeholder="e.g. DHL, FedEx"
-                                        className="w-full h-12 px-5 rounded-2xl border border-border bg-[#f8fafc] font-bold text-sm focus:border-[#14532d] transition-all" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-300 ml-1">Tracking Number</label>
-                                    <div className="relative group">
-                                        <input value={trackingInput} onChange={e => setTrackingInput(e.target.value)}
-                                            placeholder="AWB #"
-                                            className="w-full h-12 px-5 rounded-2xl border border-border bg-[#f8fafc] font-mono font-bold text-sm focus:border-[#14532d] transition-all" />
-                                        <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-8 w-8 rounded-lg text-slate-300 hover:text-[#14532d]"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(trackingInput);
-                                                toast({ title: "COPIED" });
-                                            }}>
-                                            <Copy className="w-3.5 h-3.5" />
-                                        </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        {/* Logistic Protocol */}
+                        <div className="bg-white rounded-[40px] border border-slate-100 p-10 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col justify-between">
+                            <div>
+                                <h2 className="text-xl font-black text-slate-950 mb-10 uppercase italic flex items-center gap-4">
+                                    <Truck className="w-6 h-6 text-blue-600" />
+                                    Logistic Protocol
+                                </h2>
+                                <div className="space-y-8">
+                                    <div className="space-y-4 group/field">
+                                        <label className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 group-focus-within/field:text-blue-600 transition-colors">Nominated Carrier</label>
+                                        <input value={courierInput} onChange={e => setCourierInput(e.target.value)}
+                                            placeholder="e.g. CORE_LOGISTICS_X"
+                                            className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-slate-50/50 text-sm font-black uppercase tracking-tight focus:outline-none focus:ring-8 focus:ring-blue-500/5 focus:bg-white focus:border-blue-500 transition-all shadow-inner" />
+                                    </div>
+                                    <div className="space-y-4 group/field">
+                                        <label className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1 group-focus-within/field:text-blue-600 transition-colors">AWB / Airway Identifier</label>
+                                        <div className="relative">
+                                            <input value={trackingInput} onChange={e => setTrackingInput(e.target.value)}
+                                                placeholder="SIGNAL_REF_CODE"
+                                                className="w-full h-14 pl-6 pr-16 rounded-2xl border border-slate-100 bg-slate-50/50 font-mono text-sm font-black focus:outline-none focus:ring-8 focus:ring-blue-500/5 focus:bg-white focus:border-blue-500 transition-all shadow-inner" />
+                                            <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-300 hover:text-blue-600 transition-all shadow-sm active:scale-90"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(trackingInput);
+                                                    toast({ title: "Copied to clipboard" });
+                                                }}>
+                                                <Copy className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <Button className="w-full h-12 rounded-2xl bg-[#14532d] text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-[#14532d]/10 mt-2" onClick={saveTracking}>
-                                    Update Fulfillment
-                                </Button>
                             </div>
+                            <Button className="w-full h-16 rounded-2xl bg-blue-600 hover:bg-black text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-blue-600/20 transition-all mt-10 active:scale-95" onClick={saveTracking}>
+                                Apply Fullfillment Vector
+                            </Button>
                         </div>
 
-                        {/* Event Trace */}
-                        <div className="bg-white rounded-[32px] border border-border p-8 shadow-sm">
-                            <h2 className="text-lg font-black text-[#14532d] mb-6 flex items-center gap-3">
-                                <Clock className="w-5 h-5 text-[#f97316]" />
-                                History Trace
+                        {/* System Event Trace */}
+                        <div className="bg-white rounded-[40px] border border-slate-100 p-10 shadow-sm hover:shadow-2xl transition-all duration-500">
+                            <h2 className="text-xl font-black text-slate-950 mb-10 uppercase italic flex items-center gap-4">
+                                <Clock className="w-6 h-6 text-blue-600" />
+                                Event Signal Trace
                             </h2>
                             {timeline.length === 0 ? (
-                                <div className="text-center py-6 text-slate-200 font-bold uppercase text-[10px] tracking-widest italic">No events logged</div>
+                                <div className="text-center py-20 bg-slate-50/30 rounded-[32px] border border-dashed border-slate-200">
+                                    <div className="w-20 h-20 rounded-full bg-white mx-auto mb-6 flex items-center justify-center text-slate-100 shadow-sm">
+                                        <Clock className="w-10 h-10" />
+                                    </div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 italic">No Registry Events</p>
+                                </div>
                             ) : (
-                                <div className="relative pl-7 space-y-8">
-                                    <div className="absolute left-[13px] top-2 bottom-2 w-0.5 bg-slate-50" />
+                                <div className="relative pl-10 space-y-12">
+                                    <div className="absolute left-[19px] top-4 bottom-4 w-1 bg-slate-50 rounded-full" />
                                     {timeline.map((t, i) => {
                                         const Icon = STAGE_ICONS[t.status] || Clock;
                                         const isLast = i === timeline.length - 1;
                                         return (
-                                            <div key={t.id} className="relative group/time">
-                                                <div className={`absolute -left-[30px] w-7 h-7 rounded-lg flex items-center justify-center border-2 transition-all ${isLast ? "bg-[#14532d] border-[#14532d] text-white shadow-lg shadow-[#14532d]/20 scale-110" : "bg-white border-slate-100 text-slate-200"
-                                                    }`}>
-                                                    <Icon className="w-3.5 h-3.5" />
+                                            <div key={t.id} className="relative group/ev">
+                                                <div className={cn(
+                                                    "absolute -left-[54px] w-12 h-12 rounded-[18px] flex items-center justify-center border-4 transition-all duration-500 group-hover/ev:scale-110 shadow-lg",
+                                                    isLast ? "bg-blue-600 border-white text-white shadow-blue-600/30" : "bg-white border-slate-50 text-slate-200"
+                                                )}>
+                                                    <Icon className="w-5 h-5" />
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <p className="text-xs font-bold text-[#14532d] uppercase tracking-tight">{STAGE_LABELS[t.status] || t.status}</p>
-                                                    <div className="flex items-center justify-between gap-4">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                            {new Date(t.created_at).toLocaleString("en-IN", { timeStyle: 'short', dateStyle: 'medium' })}
-                                                        </p>
-                                                    </div>
-                                                    {t.note && <p className="text-[11px] font-medium text-slate-400 italic pt-1 border-l-2 border-slate-50 pl-3 mt-1 leading-tight">{t.note}</p>}
+                                                <div className="space-y-2">
+                                                    <p className="text-sm font-black text-slate-950 uppercase italic tracking-tight leading-none">{STAGE_LABELS[t.status] || t.status}</p>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] italic font-mono">
+                                                        {new Date(t.created_at).toLocaleString("en-IN", { timeStyle: 'short', dateStyle: 'medium' })}
+                                                    </p>
+                                                    {t.note && (
+                                                        <div className="mt-4 p-5 rounded-[24px] bg-slate-50 group-hover/ev:bg-blue-50/50 transition-colors border border-slate-100 border-l-4 border-l-blue-600 shadow-sm">
+                                                            <p className="text-[11px] font-bold text-slate-500 leading-relaxed uppercase tracking-tight">{t.note}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
@@ -344,100 +384,109 @@ export default function EcomOrderDetail() {
                     </div>
                 </div>
 
-                {/* Vertical Sidebar */}
-                <div className="lg:col-span-4 space-y-8">
-                    {/* Customer */}
-                    <div className="bg-[#14532d] rounded-[40px] p-8 text-white shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[80px] -z-0" />
-                        <h2 className="text-xl font-black uppercase mb-8 relative z-10">Customer Profile</h2>
-                        <div className="flex items-center gap-6 mb-10 relative z-10">
-                            <div className="w-16 h-16 rounded-3xl bg-white/10 flex items-center justify-center text-white font-black text-2xl shadow-inner border border-white/5">
+                {/* Vertical Intelligence Sidebar */}
+                <div className="lg:col-span-4 space-y-12">
+                    {/* Buyer Identity Profile */}
+                    <div className="bg-slate-950 rounded-[48px] p-12 text-white shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/10 rounded-full blur-[80px] -z-0 group-hover:bg-blue-600/20 transition-all duration-1000" />
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 mb-12 relative z-10 italic">Article Consignee</h2>
+
+                        <div className="flex flex-col items-center text-center mb-12 relative z-10">
+                            <div className="w-32 h-32 rounded-[40px] bg-white/5 flex items-center justify-center text-white font-black text-5xl shadow-inner border border-white/10 mb-8 transform group-hover:-translate-y-2 transition-transform duration-700 italic">
                                 {order.customer_name?.charAt(0)}
                             </div>
-                            <div>
-                                <p className="font-black text-xl tracking-tight leading-none mb-1">{order.customer_name}</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f97316]">Verified Customer</p>
-                            </div>
+                            <h3 className="font-black text-3xl tracking-tighter leading-none mb-3 uppercase italic">{order.customer_name}</h3>
+                            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-600/20 text-blue-400 text-[9px] font-black uppercase tracking-[0.2em] border border-blue-500/30">Registry Identity Verified</div>
                         </div>
 
                         <div className="space-y-6 relative z-10">
-                            <div className="flex items-center gap-4 group/item">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 group-hover/item:text-white transition-colors">
-                                    <Phone className="w-4 h-4" />
+                            <div className="flex items-center gap-6 p-6 rounded-[28px] bg-white/5 hover:bg-white/10 transition-all border border-white/5 group/row">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover/row:bg-blue-600 group-hover/row:text-white transition-all">
+                                    <Phone className="w-5 h-5" />
                                 </div>
-                                <span className="text-sm font-bold text-white/80">{order.customer_phone || "Not provided"}</span>
+                                <span className="text-base font-black tracking-tight text-white/90 font-mono">{order.customer_phone || "UNSPECIFIED"}</span>
                             </div>
-                            <div className="flex items-center gap-4 group/item">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 group-hover/item:text-white transition-colors">
-                                    <Mail className="w-4 h-4" />
+                            <div className="flex items-center gap-6 p-6 rounded-[28px] bg-white/5 hover:bg-white/10 transition-all border border-white/5 group/row">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover/row:bg-blue-600 group-hover/row:text-white transition-all">
+                                    <Mail className="w-5 h-5" />
                                 </div>
-                                <span className="text-sm font-bold text-white/80 truncate pr-4">{order.customer_email || "Not provided"}</span>
+                                <span className="text-sm font-black tracking-tight text-white/90 truncate">{order.customer_email || "ANONYMOUS_CLIENT"}</span>
                             </div>
                         </div>
 
                         {addr.line1 && (
-                            <div className="mt-10 pt-10 border-t border-white/5 relative z-10">
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-5">Delivery Destination</h3>
-                                <div className="flex gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 shrink-0">
-                                        <MapPin className="w-4 h-4" />
-                                    </div>
-                                    <div className="text-sm font-bold leading-relaxed text-white/70">
-                                        <p className="text-white">{addr.line1}</p>
-                                        {addr.line2 && <p>{addr.line2}</p>}
-                                        <p className="text-[#f97316] mt-1">{addr.city}, {addr.state} • {addr.pincode}</p>
-                                    </div>
+                            <div className="mt-12 pt-12 border-t border-white/10 relative z-10">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <MapPin className="w-5 h-5 text-blue-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 italic">Dispatch Vector</h3>
+                                </div>
+                                <div className="p-8 rounded-[32px] bg-white/5 border border-white/5 text-sm font-bold leading-relaxed text-white/50 group-hover:bg-white/[0.07] transition-all">
+                                    <p className="text-white font-black text-lg mb-2 uppercase italic">{addr.line1}</p>
+                                    {addr.line2 && <p className="mb-3 opacity-60 font-medium">{addr.line2}</p>}
+                                    <div className="h-px w-full bg-white/5 my-4" />
+                                    <p className="text-blue-500 font-black uppercase tracking-[0.3em] text-xs font-mono">{addr.city}, {addr.state} • {addr.pincode}</p>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Payment */}
-                    <div className="bg-white rounded-[40px] border border-border p-8 shadow-sm">
-                        <h2 className="text-xl font-black text-[#14532d] mb-8">Payment Details</h2>
-                        <div className="space-y-6">
-                            <div className="p-6 rounded-3xl bg-[#f8fafc] border border-slate-50">
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Method</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-white rounded-full border border-slate-100 text-[#14532d]">{order.payment_method || "PREPAID"}</span>
-                                </div>
-                                <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-4">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Status</span>
-                                        <span className={`text-xs font-black uppercase tracking-widest ${order.payment_status === 'paid' ? 'text-emerald-500' : 'text-amber-500'}`}>{order.payment_status}</span>
+                    {/* Settlement Intelligence */}
+                    <div className="bg-white rounded-[48px] border border-slate-100 p-10 shadow-sm hover:shadow-2xl transition-all duration-500">
+                        <h2 className="text-xl font-black text-slate-950 mb-10 uppercase italic flex items-center gap-4">
+                            <CreditCard className="w-6 h-6 text-blue-600" />
+                            Financial Context
+                        </h2>
+                        <div className="space-y-10">
+                            <div className="p-10 rounded-[40px] bg-slate-50 border border-slate-100 shadow-inner group/bill">
+                                <div className="flex justify-between items-center mb-10">
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 block">Protocol Type</span>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2 bg-white rounded-xl border border-slate-200 text-slate-950 shadow-sm">{order.payment_method || "CRYPTO_S"}</span>
                                     </div>
-                                    <span className="text-3xl font-black text-[#14532d] tabular-nums tracking-tighter">{fmt(order.grand_total || 0)}</span>
+                                    <div className="space-y-1 text-right">
+                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 block">Signal Status</span>
+                                        <span className={cn(
+                                            "text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2 rounded-xl border-2",
+                                            order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/10 shadow-lg' : 'bg-amber-50 text-amber-600 border-amber-100 shadow-inner'
+                                        )}>{order.payment_status}</span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-center pt-10 border-t border-slate-200/60">
+                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Settlement Quantum</span>
+                                    <span className="text-6xl font-black text-slate-950 tracking-tighter italic group-hover/bill:scale-110 transition-transform duration-500">{fmt(order.grand_total || 0).replace('₹', '')}<span className="text-xs ml-2 not-italic text-slate-300 font-light">INR</span></span>
                                 </div>
                             </div>
 
                             {order.payment_gateway_ref && (
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-300 ml-1">Ref ID</label>
-                                    <div className="flex items-center gap-3 p-4 bg-[#f8fafc] rounded-2xl border border-slate-100 group">
-                                        <span className="font-mono text-[10px] font-bold truncate flex-1 text-[#14532d]/40">{order.payment_gateway_ref}</span>
+                                <div className="space-y-4">
+                                    <label className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Gateway Signal Signature</label>
+                                    <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-[28px] border border-slate-100 shadow-inner group/sig">
+                                        <span className="font-mono text-[10px] font-black truncate flex-1 text-slate-400 group-hover/sig:text-blue-600 transition-colors uppercase italic">{order.payment_gateway_ref}</span>
                                         <button onClick={() => {
                                             navigator.clipboard.writeText(order.payment_gateway_ref);
-                                            toast({ title: "COPIED" });
-                                        }} className="text-slate-200 hover:text-[#14532d] transition-colors">
+                                            toast({ title: "Signal signature captured" });
+                                        }} className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-300 hover:text-blue-600 transition-all hover:shadow-md active:scale-90">
                                             <Copy className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
                             )}
 
-                            {order.payment_status === "pending" && (
-                                <Button className="w-full h-14 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-amber-500/20 flex items-center gap-3 border-none" onClick={markPaymentPaid}>
-                                    <CreditCard className="w-5 h-5" /> Confirm Payment Manually
-                                </Button>
-                            )}
-
-                            {order.payment_status === "paid" && !["cancelled", "returned", "delivered"].includes(order.status) && (
-                                <Link to={`/ecommerce/refunds/new?order=${order.id}`} className="block">
-                                    <Button variant="outline" className="w-full h-14 rounded-2xl font-black text-xs uppercase tracking-widest text-red-500 border-red-50 hover:bg-red-50 gap-3 border-2">
-                                        <RotateCcw className="w-5 h-5" /> Process Refund
+                            <div className="space-y-4">
+                                {order.payment_status === "pending" && (
+                                    <Button className="w-full h-16 rounded-[24px] bg-amber-500 hover:bg-black text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-amber-500/20 flex items-center justify-center gap-4 border-none transition-all active:scale-95" onClick={markPaymentPaid}>
+                                        <CreditCard className="w-6 h-6" /> Authenticate Payment Signal
                                     </Button>
-                                </Link>
-                            )}
+                                )}
+
+                                {order.payment_status === "paid" && !["cancelled", "returned", "delivered"].includes(order.status) && (
+                                    <Link to={`/ecommerce/refunds/new?order=${order.id}`} className="block">
+                                        <Button variant="outline" className="w-full h-16 rounded-[24px] font-black text-[10px] uppercase tracking-[0.3em] text-rose-500 border-rose-50 hover:bg-rose-500 hover:text-white gap-4 border-2 transition-all active:scale-95 shadow-lg shadow-rose-500/5">
+                                            <RotateCcw className="w-6 h-6" /> Trigger Disbursement
+                                        </Button>
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -4,11 +4,12 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
-    Image as ImageIcon, Plus, Pencil, Trash2, ToggleLeft, ToggleRight,
+    Image as ImageIcon, Plus, Pencil, Trash2,
     MoveUp, MoveDown, Clock, X, Link as LinkIcon, RefreshCw, Save,
     ShieldCheck, Leaf, Layout
 } from "lucide-react";
 import { MediaUpload } from "@/components/common/MediaUpload";
+import { cn } from "@/lib/utils";
 
 const BANNER_POSITIONS = [
     // Home Page
@@ -120,72 +121,110 @@ export default function Banners() {
     const posConf = (key: string) => BANNER_POSITIONS.find(p => p.key === key) || BANNER_POSITIONS[0];
 
     return (
-        <div className="p-8 space-y-12 w-full">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-slate-100 pb-12">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <ImageIcon className="w-6 h-6 text-[#f97316]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#14532d]/40">Visual Merchandising</span>
+        <div className="p-8 space-y-8 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-8 bg-blue-600 rounded-full" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Merchandising & Assets</span>
                     </div>
-                    <h1 className="text-5xl font-black italic tracking-tighter uppercase text-[#14532d]">Hero <br /><span className="text-slate-200">Banners</span></h1>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Storefront Banners</h1>
+                    <p className="text-sm font-medium text-slate-500">
+                        {banners.length} Creative Assets · {banners.filter(b => b.is_active).length} Active Banners
+                    </p>
                 </div>
-                <Button
-                    onClick={openNew}
-                    className="h-16 px-10 rounded-2xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[#14532d]/20"
-                >
-                    <Plus className="w-4 h-4 mr-3" /> Initialize New Banner
+                <Button onClick={openNew} className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 transition-all gap-3 active:scale-95 group">
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" /> Create Banner
                 </Button>
             </div>
 
             {loading ? (
-                <div className="text-center py-40 animate-pulse text-slate-300 italic font-medium uppercase tracking-[0.2em]">Synchronizing Creative Assets...</div>
+                <div className="flex flex-col items-center justify-center py-32 gap-6">
+                    <RefreshCw className="w-12 h-12 text-blue-600 animate-spin opacity-20" />
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 animate-pulse">Loading Assets...</p>
+                </div>
             ) : banners.length === 0 ? (
-                <div className="bg-white rounded-[48px] border border-dashed border-slate-200 p-32 text-center group hover:border-[#14532d]/20 transition-all">
-                    <Layout className="w-16 h-16 mx-auto mb-6 text-slate-100 group-hover:text-[#14532d]/10 transition-colors" />
-                    <p className="text-2xl font-black text-[#14532d] uppercase tracking-tight">Archives Empty</p>
-                    <p className="text-slate-400 font-medium italic mt-2">Launch your first promotional slide to engage visitors.</p>
-                    <Button onClick={openNew} variant="outline" className="mt-10 rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-[10px]">Start Creation</Button>
+                <div className="bg-white rounded-3xl border border-slate-100 border-dashed text-center py-32 max-w-3xl mx-auto shadow-sm">
+                    <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                        <Layout className="w-10 h-10 text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No active banners</h3>
+                    <p className="text-sm font-medium text-slate-500 mb-10 max-w-sm mx-auto leading-relaxed">Promote your collections with high-impact visual banners across your storefront.</p>
+                    <Button className="h-12 px-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 active:scale-95" onClick={openNew}>
+                        <Plus className="w-5 h-5 mr-3" /> Design First Banner
+                    </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-10">
                     {banners.map(b => {
                         const pos = posConf(b.position);
                         const isExpired = b.ends_at && new Date(b.ends_at) < new Date();
                         return (
-                            <div key={b.id} className={`bg-white rounded-[32px] border transition-all overflow-hidden shadow-sm hover:shadow-xl hover:translate-y-[-2px] ${b.is_active && !isExpired ? "border-slate-50" : "border-slate-100 opacity-60"}`}>
-                                <div className="flex flex-col lg:flex-row">
-                                    <div className="w-full lg:w-[400px] h-[240px] relative overflow-hidden bg-slate-50 shrink-0">
-                                        <img src={b.image_url} alt={b.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
-                                        <div className="absolute inset-0 flex flex-col justify-end p-8" style={{ background: `rgba(0,0,0,${(b.overlay_opacity || 40) / 100})` }}>
-                                            {b.badge_text && <span className="px-3 py-1 bg-[#f97316] text-white text-[9px] font-black uppercase tracking-widest rounded-lg w-fit mb-3">{b.badge_text}</span>}
-                                            <h3 className="text-white text-xl font-black uppercase tracking-tighter leading-none line-clamp-2">{b.title}</h3>
+                            <div key={b.id} className={cn(
+                                "group bg-white rounded-[32px] border transition-all duration-300 overflow-hidden flex flex-col lg:flex-row shadow-sm hover:shadow-xl",
+                                !b.is_active || isExpired ? "grayscale-[0.5] opacity-70 border-slate-100" : "border-slate-100 hover:border-blue-200"
+                            )}>
+                                <div className="w-full lg:w-[480px] h-[300px] relative overflow-hidden bg-slate-50 shrink-0">
+                                    <img src={b.image_url} alt={b.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent p-10 flex flex-col justify-end">
+                                        {b.badge_text && (
+                                            <div className="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-full w-fit mb-4 shadow-xl">
+                                                {b.badge_text}
+                                            </div>
+                                        )}
+                                        <h3 className="text-white text-3xl font-extrabold tracking-tight leading-none uppercase">{b.title}</h3>
+                                    </div>
+                                    <div className="absolute top-6 right-6 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                        <button onClick={() => reorder(b, -1)} className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md shadow-lg flex items-center justify-center text-slate-900 hover:bg-blue-600 hover:text-white transition-all active:scale-90">
+                                            <MoveUp className="w-5 h-5" />
+                                        </button>
+                                        <button onClick={() => reorder(b, 1)} className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md shadow-lg flex items-center justify-center text-slate-900 hover:bg-blue-600 hover:text-white transition-all active:scale-90">
+                                            <MoveDown className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-10 flex-1 flex flex-col">
+                                    <div className="flex items-start justify-between mb-6">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600">{pos.label}</p>
+                                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest leading-none">Display Order: {b.display_order}</p>
+                                        </div>
+                                        <button onClick={() => toggle(b)}
+                                            className={cn("relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none", b.is_active ? "bg-blue-600" : "bg-slate-200")}>
+                                            <div className={cn("absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300", b.is_active ? "translate-x-5" : "")} />
+                                        </button>
+                                    </div>
+
+                                    {b.subtitle && <p className="text-lg font-medium text-slate-500 italic mb-8 leading-relaxed">"{b.subtitle}"</p>}
+
+                                    <div className="flex flex-wrap gap-4 mb-10">
+                                        {b.button_text && (
+                                            <div className="px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:bg-white hover:border-blue-100 transition-colors">
+                                                <LinkIcon className="w-4 h-4 text-blue-600" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Call to Action</span>
+                                                    <span className="text-xs font-extrabold text-slate-900">{b.button_text}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:bg-white hover:border-blue-100 transition-colors">
+                                            <Layout className="w-4 h-4 text-blue-600" />
+                                            <div className="flex flex-col">
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Overlay Style</span>
+                                                <span className="text-xs font-extrabold text-slate-900 capitalize">{b.text_color} Context</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex-1 p-10 flex flex-col justify-between">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-4">
-                                                <span className="px-3 py-1 bg-[#14532d]/5 text-[#14532d] text-[10px] font-black uppercase tracking-widest rounded-full">{pos.label}</span>
-                                                {isExpired && <span className="px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-full">Expired Asset</span>}
-                                            </div>
-                                            <p className="text-slate-500 font-medium italic">{b.subtitle || "Nurturing brand awareness through visual excellence."}</p>
-                                            <div className="flex gap-4 pt-2">
-                                                {b.button_text && <span className="text-[10px] font-black uppercase tracking-widest text-[#14532d]/40 flex items-center gap-2"><LinkIcon className="w-4 h-4" /> {b.button_text}</span>}
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-[#14532d]/40 flex items-center gap-2"><Layout className="w-4 h-4" /> Sequence: {b.display_order}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between pt-8 border-t border-slate-50 mt-8">
-                                            <div className="flex gap-2">
-                                                <Button size="icon" variant="ghost" onClick={() => reorder(b, -1)} className="rounded-xl border border-slate-50"><MoveUp className="w-4 h-4 text-slate-400" /></Button>
-                                                <Button size="icon" variant="ghost" onClick={() => reorder(b, 1)} className="rounded-xl border border-slate-50"><MoveDown className="w-4 h-4 text-slate-400" /></Button>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <button onClick={() => toggle(b)} className="transition-all">
-                                                    {b.is_active ? <ToggleRight className="w-10 h-10 text-emerald-500" /> : <ToggleLeft className="w-10 h-10 text-slate-200" />}
-                                                </button>
-                                                <Button variant="ghost" size="icon" onClick={() => openEdit(b)} className="rounded-xl hover:bg-slate-50"><Pencil className="w-4 h-4 text-slate-400" /></Button>
-                                                <Button variant="ghost" size="icon" onClick={() => remove(b)} className="rounded-xl hover:bg-rose-50 hover:text-rose-600"><Trash2 className="w-4 h-4" /></Button>
-                                            </div>
-                                        </div>
+
+                                    <div className="flex gap-4 pt-6 border-t border-slate-50 mt-auto">
+                                        <Button className="flex-1 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-600/10 transition-all gap-2 active:scale-95" onClick={() => openEdit(b)}>
+                                            <Pencil className="w-4 h-4" /> Edit Banner
+                                        </Button>
+                                        <button onClick={() => remove(b)}
+                                            className="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-400 hover:text-rose-600 hover:bg-white border border-rose-100 transition-all active:scale-95">
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -194,86 +233,122 @@ export default function Banners() {
                 </div>
             )}
 
-            {/* Modal - The Editor */}
+            {/* Modal */}
             {open && (
-                <div className="fixed inset-0 bg-[#0a2e18]/80 z-50 flex items-center justify-center p-6 backdrop-blur-md overflow-hidden">
-                    <div className="bg-white w-full max-w-4xl rounded-[48px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in duration-300">
-                        <div className="p-10 border-b border-slate-50 flex items-center justify-between shrink-0">
+                <div className="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center p-6 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-3xl rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+                        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                             <div>
-                                <h2 className="text-3xl font-black italic tracking-tighter uppercase text-[#14532d]">{editing ? "Refine" : "Launch"} Asset</h2>
-                                <p className="text-xs font-medium text-slate-400 italic">Configure the visual manifestation of your promotional node.</p>
+                                <h2 className="text-xl font-bold tracking-tight text-slate-950">{editing ? "Edit Banner" : "Create Banner"}</h2>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Banner Configuration</p>
                             </div>
-                            <button onClick={() => setOpen(false)} className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-colors"><X className="w-6 h-6" /></button>
+                            <button onClick={() => setOpen(false)} className="w-12 h-12 rounded-2xl hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-950 transition-all border border-transparent hover:border-slate-100 active:scale-95">
+                                <X className="w-6 h-6" />
+                            </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto px-10 py-10 space-y-12">
-                            <form onSubmit={save} className="space-y-12">
-                                <div className="space-y-6">
+                        <form onSubmit={save} className="flex-1 overflow-y-auto p-10 space-y-10 bg-white">
+                            <div className="space-y-4">
+                                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Creative Master Asset *</label>
+                                <div className="rounded-3xl overflow-hidden border-2 border-dashed border-slate-100 bg-slate-50 p-4 hover:border-blue-200 transition-all">
                                     <MediaUpload
                                         value={form.image_url}
                                         onChange={val => set("image_url", val)}
-                                        label="Creative Canvas (16:9 recommended) *"
+                                        label="Select high-resolution horizontal banner (16:9 recommended)"
                                         folder="banners"
                                     />
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Heading Manifest</label>
-                                        <input value={form.title} onChange={e => set("title", e.target.value)}
-                                            className="w-full h-16 px-6 rounded-2xl bg-slate-50 border-none font-black uppercase tracking-tight text-[#14532d] placeholder:text-slate-200" placeholder="e.g. Summer Harvest" />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Visual Badge</label>
-                                        <input value={form.badge_text} onChange={e => set("badge_text", e.target.value)}
-                                            className="w-full h-16 px-6 rounded-2xl bg-slate-50 border-none font-black uppercase tracking-tight text-[#14532d] placeholder:text-slate-200" placeholder="e.g. 50% Selected" />
-                                    </div>
-                                    <div className="md:col-span-2 space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Subtext Projection</label>
-                                        <textarea value={form.subtitle} onChange={e => set("subtitle", e.target.value)}
-                                            className="w-full h-32 px-6 py-6 rounded-[32px] bg-slate-50 border-none font-medium text-slate-500 italic placeholder:text-slate-200 resize-none" placeholder="Elaborate on the seasonal essence..." />
-                                    </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Banner Heading</label>
+                                    <input value={form.title} onChange={e => set("title", e.target.value)}
+                                        placeholder="e.g. Autumn Collections 2024"
+                                        className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-white text-sm font-bold focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all shadow-sm" />
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Strategic Placement</label>
-                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                                        {BANNER_POSITIONS.map(p => (
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Promotional Badge</label>
+                                    <input value={form.badge_text} onChange={e => set("badge_text", e.target.value)}
+                                        placeholder="e.g. NEW ARRIVAL | 40% OFF"
+                                        className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-white text-sm font-bold shadow-sm focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all uppercase tracking-widest" />
+                                </div>
+
+                                <div className="md:col-span-2 space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Supportive Subtext</label>
+                                    <textarea value={form.subtitle} onChange={e => set("subtitle", e.target.value)}
+                                        placeholder="A brief catchy description for this banner..."
+                                        rows={3}
+                                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-white text-sm font-bold focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all resize-none shadow-sm" />
+                                </div>
+
+                                <div className="md:col-span-2 space-y-5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">System Placement Strategy</label>
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                                        {BANNER_POSITIONS.slice(0, 12).map(p => (
                                             <button key={p.key} type="button" onClick={() => set("position", p.key)}
-                                                className={`p-6 rounded-2xl border-2 text-left transition-all ${form.position === p.key ? "border-[#14532d] bg-[#14532d] text-white" : "border-slate-50 bg-slate-50 text-slate-400"}`}>
-                                                <p className="font-black uppercase text-[10px] tracking-widest">{p.label}</p>
+                                                className={cn(
+                                                    "flex flex-col items-center justify-center p-5 rounded-2xl border transition-all duration-300",
+                                                    form.position === p.key ? "border-blue-600 bg-blue-50 text-blue-600 ring-8 ring-blue-600/5" : "border-slate-100 bg-white hover:border-slate-200 text-slate-400"
+                                                )}>
+                                                <span className="text-[10px] font-extrabold uppercase tracking-widest text-center italic">{p.label.split('—')[1] || p.label}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Overlay Opacity ({form.overlay_opacity}%)</label>
-                                        <input type="range" min={0} max={90} value={form.overlay_opacity} onChange={e => set("overlay_opacity", Number(e.target.value))}
-                                            className="w-full accent-[#14532d]" />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Sequence Order</label>
-                                        <input type="number" value={form.display_order} onChange={e => set("display_order", e.target.value)}
-                                            className="w-full h-16 px-6 rounded-2xl bg-slate-50 border-none font-black text-[#14532d]" />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/50">Interaction Theme</label>
-                                        <select value={form.text_color} onChange={e => set("text_color", e.target.value)}
-                                            className="w-full h-16 px-6 rounded-2xl bg-slate-50 border-none font-black uppercase text-[#14532d]">
-                                            <option value="white">Light Prism</option>
-                                            <option value="black">Dark Soul</option>
-                                        </select>
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">CTA Button Text</label>
+                                    <input value={form.button_text} onChange={e => set("button_text", e.target.value)}
+                                        placeholder="e.g. Shop Now"
+                                        className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-white text-sm font-bold focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all shadow-sm" />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Target Link URL</label>
+                                    <div className="relative">
+                                        <LinkIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                                        <input value={form.button_link} onChange={e => set("button_link", e.target.value)}
+                                            placeholder="/category/electronics"
+                                            className="w-full h-14 pl-12 pr-6 rounded-2xl border border-slate-100 bg-white text-sm font-bold focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all shadow-sm" />
                                     </div>
                                 </div>
-                            </form>
-                        </div>
 
-                        <div className="p-10 bg-slate-50/50 border-t border-slate-50 flex gap-6 shrink-0">
-                            <Button variant="ghost" className="flex-1 h-16 rounded-[24px] font-black uppercase tracking-widest text-[10px]" onClick={() => setOpen(false)}>Discard</Button>
-                            <Button onClick={save} disabled={saving} className="flex-1 h-16 rounded-[24px] bg-[#14532d] text-white font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-[#14532d]/20">
-                                <Save className="w-4 h-4 mr-3" /> {saving ? "Synchronizing..." : editing ? "Update Manifest" : "Launch Protocol"}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Overlay Depth ({form.overlay_opacity}%)</label>
+                                    <div className="flex items-center gap-6 h-14 px-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
+                                        <input type="range" min={0} max={90} value={form.overlay_opacity} onChange={e => set("overlay_opacity", Number(e.target.value))}
+                                            className="flex-1 accent-blue-600" />
+                                        <span className="text-sm font-bold font-mono text-slate-600">{form.overlay_opacity}%</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-900 ml-1">Display Order</label>
+                                    <input type="number" value={form.display_order} onChange={e => set("display_order", e.target.value)}
+                                        className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-white text-sm font-bold focus:border-blue-600 focus:ring-[12px] focus:ring-blue-600/5 outline-none transition-all shadow-sm" />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div>
+                                    <p className="text-sm font-semibold text-slate-800">Active on Storefront</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Instantly show this banner on your store</p>
+                                </div>
+                                <label className="relative flex items-center cursor-pointer group/toggle">
+                                    <div className={cn("w-14 h-8 rounded-full transition-all duration-300", form.is_active ? "bg-blue-600" : "bg-slate-200")}>
+                                        <input type="checkbox" checked={form.is_active} onChange={e => set("is_active", e.target.checked)} className="sr-only" />
+                                        <div className={cn("absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all duration-300 shadow-xl", form.is_active ? "translate-x-6" : "")} />
+                                    </div>
+                                </label>
+                            </div>
+                        </form>
+
+                        <div className="p-6 border-t border-slate-100 flex gap-3 bg-slate-50/50">
+                            <Button type="button" variant="ghost" className="flex-1 h-12 rounded-xl font-semibold text-slate-500 hover:bg-white" onClick={() => setOpen(false)}>Cancel</Button>
+                            <Button type="button" onClick={save} className="flex-[2] h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xl shadow-blue-600/20 active:scale-95 transition-all" disabled={saving}>
+                                {saving ? "Saving..." : editing ? "Update Banner" : "Create Banner"}
                             </Button>
                         </div>
                     </div>

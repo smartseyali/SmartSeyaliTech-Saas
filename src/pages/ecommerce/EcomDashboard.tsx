@@ -6,9 +6,11 @@ import { Link } from "react-router-dom";
 import {
     ShoppingBag, TrendingUp, Package, RefreshCw, AlertCircle,
     ArrowUpRight, Clock, CheckCircle2, XCircle, Truck, RotateCcw,
-    CreditCard, Tag, Star, Users, BarChart3, MapPin, Image as ImageIcon, Plus
+    CreditCard, Tag, Star, Users, BarChart3, MapPin, Image as ImageIcon, Plus,
+    ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Stats {
     totalOrders: number;
@@ -103,12 +105,12 @@ export default function EcomDashboard() {
                 <div className="w-24 h-24 rounded-[2.5rem] bg-amber-100 flex items-center justify-center text-amber-600 shadow-2xl shadow-amber-200/50">
                     <AlertCircle className="w-12 h-12" />
                 </div>
-                <div className="space-y-2 max-w-md">
-                    <h2 className="text-3xl font-black tracking-tight">No Active Workspace</h2>
-                    <p className="text-muted-foreground font-medium">We couldn't find an active company linked to your account. Please create or select a workspace to manage your store.</p>
+                <div className="space-y-4 max-w-md">
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">No Active Workspace</h2>
+                    <p className="text-slate-500 font-medium text-sm">We couldn't find an active company linked to your account. Please create or select a workspace to manage your store.</p>
                 </div>
                 <div className="flex gap-4">
-                    <Button onClick={() => window.location.href = "/settings"} className="rounded-xl font-black uppercase tracking-widest px-8">Setup Workspace</Button>
+                    <Button onClick={() => window.location.href = "/settings"} className="px-8 font-bold">Setup Workspace</Button>
                 </div>
             </div>
         );
@@ -116,56 +118,60 @@ export default function EcomDashboard() {
 
     if (loading) return (
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
-            <RefreshCw className="w-8 h-8 text-primary animate-spin opacity-20" />
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">Synchronizing Data...</p>
+            <RefreshCw className="w-6 h-6 text-blue-600 animate-spin opacity-40" />
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Synchronizing Data...</p>
         </div>
     );
 
     return (
-        <div className="space-y-10 w-full pb-16 animate-in fade-in duration-700">
+        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter text-foreground">Ecommerce <span className="text-primary italic">Intelligence</span></h1>
-                    <p className="text-muted-foreground text-sm font-medium mt-1 uppercase tracking-widest opacity-70">
-                        Operational Overview • <strong>{activeCompany?.name}</strong>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100 relative">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <TrendingUp className="w-6 h-6 text-blue-600" />
+                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Executive Overview</span>
+                    </div>
+                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase">Commerce Intelligence</h1>
+                    <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
+                        Operational Status: <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-bold border border-emerald-100"><div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> LIVE</span> • <span className="text-blue-600 font-bold">{activeCompany?.name}</span>
                     </p>
                 </div>
-                <div className="flex gap-3">
-                    <button onClick={load}
-                        className="h-12 px-6 rounded-2xl border-2 border-border bg-background font-bold text-sm hover:bg-secondary hover:scale-105 transition-all flex items-center gap-2 shadow-sm">
-                        <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh Data
+                <div className="flex items-center gap-4">
+                    <button onClick={load} className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+                        <RefreshCw className={cn("w-5 h-5", loading && "animate-spin")} />
                     </button>
-                    <Link to="/ecommerce/orders/new"
-                        className="h-12 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25 flex items-center gap-3">
-                        <Plus className="w-4 h-4" /> Create {t("Order")}
+                    <Link to="/ecommerce/orders/new">
+                        <Button className="h-12 px-8 rounded-2xl bg-blue-600 hover:bg-black text-white font-bold shadow-xl shadow-blue-600/20 transition-all gap-3 border-0">
+                            <Plus className="w-5 h-5" /> New Transaction
+                        </Button>
                     </Link>
                 </div>
             </div>
 
             {/* Premium KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
-                    { label: "Gross Revenue", value: fmt(stats?.totalRevenue || 0), sub: `${fmt(stats?.todayRevenue || 0)} contribution today`, icon: TrendingUp, color: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20" },
-                    { label: "Volume of Sales", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} ${t("Orders").toLowerCase()} today`, icon: ShoppingBag, color: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20" },
-                    { label: "Basket Average", value: fmt(stats?.avgOrderValue || 0), sub: `standard ${t("Order").toLowerCase()} size`, icon: BarChart3, color: "from-purple-500 to-fuchsia-600", shadow: "shadow-purple-500/20" },
-                    { label: `${t("Customer")} Base`, value: stats?.totalCustomers || 0, sub: `active ${t("Customers").toLowerCase()}`, icon: Users, color: "from-teal-500 to-emerald-600", shadow: "shadow-teal-500/20" },
-                    { label: "Marketing Hooks", value: stats?.activeCoupons || 0, sub: "active promotional codes", icon: Tag, color: "from-orange-500 to-amber-600", shadow: "shadow-orange-500/20" },
+                    { label: "Gross Revenue", value: fmt(stats?.totalRevenue || 0), sub: `${fmt(stats?.todayRevenue || 0)} across 24h`, icon: TrendingUp, color: "bg-blue-600" },
+                    { label: "Total Orders", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} received today`, icon: ShoppingBag, color: "bg-slate-900" },
+                    { label: "Avg. Ticket Size", value: fmt(stats?.avgOrderValue || 0), sub: "lifetime average", icon: BarChart3, color: "bg-blue-600" },
+                    { label: "Customer Base", value: stats?.totalCustomers || 0, sub: "registered accounts", icon: Users, color: "bg-slate-900" },
                 ].map(k => (
-                    <div key={k.label} className={`relative group p-1 rounded-[2rem] bg-gradient-to-br ${k.color} ${k.shadow} hover:scale-105 transition-all duration-500 cursor-default`}>
-                        <div className="bg-card rounded-[1.8rem] p-6 h-full flex flex-col justify-between overflow-hidden">
-                            <div className="absolute -right-4 -top-4 opacity-[0.05] group-hover:scale-125 transition-transform duration-700">
-                                <k.icon className="w-24 h-24" />
+                    <div key={k.label} className="group bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-2xl hover:border-blue-200 transition-all duration-500 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                            <k.icon className="w-24 h-24 -rotate-12 translate-x-8 translate-y-4" />
+                        </div>
+                        <div className="flex items-center justify-between mb-10 relative z-10">
+                            <div className={cn("p-4 rounded-2xl shadow-lg shadow-blue-600/5 text-white transition-transform group-hover:scale-110", k.color)}>
+                                <k.icon className="w-6 h-6" />
                             </div>
-                            <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{k.label}</p>
-                                <div className={`p-2 rounded-xl bg-gradient-to-br ${k.color} text-white shadow-lg`}>
-                                    <k.icon className="w-4 h-4" />
-                                </div>
-                            </div>
-                            <div>
-                                <p className="text-3xl font-black tracking-tighter mb-1">{k.value}</p>
-                                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tight">{k.sub}</p>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">{k.label}</span>
+                        </div>
+                        <div className="relative z-10">
+                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2 truncate">{k.value}</p>
+                            <div className="flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">{k.sub}</p>
                             </div>
                         </div>
                     </div>
@@ -173,73 +179,79 @@ export default function EcomDashboard() {
             </div>
 
             {/* Performance Pipeline */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="lg:col-span-8 bg-card rounded-[2.5rem] border border-border/40 p-1 shadow-xl shadow-primary/5">
-                    <div className="p-8 h-full flex flex-col">
-                        <div className="flex items-center justify-between mb-8">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
-                                    <Clock className="w-5 h-5" />
-                                </div>
-                                <h2 className="text-xl font-black tracking-tight">Fulfillment Pipeline</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-8 bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-500">
+                    <div className="px-10 py-8 border-b border-slate-50 bg-white flex items-center justify-between relative">
+                        <div className="absolute top-0 left-0 w-24 h-1 bg-blue-600 rounded-full ml-10" />
+                        <div className="flex items-center gap-5">
+                            <div className="p-4 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
+                                <Clock className="w-6 h-6" />
                             </div>
-                            <Link to="/ecommerce/orders" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline bg-primary/5 px-4 py-2 rounded-full transition-all">
-                                View Full Console
-                            </Link>
+                            <div>
+                                <h2 className="text-2xl font-bold tracking-tight text-slate-900 leading-none">Fulfillment Protocol</h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Real-time logistic stream</p>
+                            </div>
                         </div>
+                        <Link to="/ecommerce/orders">
+                            <Button variant="ghost" className="h-11 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">Audit All Orders <ExternalLink className="w-4 h-4 ml-2" /></Button>
+                        </Link>
+                    </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <div className="p-10 space-y-12 flex-1">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             {[
-                                { label: "Awaiting Action", value: stats?.pendingOrders, color: "border-amber-400 text-amber-600 bg-amber-500/5", icon: Clock },
-                                { label: "Transit Phase", value: stats?.shippedOrders, color: "border-indigo-400 text-indigo-600 bg-indigo-500/5", icon: Truck },
-                                { label: "Successful", value: stats?.deliveredOrders, color: "border-emerald-400 text-emerald-600 bg-emerald-500/5", icon: CheckCircle2 },
-                                { label: "System Loss", value: stats?.cancelledOrders, color: "border-rose-400 text-rose-600 bg-rose-500/5", icon: XCircle },
+                                { label: "Incoming", value: stats?.pendingOrders, color: "bg-blue-50 text-blue-600", border: "border-blue-100", icon: Clock },
+                                { label: "In Transit", value: stats?.shippedOrders, color: "bg-amber-50 text-amber-600", border: "border-amber-100", icon: Truck },
+                                { label: "Fulfilled", value: stats?.deliveredOrders, color: "bg-emerald-50 text-emerald-600", border: "border-emerald-100", icon: CheckCircle2 },
+                                { label: "Failed", value: stats?.cancelledOrders, color: "bg-rose-50 text-rose-600", border: "border-rose-100", icon: XCircle },
                             ].map(s => (
-                                <div key={s.label} className={`flex flex-col gap-1 p-5 rounded-3xl border-l-4 shadow-sm transition-all hover:shadow-md ${s.color}`}>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <s.icon className="w-4 h-4 opacity-40" />
-                                        <span className="text-2xl font-black tracking-tighter">{s.value || 0}</span>
+                                <div key={s.label} className={cn("flex flex-col gap-2 p-6 rounded-3xl border bg-white shadow-sm transition-all hover:shadow-xl group relative overflow-hidden", s.border)}>
+                                    <div className="flex items-center justify-between relative z-10">
+                                        <div className={cn("p-2.5 rounded-xl border shadow-inner", s.color)}>
+                                            <s.icon className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-3xl font-bold tracking-tight text-slate-900 group-hover:scale-110 transition-transform">{s.value || 0}</span>
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-wider opacity-60">{s.label}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 relative z-10 mt-2">{s.label}</p>
                                 </div>
                             ))}
                         </div>
 
                         {/* Recent Orders Table */}
-                        <div className="flex-1 overflow-hidden min-h-[400px]">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-4 ml-1">Live Activity Stream</h3>
-                            <div className="rounded-3xl border border-border/40 overflow-hidden bg-secondary/5">
-                                <table className="w-full text-sm">
+                        <div className="space-y-6">
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-300 ml-1">Live Transaction Ledger</h3>
+                            <div className="rounded-[32px] border border-slate-50 overflow-hidden bg-white shadow-inner">
+                                <table className="w-full">
                                     <thead>
-                                        <tr className="bg-secondary/20 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/20">
-                                            <th className="px-6 py-4 text-left">Internal Ref</th>
-                                            <th className="px-6 py-4 text-left">{t("Customer")}</th>
-                                            <th className="px-6 py-4 text-right">Value</th>
-                                            <th className="px-6 py-4 text-center">Fulfillment</th>
-                                            <th className="px-6 py-4 text-left">Time</th>
+                                        <tr className="bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                                            <th className="px-8 py-5 text-left">Internal Ref</th>
+                                            <th className="px-8 py-5 text-left">Client Entity</th>
+                                            <th className="px-8 py-5 text-right">Settlement</th>
+                                            <th className="px-8 py-5 text-center">Protocol Status</th>
+                                            <th className="px-8 py-5 text-left">Timestamp</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-border/10">
+                                    <tbody className="divide-y divide-slate-50">
                                         {recentOrders.map(o => {
                                             const s = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
                                             return (
-                                                <tr key={o.id} className="hover:bg-primary/5 transition-colors group cursor-pointer" onClick={() => window.location.href = `/ecommerce/orders/${o.id}`}>
-                                                    <td className="px-6 py-4">
-                                                        <span className="font-bold text-primary group-hover:underline uppercase tracking-tight">{o.order_number}</span>
+                                                <tr key={o.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => window.location.href = `/ecommerce/orders/${o.id}`}>
+                                                    <td className="px-8 py-4">
+                                                        <span className="font-bold text-blue-600 group-hover:underline uppercase tracking-widest text-xs font-mono">{o.order_number}</span>
                                                     </td>
-                                                    <td className="px-6 py-4">
-                                                        <p className="font-bold text-foreground truncate max-w-[120px]">{o.customer_name}</p>
+                                                    <td className="px-8 py-4">
+                                                        <p className="font-bold text-slate-700 truncate max-w-[150px]">{o.customer_name}</p>
                                                     </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <span className="font-black font-mono text-xs">{fmt(Number(o.grand_total))}</span>
+                                                    <td className="px-8 py-4 text-right text-slate-900 font-bold font-mono">
+                                                        {fmt(Number(o.grand_total))}
                                                     </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter border shadow-sm ${s.color}`}>
+                                                    <td className="px-8 py-4 text-center">
+                                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase border shadow-sm", s.color.replace('dark:', ''))}>
                                                             <s.icon className="w-3 h-3" /> {s.label}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4">
-                                                        <p className="text-[10px] font-bold text-muted-foreground opacity-60 italic">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
+                                                    <td className="px-8 py-4">
+                                                        <p className="text-[10px] font-bold text-slate-400 italic">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
                                                     </td>
                                                 </tr>
                                             );
@@ -253,33 +265,39 @@ export default function EcomDashboard() {
 
                 <div className="lg:col-span-4 space-y-8">
                     {/* Operational Alerts */}
-                    <div className="bg-card rounded-[2.5rem] border border-border/40 p-8 shadow-xl shadow-primary/5">
-                        <h2 className="text-xl font-black tracking-tight mb-8">Priority Queue</h2>
-                        <div className="space-y-4">
+                    <div className="bg-white rounded-[40px] border border-slate-100 p-10 shadow-sm hover:shadow-2xl transition-all duration-500">
+                        <div className="flex items-center justify-between mb-10 border-b border-slate-50 pb-6 relative">
+                            <div className="absolute top-0 left-0 w-12 h-1 bg-rose-500 rounded-full" />
+                            <h2 className="text-xl font-bold tracking-tight text-slate-900">Task Backlog</h2>
+                            <span className="text-[10px] font-bold bg-rose-50 text-rose-600 px-3 py-1 rounded-full border border-rose-100">CRITICAL</span>
+                        </div>
+                        <div className="space-y-5">
                             {[
-                                { label: "Disbursement Requests", value: stats?.pendingRefunds || 0, icon: RotateCcw, color: "text-rose-500 bg-rose-100/50", border: "border-rose-100", link: "/ecommerce/refunds", urgent: (stats?.pendingRefunds || 0) > 0 },
-                                { label: "Product Testimonials", value: stats?.pendingReviews || 0, icon: Star, color: "text-amber-500 bg-amber-100/50", border: "border-amber-100", link: "/ecommerce/reviews", urgent: (stats?.pendingReviews || 0) > 0 },
-                                { label: "Abandoned Carts", value: "8 Active", icon: Users, color: "text-indigo-500 bg-indigo-100/50", border: "border-indigo-100", link: "/ecommerce/abandoned-carts", urgent: true },
+                                { label: "Disbursement Requests", value: stats?.pendingRefunds || 0, icon: RotateCcw, color: "text-rose-600 bg-rose-50", border: "border-rose-100", link: "/ecommerce/refunds", urgent: (stats?.pendingRefunds || 0) > 0 },
+                                { label: "Product Testimonials", value: stats?.pendingReviews || 0, icon: Star, color: "text-amber-600 bg-amber-50", border: "border-amber-100", link: "/ecommerce/reviews", urgent: (stats?.pendingReviews || 0) > 0 },
+                                { label: "Abandoned Sessions", value: "8 Active", icon: Users, color: "text-blue-600 bg-blue-50", border: "border-blue-100", link: "/ecommerce/abandoned-carts", urgent: true },
                             ].map(a => (
                                 <Link key={a.label} to={a.link}
-                                    className={`relative group flex items-center justify-between p-5 rounded-3xl border-2 transition-all hover:scale-105 active:scale-95 ${a.urgent ? `${a.border} bg-white dark:bg-card shadow-lg` : "border-border/30 grayscale hover:grayscale-0"
-                                        }`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${a.color}`}>
-                                            <a.icon className="w-5 h-5" />
+                                    className={cn(
+                                        "relative group flex items-center justify-between p-6 rounded-3xl border transition-all duration-300 hover:shadow-xl bg-white",
+                                        a.urgent ? `${a.border} border-l-4` : "border-slate-50 opacity-50 grayscale"
+                                    )}>
+                                    <div className="flex items-center gap-5">
+                                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner border", a.color)}>
+                                            <a.icon className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{a.label}</p>
-                                            <p className={`text-xl font-black tracking-tighter ${a.urgent ? "text-foreground" : "text-muted-foreground"}`}>{a.value}</p>
+                                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">{a.label}</p>
+                                            <p className="text-2xl font-bold tracking-tight text-slate-900">{a.value}</p>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <ArrowUpRight className="w-4 h-4 text-primary" />
+                                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all border border-slate-100">
+                                        <ArrowUpRight className="w-5 h-5 text-blue-600" />
                                     </div>
                                     {a.urgent && (
-                                        <div className="absolute -top-1 -right-1 flex h-4 w-4">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                                        <div className="absolute top-3 right-3 flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                                         </div>
                                     )}
                                 </Link>
@@ -288,24 +306,24 @@ export default function EcomDashboard() {
                     </div>
 
                     {/* Fast Navigation */}
-                    <div className="bg-card rounded-[2.5rem] border border-border/40 p-8 shadow-xl shadow-primary/5">
-                        <h2 className="text-xl font-black tracking-tight mb-8">Service Console</h2>
-                        <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-slate-900 rounded-[40px] p-10 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-all" />
+                        <h2 className="text-xl font-bold tracking-tight text-white mb-10 border-b border-white/5 pb-6">Shortcuts</h2>
+                        <div className="grid grid-cols-2 gap-5 relative z-10">
                             {[
-                                { label: "Zones", icon: MapPin, link: "/ecommerce/shipping-zones", color: "bg-indigo-500" },
-                                { label: "Gallery", icon: ImageIcon, link: "/ecommerce/gallery", color: "bg-teal-500" },
-                                { label: "Offers", icon: TrendingUp, link: "/ecommerce/offers", color: "bg-pink-500" },
-                                { label: "Vault", icon: CreditCard, link: "/ecommerce/payment-gateways", color: "bg-emerald-500" },
-                                { label: "Logistics", icon: Truck, link: "/ecommerce/deliveries", color: "bg-purple-500" },
-                                { label: "Returns", icon: RotateCcw, link: "/ecommerce/refunds", color: "bg-rose-500" },
+                                { label: "Zones", icon: MapPin, link: "/ecommerce/shipping-zones", color: "bg-blue-600 shadow-blue-600/30" },
+                                { label: "Assets", icon: ImageIcon, link: "/ecommerce/gallery", color: "bg-white/10 shadow-white/5 border border-white/10" },
+                                { label: "Growth", icon: TrendingUp, link: "/ecommerce/offers", color: "bg-blue-600 shadow-blue-600/30" },
+                                { label: "Finance", icon: CreditCard, link: "/ecommerce/payment-gateways", color: "bg-white/10 shadow-white/5 border border-white/10" },
+                                { label: "Fleet", icon: Truck, link: "/ecommerce/deliveries", color: "bg-blue-600 shadow-blue-600/30" },
+                                { label: "Vitals", icon: BarChart3, link: "/ecommerce/reports", color: "bg-white/10 shadow-white/5 border border-white/10" },
                             ].map(q => (
                                 <Link key={q.label} to={q.link}
-                                    className="flex flex-col items-center justify-center gap-3 p-5 rounded-[2rem] border border-border/40 hover:bg-secondary/40 hover:border-primary/20 transition-all group overflow-hidden relative">
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${q.color} opacity-0 group-hover:opacity-[0.03] transition-opacity`} />
-                                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform ${q.color} text-white`}>
+                                    className="flex flex-col items-center justify-center gap-4 p-6 rounded-[28px] bg-white/5 hover:bg-white transition-all duration-500 group shadow-sm border border-white/5 hover:border-white">
+                                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl transform group-hover:-translate-y-2 transition-transform text-white group-hover:text-white", q.color, q.label === "Assets" || q.label === "Finance" || q.label === "Vitals" ? "group-hover:bg-black" : "")}>
                                         <q.icon className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors text-center">{q.label}</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-slate-500 group-hover:text-black transition-colors text-center">{q.label}</span>
                                 </Link>
                             ))}
                         </div>

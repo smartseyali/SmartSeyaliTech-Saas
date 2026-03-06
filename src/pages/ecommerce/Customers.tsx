@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function Customers() {
     const { activeCompany } = useTenant();
@@ -83,20 +84,22 @@ export default function Customers() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-black tracking-tight text-[#14532d]">Storefront {t("Customers")}</h1>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Manage users who registered on your website.
-                    </p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-slate-100">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <User className="w-6 h-6 text-blue-600" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Customer Relations</span>
+                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">User Directory</h1>
+                    <p className="text-sm font-medium text-slate-500">Manage customers who registered on your website</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={load}>
-                        <RefreshCw className="w-4 h-4" />
+                <div className="flex items-center gap-3">
+                    <Button variant="outline" className="h-11 px-4 rounded-lg bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all gap-2" onClick={load}>
+                        <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
                     </Button>
-                    <Button variant="outline" size="sm" className="rounded-xl gap-2">
+                    <Button variant="outline" className="h-11 px-6 rounded-lg bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all gap-2">
                         <Download className="w-4 h-4" /> Export
                     </Button>
                 </div>
@@ -104,123 +107,110 @@ export default function Customers() {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-card p-6 rounded-3xl border border-border/50 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary/10 text-primary flex items-center justify-center rounded-2xl">
-                        <User className="w-6 h-6" />
+                {[
+                    { label: `Total ${t("Customers")}`, value: customers.length, icon: User, color: "text-blue-600", bg: "bg-blue-50" },
+                    { label: "Active Users", value: customers.filter(c => c.status === 'active').length, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+                    { label: "New Today", value: customers.filter(c => new Date(c.created_at).toDateString() === new Date().toDateString()).length, icon: ShoppingBag, color: "text-amber-600", bg: "bg-amber-50" },
+                ].map(s => (
+                    <div key={s.label} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4 transition-all hover:shadow-md">
+                        <div className={cn("w-12 h-12 flex items-center justify-center rounded-xl", s.bg, s.color)}>
+                            <s.icon className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1.5">{s.label}</p>
+                            <p className="text-2xl font-bold tracking-tight text-slate-900">{s.value}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Total {t("Customers")}</p>
-                        <p className="text-2xl font-black">{customers.length}</p>
-                    </div>
-                </div>
-                <div className="bg-card p-6 rounded-3xl border border-border/50 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 text-green-600 flex items-center justify-center rounded-2xl">
-                        <CheckCircle2 className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Active Users</p>
-                        <p className="text-2xl font-black">{customers.filter(c => c.status === 'active').length}</p>
-                    </div>
-                </div>
-                <div className="bg-card p-6 rounded-3xl border border-border/50 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-100 text-amber-600 flex items-center justify-center rounded-2xl">
-                        <ShoppingBag className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">New Today</p>
-                        <p className="text-2xl font-black">
-                            {customers.filter(c => new Date(c.created_at).toDateString() === new Date().toDateString()).length}
-                        </p>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Filter & Search */}
-            <div className="bg-card p-4 rounded-2xl border border-border/50 shadow-sm flex gap-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder={`Search ${t("Customers").toLowerCase()} by name, email or phone...`}
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border-none bg-secondary/40 text-sm focus:ring-2 focus:ring-primary/20"
-                    />
-                </div>
-                <Button variant="outline" className="rounded-xl gap-2 bg-secondary/40 border-none">
-                    <Filter className="w-4 h-4" /> Filters
-                </Button>
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder={`Search ${t("Customers").toLowerCase()} by name, email or phone...`}
+                    className="w-full h-12 pl-12 pr-4 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                />
             </div>
 
             {/* Table */}
-            <div className="bg-card rounded-3xl border border-border/50 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-secondary/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                            <tr>
+                        <thead>
+                            <tr className="bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 border-b border-slate-100">
                                 <th className="px-6 py-4 text-left">{t("Customer")}</th>
-                                <th className="px-6 py-4 text-left">Contact</th>
+                                <th className="px-6 py-4 text-left">Contact Info</th>
                                 <th className="px-6 py-4 text-left">Status</th>
-                                <th className="px-6 py-4 text-left">Joined</th>
+                                <th className="px-6 py-4 text-left">Member Since</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border/40">
+                        <tbody className="divide-y divide-slate-50">
                             {loading ? (
-                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground animate-pulse">Loading {t("Customer").toLowerCase()} directory...</td></tr>
+                                <tr><td colSpan={5} className="py-20">
+                                    <div className="flex flex-col items-center justify-center gap-4">
+                                        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
+                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Loading directory...</p>
+                                    </div>
+                                </td></tr>
                             ) : filtered.length === 0 ? (
-                                <tr><td colSpan={5} className="py-20 text-center text-muted-foreground">No {t("Customers").toLowerCase()} found.</td></tr>
+                                <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-bold">No {t("Customers").toLowerCase()} found.</td></tr>
                             ) : (
                                 filtered.map(c => (
-                                    <tr key={c.id} className="hover:bg-secondary/10 transition-colors group">
+                                    <tr key={c.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold">
+                                                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100">
                                                     {c.full_name?.charAt(0) || <User className="w-4 h-4" />}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-slate-800">{c.full_name || `Unnamed ${t("Customer")}`}</p>
-                                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ID: {c.id.slice(0, 8)}</p>
+                                                    <p className="font-bold text-slate-900">{c.full_name || `Unnamed ${t("Customer")}`}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ID: {c.id.slice(0, 8)}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <Mail className="w-3 h-3 text-primary/40" /> {c.email}
+                                                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                    <Mail className="w-3.5 h-3.5 text-slate-300" /> {c.email}
                                                 </div>
                                                 {c.phone && (
-                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                        <Phone className="w-3 h-3 text-primary/40" /> {c.phone}
+                                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                                        <Phone className="w-3.5 h-3.5 text-slate-300" /> {c.phone}
                                                     </div>
                                                 )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <Badge className={c.status === 'active' ? 'bg-green-100 text-green-700 hover:bg-green-100' : 'bg-red-100 text-red-700 hover:bg-red-100'}>
+                                            <div className={cn(
+                                                "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border",
+                                                c.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
+                                            )}>
                                                 {c.status}
-                                            </Badge>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(c.created_at).toLocaleDateString()}
+                                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 italic">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                {new Date(c.created_at).toLocaleDateString("en-IN")}
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                                                <button
+                                                    className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:text-blue-600 border border-slate-100"
                                                     onClick={() => toggleStatus(c)}
                                                     title={c.status === 'active' ? `Block ${t("Customer")}` : `Activate ${t("Customer")}`}
                                                 >
                                                     {c.status === 'active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                                                </Button>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                                                </button>
+                                                <button className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
                                                     <MoreVertical className="w-4 h-4" />
-                                                </Button>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

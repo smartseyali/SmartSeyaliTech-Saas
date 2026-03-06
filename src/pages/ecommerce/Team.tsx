@@ -43,17 +43,17 @@ const RESOURCES = [
 const teamColumns = [
     {
         key: "user_id",
-        label: "Operational Profile",
+        label: "Team Member",
         render: (val: any, row: any) => (
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
-                    <Users className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm">
+                    <Users className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                    <p className="font-black text-sm text-foreground uppercase tracking-tight">{row.users?.full_name || row.users?.username?.split('@')[0] || 'System User'}</p>
+                    <p className="font-bold text-sm text-slate-900">{row.users?.full_name || row.users?.username?.split('@')[0] || 'System User'}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                        <Mail className="w-3 h-3 text-muted-foreground/60" />
-                        <p className="text-[10px] font-bold text-muted-foreground tracking-wider">{row.users?.username}</p>
+                        <Mail className="w-3 h-3 text-slate-400" />
+                        <p className="text-xs font-medium text-slate-500">{row.users?.username}</p>
                     </div>
                 </div>
             </div>
@@ -61,18 +61,18 @@ const teamColumns = [
     },
     {
         key: "role",
-        label: "Authority Tier",
+        label: "Role",
         render: (val: string) => {
             const isOwner = val === 'owner';
             const isAdmin = val === 'admin';
             return (
                 <div className={cn(
-                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest",
-                    isOwner ? "bg-purple-50 text-purple-700 border-purple-200 shadow-sm" :
-                        isAdmin ? "bg-orange-50 text-orange-700 border-orange-200 shadow-sm" :
+                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider",
+                    isOwner ? "bg-purple-50 text-purple-700 border-purple-200" :
+                        isAdmin ? "bg-blue-50 text-blue-700 border-blue-200" :
                             "bg-slate-50 text-slate-700 border-slate-200"
                 )}>
-                    {isOwner ? <Lock className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
+                    {isOwner ? <Lock className="w-3" /> : <Shield className="w-3" />}
                     {val}
                 </div>
             );
@@ -80,14 +80,14 @@ const teamColumns = [
     },
     {
         key: "created_at",
-        label: "Onboarded",
+        label: "Member Since",
         render: (val: string) => {
             const d = val ? new Date(val) : null;
             return (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-slate-500">
                     <Calendar className="w-3.5 h-3.5" />
-                    <span className="text-[11px] font-bold">
-                        {d && !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Strategic Onboarding'}
+                    <span className="text-xs font-semibold">
+                        {d && !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Active Member'}
                     </span>
                 </div>
             );
@@ -96,21 +96,21 @@ const teamColumns = [
 ];
 
 const getTeamFields = (isEdit: boolean): FieldConfig[] => [
-    { key: "full_name", label: "Member Legal Name", ph: "John Doe", required: true },
-    { key: "username", label: "Login ID / Email", ph: "john.doe@example.com", required: true },
+    { key: "full_name", label: "Full Name", ph: "John Doe", required: true },
+    { key: "username", label: "Email Address", ph: "john.doe@example.com", required: true },
     {
         key: "password",
-        label: isEdit ? "Update Access Pin (Leave blank to keep current)" : "Initial Access Pin",
+        label: isEdit ? "Update Password (Leave blank to keep current)" : "Password",
         ph: isEdit ? "Only fill to change" : "Minimum 6 characters",
         required: !isEdit
     },
     {
         key: "role",
-        label: "Workspace Role",
+        label: "Account Role",
         type: "select",
         options: [
-            { label: "Administrator (Strategic Access)", value: "admin" },
-            { label: "Operational Staff (Tactical Access)", value: "staff" }
+            { label: "Administrator (Full Access)", value: "admin" },
+            { label: "Staff Member (Limited Access)", value: "staff" }
         ],
         required: true
     },
@@ -278,35 +278,36 @@ export default function Team() {
     };
 
     return (
-        <div className="p-8 space-y-12 w-full animate-in fade-in duration-700">
+        <div className="p-8 space-y-10 w-full animate-in fade-in duration-500">
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-12 border-b border-divider">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                        <Lock className="w-5 h-5 text-orange-500" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/60">Personnel & Security</span>
+                        <Shield className="w-5 h-5 text-blue-600" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Team Management</span>
                     </div>
-                    <h1 className="text-5xl font-black italic tracking-tighter uppercase text-foreground">Strategic <br /><span className="text-muted-foreground/20">Operations</span></h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Personnel & Staff</h1>
+                    <p className="text-sm font-medium text-slate-500">Manage your team members and their access levels</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end mr-4">
-                        <span className="text-[10px] font-black uppercase text-muted-foreground opacity-40">Active Force</span>
-                        <span className="text-2xl font-black text-foreground tracking-tighter">{team?.length || 0} Members</span>
+                <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Total Members</span>
+                        <span className="text-2xl font-bold text-slate-900">{team?.length || 0}</span>
                     </div>
                     <Button
                         onClick={handleNew}
-                        className="h-16 px-10 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase tracking-widest text-[10px] shadow-2xl transition-all active:scale-95"
+                        className="h-11 px-6 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold shadow-md shadow-blue-600/10 transition-all active:scale-95"
                     >
-                        <UserPlus className="w-4 h-4 mr-3" /> Integrate Unit
+                        <UserPlus className="w-4 h-4 mr-2" /> Add Member
                     </Button>
                 </div>
             </div>
 
             {/* Main Table */}
             <ModuleListPage
-                title="Infrastructure Force"
-                subtitle="Calibrate operational authority tiers and member assignments"
+                title="Staff Directory"
+                subtitle="Manage user permissions and account roles"
                 columns={teamColumns}
                 data={team}
                 loading={loading}
@@ -316,10 +317,10 @@ export default function Team() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenPermissions(row)}
-                        className="h-9 px-4 rounded-xl border-divider hover:bg-muted font-bold text-[11px] gap-2"
+                        className="h-9 px-4 rounded-lg border-slate-200 hover:bg-slate-50 font-bold text-xs gap-2"
                     >
-                        <Shield className="w-3.5 h-3.5 text-primary" />
-                        Authorization
+                        <Shield className="w-3.5 h-3.5 text-blue-600" />
+                        Permissions
                     </Button>
                 )}
                 onEdit={handleEdit}
@@ -336,18 +337,18 @@ export default function Team() {
 
             {/* Permission Manager Dialog */}
             <Dialog open={permissionOpen} onOpenChange={setPermissionOpen}>
-                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-none shadow-3xl rounded-[32px] bg-background">
-                    <div className="bg-muted/30 p-8 border-b border-divider">
+                <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-slate-200 shadow-2xl rounded-xl bg-white">
+                    <div className="bg-slate-50 p-8 border-b border-slate-100">
                         <DialogHeader>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
-                                    <Shield className="w-5 h-5 text-primary" />
+                                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <Shield className="w-5 h-5 text-blue-600" />
                                 </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Authorization Calibrator</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Permission Access</span>
                             </div>
-                            <DialogTitle className="text-2xl font-black uppercase tracking-tight">Access Control</DialogTitle>
-                            <DialogDescription className="text-sm font-medium text-muted-foreground mt-1 tracking-tight">
-                                Define the operational boundaries for <span className="text-foreground font-bold">{selectedUser?.users?.full_name || 'this member'}</span>.
+                            <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">Access Control</DialogTitle>
+                            <DialogDescription className="text-sm font-medium text-slate-500 mt-1">
+                                Define which areas <span className="text-slate-900 font-bold">{selectedUser?.users?.full_name || 'this member'}</span> can access.
                             </DialogDescription>
                         </DialogHeader>
                     </div>
@@ -359,43 +360,43 @@ export default function Team() {
                                     key={res.id}
                                     onClick={() => togglePermission(res.id)}
                                     className={cn(
-                                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer group",
+                                        "flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer group",
                                         memberPermissions.includes(res.id)
-                                            ? "border-primary bg-primary/5 shadow-sm"
-                                            : "border-divider/50 bg-white hover:border-divider"
+                                            ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                                            : "border-slate-100 bg-white hover:border-slate-200"
                                     )}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className={cn(
                                             "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                                            memberPermissions.includes(res.id) ? "bg-primary text-white" : "bg-muted text-muted-foreground/40"
+                                            memberPermissions.includes(res.id) ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400"
                                         )}>
                                             <CheckCircle2 className={cn("w-4 h-4", !memberPermissions.includes(res.id) && "opacity-20")} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] font-black uppercase tracking-tight text-foreground">{res.label}</span>
-                                            <span className="text-[10px] font-medium text-muted-foreground/60 tracking-tight">Full Strategic Access</span>
+                                            <span className="text-xs font-bold text-slate-900">{res.label}</span>
+                                            <span className="text-[10px] font-medium text-slate-500">Access Granted</span>
                                         </div>
                                     </div>
                                     <ArrowRight className={cn(
                                         "w-4 h-4 transition-all opacity-0 group-hover:opacity-100 group-hover:translate-x-1",
-                                        memberPermissions.includes(res.id) ? "text-primary" : "text-muted-foreground/20"
+                                        memberPermissions.includes(res.id) ? "text-blue-600" : "text-slate-200"
                                     )} />
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="bg-muted/30 p-6 flex justify-end gap-3 border-t border-divider">
-                        <Button variant="ghost" onClick={() => setPermissionOpen(false)} className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-12 px-6">
-                            Abort
+                    <div className="bg-slate-50 p-6 flex justify-end gap-3 border-t border-slate-100">
+                        <Button variant="ghost" onClick={() => setPermissionOpen(false)} className="rounded-lg font-bold text-xs h-10 px-6">
+                            Cancel
                         </Button>
                         <Button
                             onClick={savePermissions}
                             disabled={savingPerms}
-                            className="rounded-2xl bg-foreground text-background font-black uppercase text-[10px] tracking-widest h-12 px-8 shadow-xl active:scale-95 transition-all"
+                            className="rounded-lg bg-blue-600 text-white font-bold text-xs h-10 px-8 shadow-md shadow-blue-600/10 active:scale-95 transition-all"
                         >
-                            {savingPerms ? "Synchronizing..." : "Update Authorization"}
+                            {savingPerms ? "Saving..." : "Update Permissions"}
                         </Button>
                     </div>
                 </DialogContent>

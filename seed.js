@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://twymipaywjufnluuzpug.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eW1pcGF5d2p1Zm5sdXV6cHVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTUxOTQsImV4cCI6MjA4NzQzMTE5NH0.--jjugv93Y5PXC66ff25vv0iGlSFtRb4Yt9URsDtr4g';
+const supabaseUrl = 'https://vxwjfonhadjjbdmkdrjc.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2pmb25oYWRqamJkbWtkcmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NTg0OTIsImV4cCI6MjA4NzIzNDQ5Mn0.lKrOXOLQtHDBhRgH6kz_t8admjaA_WR1bs_pIIwq0wM';
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -184,6 +184,51 @@ async function seed() {
 
         const { data: insertedOrders, error: oErr } = await supabase.from('ecom_orders').insert(sampleOrders).select();
         if (oErr) throw oErr;
+
+        // 6. Seed Templates
+        console.log('🎨 Seeding Templates...');
+        const templates = [
+            {
+                folder: 'modern-shop',
+                name: 'Modern Marketplace',
+                description: 'Full-featured Flipkart-style layout with sticky header, mega menu, banner carousel, cart drawer, and multi-step checkout. Best for multi-category stores.',
+                version: '1.0.0',
+                preview_image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=900',
+                color: '#2874f0',
+                tags: ['featured', 'popular'],
+                category: 'Marketplace',
+                sort_order: 1,
+                is_active: true
+            },
+            {
+                folder: 'amazon-style',
+                name: 'Bazaar Prime',
+                description: 'Clean, trust-focused design inspired by Amazon. Features a prominent search bar, category squares, and a dark nav bar. Optimized for high-conversion retail.',
+                version: '1.0.0',
+                preview_image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=900',
+                color: '#febd69',
+                tags: ['clean', 'retail'],
+                category: 'Electronics',
+                sort_order: 2,
+                is_active: true
+            },
+            {
+                folder: 'Fruitables',
+                name: 'Fruitables Organic',
+                description: 'Vibrant, fresh design perfect for organic groceries, fruit shops, and healthy food stores. Includes seasonal banners and category-based filtering.',
+                version: '1.0.1',
+                preview_image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=900',
+                color: '#81c408',
+                tags: ['groceries', 'fresh', 'organic'],
+                category: 'Groceries',
+                sort_order: 3,
+                is_active: true
+            }
+        ];
+
+        for (const tmpl of templates) {
+            await supabase.from('ecom_templates').upsert(tmpl, { onConflict: 'folder' });
+        }
 
         console.log('✨ DATABASE SEEDING COMPLETE!');
 

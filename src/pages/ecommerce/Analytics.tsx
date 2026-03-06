@@ -1,4 +1,3 @@
-import { ModuleListPage } from "@/components/modules/ModuleListPage";
 import { BarChart3, TrendingUp, DollarSign, ShoppingBag, Users, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 export default function Analytics() {
@@ -10,38 +9,54 @@ export default function Analytics() {
     ];
 
     return (
-        <div className="p-8 space-y-8">
-            <div className="space-y-1">
-                <h1 className="text-3xl font-black italic tracking-tighter uppercase">Intelligence Dashboard</h1>
-                <p className="text-muted-foreground font-medium">Deep-dive performance metrics and behavioral analytics.</p>
+        <div className="p-8 pb-20 space-y-8 animate-in fade-in duration-500">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
+                <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Performance</p>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Analytics</h1>
+                    <p className="text-sm text-slate-500 mt-1">Deep-dive performance metrics and behavioral analytics.</p>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {stats.map((s, i) => (
-                    <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4 group hover:border-primary/20 transition-all">
-                        <div className="flex justify-between items-start">
-                            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                                <s.icon className="w-6 h-6" />
+                    <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                        <div className="flex justify-between items-start mb-5">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                <s.icon className="w-5 h-5" />
                             </div>
-                            <div className={`flex items-center gap-1 text-xs font-black ${s.positive ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                {s.positive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                            <div className={`flex items-center gap-1 text-xs font-bold ${s.positive ? 'text-emerald-600' : 'text-rose-500'}`}>
+                                {s.positive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                                 {s.trend}
                             </div>
                         </div>
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#14532d]/40 mb-1">{s.label}</p>
-                            <h3 className="text-2xl font-black text-[#14532d]">{s.value}</h3>
-                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{s.label}</p>
+                        <h3 className="text-2xl font-bold text-slate-900">{s.value}</h3>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm h-96 flex items-center justify-center italic text-slate-300">
-                    Growth Velocity Visualization
+            {/* Chart placeholders */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col">
+                    <div className="flex items-center gap-2 mb-6">
+                        <BarChart3 className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-bold text-slate-700">Revenue Over Time</span>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center text-slate-300 text-sm font-medium">
+                        Chart coming soon
+                    </div>
                 </div>
-                <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm h-96 flex items-center justify-center italic text-slate-300">
-                    Conversion Funnel Analytics
+                <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col">
+                    <div className="flex items-center gap-2 mb-6">
+                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-bold text-slate-700">Conversion Funnel</span>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center text-slate-300 text-sm font-medium">
+                        Chart coming soon
+                    </div>
                 </div>
             </div>
         </div>

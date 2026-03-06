@@ -23,7 +23,19 @@ interface TemplateEntry {
     is_active?: boolean;
 }
 
-// No hardcoded templates — loaded from /templates/templates-registry.json
+// ── Local Template Fallbacks (Ensures core templates appear even if DB is syncing) ──
+const LOCAL_REGISTRY: TemplateEntry[] = [
+    {
+        id: 'Fruitables',
+        folder: 'Fruitables',
+        name: 'Fruitables Organic',
+        description: 'Vibrant, fresh design perfect for organic groceries, fruit shops, and healthy food stores. Includes seasonal banners and category-based filtering.',
+        version: '1.0.1',
+        preview_image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=900',
+        color: '#81c408',
+        tags: ['groceries', 'fresh', 'organic'],
+    }
+];
 
 export default function Onboarding() {
     const { user } = useAuth();
@@ -65,8 +77,16 @@ export default function Onboarding() {
                     tags: row.tags || [],
                 }));
 
-                setTemplates(mapped);
-                if (mapped.length > 0) setSelectedTemplate(mapped[0].id);
+                // Merge local fallbacks to ensure new templates appear even if seeding lagged
+                const finalTemplates = [...mapped];
+                LOCAL_REGISTRY.forEach(fallback => {
+                    if (!finalTemplates.some(t => t.folder === fallback.folder)) {
+                        finalTemplates.push(fallback);
+                    }
+                });
+
+                setTemplates(finalTemplates);
+                if (finalTemplates.length > 0 && !selectedTemplate) setSelectedTemplate(finalTemplates[0].id);
             } catch (err) {
                 console.error("Failed to load templates from ecom_templates:", err);
                 setTemplates([]);
