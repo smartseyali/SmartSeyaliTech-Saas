@@ -134,7 +134,7 @@ export default function EcomDashboard() {
                     </div>
                     <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase">Commerce Intelligence</h1>
                     <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                        Operational Status: <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-bold border border-emerald-100"><div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> LIVE</span> • <span className="text-blue-600 font-bold">{activeCompany?.name}</span>
+                        Operational Status: <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-bold border border-emerald-100"><span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> LIVE</span> • <span className="text-blue-600 font-bold">{activeCompany?.name}</span>
                     </p>
                 </div>
                 <div className="flex items-center gap-4">

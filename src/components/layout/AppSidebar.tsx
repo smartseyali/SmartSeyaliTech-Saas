@@ -33,6 +33,7 @@ import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface NavItem {
     title: string;
@@ -157,8 +158,12 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const location = useLocation();
     const { hasModule, isSuperAdmin, can } = usePermissions();
     const { activeCompany, companies, setCompany } = useTenant();
+    const { settings } = useStoreSettings();
     const [openGroups, setOpenGroups] = useState<string[]>(["Ecommerce"]);
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
+
+    const logoUrl = settings?.logo_url;
+    const storeName = settings?.store_name || activeCompany?.name || "LiteAdmin";
 
     // Dynamic Navigation Generation based on Industry
     const industry = activeCompany?.industry_type || 'retail';
@@ -183,21 +188,64 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 collapsed ? "w-[80px]" : "w-[260px]"
             )}
         >
-            {/* Header / Logo Section */}
-            <div className="flex items-center h-16 md:h-20 px-6 shrink-0 z-10">
-                <div className="flex items-center gap-3 overflow-hidden cursor-pointer group">
-                    <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shrink-0">
-                        <Rocket className="text-white w-5 h-5" />
-                    </div>
-                    {!collapsed && (
-                        <div className="flex flex-col">
-                            <span className="font-bold text-slate-900 tracking-tight text-lg">
-                                LiteAdmin
-                            </span>
+            {/* Header / Logo + Collapse Toggle */}
+            {collapsed ? (
+                /* Collapsed: centered logo icon, click to expand */
+                <button
+                    onClick={onToggle}
+                    className="flex items-center justify-center h-16 w-full border-b border-slate-100 shrink-0 group"
+                    title="Expand sidebar"
+                >
+                    {logoUrl ? (
+                        <img
+                            src={logoUrl}
+                            alt={storeName}
+                            className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0 group-hover:border-blue-200 transition-all"
+                        />
+                    ) : (
+                        <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-700 transition-colors">
+                            <Rocket className="text-white w-4 h-4" />
                         </div>
                     )}
+                </button>
+            ) : (
+                /* Expanded: logo + name on left, chevron on right */
+                <div className="flex items-center h-16 px-4 justify-between shrink-0 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
+                        {logoUrl ? (
+                            <img
+                                src={logoUrl}
+                                alt={storeName}
+                                className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0"
+                            />
+                        ) : (
+                            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+                                <Rocket className="text-white w-4 h-4" />
+                            </div>
+                        )}
+                        <div className="flex flex-col min-w-0">
+                            <span className="font-bold text-slate-900 tracking-tight text-[15px] truncate leading-tight">
+                                {storeName}
+                            </span>
+                            {settings?.store_tagline && (
+                                <span className="text-[10px] text-slate-400 font-medium truncate leading-none mt-0.5">
+                                    {settings.store_tagline}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Collapse chevron */}
+                    <button
+                        onClick={onToggle}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all shrink-0 ml-2"
+                        title="Collapse sidebar"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                    </button>
                 </div>
-            </div>
+            )}
+
 
             {/* Tenant Switcher */}
             {!collapsed && activeCompany && (
@@ -306,12 +354,12 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             </div>
 
             {/* Bottom Utilities */}
-            <div className="p-4 space-y-1 border-t border-slate-100 bg-slate-50/50 shrink-0">
+            <div className="p-3 space-y-1 border-t border-slate-100 bg-slate-50/50 shrink-0">
                 {isSuperAdmin && (
                     <NavLink
                         to="/super-admin"
                         className={cn(
-                            "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all text-sm font-semibold text-blue-600 hover:bg-blue-100/50",
+                            "group flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm font-semibold text-blue-600 hover:bg-blue-100/50",
                             collapsed ? "justify-center" : ""
                         )}
                         activeClassName="bg-blue-100"
@@ -320,17 +368,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                         {!collapsed && <span className="flex-1 truncate">Platform Admin</span>}
                     </NavLink>
                 )}
-
-                <button
-                    onClick={onToggle}
-                    className={cn(
-                        "group flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100",
-                        collapsed ? "justify-center" : ""
-                    )}
-                >
-                    <ChevronLeft className={cn("w-5 h-5 shrink-0 transition-transform", collapsed && "rotate-180")} />
-                    {!collapsed && <span className="flex-1 text-left truncate">Collapse</span>}
-                </button>
             </div>
         </aside>
     );

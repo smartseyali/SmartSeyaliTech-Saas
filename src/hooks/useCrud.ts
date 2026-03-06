@@ -62,7 +62,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
         const payloadWithCompany = {
             ...payload,
             company_id: activeCompany.id,
-            created_by: authUser?.id // Optional: attribute to specific user
+            user_id: authUser?.id // Optional: attribute to specific user
         };
 
         const { data: result, error } = await supabase
