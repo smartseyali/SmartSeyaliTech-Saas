@@ -58,12 +58,38 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
     const createItem = async (payload: any) => {
         if (!activeCompany) throw new Error("No active workspace selected.");
 
+        // Clean payload to prevent joined relations from breaking the insert
+        const cleanPayload = (data: any) => {
+            const cleaned = { ...data };
+            const jsonColumns = ['shipping_address', 'config', 'content', 'mapping_config'];
+
+            // 1. Remove objects/arrays that are not json columns
+            for (const key in cleaned) {
+                const val = cleaned[key];
+                if (val !== null && typeof val === 'object' && !(val instanceof Date) && !jsonColumns.includes(key)) {
+                    delete cleaned[key];
+                }
+            }
+
+            // 2. Extract implicitly joined relations from the selectQuery and strip them out
+            // e.g. "*, ecom_categories(id, name)" -> extracts "ecom_categories"
+            const matches = selectQuery.match(/(\w+)\s*\(/g);
+            if (matches) {
+                matches.forEach(m => {
+                    const relationKey = m.replace('(', '').trim();
+                    delete cleaned[relationKey];
+                });
+            }
+
+            return cleaned;
+        };
+
         // Always stamp company_id and created_by on creation — the SaaS foundation
-        const payloadWithCompany = {
+        const payloadWithCompany = cleanPayload({
             ...payload,
             company_id: activeCompany.id,
             user_id: authUser?.id // Optional: attribute to specific user
-        };
+        });
 
         const { data: result, error } = await supabase
             .from(tableName)
@@ -83,15 +109,36 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
     const updateItem = async (id: number | string, payload: any) => {
         if (!activeCompany) throw new Error("No active workspace selected.");
 
-        // Always stamp updated_by on update
-        const payloadWithAudit = {
-            ...payload,
-            updated_by: authUser?.id
+        // Clean payload to prevent joined relations from breaking the update
+        const cleanPayload = (data: any) => {
+            const cleaned = { ...data };
+            const jsonColumns = ['shipping_address', 'config', 'content', 'mapping_config'];
+
+            // 1. Remove objects/arrays that are not json columns
+            for (const key in cleaned) {
+                const val = cleaned[key];
+                if (val !== null && typeof val === 'object' && !(val instanceof Date) && !jsonColumns.includes(key)) {
+                    delete cleaned[key];
+                }
+            }
+
+            // 2. Extract implicitly joined relations from the selectQuery and strip them out
+            const matches = selectQuery.match(/(\w+)\s*\(/g);
+            if (matches) {
+                matches.forEach(m => {
+                    const relationKey = m.replace('(', '').trim();
+                    delete cleaned[relationKey];
+                });
+            }
+
+            return cleaned;
         };
+
+        const cleanedPayload = cleanPayload(payload);
 
         const query = supabase
             .from(tableName)
-            .update(payloadWithAudit)
+            .update(cleanedPayload)
             .eq("id", id);
 
         if (activeCompany) {

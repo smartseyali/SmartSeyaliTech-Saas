@@ -38,7 +38,7 @@ export const EcomProducts = () => {
         { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-10 h-10 rounded-xl object-cover shadow-sm" /> : <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200"><Box className="w-5 h-5 text-slate-400" /></div> },
         {
             key: "name",
-            label: `${t("Product")} Identity`,
+            label: `${t("Product")} Name`,
             render: (val: string, row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-slate-900 leading-tight">{val}</span>
@@ -51,7 +51,7 @@ export const EcomProducts = () => {
 
     const ecomProductFields: FieldConfig[] = [
         { key: "image_url", label: "Primary Image", type: "image", folder: "products" },
-        { key: "name", label: "Display Name (for Site)", required: true },
+        { key: "name", label: "Product Name", required: true },
         { key: "sku", label: `${t("SKU")} / Model` },
         {
             key: "category_id",
@@ -59,16 +59,16 @@ export const EcomProducts = () => {
             type: "select",
             options: (categories || []).map(c => ({ label: c.name, value: String(c.id) }))
         },
-        { key: "rate", label: `Sale ${t("Price")} (MRP)`, type: "number" },
-        { key: "description", label: "Web Description", type: "textarea" },
+        { key: "rate", label: `Price (MRP)`, type: "number" },
+        { key: "description", label: "Description", type: "textarea" },
         {
-            key: "is_featured", label: "Feature on Home Page", type: "select", options: [
+            key: "is_featured", label: "Show on Home Page", type: "select", options: [
                 { label: "Hide", value: "false" },
                 { label: "Show in Featured section", value: "true" }
             ]
         },
         {
-            key: "is_best_seller", label: "Mark as Best Seller", type: "select", options: [
+            key: "is_best_seller", label: "Is Best Seller", type: "select", options: [
                 { label: "No", value: "false" },
                 { label: "Yes", value: "true" }
             ]
@@ -126,7 +126,7 @@ export const EcomProducts = () => {
                 <ResizablePanel defaultSize={selectedProduct ? 40 : 100} minSize={30} className="bg-white">
                     <ModuleListPage
                         title={selectedProduct ? `Inventory` : `Store ${t("Products")}`}
-                        subtitle={selectedProduct ? "Operational Node Management" : "High-performance management of your digital shelf"}
+                        subtitle={selectedProduct ? "Manage your products" : "High-performance management of your digital shelf"}
                         columns={ecomProductColumns}
                         data={ecomData}
                         loading={loading}
@@ -162,7 +162,7 @@ export const EcomProducts = () => {
                                     selectedProduct?.id === row.id ? "bg-blue-600 shadow-lg shadow-blue-600/20" : "border-slate-200"
                                 )}
                             >
-                                {selectedProduct?.id === row.id ? "Inspecting" : "Select"}
+                                {selectedProduct?.id === row.id ? "Selected" : "Select"}
                             </Button>
                         )}
                     />
@@ -186,7 +186,7 @@ export const EcomProducts = () => {
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Entity Workspace</p>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Product Details</p>
                                             </div>
                                             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{selectedProduct.name}</h2>
                                         </div>
@@ -214,13 +214,13 @@ export const EcomProducts = () => {
                                 <Tabs defaultValue="inventory" className="flex-1 flex flex-col min-h-0">
                                     <TabsList className="bg-white/60 p-1.5 rounded-2xl border border-slate-200/60 shadow-sm mb-6 w-fit h-auto flex gap-1">
                                         <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
-                                            <Database className="w-3.5 h-3.5" /> Sku Inventory
+                                            <Database className="w-3.5 h-3.5" /> Inventory
                                         </TabsTrigger>
                                         <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Info className="w-3.5 h-3.5" /> Specifications
                                         </TabsTrigger>
                                         <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
-                                            <Layers className="w-3.5 h-3.5" /> Assets
+                                            <Layers className="w-3.5 h-3.5" /> Media
                                         </TabsTrigger>
                                     </TabsList>
 
@@ -260,7 +260,7 @@ export const EcomProducts = () => {
                                                 ))}
                                                 <div className="col-span-2 bg-white p-8 rounded-[32px] border border-slate-200/60 shadow-sm">
                                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
-                                                        <Info className="w-4 h-4" /> Product Narrative
+                                                        <Info className="w-4 h-4" /> Product Description
                                                     </h4>
                                                     <p className="text-sm leading-relaxed text-slate-600 font-medium whitespace-pre-wrap">
                                                         {selectedProduct.description || "No description provided for this entity."}
@@ -291,7 +291,7 @@ export const EcomProducts = () => {
             <DynamicFormDialog
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                title={editingItem ? `Refine ${t("Product")}` : `Launch New ${t("Product")}`}
+                title={editingItem ? `Edit ${t("Product")}` : `Add New ${t("Product")}`}
                 fields={ecomProductFields}
                 initialData={editingItem}
                 onSubmit={handleSubmit}

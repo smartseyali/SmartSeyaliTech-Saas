@@ -132,7 +132,7 @@ export function ProductVariantDialog({
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
                                 <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Sku Inventory Master</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Inventory Details</p>
                             </div>
                             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Product Variants</h2>
                         </div>
@@ -190,25 +190,25 @@ export function ProductVariantDialog({
                                     {/* Fields */}
                                     <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-5">
                                         <div className="space-y-2">
-                                            <label className={labelCls}>Identity SKU</label>
+                                            <label className={labelCls}>SKU</label>
                                             <input value={v.sku} onChange={e => {
                                                 const next = [...variants]; next[i].sku = e.target.value; setVariants(next);
                                             }} className={inputCls} placeholder="SKU-CODE" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className={labelCls}>Variation Color</label>
+                                            <label className={labelCls}>Color</label>
                                             <input value={v.options.color} onChange={e => {
                                                 const next = [...variants]; next[i].options = { ...next[i].options, color: e.target.value }; setVariants(next);
                                             }} className={inputCls} placeholder="e.g. Slate Blue" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className={labelCls}>Dimension Size</label>
+                                            <label className={labelCls}>Size</label>
                                             <input value={v.options.size} onChange={e => {
                                                 const next = [...variants]; next[i].options = { ...next[i].options, size: e.target.value }; setVariants(next);
                                             }} className={inputCls} placeholder="e.g. XL" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className={labelCls}>Listed Price</label>
+                                            <label className={labelCls}>Price</label>
                                             <div className="relative">
                                                 <input type="number" value={v.price} onChange={e => {
                                                     const next = [...variants]; next[i].price = Number(e.target.value); setVariants(next);
@@ -217,7 +217,7 @@ export function ProductVariantDialog({
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className={labelCls}>Stock Availability</label>
+                                            <label className={labelCls}>Stock</label>
                                             <input type="number" value={v.stock} onChange={e => {
                                                 const next = [...variants]; next[i].stock = Number(e.target.value); setVariants(next);
                                             }} className={inputCls + " font-bold"} />
@@ -232,7 +232,7 @@ export function ProductVariantDialog({
                                                 onClick={() => removeVariant(i, v.id)}
                                                 className="h-8 px-4 flex items-center gap-2 rounded-xl text-rose-500 hover:bg-rose-50 text-[10px] font-black uppercase tracking-widest transition-all border border-transparent hover:border-rose-100"
                                             >
-                                                <Trash2 className="w-3 h-3" /> Decommission
+                                                <Trash2 className="w-3 h-3" /> Delete
                                             </button>
                                         </div>
                                     </div>
@@ -248,7 +248,7 @@ export function ProductVariantDialog({
                             <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all">
                                 <Plus className="w-4 h-4" />
                             </div>
-                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Append New Variant Entity</span>
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Add New Variant</span>
                         </button>
                     </div>
                 )}
@@ -263,7 +263,7 @@ export function ProductVariantDialog({
                 )}
                 <Button onClick={handleSave} className={cn("h-12 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 transition-all active:scale-95 gap-3", isEmbedded ? "w-full" : "flex-[2]")} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {saving ? "SYNCING..." : "COMMIT INVENTORY UPDATES"}
+                    {saving ? "SAVING..." : "SAVE CHANGES"}
                 </Button>
             </div>
         </div>

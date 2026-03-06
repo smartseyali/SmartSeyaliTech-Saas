@@ -63,7 +63,7 @@ export function DynamicFormDialog({
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Operational Registry</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Record Information</p>
                         </div>
                         <h2 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h2>
                     </div>
@@ -80,7 +80,7 @@ export function DynamicFormDialog({
                     <div className="hidden md:flex w-48 shrink-0 bg-slate-900/5 border-r border-white/40 p-6 flex-col gap-8">
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Entry ID</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Record ID</p>
                                 <p className="text-xs font-mono font-bold text-slate-600">#{initialData?.id || 'NEW_RECORD'}</p>
                             </div>
                             <div className="space-y-1">
@@ -93,7 +93,7 @@ export function DynamicFormDialog({
 
                         <div className="mt-auto pt-6 border-t border-slate-200/50">
                             <p className="text-[10px] leading-relaxed text-slate-500 font-medium italic">
-                                Ensure all required data nodes are calibrated before deployment.
+                                Please ensure all required fields are filled out.
                             </p>
                         </div>
                     </div>
@@ -134,7 +134,7 @@ export function DynamicFormDialog({
                                                     value={formData[field.key] || ""}
                                                     onChange={e => setFormData({ ...formData, [field.key]: e.target.value })}
                                                     required={field.required}
-                                                    placeholder={field.ph || "Detailed specifications..."}
+                                                    placeholder={field.ph || "Enter details..."}
                                                 />
                                             ) : field.type === "select" ? (
                                                 <div className="relative group/select">
@@ -144,7 +144,7 @@ export function DynamicFormDialog({
                                                         onChange={e => setFormData({ ...formData, [field.key]: e.target.value })}
                                                         required={field.required}
                                                     >
-                                                        <option value="" disabled>Registry Mapping...</option>
+                                                        <option value="" disabled>Select an option...</option>
                                                         {field.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                                                     </select>
                                                     <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-blue-600 transition-colors">
@@ -171,7 +171,7 @@ export function DynamicFormDialog({
                                                     value={formData[field.key] || ""}
                                                     onChange={e => setFormData({ ...formData, [field.key]: field.type === "number" ? Number(e.target.value) : e.target.value })}
                                                     required={field.required}
-                                                    placeholder={field.ph || `Define ${field.label.toLowerCase()}...`}
+                                                    placeholder={field.ph || `Enter ${field.label.toLowerCase()}...`}
                                                 />
                                             )}
                                         </div>
@@ -202,7 +202,7 @@ export function DynamicFormDialog({
                                     className="h-11 px-8 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 transition-all gap-2 active:scale-95"
                                 >
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                    {loading ? "PROCESING..." : "COMMIT CHANGES"}
+                                    {loading ? "SAVING..." : "SAVE CHANGES"}
                                 </Button>
                             </div>
                         </div>
