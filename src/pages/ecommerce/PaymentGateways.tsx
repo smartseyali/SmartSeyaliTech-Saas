@@ -134,24 +134,20 @@ export default function PaymentGateways() {
     );
 
     return (
-        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
+        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <ShieldCheck className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Financial Infrastructure</span>
-                    </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Channels</h1>
-                    <p className="text-sm font-medium text-slate-500">Configure secure transaction lanes and settlement flows for your store.</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
+                <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Financial</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Payment Gateways</h1>
+                    <p className="text-sm text-slate-500 mt-1">Configure payment channels and settlement options for your store.</p>
                 </div>
-
-                <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                    <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-2 border border-emerald-100">
+                <div className="flex items-center gap-3">
+                    <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-semibold flex items-center gap-2 border border-emerald-100">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> PCI Verified
                     </div>
-                    <div className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-2 border border-blue-100">
-                        {gateways.filter(g => g.is_active).length} Active Channels
+                    <div className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-xs font-semibold border border-blue-100">
+                        {gateways.filter(g => g.is_active).length} Active
                     </div>
                 </div>
             </div>
@@ -224,70 +220,71 @@ export default function PaymentGateways() {
                                 </div>
 
                                 {isActive && (
-                                    <div className="pt-8 border-t border-slate-50 flex items-center justify-between gap-4">
+                                    <div className="pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
                                         <Button
                                             variant="ghost"
                                             onClick={() => setEditing(isEditing ? null : key)}
-                                            className="h-11 px-6 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
+                                            className="h-9 px-4 rounded-xl font-semibold text-sm gap-2 bg-slate-50 text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
                                         >
-                                            <Settings className="w-4 h-4" /> {isEditing ? "Close Control" : "Protocol Control"}
+                                            <Settings className="w-4 h-4" /> {isEditing ? "Close Settings" : "Configure"}
                                         </Button>
                                         {key !== 'cod' && (
                                             <Button
                                                 variant="ghost"
                                                 disabled={testing === key}
                                                 onClick={() => testConnection(key)}
-                                                className="h-11 px-6 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2 text-slate-400 hover:text-blue-600 transition-all"
+                                                className="h-9 px-4 rounded-xl font-semibold text-sm gap-2 text-slate-400 hover:text-blue-600 transition-all"
                                             >
                                                 {testing === key ? <RefreshCw className="w-4 h-4 animate-spin text-blue-600" /> : <ShieldCheck className="w-4 h-4" />}
-                                                {testing === key ? "Handshaking..." : "Audit Connection"}
+                                                {testing === key ? "Testing..." : "Test Connection"}
                                             </Button>
                                         )}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Editing Panel */}
-                            {isEditing && (isActive) && (
-                                <div className="bg-slate-50 p-10 border-t border-slate-200 space-y-10 animate-in slide-in-from-top-4 duration-300">
-                                    <div className="grid grid-cols-1 gap-8">
+                            {/* Inline Config Panel */}
+                            {isEditing && isActive && (
+                                <div className="border-t border-slate-100 bg-slate-50/50 px-7 py-6 space-y-5 animate-in slide-in-from-top-2 duration-200">
+                                    <div className="grid grid-cols-1 gap-4">
                                         {meta.fields.map(field => (
-                                            <div key={field.key} className="space-y-3">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">{field.label}</label>
-                                                <div className="relative group">
+                                            <div key={field.key} className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{field.label}</label>
+                                                <div className="relative">
                                                     <input
                                                         type={field.type === "password" && !showSecrets[`${key}_${field.key}`] ? "password" : "text"}
                                                         value={cfg[field.key] || ""}
                                                         onChange={e => setConfigField(key, field.key, e.target.value)}
                                                         placeholder={field.placeholder}
-                                                        className="w-full h-12 px-6 pr-14 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                                                        className="w-full h-11 px-4 pr-11 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-900 placeholder:text-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/8 outline-none transition-all"
                                                     />
                                                     {field.type === "password" && (
                                                         <button type="button"
                                                             onClick={() => setShowSecrets(s => ({ ...s, [`${key}_${field.key}`]: !s[`${key}_${field.key}`] }))}
-                                                            className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-blue-600 transition-colors">
-                                                            {showSecrets[`${key}_${field.key}`] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                                                        >
+                                                            {showSecrets[`${key}_${field.key}`] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex gap-4 pt-4 border-t border-slate-100">
+                                    <div className="flex gap-3 pt-2 border-t border-slate-100">
                                         <Button
-                                            className="h-12 flex-[2] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-[10px] shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-3"
+                                            className="h-10 flex-[2] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/20 transition-all gap-2 active:scale-95"
                                             disabled={saving}
                                             onClick={() => saveConfig(key)}
                                         >
                                             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
-                                            {saving ? "Synchronizing..." : "Update Protocol"}
+                                            {saving ? "Saving..." : "Save Settings"}
                                         </Button>
                                         <Button
                                             variant="ghost"
-                                            className="h-12 flex-1 rounded-xl text-slate-400 hover:text-slate-900 font-bold uppercase text-[10px] tracking-widest bg-white border border-slate-200"
+                                            className="h-10 flex-1 rounded-xl text-slate-500 hover:text-slate-800 font-semibold bg-white border border-slate-200 hover:bg-slate-50"
                                             onClick={() => setEditing(null)}
                                         >
-                                            Discard
+                                            Cancel
                                         </Button>
                                     </div>
                                 </div>
