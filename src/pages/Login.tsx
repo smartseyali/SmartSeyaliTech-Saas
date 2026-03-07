@@ -5,10 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-    Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft,
+    Mail, Lock, Eye, EyeOff, ArrowRight,
     Sparkles, ShieldCheck, ShoppingBag, User as UserIcon,
-    Facebook, Github, Chrome
+    Chrome, Github, Twitter, Zap, Globe, Layers, X
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export default function Login() {
@@ -35,7 +36,6 @@ export default function Login() {
 
     const checkRoleAndRedirect = async () => {
         try {
-            // Case-insensitive lookup for the user profile
             const { data: localUser } = await supabase
                 .from('users')
                 .select('is_super_admin')
@@ -43,25 +43,28 @@ export default function Login() {
                 .maybeSingle();
 
             if (localUser?.is_super_admin) {
-                console.log("Super Admin detected, navigating to dashboard...");
-                navigate("/ecommerce");
+                navigate("/super-admin");
                 return;
             }
 
-            const { data: mappings } = await supabase
-                .from('company_users')
-                .select('role')
-                .eq('user_id', user?.id);
+            // Check if the user has any company (owned OR as a member)
+            const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
+                supabase.from('company_users').select('role').eq('user_id', user?.id),
+                supabase.from('companies').select('id').eq('user_id', user?.id).limit(1)
+            ]);
 
-            const isAdmin = mappings?.some(m => ['admin', 'owner'].includes(m.role));
+            const hasCompany = (mappings && mappings.length > 0) || (ownedCompanies && ownedCompanies.length > 0);
 
-            if (isAdmin || isMerchantLogin) {
-                navigate("/ecommerce");
-            } else {
-                navigate("/");
+            if (!hasCompany) {
+                // Logged in but no company — send to onboarding to finish setup
+                navigate("/onboarding");
+                return;
             }
+
+            // Go to ecommerce dashboard
+            navigate("/ecommerce");
         } catch (err) {
-            navigate(isMerchantLogin ? "/ecommerce" : "/");
+            navigate("/ecommerce");
         }
     };
 
@@ -71,9 +74,9 @@ export default function Login() {
         try {
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            toast({ title: "Welcome back!", description: "Sign in successful." });
+            toast({ title: "Welcome back!", description: "Signature verification successful." });
         } catch (err: any) {
-            toast({ variant: "destructive", title: "Login Failed", description: err?.message });
+            toast({ variant: "destructive", title: "Access Denied", description: err?.message });
         } finally { setLoading(false); }
     };
 
@@ -81,18 +84,15 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const { error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: { data: { full_name: fullName } }
             });
             if (error) throw error;
-
-            // Auto-create user profile is handled by TenantContext/trigger usually
-            // But let's ensure the user entry exists for redirection
-            toast({ title: "Account Created", description: "Welcome to BeliBeli!" });
+            toast({ title: "Engine Initialized", description: "Your merchant account is being provisioned." });
         } catch (err: any) {
-            toast({ variant: "destructive", title: "Signup Failed", description: err?.message });
+            toast({ variant: "destructive", title: "Initialization Failed", description: err?.message });
         } finally { setLoading(false); }
     };
 
@@ -104,200 +104,216 @@ export default function Login() {
                 redirectTo: `${window.location.origin}/reset-password`,
             });
             if (error) throw error;
-            toast({ title: "Reset Link Sent", description: "Check your email." });
+            toast({ title: "Secure Link Sent", description: "Identity verification link dispatched." });
             setMode("login");
         } catch (err: any) {
-            toast({ variant: "destructive", title: "Error", description: err?.message });
+            toast({ variant: "destructive", title: "Dispatch Failed", description: err?.message });
         } finally { setLoading(false); }
     };
 
     return (
-        <div className="min-h-screen flex bg-[#F8F9FA]">
-            {/* Left Side: Brand Experience */}
-            <div className="hidden lg:flex w-1/2 relative flex-col overflow-hidden bg-black p-16">
-                <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600"
-                        className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all duration-1000"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="min-h-screen bg-[#050505] flex overflow-hidden selection:bg-blue-500/30">
+            {/* ── Background Elements ── */}
+            <div className="fixed inset-0 z-0">
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-50 contrast-150" />
+            </div>
+
+            {/* ── Left Sidebar (Brand/Promo) ── */}
+            <div className="hidden lg:flex w-[40%] relative z-10 flex-col justify-between p-16 border-r border-white/5 bg-black/20 backdrop-blur-md">
+                <div>
+                    <Link to="/" className="flex items-center gap-4 group">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform group-hover:rotate-12">
+                            <Zap className="w-6 h-6 fill-current" />
+                        </div>
+                        <div>
+                            <span className="text-white font-black text-2xl uppercase tracking-tighter block leading-none">Smartseyali Tech</span>
+                            <span className="text-white/40 text-[10px] uppercase font-bold tracking-[0.3em]">Enterprise Cloud Edition</span>
+                        </div>
+                    </Link>
                 </div>
 
-                <div className="relative z-10 h-full flex flex-col justify-between">
-                    <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-all">
-                            <ShieldCheck className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="text-white font-black text-2xl uppercase tracking-tighter">Merchant Hub</span>
-                    </Link>
+                <div className="space-y-12">
+                    <div className="flex gap-4">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-sm">
+                                {i === 1 && <Globe className="w-6 h-6 text-blue-400" />}
+                                {i === 2 && <Layers className="w-6 h-6 text-indigo-400" />}
+                                {i === 3 && <ShoppingBag className="w-6 h-6 text-purple-400" />}
+                            </div>
+                        ))}
+                    </div>
 
                     <div className="space-y-6">
-                        <div className="flex items-center gap-2">
-                            <div className="flex -space-x-3">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="w-12 h-12 rounded-full border-4 border-black bg-secondary overflow-hidden">
-                                        <img src={`https://i.pravatar.cc/150?u=${i}`} />
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="text-white/60 text-sm font-medium">Powering <span className="text-white font-bold">500+</span> e-commerce stores</p>
-                        </div>
-                        <h2 className="text-5xl font-black text-white leading-tight uppercase tracking-tight">
-                            Scale Your <br />
-                            <span className="text-primary italic font-normal">Business</span> Today
+                        <h2 className="text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase">
+                            Consult. <br />
+                            Scal<span className="text-blue-500 italic font-medium">e</span>. <br />
+                            Deploy.
                         </h2>
-                        <p className="text-white/40 max-w-sm text-lg leading-relaxed">
-                            The all-in-one SaaS platform for modern merchants to manage inventory, orders, and growth.
+                        <p className="text-white/40 max-w-sm text-lg font-medium leading-relaxed">
+                            Smartseyali Tech: High-performance SaaS infrastructure & elite IT consulting for the modern enterprise.
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-8 text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">
-                        <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> Secure Payment</span>
-                        <span className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Original Products</span>
+                    <div className="flex items-center gap-10">
+                        <div>
+                            <p className="text-white font-black text-2xl leading-none">99.99%</p>
+                            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-2">SLA Guarantee</p>
+                        </div>
+                        <div className="w-px h-10 bg-white/10" />
+                        <div>
+                            <p className="text-white font-black text-2xl leading-none">500+</p>
+                            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-2">Global Projects</p>
+                        </div>
                     </div>
+                </div>
+
+                <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em]">
+                    © 2026 Smartseyali Tech Systems Inc.
                 </div>
             </div>
 
-            {/* Right Side: Identity Form */}
-            <div className="flex-1 flex items-center justify-center p-8 md:p-16">
-                <div className="w-full max-w-md space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="text-center lg:text-left space-y-2">
-                        <h1 className="text-4xl font-black tracking-tight uppercase">
-                            {isMerchantLogin ? 'Command Center' : (mode === 'login' ? 'Welcome Back' : mode === 'signup' ? 'Create Account' : 'Reset Password')}
+            {/* ── Main Auth Area ── */}
+            <div className="flex-1 relative z-10 flex flex-col items-center justify-center p-8 lg:p-16">
+                <div className="w-full max-w-md space-y-12 transition-all duration-700">
+                    <div className="text-center lg:text-left">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6"
+                        >
+                            <ShieldCheck className="w-3 h-3" /> Secure Gateway Alpha
+                        </motion.div>
+                        <h1 className="text-5xl font-black text-white tracking-tighter uppercase mb-4">
+                            {mode === 'login' ? 'Consultant Login' : mode === 'signup' ? 'Project Onboarding' : 'Recovery'}
                         </h1>
-                        <p className="text-muted-foreground font-medium">
-                            {isMerchantLogin
-                                ? "Administrative Access for Merchant Partners"
-                                : "Join the community and start shopping."}
+                        <p className="text-white/40 font-medium text-lg">
+                            {mode === 'login' ? 'Secure access to the Smartseyali command center.' : 'Initialize your SaaS instance.'}
                         </p>
                     </div>
 
-                    <div className="space-y-6">
-                        {!isMerchantLogin && (
-                            <>
-                                {/* Social Login placeholders */}
-                                <div className="grid grid-cols-3 gap-4">
-                                    {[
-                                        { icon: Chrome, color: "hover:text-red-500" },
-                                        { icon: Facebook, color: "hover:text-blue-600" },
-                                        { icon: Github, color: "hover:text-gray-900" }
-                                    ].map((s, i) => (
-                                        <button key={i} className={cn("h-14 rounded-2xl border border-border bg-white flex items-center justify-center hover:shadow-lg transition-all transform hover:-translate-y-1", s.color)}>
-                                            <s.icon className="w-5 h-5" />
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="relative flex items-center py-2">
-                                    <div className="flex-1 h-px bg-border" />
-                                    <span className="px-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Or continue with</span>
-                                    <div className="flex-1 h-px bg-border" />
-                                </div>
-                            </>
-                        )}
-
-                        <form onSubmit={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgotPassword} className="space-y-5">
-                            {mode === 'signup' && (
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Full Name</label>
-                                    <div className="relative group">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                        <input
-                                            type="text"
-                                            value={fullName}
-                                            onChange={e => setFullName(e.target.value)}
-                                            placeholder="Jane Doe"
-                                            required
-                                            className="w-full h-14 pl-12 pr-4 rounded-2xl border border-border bg-white text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Email Address</label>
-                                <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        placeholder="hello@example.com"
-                                        required
-                                        className="w-full h-14 pl-12 pr-4 rounded-2xl border border-border bg-white text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                                    />
-                                </div>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={mode}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-8"
+                        >
+                            {/* Social Providers */}
+                            <div className="grid grid-cols-3 gap-4">
+                                {[Chrome, Github, Twitter].map((Icon, i) => (
+                                    <button key={i} className="h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group">
+                                        <Icon className="w-5 h-5 text-white/40 group-hover:text-white transition-colors" />
+                                    </button>
+                                ))}
                             </div>
 
-                            {mode !== 'forgot-password' && (
-                                <div className="space-y-1.5">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Password</label>
-                                        {mode === 'login' && (
-                                            <button type="button" onClick={() => setMode('forgot-password')} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
-                                                Forgot?
-                                            </button>
-                                        )}
+                            <div className="relative flex items-center">
+                                <div className="flex-1 h-px bg-white/5" />
+                                <span className="px-6 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Corporate ID</span>
+                                <div className="flex-1 h-px bg-white/5" />
+                            </div>
+
+                            <form onSubmit={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgotPassword} className="space-y-6">
+                                {mode === 'signup' && (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Legal Entity / Full Name</label>
+                                        <div className="relative group">
+                                            <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
+                                            <input
+                                                type="text"
+                                                value={fullName}
+                                                onChange={e => setFullName(e.target.value)}
+                                                placeholder="Natesh Systems Ltd."
+                                                required
+                                                className="w-full h-16 pl-14 pr-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
+                                            />
+                                        </div>
                                     </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Work Email Address</label>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
                                         <input
-                                            type={showPassword ? "text" : "password"}
-                                            value={password}
-                                            onChange={e => setPassword(e.target.value)}
-                                            placeholder="••••••••"
+                                            type="email"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            placeholder="admin@enterprise.com"
                                             required
-                                            className="w-full h-14 pl-12 pr-12 rounded-2xl border border-border bg-white text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                                            className="w-full h-16 pl-14 pr-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
                                         />
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary">
-                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
                                     </div>
                                 </div>
-                            )}
 
-                            <Button
-                                type="submit"
-                                className="w-full h-14 rounded-2xl bg-black text-white hover:bg-primary font-black uppercase text-xs tracking-widest shadow-xl transition-all disabled:opacity-50"
-                                disabled={loading}
-                            >
-                                {loading ? "Processing..." : (
-                                    <span className="flex items-center gap-2">
-                                        {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Link'}
-                                        <ArrowRight className="w-4 h-4" />
-                                    </span>
+                                {mode !== 'forgot-password' && (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-white/30">Secret Key</label>
+                                            {mode === 'login' && (
+                                                <button type="button" onClick={() => setMode('forgot-password')} className="text-[10px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 transition-colors">
+                                                    Recover?
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="relative group">
+                                            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                value={password}
+                                                onChange={e => setPassword(e.target.value)}
+                                                placeholder="••••••••••••"
+                                                required
+                                                className="w-full h-16 pl-14 pr-14 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
+                                            />
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors">
+                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                            </button>
+                                        </div>
+                                    </div>
                                 )}
-                            </Button>
-                        </form>
 
-                        <div className="pt-6 text-center">
-                            <button
-                                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                                className="text-sm font-medium text-muted-foreground"
-                            >
-                                {mode === 'login'
-                                    ? <>New Merchant? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Apply for Account</span></>
-                                    : <>Already a Partner? <span className="text-black font-black uppercase tracking-tight hover:text-primary transition-colors">Sign In</span></>}
-                            </button>
+                                <Button
+                                    type="submit"
+                                    className="w-full h-18 rounded-2xl bg-white text-black hover:bg-white/90 font-black uppercase text-xs tracking-[0.2em] shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all transform active:scale-95 disabled:opacity-50 mt-4"
+                                    disabled={loading}
+                                >
+                                    {loading ? "Decrypting Protocols..." : (
+                                        <span className="flex items-center gap-3 justify-center">
+                                            {mode === 'login' ? 'Access Console' : mode === 'signup' ? 'Deploy Infrastructure' : 'Send Pulse'}
+                                            <ArrowRight className="w-4 h-4" />
+                                        </span>
+                                    )}
+                                </Button>
+                            </form>
+                        </motion.div>
+                    </AnimatePresence>
+
+                    <div className="pt-8 text-center flex flex-col gap-4">
+                        <button
+                            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                            className="text-sm font-bold text-white/40 hover:text-white transition-all group"
+                        >
+                            {mode === 'login'
+                                ? <>Already verified? <span className="text-white group-hover:text-blue-500 transition-colors">Return to Console</span></>
+                                : <>Already have an account? <span className="text-white group-hover:text-blue-500 transition-colors">Sign In</span></>}
+                        </button>
+
+                        <Link to="/onboarding" className="text-sm font-bold text-white/40 hover:text-white transition-all group">
+                            New here? <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors">Start your free setup →</span>
+                        </Link>
+
+                        <div className="pt-6 border-t border-white/5 flex gap-8 justify-center opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">PCI-DSS Level 1</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">GDPR Compliant</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">ISO 27001</span>
                         </div>
                     </div>
-
-                    {isMerchantLogin && (
-                        <div className="pt-10 border-t border-border flex flex-col items-center gap-4">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                Technical support needed?
-                            </p>
-                            <a
-                                href="mailto:support@merchanthub.com"
-                                className="text-xs font-bold px-6 py-2 rounded-full border border-border hover:bg-secondary transition-all"
-                            >
-                                Contact Support
-                            </a>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
     );
 }
-

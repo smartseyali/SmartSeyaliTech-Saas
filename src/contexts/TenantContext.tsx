@@ -115,7 +115,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 const savedCompany = companiesData.find(c => String(c.id) === savedId);
 
                 setActiveCompany(savedCompany || companiesData[0] || null);
-                setNeedsOnboarding(companiesData.length === 0);
+                setNeedsOnboarding(false);
                 return;
             }
 
@@ -182,6 +182,12 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // Determine if we're on a public route — never block these with loading spinner
+    const isPublicRoute = (() => {
+        const p = window.location.pathname;
+        return p === '/login' || p === '/onboarding' || p === '/reset-password' || p.startsWith('/ecommerce-login');
+    })();
+
     return (
         <TenantContext.Provider value={{
             activeCompany,
@@ -191,12 +197,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             needsOnboarding,
             loading
         }}>
-            {loading ? (
-                <div className="h-screen w-full flex flex-col items-center justify-center bg-[#F8F9FA]">
-                    <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white animate-bounce shadow-2xl mb-4">
-                        <Rocket className="w-8 h-8" />
+            {loading && !isPublicRoute ? (
+                <div className="h-screen w-full flex flex-col items-center justify-center bg-black">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[24px] flex items-center justify-center text-white shadow-2xl mb-6">
+                        <Rocket className="w-10 h-10" />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Architecting Workspace...</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.6em] text-white/30">Smartseyali Tech</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/10 mt-2">Architecting Workspace...</span>
                 </div>
             ) : children}
         </TenantContext.Provider>

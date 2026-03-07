@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .confirm-wrap {
+            max-width: 640px;
+            margin: 40px auto;
+        }
+
+        .success-hero {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 48px 32px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .tick-circle {
+            width: 72px;
+            height: 72px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: pop .4s ease;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0)
+            }
+
+            80% {
+                transform: scale(1.15)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .tick-circle svg {
+            width: 36px;
+            height: 36px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .success-hero h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .success-hero p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .order-box {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 16px;
+        }
+
+        .order-box h3 {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .detail-row:last-child {
+            border: none;
+        }
+
+        .detail-row .label {
+            color: var(--text-muted);
+        }
+
+        .detail-row .val {
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-shipped {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg);
+            align-items: center;
+        }
+
+        .item-row:last-child {
+            border: none;
+        }
+
+        .item-row img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="main-header"></header>
+    <main class="container">
+        <div class="confirm-wrap fade-in" id="confirm-content">
+            <div style="text-align:center;padding:80px;color:var(--text-muted)">Loading order details...</div>
+        </div>
+    </main>
+
+    <script type="module">
+        import ui from './js/ui.js';
+        import api from './js/api.js';
+        import { mapper } from './js/mapper.js';
+
+        try { await ui.init(); } catch (e) { }
+
+        const orderId = new URLSearchParams(location.search).get('id');
+        if (!orderId) {
+            window.location.href = 'index.html';
+        }
+
+        const order = await api.getOrder(orderId);
+        const wrap = document.getElementById('confirm-content');
+
+        if (!order) {
+            wrap.innerHTML = '<div style="text-align:center;padding:80px">Order not found.</div>';
+            throw new Error("Not found");
+        }
+
+        const addr = order.shipping_address || {};
+        const items = order.ecom_order_items || order.items || [];
+        const statusClass = `status-${order.status?.toLowerCase() || 'pending'}`;
+
+        wrap.innerHTML = `
+            <!-- Success Hero -->
+            <div class="success-hero">
+                <div class="tick-circle">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h1>Order Placed Successfully! 🎉</h1>
+                <p>Thank you for shopping with us. We've received your order and it's being processed.</p>
+                <div style="margin-top:20px">
+                    <span style="font-size:13px;color:var(--text-muted)">Order ID:</span>
+                    <strong style="font-size:15px;margin-left:8px;color:var(--primary)">#${order.order_number || orderId.slice(0, 8).toUpperCase()}</strong>
+                </div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-box">
+                <h3>📦 Order Details</h3>
+                <div class="detail-row"><span class="label">Status</span><span class="val"><span class="status-badge ${statusClass}">${order.status || 'Pending'}</span></span></div>
+                <div class="detail-row"><span class="label">Payment Method</span><span class="val">${(order.payment_method || 'COD').toUpperCase()}</span></div>
+                <div class="detail-row"><span class="label">Payment Status</span><span class="val">${order.payment_status || '—'}</span></div>
+                <div class="detail-row"><span class="label">Order Date</span><span class="val">${new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="order-box">
+                <h3>📍 Delivery Address</h3>
+                <p style="font-weight:700;font-size:14px">${addr.name || '—'}</p>
+                <p style="font-size:13px;color:var(--text-muted);margin-top:6px;line-height:1.7">
+                    ${addr.address || ''}, ${addr.city || ''}<br>
+                    ${addr.state || ''} - ${addr.pincode || ''}<br>
+                    📞 ${addr.phone || '—'}
+                </p>
+            </div>
+
+            <!-- Items -->
+            ${items.length ? `
+            <div class="order-box">
+                <h3>🛍️ Items Ordered</h3>
+                ${items.map(item => `
+                    <div class="item-row">
+                        <div style="flex:1">
+                            <div style="font-weight:700;font-size:13px">${item.name || 'Product'}</div>
+                            <div style="font-size:12px;color:var(--text-muted)">Qty: ${item.quantity} × ${mapper.formatCurrency(item.unit_price || 0)}</div>
+                        </div>
+                        <div style="font-weight:800">${mapper.formatCurrency(item.total_price || 0)}</div>
+                    </div>
+                `).join('')}
+            </div>` : ''}
+
+            <!-- Price -->
+            <div class="order-box">
+                <h3>💰 Price Summary</h3>
+                <div class="detail-row"><span class="label">Subtotal</span><span class="val">${mapper.formatCurrency(order.subtotal || 0)}</span></div>
+                <div class="detail-row"><span class="label">Shipping</span><span class="val" style="color:var(--success)">${order.shipping_cost > 0 ? mapper.formatCurrency(order.shipping_cost) : 'FREE'}</span></div>
+                ${order.discount_amount > 0 ? `<div class="detail-row"><span class="label">Discount</span><span class="val" style="color:var(--danger)">− ${mapper.formatCurrency(order.discount_amount)}</span></div>` : ''}
+                <div class="detail-row" style="font-weight:800;font-size:15px"><span>Grand Total</span><span>${mapper.formatCurrency(order.grand_total || 0)}</span></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-btns" style="margin-top:8px;margin-bottom:40px">
+                <a href="order-tracking.html?id=${orderId}" class="btn btn-secondary" style="flex:1;text-align:center">Track Order</a>
+                <a href="shop.html" class="btn btn-outline" style="flex:1;text-align:center">Continue Shopping</a>
+            </div>
+        `;
+    </script>
+</body>
+
+</html>

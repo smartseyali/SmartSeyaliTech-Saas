@@ -54,6 +54,10 @@ import StoreContact from "./pages/storefront/Contact";
 
 import SuperAdminDashboard from "./pages/super-admin/Dashboard";
 import HeadlessConsole from "./pages/super-admin/HeadlessConsole";
+import PlatformTenants from "./pages/super-admin/Tenants";
+import PlatformUsers from "./pages/super-admin/Users";
+import PlatformTemplates from "./pages/super-admin/Templates";
+import PlatformPlans from "./pages/super-admin/Plans";
 import Onboarding from "./pages/ecommerce/Onboarding";
 
 const queryClient = new QueryClient();
@@ -61,17 +65,25 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
     const { needsOnboarding, loading } = useTenant();
+    const currentPath = window.location.pathname;
 
+    // Not logged in → go to login
     if (!user) return <Navigate to="/login" replace />;
+
+    // Still loading tenant info → wait (but onboarding itself doesn't need this check)
     if (loading) return null;
 
-    // Force onboarding if company doesn't exist AND we aren't already on the onboarding page
-    if (needsOnboarding && window.location.pathname !== "/onboarding") {
+    // If user has no company yet, send them to onboarding
+    // BUT: only redirect if they're NOT already on onboarding (prevent loop)
+    if (needsOnboarding && currentPath !== '/onboarding') {
         return <Navigate to="/onboarding" replace />;
     }
 
     return <>{children}</>;
 };
+
+// Dedicated route for onboarding — FULLY PUBLIC since account doesn't exist yet
+// The onboarding page itself handles: already-logged-in-with-company → redirect to /ecommerce
 
 const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
@@ -130,10 +142,16 @@ const App = () => (
                                         {/* Super Admin Control Center */}
                                         <Route element={<AppLayout />}>
                                             <Route path="/super-admin" element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} />
+                                            <Route path="/super-admin/tenants" element={<SuperAdminRoute><PlatformTenants /></SuperAdminRoute>} />
+                                            <Route path="/super-admin/users" element={<SuperAdminRoute><PlatformUsers /></SuperAdminRoute>} />
+                                            <Route path="/super-admin/plans" element={<SuperAdminRoute><PlatformPlans /></SuperAdminRoute>} />
+                                            <Route path="/super-admin/templates" element={<SuperAdminRoute><PlatformTemplates /></SuperAdminRoute>} />
                                             <Route path="/super-admin/connectors" element={<SuperAdminRoute><HeadlessConsole /></SuperAdminRoute>} />
                                         </Route>
 
-                                        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+                                        {/* Onboarding — Public route, no auth needed.
+                                            Account is created at the END of the onboarding flow. */}
+                                        <Route path="/onboarding" element={<Onboarding />} />
 
                                         {/* Ecommerce Admin Routes (Protected) */}
                                         <Route element={<AppLayout />}>

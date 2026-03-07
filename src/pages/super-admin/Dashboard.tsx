@@ -20,19 +20,37 @@ export default function SuperAdminDashboard() {
         const fetchGlobalData = async () => {
             setLoading(true);
             try {
-                const [compRes, userRes, subRes] = await Promise.all([
-                    supabase.from("companies").select("*, subscriptions(plan_id, subscription_plans(name, price_monthly))").order("created_at", { ascending: false }),
-                    supabase.from("users").select("id", { count: "exact" }),
-                    supabase.from("subscriptions").select("plan_id, subscription_plans(price_monthly)")
-                ]);
+                // Fetch companies with their selected system plans
+                const { data: compData, error: compErr } = await supabase
+                    .from("companies")
+                    .select(`
+                        *,
+                        system_plans (
+                            name,
+                            price_monthly
+                        )
+                    `)
+                    .order("created_at", { ascending: false });
 
-                setCompaniesList(compRes.data || []);
+                if (compErr) throw compErr;
 
-                const totalRevenue = (subRes.data || []).reduce((acc, sub: any) => acc + (sub.subscription_plans?.price_monthly || 0), 0);
+                // Fetch total user count
+                const { count: userCount, error: userErr } = await supabase
+                    .from("users")
+                    .select("id", { count: "exact" });
+
+                if (userErr) throw userErr;
+
+                setCompaniesList(compData || []);
+
+                // Calculate MRR based on active company plan prices
+                const totalRevenue = (compData || []).reduce((acc, company: any) => {
+                    return acc + (company.system_plans?.price_monthly || 0);
+                }, 0);
 
                 setStats({
-                    companies: compRes.data?.length || 0,
-                    users: userRes.count || 0,
+                    companies: compData?.length || 0,
+                    users: userCount || 0,
                     revenue: totalRevenue
                 });
             } catch (err) {
@@ -59,9 +77,9 @@ export default function SuperAdminDashboard() {
                         <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
                             <ShieldCheck className="w-6 h-6" />
                         </div>
-                        <h1 className="text-3xl font-black tracking-tight uppercase">Control Center</h1>
+                        <h1 className="text-3xl font-black tracking-tight uppercase italic">Control Center</h1>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60 ml-1">Universal SaaS Administration</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60 ml-1">Universal Smartseyali Administration</p>
                 </div>
 
                 <div className="flex gap-4">
@@ -70,7 +88,7 @@ export default function SuperAdminDashboard() {
                         <input
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search Marketplace..."
+                            placeholder="Search Ecosystem..."
                             className="h-14 pl-12 pr-6 w-full md:w-[300px] rounded-2xl bg-card border border-border focus:ring-2 focus:ring-primary/20 focus:outline-none font-bold text-sm"
                         />
                     </div>
@@ -83,9 +101,9 @@ export default function SuperAdminDashboard() {
             {/* Global Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: "Active Merchants", value: stats.companies, Icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
-                    { label: "Total Platform Users", value: stats.users, Icon: Users, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-                    { label: "Platform Revenue (MRR)", value: `₹ ${stats.revenue.toLocaleString()}`, Icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" }
+                    { label: "Active Nodes", value: stats.companies, Icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
+                    { label: "Total Accounts", value: stats.users, Icon: Users, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+                    { label: "Platform MRR", value: `$ ${stats.revenue.toLocaleString()}`, Icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" }
                 ].map((s, i) => (
                     <div key={i} className="bg-card rounded-[2.5rem] border border-border p-8 space-y-4 hover:shadow-xl hover:shadow-primary/5 transition-all group">
                         <div className="flex items-center justify-between">
@@ -107,9 +125,9 @@ export default function SuperAdminDashboard() {
             {/* Companies Table */}
             <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-2xl shadow-black/5">
                 <div className="p-8 border-b border-border flex items-center justify-between bg-secondary/5">
-                    <h2 className="text-xl font-black tracking-tight uppercase">Institutional Roster</h2>
+                    <h2 className="text-xl font-black tracking-tight uppercase italic">Enterprise Registry</h2>
                     <Button className="rounded-xl font-bold gap-2">
-                        <LayoutDashboard className="w-4 h-4" /> Global Logs
+                        <LayoutDashboard className="w-4 h-4" /> System Logs
                     </Button>
                 </div>
 
@@ -117,16 +135,16 @@ export default function SuperAdminDashboard() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-border/40">
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Marketplace</th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endpoint</th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logic Tier</th>
-                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Creation</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Ecosystem</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Live Endpoint</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Engine Pack</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Deployment</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/40">
                             {filteredCompanies.map((company) => {
-                                const sub = company.subscriptions?.[0];
+                                const plan = company.system_plans;
                                 return (
                                     <tr key={company.id} className="hover:bg-secondary/5 transition-colors group">
                                         <td className="px-8 py-6">
@@ -136,7 +154,7 @@ export default function SuperAdminDashboard() {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-sm tracking-tight">{company.name}</p>
-                                                    <p className="text-[10px] text-muted-foreground font-medium italic opacity-60">ID: {company.id}</p>
+                                                    <p className="text-[10px] text-muted-foreground font-medium italic opacity-60">REF: {company.id}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -144,17 +162,17 @@ export default function SuperAdminDashboard() {
                                             <div className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer">
                                                 <Globe className="w-3.5 h-3.5" />
                                                 <span className="text-xs font-bold tracking-tight underline decoration-indigo-500/30 underline-offset-4">
-                                                    {company.subdomain}.belibeli.com
+                                                    {company.subdomain}.smartseyali.tech
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className={cn(
-                                                "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest",
-                                                sub?.plan_id === 'enterprise' ? "bg-amber-500/10 text-amber-600" :
-                                                    sub?.plan_id === 'pro' ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                                                "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border",
+                                                company.plan === 'enterprise' || company.plan === 'Enterprise' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                                                    company.plan === 'professional' || company.plan === 'Professional' ? "bg-blue-500/10 text-blue-600 border-blue-500/20" : "bg-muted text-muted-foreground border-border"
                                             )}>
-                                                {sub?.subscription_plans?.name || 'Starter'}
+                                                {plan?.name || company.plan || 'Starter'}
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -167,13 +185,13 @@ export default function SuperAdminDashboard() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    className="rounded-xl font-bold h-10 gap-2"
+                                                    className="rounded-xl font-bold h-10 gap-2 border-slate-200"
                                                     onClick={() => {
                                                         setCompany(company.id);
                                                         window.location.href = "/ecommerce";
                                                     }}
                                                 >
-                                                    Impersonate <ExternalLink className="w-3.5 h-3.5" />
+                                                    Access Node <ExternalLink className="w-3.5 h-3.5" />
                                                 </Button>
                                                 <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10">
                                                     <MoreVertical className="w-4 h-4 text-muted-foreground" />

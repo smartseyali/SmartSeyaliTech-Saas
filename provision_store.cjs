@@ -36,20 +36,59 @@ function provisionStore({
     supabaseKey = 'your_anon_key'
 }) {
     const rootDir = __dirname;
-    const templateDir = path.join(rootDir, 'templates', templateFolder);
-    const storesDir = path.join(rootDir, 'stores');
-    const targetDir = path.join(storesDir, storeName);
+    // ── Smart folder resolver: try exact name, then slugified variations ──
+    const templatesRoot = path.join(rootDir, 'templates');
+
+    function slugify(str) {
+        return str.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    // Build candidate list: exact → slugified → lowercase
+    const candidates = [
+        templateFolder,
+        slugify(templateFolder),
+        templateFolder.toLowerCase(),
+        templateFolder.toLowerCase().replace(/\s+/g, '-'),
+        templateFolder.toLowerCase().replace(/\s+/g, '_'),
+    ];
+
+    // Also try to find a case-insensitive match in the real folder listing
+    let resolvedFolder = null;
+    if (fs.existsSync(templatesRoot)) {
+        const available = fs.readdirSync(templatesRoot)
+            .filter(f => fs.statSync(path.join(templatesRoot, f)).isDirectory());
+
+        for (const candidate of candidates) {
+            // Exact match
+            if (available.includes(candidate)) { resolvedFolder = candidate; break; }
+            // Case-insensitive match
+            const caseMatch = available.find(f => f.toLowerCase() === candidate.toLowerCase());
+            if (caseMatch) { resolvedFolder = caseMatch; break; }
+        }
+    }
+
+    const templateDir = path.join(templatesRoot, resolvedFolder || templateFolder);
 
     // ── Validate template exists ──────────────────────────────
-    if (!fs.existsSync(templateDir)) {
-        console.error(`❌  Template "${templateFolder}" not found at: ${templateDir}`);
-        console.log(`    Available templates:`);
-        if (fs.existsSync(path.join(rootDir, 'templates'))) {
-            fs.readdirSync(path.join(rootDir, 'templates'))
-                .forEach(f => console.log(`      - ${f}`));
+    if (!resolvedFolder || !fs.existsSync(templateDir)) {
+        console.error(`❌  Template "${templateFolder}" not found.`);
+        console.log(`    Tried these folder names:`);
+        candidates.forEach(c => console.log(`      • ${c}`));
+        console.log(`    Available templates in /templates:`);
+        if (fs.existsSync(templatesRoot)) {
+            fs.readdirSync(templatesRoot)
+                .filter(f => fs.statSync(path.join(templatesRoot, f)).isDirectory())
+                .forEach(f => console.log(`      ✓ ${f}`));
         }
         process.exit(1);
     }
+
+    if (resolvedFolder !== templateFolder) {
+        console.log(`🔄  Template name normalized: "${templateFolder}" → "${resolvedFolder}"`);
+    }
+
+    const storesDir = path.join(rootDir, 'stores');
+    const targetDir = path.join(storesDir, storeName);
 
     // ── Warn if store already exists ──────────────────────────
     if (fs.existsSync(targetDir)) {

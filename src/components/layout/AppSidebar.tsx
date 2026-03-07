@@ -148,22 +148,38 @@ export const getRequiredResource = (pathname: string): string | undefined => {
     return undefined;
 };
 
-
 interface AppSidebarProps {
     collapsed: boolean;
     onToggle: () => void;
 }
+
+const superAdminNavGroups: NavGroup[] = [
+    {
+        label: "Platform Hub",
+        module: "Platform",
+        icon: ShieldCheck,
+        items: [
+            { title: "Platform Dashboard", url: "/super-admin", icon: LayoutDashboard },
+            { title: "Tenant/Company List", url: "/super-admin/tenants", icon: Globe2 },
+            { title: "Subscription Plans", url: "/super-admin/plans", icon: CreditCard },
+            { title: "User Management", url: "/super-admin/users", icon: Users },
+            { title: "Template Management", url: "/super-admin/templates", icon: Layout },
+            { title: "Headless Connectors", url: "/super-admin/connectors", icon: Zap },
+        ],
+    }
+];
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const location = useLocation();
     const { hasModule, isSuperAdmin, can } = usePermissions();
     const { activeCompany, companies, setCompany } = useTenant();
     const { settings } = useStoreSettings();
-    const [openGroups, setOpenGroups] = useState<string[]>(["Ecommerce"]);
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
 
+    const isSuperAdminView = location.pathname.startsWith('/super-admin');
+
     const logoUrl = settings?.logo_url;
-    const storeName = settings?.store_name || activeCompany?.name || "LiteAdmin";
+    const storeName = isSuperAdminView ? "Platform Admin" : (settings?.store_name || activeCompany?.name || "LiteAdmin");
 
     // Dynamic Navigation Generation based on Industry
     const industry = activeCompany?.industry_type || 'retail';
@@ -178,8 +194,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         }))
     }));
 
-    const isGroupActive = (group: NavGroup) =>
-        group.items.some((item) => location.pathname.startsWith(item.url));
+    const activeGroupsToRender = isSuperAdminView ? superAdminNavGroups : navGroups;
 
     return (
         <aside
@@ -196,15 +211,15 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     className="flex items-center justify-center h-16 w-full border-b border-slate-100 shrink-0 group"
                     title="Expand sidebar"
                 >
-                    {logoUrl ? (
+                    {logoUrl && !isSuperAdminView ? (
                         <img
                             src={logoUrl}
                             alt={storeName}
                             className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0 group-hover:border-blue-200 transition-all"
                         />
                     ) : (
-                        <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-700 transition-colors">
-                            <Rocket className="text-white w-4 h-4" />
+                        <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors", isSuperAdminView ? "bg-slate-900 group-hover:bg-slate-800" : "bg-blue-600 group-hover:bg-blue-700")}>
+                            {isSuperAdminView ? <ShieldCheck className="text-white w-4 h-4" /> : <Rocket className="text-white w-4 h-4" />}
                         </div>
                     )}
                 </button>
@@ -212,22 +227,22 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 /* Expanded: logo + name on left, chevron on right */
                 <div className="flex items-center h-16 px-4 justify-between shrink-0 border-b border-slate-100">
                     <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
-                        {logoUrl ? (
+                        {logoUrl && !isSuperAdminView ? (
                             <img
                                 src={logoUrl}
                                 alt={storeName}
                                 className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0"
                             />
                         ) : (
-                            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-                                <Rocket className="text-white w-4 h-4" />
+                            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", isSuperAdminView ? "bg-slate-900" : "bg-blue-600")}>
+                                {isSuperAdminView ? <ShieldCheck className="text-white w-4 h-4" /> : <Rocket className="text-white w-4 h-4" />}
                             </div>
                         )}
                         <div className="flex flex-col min-w-0">
                             <span className="font-bold text-slate-900 tracking-tight text-[15px] truncate leading-tight">
                                 {storeName}
                             </span>
-                            {settings?.store_tagline && (
+                            {!isSuperAdminView && settings?.store_tagline && (
                                 <span className="text-[10px] text-slate-400 font-medium truncate leading-none mt-0.5">
                                     {settings.store_tagline}
                                 </span>
@@ -247,8 +262,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
 
 
-            {/* Tenant Switcher */}
-            {!collapsed && activeCompany && (
+            {/* Tenant Switcher (Hide on Super Admin View) */}
+            {!collapsed && activeCompany && !isSuperAdminView && (
                 <div className="px-4 py-2 shrink-0">
                     <button
                         onClick={() => setShowCompanySwitcher(!showCompanySwitcher)}
@@ -288,7 +303,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 px-3 space-y-4 pb-4">
                 <div className="space-y-1">
                     <NavLink
-                        to="/ecommerce"
+                        to={isSuperAdminView ? "/super-admin" : "/ecommerce"}
                         className={cn(
                             "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm",
                             collapsed ? "justify-center" : "",
@@ -301,10 +316,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     </NavLink>
                 </div>
 
-                {navGroups
-                    .filter((group) => hasModule(group.module || group.label))
+                {activeGroupsToRender
+                    .filter((group) => isSuperAdminView ? true : hasModule(group.module || group.label))
                     .map((group) => {
-                        const visibleItems = group.items.filter(item => !item.resource || can('manage', item.resource));
+                        const visibleItems = group.items.filter(item => !item.resource || can('manage', item.resource) || isSuperAdminView);
                         if (visibleItems.length === 0) return null;
 
                         return (
@@ -357,15 +372,16 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <div className="p-3 space-y-1 border-t border-slate-100 bg-slate-50/50 shrink-0">
                 {isSuperAdmin && (
                     <NavLink
-                        to="/super-admin"
+                        to={isSuperAdminView ? "/ecommerce" : "/super-admin"}
                         className={cn(
-                            "group flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm font-semibold text-blue-600 hover:bg-blue-100/50",
+                            "group flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm font-semibold hover:bg-slate-200/50",
+                            isSuperAdminView ? "text-slate-600" : "text-blue-600 hover:bg-blue-100/50",
                             collapsed ? "justify-center" : ""
                         )}
-                        activeClassName="bg-blue-100"
+                        activeClassName={isSuperAdminView ? "bg-slate-200" : "bg-blue-100"}
                     >
-                        <ShieldCheck className="w-5 h-5 shrink-0" />
-                        {!collapsed && <span className="flex-1 truncate">Platform Admin</span>}
+                        {isSuperAdminView ? <LayoutDashboard className="w-5 h-5 shrink-0" /> : <ShieldCheck className="w-5 h-5 shrink-0" />}
+                        {!collapsed && <span className="flex-1 truncate">{isSuperAdminView ? "Merchant mode" : "Platform Admin"}</span>}
                     </NavLink>
                 )}
             </div>
