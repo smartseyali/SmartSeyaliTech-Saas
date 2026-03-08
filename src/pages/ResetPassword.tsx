@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Lock, Eye, EyeOff, Check, ArrowRight, Sparkles } from "lucide-react";
+import { Lock, Eye, EyeOff, Check, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 
 export default function ResetPassword() {
     const navigate = useNavigate();
@@ -67,48 +67,55 @@ export default function ResetPassword() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0f172a] p-8">
-            <div className="absolute top-[-80px] left-[-80px] w-96 h-96 rounded-full opacity-20 blur-3xl"
-                style={{ background: "radial-gradient(circle, #6366f1, transparent)" }} />
-            <div className="absolute bottom-[-60px] right-[-60px] w-80 h-80 rounded-full opacity-15 blur-3xl"
-                style={{ background: "radial-gradient(circle, #8b5cf6, transparent)" }} />
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-8 relative overflow-hidden font-sans">
+            {/* Background pattern */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.4] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:32px_32px]" />
 
-            <div className="w-full max-w-md bg-background rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative z-10">
+            {/* Background blobs */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute top-0 -left-4 w-[600px] h-[600px] bg-primary-100/50 rounded-full blur-[150px] opacity-40 animate-blob" />
+                <div className="absolute bottom-0 -right-4 w-[600px] h-[600px] bg-teal-100/40 rounded-full blur-[150px] opacity-30 animate-blob animation-delay-2000" />
+            </div>
+
+            <div className="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-2xl overflow-hidden relative z-10">
                 <div className="p-8 md:p-12">
                     {success ? (
-                        <div className="text-center space-y-6">
-                            <div className="w-20 h-20 rounded-3xl bg-green-500/10 flex items-center justify-center mx-auto">
-                                <Check className="w-10 h-10 text-green-500" />
+                        <div className="text-center space-y-8">
+                            <div className="w-20 h-20 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto shadow-inner">
+                                <Check className="w-10 h-10 text-emerald-500 stroke-[3]" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight">Success!</h1>
-                                <p className="text-muted-foreground mt-2 text-sm">
-                                    Your password has been reset. Redirecting you to login...
+                                <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase italic">Success!</h1>
+                                <p className="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">
+                                    Your password has been reset. <br />Redirecting to login...
                                 </p>
                             </div>
-                            <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
-                                <div className="bg-primary h-1.5 rounded-full w-full animate-pulse" />
+                            <div className="w-full bg-slate-50 rounded-full h-1.5 overflow-hidden">
+                                <div className="bg-primary-600 h-1.5 rounded-full w-full animate-pulse" />
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
-                                    <Sparkles className="w-5 h-5 text-primary" />
+                        <div className="space-y-10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30">
+                                    <Sparkles className="w-6 h-6 text-white" />
                                 </div>
-                                <span className="font-bold text-xl tracking-tight">SmartSuite</span>
+                                <div>
+                                    <span className="font-bold text-2xl tracking-tight text-primary-600 block leading-none">Smartseyali</span>
+                                    <span className="font-bold text-[9px] text-slate-400 uppercase tracking-widest leading-none">Security Center</span>
+                                </div>
                             </div>
 
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight">New password</h1>
-                                <p className="text-muted-foreground text-sm mt-1.5">Enter a secure new password for your account</p>
+                                <h1 className="text-4xl font-bold text-slate-900 tracking-tighter uppercase italic leading-none">New <span className="text-primary-600">Password</span></h1>
+                                <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest">Enter a secure new password.</p>
                             </div>
 
-                            <form onSubmit={handleResetPassword} className="space-y-5">
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium">New Password</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <form onSubmit={handleResetPassword} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 ml-1">New Password</label>
+                                    <div className="relative group">
+                                        <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             value={password}
@@ -116,36 +123,40 @@ export default function ResetPassword() {
                                             placeholder="••••••••"
                                             required
                                             minLength={6}
-                                            className="w-full h-12 pl-10 pr-12 rounded-xl border border-input bg-secondary/30 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                                            className="w-full h-14 pl-14 pr-12 rounded-2xl border border-slate-100 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:ring-8 focus:ring-primary-600/5 focus:border-primary-600 transition-all"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-900 transition-colors"
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium">Confirm Password</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 ml-1">Confirm Password</label>
+                                    <div className="relative group">
+                                        <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             value={confirmPassword}
                                             onChange={e => setConfirmPassword(e.target.value)}
                                             placeholder="••••••••"
                                             required
-                                            className="w-full h-12 pl-10 pr-4 rounded-xl border border-input bg-secondary/30 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                                            className="w-full h-14 pl-14 pr-4 rounded-2xl border border-slate-100 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:ring-8 focus:ring-primary-600/5 focus:border-primary-600 transition-all"
                                         />
                                     </div>
                                 </div>
 
-                                <Button type="submit" className="w-full h-12 rounded-xl text-base font-semibold group" disabled={loading}>
-                                    {loading ? "Updating..." : "Update Password"}
-                                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                <Button type="submit" className="w-full h-16 rounded-2xl bg-slate-900 text-white hover:bg-black font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl transform active:scale-95 transition-all group mt-4 leading-none" disabled={loading}>
+                                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                                        <>
+                                            Update Password
+                                            <ArrowRight className="w-5 h-5 ml-4 group-hover:translate-x-1 transition-transform stroke-[3]" />
+                                        </>
+                                    )}
                                 </Button>
                             </form>
                         </div>

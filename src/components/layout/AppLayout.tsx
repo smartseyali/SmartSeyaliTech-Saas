@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, Outlet, Navigate } from "react-router-dom";
+import { useLocation, Outlet, Navigate, useNavigate } from "react-router-dom";
 import { AppSidebar, getRequiredResource } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { can, loading: pLoading } = usePermissions();
   const isAuthPage = ["/login", "/reset-password"].includes(location.pathname);
 
@@ -27,7 +28,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const requiredResource = getRequiredResource(location.pathname);
   const hasAccess = !requiredResource || can('manage', requiredResource);
 
-  if (pLoading) return null;
+  // Only block on initial load if we really need to.
+  // Returning null here unmounts the entire sidebar and header, which is jarring.
+  // Instead, we let the render continue and 'hasAccess' will be handled below.
 
   if (!hasAccess) {
     return (
@@ -46,7 +49,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
             <div className="pt-4">
               <Button
-                onClick={() => window.location.href = '/ecommerce'}
+                onClick={() => navigate('/ecommerce')}
                 className="h-14 px-8 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 font-bold uppercase tracking-widest text-[10px] gap-3 active:scale-95 transition-all shadow-xl shadow-slate-200"
               >
                 <Home className="w-4 h-4" /> Return to Command Center

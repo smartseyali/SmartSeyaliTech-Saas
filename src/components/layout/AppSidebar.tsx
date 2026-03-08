@@ -26,7 +26,8 @@ import {
     Crown,
     Award,
     Layout,
-    Rocket
+    Rocket,
+    Box
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -78,70 +79,259 @@ const INDUSTRY_MAP: Record<string, any> = {
     }
 };
 
-const baseNavGroups: NavGroup[] = [
-    {
-        label: "Catalog & Media",
-        module: "Ecommerce",
-        icon: Library,
-        items: [
-            { title: "Products", url: "/ecommerce/masters/products", icon: Boxes, resource: "products" },
-            { title: "Categories", url: "/ecommerce/masters/categories", icon: LayoutGrid, resource: "products" },
-            { title: "Brands", url: "/ecommerce/masters/brands", icon: Award, resource: "products" },
-            { title: "Collections", url: "/ecommerce/masters/collections", icon: Library, resource: "products" },
-            { title: "Hero Banners", url: "/ecommerce/banners", icon: Layout, resource: "marketing" },
-            { title: "Media Gallery", url: "/ecommerce/gallery", icon: ImageIcon, resource: "products" },
-        ],
-    },
-    {
-        label: "Sales & Logistics",
-        module: "Ecommerce",
-        icon: ShoppingBag,
-        items: [
-            { title: "Orders", url: "/ecommerce/orders", icon: EcomCart, resource: "orders" },
-            { title: "Customers", url: "/ecommerce/customers", icon: Users, resource: "customers" },
-            { title: "Deliveries", url: "/ecommerce/deliveries", icon: Truck, resource: "orders" },
-            { title: "Refunds", url: "/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
-            { title: "Abandoned Carts", url: "/ecommerce/abandoned-carts", icon: ShoppingBag, resource: "orders" },
-        ],
-    },
-    {
-        label: "Marketing & Growth",
-        module: "Ecommerce",
-        icon: Zap,
-        items: [
-            { title: "Coupons", url: "/ecommerce/coupons", icon: Tag, resource: "marketing" },
-            { title: "Offers", url: "/ecommerce/offers", icon: Zap, resource: "marketing" },
-            { title: "Reviews", url: "/ecommerce/reviews", icon: Star, resource: "marketing" },
-        ],
-    },
-    {
-        label: "Business Insights",
-        module: "Ecommerce",
-        icon: BarChart3,
-        items: [
-            { title: "Analytics", url: "/ecommerce/analytics", icon: Zap, resource: "analytics" },
-            { title: "Reports", url: "/ecommerce/reports", icon: BarChart3, resource: "analytics" },
-        ],
-    },
-    {
-        label: "Settings & Systems",
-        module: "Ecommerce",
-        icon: Settings,
-        items: [
-            { title: "Website Manager", url: "/ecommerce/website", icon: Globe2, resource: "settings" },
-            { title: "Billing & Plans", url: "/ecommerce/billing", icon: CreditCard, resource: "settings" },
-            { title: "Team Management", url: "/ecommerce/team", icon: Users, resource: "team" },
-            { title: "Payment Gateways", url: "/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },
-            { title: "Shipping Zones", url: "/ecommerce/shipping-zones", icon: MapPin, resource: "settings" },
-            { title: "API & Integrations", url: "/ecommerce/api-integrations", icon: Zap, resource: "settings" },
-            { title: "General Settings", url: "/ecommerce/settings", icon: Settings, resource: "settings" },
-            { title: "View Storefront", url: "STOREFRONT", icon: ExternalLink },
-        ],
+// ── MODULE-SPECIFIC NAVIGATION ────────────────────────────────
+const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
+    ecommerce: [
+        {
+            label: "Catalog & Media",
+            module: "ecommerce",
+            icon: Library,
+            items: [
+                { title: "Products", url: "/apps/ecommerce/masters/products", icon: Boxes, resource: "products" },
+                { title: "Categories", url: "/apps/ecommerce/masters/categories", icon: LayoutGrid, resource: "products" },
+                { title: "Brands", url: "/apps/ecommerce/masters/brands", icon: Award, resource: "products" },
+                { title: "Collections", url: "/apps/ecommerce/masters/collections", icon: Library, resource: "products" },
+                { title: "Hero Banners", url: "/apps/ecommerce/banners", icon: Layout, resource: "marketing" },
+                { title: "Media Gallery", url: "/apps/ecommerce/gallery", icon: ImageIcon, resource: "products" },
+            ],
+        },
+        {
+            label: "Sales & Logistics",
+            module: "ecommerce",
+            icon: ShoppingBag,
+            items: [
+                { title: "Orders", url: "/apps/ecommerce/orders", icon: EcomCart, resource: "orders" },
+                { title: "Customers", url: "/apps/ecommerce/customers", icon: Users, resource: "customers" },
+                { title: "Deliveries", url: "/apps/ecommerce/deliveries", icon: Truck, resource: "orders" },
+                { title: "Refunds", url: "/apps/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
+                { title: "Abandoned Carts", url: "/apps/ecommerce/abandoned-carts", icon: ShoppingBag, resource: "orders" },
+            ],
+        },
+        {
+            label: "Marketing & Growth",
+            module: "ecommerce",
+            icon: Zap,
+            items: [
+                { title: "Coupons", url: "/apps/ecommerce/coupons", icon: Tag, resource: "marketing" },
+                { title: "Offers", url: "/apps/ecommerce/offers", icon: Zap, resource: "marketing" },
+                { title: "Reviews", url: "/apps/ecommerce/reviews", icon: Star, resource: "marketing" },
+            ],
+        },
+        {
+            label: "Business Insights",
+            module: "ecommerce",
+            icon: BarChart3,
+            items: [
+                { title: "Analytics", url: "/apps/ecommerce/analytics", icon: Zap, resource: "analytics" },
+                { title: "Reports", url: "/apps/ecommerce/reports", icon: BarChart3, resource: "analytics" },
+            ],
+        },
+        {
+            label: "Settings & Systems",
+            module: "ecommerce",
+            icon: Settings,
+            items: [
+                { title: "Website Manager", url: "/apps/ecommerce/website", icon: Globe2, resource: "settings" },
+                { title: "Billing & Plans", url: "/apps/ecommerce/billing", icon: CreditCard, resource: "settings" },
+                { title: "Team Management", url: "/apps/ecommerce/team", icon: Users, resource: "team" },
+                { title: "Payment Gateways", url: "/apps/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },
+                { title: "Shipping Zones", url: "/apps/ecommerce/shipping-zones", icon: MapPin, resource: "settings" },
+                { title: "API & Integrations", url: "/apps/ecommerce/api-integrations", icon: Zap, resource: "settings" },
+                { title: "General Settings", url: "/apps/ecommerce/settings", icon: Settings, resource: "settings" },
+                { title: "View Storefront", url: "STOREFRONT", icon: ExternalLink },
+            ],
+        }
+    ],
+    crm: [
+        {
+            label: "Sales Pipeline",
+            module: "crm",
+            icon: Zap,
+            items: [
+                { title: "Leads", url: "/apps/crm/leads", icon: Users },
+                { title: "Deals", url: "/apps/crm/deals", icon: ShoppingBag },
+                { title: "Pipeline View", url: "/apps/crm/pipeline", icon: LayoutGrid },
+                { title: "Forecast", url: "/apps/crm/forecast", icon: BarChart3 },
+            ],
+        },
+        {
+            label: "Customer Data",
+            module: "crm",
+            icon: Users,
+            items: [
+                { title: "Contacts", url: "/apps/crm/contacts", icon: Users },
+                { title: "Accounts", url: "/apps/crm/accounts", icon: Library },
+                { title: "Segments", url: "/apps/crm/segments", icon: Tag },
+            ],
+        }
+    ],
+    pos: [
+        {
+            label: "Point of Sale",
+            module: "pos",
+            icon: LayoutGrid,
+            items: [
+                { title: "Terminal", url: "/apps/pos/terminal", icon: Zap },
+                { title: "Register", url: "/apps/pos/register", icon: CreditCard },
+                { title: "POS Orders", url: "/apps/pos/orders", icon: ShoppingBag },
+            ],
+        }
+    ],
+    inventory: [
+        {
+            label: "Stock Management",
+            module: "inventory",
+            icon: Boxes,
+            items: [
+                { title: "Items", url: "/apps/inventory/items", icon: Boxes },
+                { title: "Stock Levels", url: "/apps/inventory/levels", icon: BarChart3 },
+                { title: "Warehouses", url: "/apps/inventory/warehouses", icon: MapPin },
+                { title: "Transfers", url: "/apps/inventory/transfers", icon: Truck },
+            ],
+        }
+    ],
+    hrms: [
+        {
+            label: "People Management",
+            module: "hrms",
+            icon: Users,
+            items: [
+                { title: "Directory", url: "/apps/hrms/directory", icon: Users },
+                { title: "Departments", url: "/apps/hrms/departments", icon: LayoutGrid },
+                { title: "Onboarding", url: "/apps/hrms/onboarding", icon: Rocket },
+            ],
+        },
+        {
+            label: "Ops & Benefits",
+            module: "hrms",
+            icon: Zap,
+            items: [
+                { title: "Attendance", url: "/apps/hrms/attendance", icon: Check },
+                { title: "Leave Tracker", url: "/apps/hrms/leave", icon: MapPin },
+                { title: "Payroll", url: "/apps/hrms/payroll", icon: CreditCard },
+            ],
+        }
+    ],
+    purchase: [
+        {
+            label: "Procurement",
+            module: "purchase",
+            icon: ShoppingBag,
+            items: [
+                { title: "Vendors", url: "/apps/purchase/vendors", icon: Users },
+                { title: "Purchase Orders", url: "/apps/purchase/orders", icon: ShoppingBag },
+                { title: "Goods Receipt", url: "/apps/purchase/receipts", icon: Box },
+            ],
+        }
+    ],
+    sales: [
+        {
+            label: "Sales Management",
+            module: "sales",
+            icon: ShoppingBag,
+            items: [
+                { title: "Quotations", url: "/apps/sales/quotations", icon: Library },
+                { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag },
+                { title: "Customers", url: "/apps/sales/customers", icon: Users },
+            ]
+        }
+    ],
+    books: [
+        {
+            label: "Accounting",
+            module: "books",
+            icon: BarChart3,
+            items: [
+                { title: "Chart of Accounts", url: "/apps/books/accounts", icon: LayoutGrid },
+                { title: "Journals", url: "/apps/books/journals", icon: Library },
+                { title: "Expenses", url: "/apps/books/expenses", icon: CreditCard },
+            ]
+        }
+    ],
+    invoicing: [
+        {
+            label: "Billing",
+            module: "invoicing",
+            icon: CreditCard,
+            items: [
+                { title: "Invoices", url: "/apps/invoicing/invoices", icon: CreditCard },
+                { title: "Payments", url: "/apps/invoicing/payments", icon: Zap },
+            ]
+        }
+    ],
+    payroll: [
+        {
+            label: "Payroll Setup",
+            module: "payroll",
+            icon: CreditCard,
+            items: [
+                { title: "Salary Structures", url: "/apps/payroll/structures", icon: LayoutGrid },
+                { title: "Run Payroll", url: "/apps/payroll/run", icon: Zap },
+            ]
+        }
+    ],
+    helpdesk: [
+        {
+            label: "Support Ops",
+            module: "helpdesk",
+            icon: ShieldCheck,
+            items: [
+                { title: "Tickets", url: "/apps/helpdesk/tickets", icon: Tag },
+                { title: "SLA Policies", url: "/apps/helpdesk/sla", icon: ShieldCheck },
+            ]
+        }
+    ],
+    hospital: [
+        {
+            label: "Clinical Records",
+            module: "hospital",
+            icon: Zap,
+            items: [
+                { title: "Patients", url: "/apps/hospital/patients", icon: Users },
+                { title: "Appointments", url: "/apps/hospital/appointments", icon: MapPin },
+            ]
+        }
+    ],
+    whatsapp: [
+        {
+            label: "Messaging",
+            module: "whatsapp",
+            icon: Zap,
+            items: [
+                { title: "Templates", url: "/apps/whatsapp/templates", icon: Library },
+                { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Zap },
+            ]
+        }
+    ],
+    "landing-page": [
+        {
+            label: "Web Builder",
+            module: "landing-page",
+            icon: Globe2,
+            items: [
+                { title: "Pages", url: "/apps/landing-page/pages", icon: LayoutGrid },
+                { title: "Themes", url: "/apps/landing-page/themes", icon: ImageIcon },
+            ]
+        }
+    ]
+};
+
+// Help detect active module from route
+const getCurrentModule = (pathname: string): string => {
+    // Expected path structure: /apps/<module_name>/...
+    const parts = pathname.split('/');
+    if (parts.length >= 3 && parts[1] === 'apps') {
+        const mod = parts[2];
+        // If module exists in MODULE_NAV_MAP, return it. Otherwise default to ecommerce
+        if (MODULE_NAV_MAP[mod]) return mod;
     }
-];
+    return 'ecommerce'; // Default
+};
 
 export const getRequiredResource = (pathname: string): string | undefined => {
-    for (const group of baseNavGroups) {
+    const activeModule = getCurrentModule(pathname);
+    const groups = MODULE_NAV_MAP[activeModule] || [];
+    for (const group of groups) {
         const match = group.items.find(item => pathname.startsWith(item.url));
         if (match) return match.resource;
     }
@@ -162,6 +352,7 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "Platform Dashboard", url: "/super-admin", icon: LayoutDashboard },
             { title: "Tenant/Company List", url: "/super-admin/tenants", icon: Globe2 },
             { title: "Subscription Plans", url: "/super-admin/plans", icon: CreditCard },
+            { title: "Marketplace Modules", url: "/super-admin/modules", icon: LayoutGrid },
             { title: "User Management", url: "/super-admin/users", icon: Users },
             { title: "Template Management", url: "/super-admin/templates", icon: Layout },
             { title: "Headless Connectors", url: "/super-admin/connectors", icon: Zap },
@@ -181,11 +372,13 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const logoUrl = settings?.logo_url;
     const storeName = isSuperAdminView ? "Platform Admin" : (settings?.store_name || activeCompany?.name || "LiteAdmin");
 
-    // Dynamic Navigation Generation based on Industry
+    // Dynamic Navigation Generation based on Active Module & Industry
+    const activeModule = getCurrentModule(location.pathname);
+    const moduleNavGroups = MODULE_NAV_MAP[activeModule] || MODULE_NAV_MAP.ecommerce;
     const industry = activeCompany?.industry_type || 'retail';
     const overrides = INDUSTRY_MAP[industry] || { labels: {}, items: {} };
 
-    const navGroups = baseNavGroups.map(group => ({
+    const navGroups = moduleNavGroups.map(group => ({
         ...group,
         label: overrides.labels[group.label] || group.label,
         items: group.items.map(item => ({
@@ -234,16 +427,16 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                 className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0"
                             />
                         ) : (
-                            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", isSuperAdminView ? "bg-slate-900" : "bg-blue-600")}>
+                            <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm", isSuperAdminView ? "bg-slate-900" : "bg-blue-600")}>
                                 {isSuperAdminView ? <ShieldCheck className="text-white w-4 h-4" /> : <Rocket className="text-white w-4 h-4" />}
                             </div>
                         )}
                         <div className="flex flex-col min-w-0">
-                            <span className="font-bold text-slate-900 tracking-tight text-[15px] truncate leading-tight">
+                            <span className="font-semibold text-slate-900 tracking-tight text-[15px] truncate">
                                 {storeName}
                             </span>
                             {!isSuperAdminView && settings?.store_tagline && (
-                                <span className="text-[10px] text-slate-400 font-medium truncate leading-none mt-0.5">
+                                <span className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                                     {settings.store_tagline}
                                 </span>
                             )}
@@ -267,10 +460,12 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 <div className="px-4 py-2 shrink-0">
                     <button
                         onClick={() => setShowCompanySwitcher(!showCompanySwitcher)}
-                        className="w-full flex items-center gap-3 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all border border-slate-200 group text-left relative"
+                        className="w-full flex items-center gap-3 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all border border-slate-200 group text-left relative"
                     >
-                        <Crown className="w-4 h-4 text-blue-600 shrink-0" />
-                        <span className="flex-1 font-semibold truncate text-[13px] text-slate-700">{activeCompany.name}</span>
+                        <div className="w-5 h-5 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0">
+                            <Crown className="w-3 h-3 text-blue-600" />
+                        </div>
+                        <span className="flex-1 font-medium truncate text-[13px] text-slate-900">{activeCompany.name}</span>
                         {(companies.length > 1) && (
                             <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showCompanySwitcher && "rotate-180")} />
                         )}
@@ -302,22 +497,34 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             {/* Navigation Sections */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 px-3 space-y-4 pb-4">
                 <div className="space-y-1">
+                    {!isSuperAdminView && (
+                        <NavLink
+                            to="/apps"
+                            className={cn(
+                                "group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all font-medium text-sm relative text-slate-500 hover:text-slate-900",
+                                collapsed ? "justify-center" : ""
+                            )}
+                            activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-blue-600 before:rounded-r-full"
+                        >
+                            <LayoutGrid className="w-5 h-5 shrink-0" />
+                            {!collapsed && <span className="flex-1 truncate font-bold uppercase tracking-widest text-[10px]">App Launcher</span>}
+                        </NavLink>
+                    )}
                     <NavLink
-                        to={isSuperAdminView ? "/super-admin" : "/ecommerce"}
+                        to={isSuperAdminView ? "/super-admin" : `/apps/${activeModule}`}
                         className={cn(
-                            "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm",
+                            "group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all font-medium text-sm relative",
                             collapsed ? "justify-center" : "",
-                            "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                            "text-slate-500 hover:text-slate-900"
                         )}
-                        activeClassName="text-blue-600 bg-blue-50 font-semibold"
+                        activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-blue-600 before:rounded-r-full"
                     >
                         <LayoutDashboard className="w-5 h-5 shrink-0" />
-                        {!collapsed && <span className="flex-1 truncate">Dashboard</span>}
+                        {!collapsed && <span className="flex-1 truncate">Dashboard Hub</span>}
                     </NavLink>
                 </div>
 
                 {activeGroupsToRender
-                    .filter((group) => isSuperAdminView ? true : hasModule(group.module || group.label))
                     .map((group) => {
                         const visibleItems = group.items.filter(item => !item.resource || can('manage', item.resource) || isSuperAdminView);
                         if (visibleItems.length === 0) return null;
@@ -325,8 +532,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                         return (
                             <div key={group.label} className="space-y-1">
                                 {!collapsed && (
-                                    <div className="px-4 py-2 mt-2">
-                                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{group.label}</p>
+                                    <div className="px-4 py-2 mt-4">
+                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">{group.label}</p>
                                     </div>
                                 )}
                                 {visibleItems.map((item) => {
@@ -353,10 +560,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                             key={item.url}
                                             to={item.url}
                                             className={cn(
-                                                "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+                                                "group flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium text-sm text-slate-500 hover:text-slate-900 relative",
                                                 collapsed ? "justify-center" : ""
                                             )}
-                                            activeClassName="text-blue-600 bg-blue-50 font-semibold"
+                                            activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-blue-600 before:rounded-r-full"
                                         >
                                             <item.icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
                                             {!collapsed && <span className="flex-1 truncate">{item.title}</span>}

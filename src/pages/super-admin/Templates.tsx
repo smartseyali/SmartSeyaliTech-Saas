@@ -264,7 +264,11 @@ export default function PlatformTemplates() {
 
             {/* Template CRUD Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-[40px]">
+                <DialogContent
+                    className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-[40px]"
+                    onPointerDownOutside={(e) => e.preventDefault()}
+                    onEscapeKeyDown={(e) => e.preventDefault()}
+                >
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">{editingId ? 'Modify Engine Architecture' : 'Initialize New Design'}</DialogTitle>
                     </DialogHeader>

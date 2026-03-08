@@ -184,7 +184,11 @@ export default function PlatformPlans() {
             )}
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent
+                    className="sm:max-w-[500px]"
+                    onPointerDownOutside={(e) => e.preventDefault()}
+                    onEscapeKeyDown={(e) => e.preventDefault()}
+                >
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-black uppercase tracking-tight">{editingId ? 'Modify Engine Pack' : 'Initialize Package'}</DialogTitle>
                     </DialogHeader>

@@ -56,7 +56,11 @@ export function DynamicFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-white border-slate-200 shadow-2xl rounded-2xl">
+            <DialogContent
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+                className="sm:max-w-[700px] p-0 overflow-hidden bg-white border-slate-200 shadow-2xl rounded-2xl"
+            >
                 <DialogHeader className="px-6 py-5 border-b border-slate-100 bg-slate-50/80">
                     <DialogTitle className="text-xl font-bold text-slate-800">{title}</DialogTitle>
                     <DialogDescription className="text-slate-500 mt-1">

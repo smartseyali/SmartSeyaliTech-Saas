@@ -41,7 +41,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
         // If the first part of the path is likely a company subdomain/slug
         // We exclude known reserved routes like 'ecommerce', 'login', 'super-admin'
-        const reserved = ['ecommerce', 'login', 'ecommerce-login', 'onboarding', 'super-admin', 'reset-password', 'cart', 'checkout'];
+        const reserved = ['ecommerce', 'login', 'ecommerce-login', 'onboarding', 'super-admin', 'reset-password', 'cart', 'checkout', 'apps', 'about', 'services', 'products', 'contact', 'policy'];
         const potentialSlug = pathParts[0];
 
         if (potentialSlug && !reserved.includes(potentialSlug)) {
@@ -79,16 +79,20 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-            setLoading(true);
+            if (!activeCompany) setLoading(true);
             // 1. Look up the user in public.users table
             let { data: localUser } = await supabase
                 .from('users')
                 .select('id, is_super_admin')
-                .eq('username', user.email)
+                .ilike('username', user.email || '')
                 .maybeSingle();
 
+            // HARDCORE BYPASS for the Primary Super Admin
+            const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
+            const isSuperAdminByEmail = user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+
             // AUTO-SYNC: If user exists in Auth but not in public profiles, create it
-            if (!localUser) {
+            if (!localUser && !isSuperAdminByEmail) {
                 const { data: newUser, error: uErr } = await supabase.from('users').insert({
                     id: user.id,
                     username: user.email,
@@ -101,7 +105,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             }
 
             // 2. SUPER ADMIN: load ALL companies so admin can switch between tenants
-            if (localUser?.is_super_admin) {
+            if (localUser?.is_super_admin || isSuperAdminByEmail) {
                 const { data: allCompanies } = await supabase
                     .from('companies')
                     .select('id, name, subdomain, industry_type, user_id')
@@ -182,11 +186,38 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // Determine if we're on a public route — never block these with loading spinner
+    // Determine if we're on a public route — never block these with full-page loading spinner
     const isPublicRoute = (() => {
         const p = window.location.pathname;
-        return p === '/login' || p === '/onboarding' || p === '/reset-password' || p.startsWith('/ecommerce-login');
+        const parts = p.split('/').filter(Boolean);
+        const first = parts[0] || '';
+
+        // These routes are definitely NOT public apps (they need the splash)
+        const appRoutes = ['apps', 'super-admin', 'ecommerce'];
+        if (appRoutes.includes(first)) return false;
+
+        // If it's a known non-app reserved route, it's public (Marketing, Auth, etc)
+        const publicReserved = ['login', 'onboarding', 'reset-password', 'ecommerce-login', 'about', 'services', 'products', 'contact', 'policy', 'seed'];
+        if (publicReserved.includes(first)) return true;
+
+        // Root is public
+        if (!first) return true;
+
+        // Default: Storefronts (/:slug/...) are considered public/lightweight
+        return true;
     })();
+
+    // Delayed loading UI to prevent flickering on fast connections
+    const [showSplash, setShowSplash] = useState(false);
+    useEffect(() => {
+        let timer: any;
+        if (loading && !isPublicRoute && !activeCompany) {
+            timer = setTimeout(() => setShowSplash(true), 300);
+        } else {
+            setShowSplash(false);
+        }
+        return () => clearTimeout(timer);
+    }, [loading, isPublicRoute, activeCompany]);
 
     return (
         <TenantContext.Provider value={{
@@ -197,13 +228,23 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             needsOnboarding,
             loading
         }}>
-            {loading && !isPublicRoute ? (
-                <div className="h-screen w-full flex flex-col items-center justify-center bg-black">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[24px] flex items-center justify-center text-white shadow-2xl mb-6">
-                        <Rocket className="w-10 h-10" />
+            {showSplash ? (
+                <div className="h-screen w-full flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm fixed inset-0 z-[9999] animate-in fade-in duration-500">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-blue-600/10 blur-3xl rounded-full animate-pulse" />
+                        <div className="relative w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[28px] flex items-center justify-center text-white shadow-2xl shadow-blue-600/20 mb-6 transform scale-90">
+                            <Rocket className="w-10 h-10" />
+                        </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.6em] text-white/30">Smartseyali Tech</span>
-                    <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/10 mt-2">Architecting Workspace...</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-800 mb-2">Smartseyali Tech</span>
+                    <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.3s]" />
+                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.15s]" />
+                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce" />
+                        </div>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 italic">Architecting Workspace</span>
+                    </div>
                 </div>
             ) : children}
         </TenantContext.Provider>

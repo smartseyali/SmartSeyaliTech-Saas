@@ -252,7 +252,11 @@ export function ProductVariantDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl h-[90vh] sm:h-[80vh] flex flex-col p-0 border-slate-200 shadow-2xl rounded-2xl bg-white overflow-hidden">
+            <DialogContent
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+                className="max-w-4xl h-[90vh] sm:h-[80vh] flex flex-col p-0 border-slate-200 shadow-2xl rounded-2xl bg-white overflow-hidden"
+            >
                 {workbenchContent}
             </DialogContent>
         </Dialog>

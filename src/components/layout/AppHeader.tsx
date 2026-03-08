@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut, Settings as SettingsIcon, ChevronDown } from "lucide-react";
+import { Bell, Search, User, LogOut, Settings as SettingsIcon, ChevronDown, Grid3X3, ExternalLink } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,12 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionsContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PLATFORM_MODULES } from "@/config/modules";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export function AppHeader() {
     const { user, signOut } = useAuth();
-    const { isAdmin, isSuperAdmin } = usePermissions();
+    const { isAdmin, isSuperAdmin, hasModule } = usePermissions();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -47,6 +49,63 @@ export function AppHeader() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-4">
+
+                    {/* ── App Launcher (9-dot) ──────────────────── */}
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <button className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all" title="Switch Module">
+                                <Grid3X3 className="w-5 h-5" />
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent align="end" sideOffset={8} className="w-[340px] p-4 rounded-2xl shadow-2xl border border-slate-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Smartseyali Apps</p>
+                                <Link to="/apps" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                    All Apps <ExternalLink className="w-3 h-3" />
+                                </Link>
+                            </div>
+                            <div className="grid grid-cols-4 gap-2">
+                                {PLATFORM_MODULES.filter(m => m.status === 'live' || m.status === 'beta')
+                                    .sort((a, b) => {
+                                        const isASubscribed = isSuperAdmin || a.isCore || hasModule(a.name) || hasModule(a.id);
+                                        const isBSubscribed = isSuperAdmin || b.isCore || hasModule(b.name) || hasModule(b.id);
+                                        if (isASubscribed && !isBSubscribed) return -1;
+                                        if (!isASubscribed && isBSubscribed) return 1;
+                                        return 0;
+                                    })
+                                    .map(mod => {
+                                        const isSubscribed = isSuperAdmin || mod.isCore || hasModule(mod.name) || hasModule(mod.id);
+
+                                        return (
+                                            <Link
+                                                key={mod.id}
+                                                to={isSubscribed ? mod.dashboardRoute : '#'}
+                                                onClick={(e) => !isSubscribed && e.preventDefault()}
+                                                className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all group ${isSubscribed
+                                                    ? 'hover:bg-slate-50'
+                                                    : 'opacity-40 grayscale-[0.8] cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} shadow-sm ${isSubscribed ? 'group-hover:scale-110 transition-transform' : ''}`}>
+                                                    {mod.icon}
+                                                </div>
+                                                <span className={`text-[9px] font-bold text-center leading-tight ${isSubscribed ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                    {mod.name}
+                                                </span>
+                                            </Link>
+                                        );
+                                    })}
+                                {/* Browse All */}
+                                <Link to="/apps" className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-slate-50 transition-all group">
+                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                                        <Grid3X3 className="w-5 h-5 text-slate-400" />
+                                    </div>
+                                    <span className="text-[9px] font-bold text-slate-400 text-center">All Apps</span>
+                                </Link>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+
                     <ThemeToggle />
 
                     <div className="flex items-center gap-1">

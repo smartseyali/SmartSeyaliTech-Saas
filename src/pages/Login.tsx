@@ -19,13 +19,12 @@ export default function Login() {
 
     // SaaS is for merchants by default
     const isMerchantLogin = window.location.pathname === "/login" || window.location.pathname === "/ecommerce-login";
-    const [mode, setMode] = useState<"login" | "signup" | "forgot-password">("login");
+    const [mode, setMode] = useState<"login" | "forgot-password">("login");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [fullName, setFullName] = useState("");
 
     // Handle Redirection based on Role
     useEffect(() => {
@@ -35,11 +34,22 @@ export default function Login() {
     }, [user, authLoading, navigate]);
 
     const checkRoleAndRedirect = async () => {
+        if (!user) return;
+
         try {
+            // HARDCORE BYPASS for the Primary Super Admin
+            const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
+
+            if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                console.log("Super Admin detected via email bypass");
+                navigate("/super-admin");
+                return;
+            }
+
             const { data: localUser } = await supabase
                 .from('users')
                 .select('is_super_admin')
-                .ilike('username', user?.email || '')
+                .ilike('username', user.email || '')
                 .maybeSingle();
 
             if (localUser?.is_super_admin) {
@@ -49,22 +59,23 @@ export default function Login() {
 
             // Check if the user has any company (owned OR as a member)
             const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
-                supabase.from('company_users').select('role').eq('user_id', user?.id),
-                supabase.from('companies').select('id').eq('user_id', user?.id).limit(1)
+                supabase.from('company_users').select('role').eq('user_id', user.id),
+                supabase.from('companies').select('id').eq('user_id', user.id).limit(1)
             ]);
 
             const hasCompany = (mappings && mappings.length > 0) || (ownedCompanies && ownedCompanies.length > 0);
 
             if (!hasCompany) {
                 // Logged in but no company — send to onboarding to finish setup
-                navigate("/onboarding");
+                navigate(`/onboarding${window.location.search}`);
                 return;
             }
 
-            // Go to ecommerce dashboard
-            navigate("/ecommerce");
+            // Go to ecommerce dashboard (App Launcher)
+            navigate("/apps");
         } catch (err) {
-            navigate("/ecommerce");
+            console.error("Redirect Error:", err);
+            navigate("/apps");
         }
     };
 
@@ -74,27 +85,12 @@ export default function Login() {
         try {
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            toast({ title: "Welcome back!", description: "Signature verification successful." });
+            toast({ title: "Welcome back!", description: "Logged in successfully." });
         } catch (err: any) {
-            toast({ variant: "destructive", title: "Access Denied", description: err?.message });
+            toast({ variant: "destructive", title: "Login Failed", description: err?.message });
         } finally { setLoading(false); }
     };
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { full_name: fullName } }
-            });
-            if (error) throw error;
-            toast({ title: "Engine Initialized", description: "Your merchant account is being provisioned." });
-        } catch (err: any) {
-            toast({ variant: "destructive", title: "Initialization Failed", description: err?.message });
-        } finally { setLoading(false); }
-    };
 
     const handleForgotPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -104,92 +100,93 @@ export default function Login() {
                 redirectTo: `${window.location.origin}/reset-password`,
             });
             if (error) throw error;
-            toast({ title: "Secure Link Sent", description: "Identity verification link dispatched." });
+            toast({ title: "Email Sent", description: "Password reset link sent to your email." });
             setMode("login");
         } catch (err: any) {
-            toast({ variant: "destructive", title: "Dispatch Failed", description: err?.message });
+            toast({ variant: "destructive", title: "Email Failed", description: err?.message });
         } finally { setLoading(false); }
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] flex overflow-hidden selection:bg-blue-500/30">
+        <div className="min-h-screen bg-slate-50 flex overflow-hidden selection:bg-primary-600/10 font-sans">
             {/* ── Background Elements ── */}
-            <div className="fixed inset-0 z-0">
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-50 contrast-150" />
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-primary-100/50 rounded-full blur-[200px] opacity-40 animate-blob" />
+                <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-teal-100/40 rounded-full blur-[200px] opacity-30 animate-blob animation-delay-2000" />
+                <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] [background-size:40px_40px] opacity-40" />
             </div>
 
             {/* ── Left Sidebar (Brand/Promo) ── */}
-            <div className="hidden lg:flex w-[40%] relative z-10 flex-col justify-between p-16 border-r border-white/5 bg-black/20 backdrop-blur-md">
+            <div className="hidden lg:flex w-[40%] relative z-10 flex-col justify-between p-20 border-r border-slate-100 bg-white">
                 <div>
-                    <Link to="/" className="flex items-center gap-4 group">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform group-hover:rotate-12">
-                            <Zap className="w-6 h-6 fill-current" />
+                    <Link to="/" className="flex items-center gap-5 group">
+                        <div className="w-14 h-14 bg-primary-600 rounded-[20px] flex items-center justify-center text-white shadow-2xl shadow-primary-500/30 transition-transform group-hover:scale-110">
+                            <Zap className="w-7 h-7 fill-current" />
                         </div>
                         <div>
-                            <span className="text-white font-black text-2xl uppercase tracking-tighter block leading-none">Smartseyali Tech</span>
-                            <span className="text-white/40 text-[10px] uppercase font-bold tracking-[0.3em]">Enterprise Cloud Edition</span>
+                            <span className="text-slate-900 font-bold text-3xl tracking-tight block leading-none mb-1 text-primary-600 font-outfit">Smartseyali</span>
+                            <span className="text-slate-400 text-[11px] uppercase font-bold tracking-[0.4em]">Business Platform</span>
                         </div>
                     </Link>
                 </div>
 
-                <div className="space-y-12">
-                    <div className="flex gap-4">
+                <div className="space-y-16">
+                    <div className="flex gap-6">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-sm">
-                                {i === 1 && <Globe className="w-6 h-6 text-blue-400" />}
-                                {i === 2 && <Layers className="w-6 h-6 text-indigo-400" />}
-                                {i === 3 && <ShoppingBag className="w-6 h-6 text-purple-400" />}
+                            <div key={i} className="w-16 h-16 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner hover:border-primary-200 transition-colors">
+                                {i === 1 && <Globe className="w-7 h-7 text-primary-600" />}
+                                {i === 2 && <Layers className="w-7 h-7 text-teal-600" />}
+                                {i === 3 && <ShoppingBag className="w-7 h-7 text-primary-500" />}
                             </div>
                         ))}
                     </div>
 
-                    <div className="space-y-6">
-                        <h2 className="text-6xl font-black text-white leading-[0.9] tracking-tighter uppercase">
-                            Consult. <br />
-                            Scal<span className="text-blue-500 italic font-medium">e</span>. <br />
-                            Deploy.
+                    <div className="space-y-8">
+                        <h2 className="text-7xl font-bold text-slate-900 leading-[0.8] tracking-tighter uppercase italic font-outfit">
+                            Build. <br />
+                            Manage<span className="text-primary-600">.</span>
+                            <br />
+                            Grow.
                         </h2>
-                        <p className="text-white/40 max-w-sm text-lg font-medium leading-relaxed">
-                            Smartseyali Tech: High-performance SaaS infrastructure & elite IT consulting for the modern enterprise.
+                        <p className="text-slate-400 max-w-sm text-lg font-bold leading-relaxed uppercase tracking-widest">
+                            The complete platform for your <span className="text-slate-900">Digital Store</span>.
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-10">
+                    <div className="flex items-center gap-12">
                         <div>
-                            <p className="text-white font-black text-2xl leading-none">99.99%</p>
-                            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-2">SLA Guarantee</p>
+                            <p className="text-slate-900 font-black text-3xl leading-none italic">99.99<span className="text-primary-600">%</span></p>
+                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mt-3">Platform Uptime</p>
                         </div>
-                        <div className="w-px h-10 bg-white/10" />
+                        <div className="w-px h-12 bg-slate-100" />
                         <div>
-                            <p className="text-white font-black text-2xl leading-none">500+</p>
-                            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest mt-2">Global Projects</p>
+                            <p className="text-slate-900 font-black text-3xl leading-none italic">500<span className="text-primary-600">+</span></p>
+                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mt-3">Deployments</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em]">
-                    © 2026 Smartseyali Tech Systems Inc.
+                <div className="text-slate-300 text-[10px] font-black uppercase tracking-[0.6em]">
+                    © 2026 Smartseyali Systems · Standard Cloud
                 </div>
             </div>
 
             {/* ── Main Auth Area ── */}
-            <div className="flex-1 relative z-10 flex flex-col items-center justify-center p-8 lg:p-16">
-                <div className="w-full max-w-md space-y-12 transition-all duration-700">
+            <div className="flex-1 relative z-10 flex flex-col items-center justify-center p-8 lg:p-20">
+                <div className="w-full max-w-md space-y-12">
                     <div className="text-center lg:text-left">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest mb-6"
+                            className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-primary-600/10 border border-primary-600/20 text-primary-600 text-[11px] font-black uppercase tracking-widest mb-8"
                         >
-                            <ShieldCheck className="w-3 h-3" /> Secure Gateway Alpha
+                            <ShieldCheck className="w-4 h-4" /> Secure Login
                         </motion.div>
-                        <h1 className="text-5xl font-black text-white tracking-tighter uppercase mb-4">
-                            {mode === 'login' ? 'Consultant Login' : mode === 'signup' ? 'Project Onboarding' : 'Recovery'}
+                        <h1 className="text-6xl font-bold text-slate-900 tracking-tighter uppercase italic leading-[0.9] mb-6 font-outfit whitespace-pre-line">
+                            {mode === 'login' ? 'Welcome \nBack' : 'Reset \nPassword'}
                         </h1>
-                        <p className="text-white/40 font-medium text-lg">
-                            {mode === 'login' ? 'Secure access to the Smartseyali command center.' : 'Initialize your SaaS instance.'}
+                        <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[11px] leading-relaxed">
+                            {mode === 'login' ? 'Login to access your dashboard.' : 'Enter your email to receive reset link.'}
                         </p>
                     </div>
 
@@ -199,52 +196,36 @@ export default function Login() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="space-y-8"
+                            className="space-y-10"
                         >
                             {/* Social Providers */}
                             <div className="grid grid-cols-3 gap-4">
-                                {[Chrome, Github, Twitter].map((Icon, i) => (
-                                    <button key={i} className="h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group">
-                                        <Icon className="w-5 h-5 text-white/40 group-hover:text-white transition-colors" />
+                                {[{ icon: Chrome, label: 'Google' }, { icon: Github, label: 'Github' }, { icon: Twitter, label: 'Twitter' }].map((provider, i) => (
+                                    <button key={i} className="h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center hover:bg-slate-50 hover:border-primary-100 shadow-sm transition-all group">
+                                        <provider.icon className="w-5 h-5 text-slate-300 group-hover:text-slate-900 transition-colors" />
                                     </button>
                                 ))}
                             </div>
 
                             <div className="relative flex items-center">
-                                <div className="flex-1 h-px bg-white/5" />
-                                <span className="px-6 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Corporate ID</span>
-                                <div className="flex-1 h-px bg-white/5" />
+                                <div className="flex-1 h-px bg-slate-100" />
+                                <span className="px-6 text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em]">Sign in with</span>
+                                <div className="flex-1 h-px bg-slate-100" />
                             </div>
 
-                            <form onSubmit={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgotPassword} className="space-y-6">
-                                {mode === 'signup' && (
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Legal Entity / Full Name</label>
-                                        <div className="relative group">
-                                            <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
-                                            <input
-                                                type="text"
-                                                value={fullName}
-                                                onChange={e => setFullName(e.target.value)}
-                                                placeholder="Natesh Systems Ltd."
-                                                required
-                                                className="w-full h-16 pl-14 pr-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
+                            <form onSubmit={mode === 'login' ? handleLogin : handleForgotPassword} className="space-y-6">
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">Work Email Address</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 ml-1 italic">Email Address</label>
                                     <div className="relative group">
-                                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
+                                        <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                         <input
                                             type="email"
                                             value={email}
                                             onChange={e => setEmail(e.target.value)}
-                                            placeholder="admin@enterprise.com"
+                                            placeholder="admin@example.com"
                                             required
-                                            className="w-full h-16 pl-14 pr-5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
+                                            className="w-full h-18 pl-16 pr-6 rounded-[20px] bg-white border border-slate-100 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-8 focus:ring-primary-600/5 focus:border-primary-600/50 transition-all font-bold shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -252,24 +233,24 @@ export default function Login() {
                                 {mode !== 'forgot-password' && (
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between px-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-white/30">Secret Key</label>
+                                            <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 italic">Account Password</label>
                                             {mode === 'login' && (
-                                                <button type="button" onClick={() => setMode('forgot-password')} className="text-[10px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 transition-colors">
-                                                    Recover?
+                                                <button type="button" onClick={() => setMode('forgot-password')} className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-600 hover:text-primary-700 transition-colors">
+                                                    Forgot Password?
                                                 </button>
                                             )}
                                         </div>
                                         <div className="relative group">
-                                            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-blue-500 transition-colors" />
+                                            <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 value={password}
                                                 onChange={e => setPassword(e.target.value)}
                                                 placeholder="••••••••••••"
                                                 required
-                                                className="w-full h-16 pl-14 pr-14 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/10 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold"
+                                                className="w-full h-18 pl-16 pr-16 rounded-[20px] bg-white border border-slate-100 text-slate-900 placeholder:text-slate-200 focus:outline-none focus:ring-8 focus:ring-primary-600/5 focus:border-primary-600/50 transition-all font-bold shadow-sm"
                                             />
-                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors">
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-200 hover:text-slate-900 transition-colors">
                                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                             </button>
                                         </div>
@@ -278,13 +259,13 @@ export default function Login() {
 
                                 <Button
                                     type="submit"
-                                    className="w-full h-18 rounded-2xl bg-white text-black hover:bg-white/90 font-black uppercase text-xs tracking-[0.2em] shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all transform active:scale-95 disabled:opacity-50 mt-4"
+                                    className="w-full h-18 rounded-[24px] bg-slate-900 text-white hover:bg-black font-bold uppercase text-[11px] tracking-[0.4em] shadow-2xl shadow-slate-900/10 transition-all transform active:scale-95 disabled:opacity-50 mt-4 leading-none"
                                     disabled={loading}
                                 >
-                                    {loading ? "Decrypting Protocols..." : (
-                                        <span className="flex items-center gap-3 justify-center">
-                                            {mode === 'login' ? 'Access Console' : mode === 'signup' ? 'Deploy Infrastructure' : 'Send Pulse'}
-                                            <ArrowRight className="w-4 h-4" />
+                                    {loading ? "Processing..." : (
+                                        <span className="flex items-center gap-4 justify-center">
+                                            {mode === 'login' ? 'Login Now' : 'Send Instructions'}
+                                            <ArrowRight className="w-5 h-5 stroke-[3]" />
                                         </span>
                                     )}
                                 </Button>
@@ -292,24 +273,24 @@ export default function Login() {
                         </motion.div>
                     </AnimatePresence>
 
-                    <div className="pt-8 text-center flex flex-col gap-4">
-                        <button
-                            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                            className="text-sm font-bold text-white/40 hover:text-white transition-all group"
-                        >
-                            {mode === 'login'
-                                ? <>Already verified? <span className="text-white group-hover:text-blue-500 transition-colors">Return to Console</span></>
-                                : <>Already have an account? <span className="text-white group-hover:text-blue-500 transition-colors">Sign In</span></>}
-                        </button>
+                    <div className="pt-10 text-center flex flex-col gap-8">
+                        {mode === 'forgot-password' && (
+                            <button
+                                onClick={() => setMode('login')}
+                                className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-all group uppercase tracking-[0.2em]"
+                            >
+                                Already have an account? <span className="text-primary-600 group-hover:underline ml-1">Return to Login</span>
+                            </button>
+                        )}
 
-                        <Link to="/onboarding" className="text-sm font-bold text-white/40 hover:text-white transition-all group">
-                            New here? <span className="text-emerald-400 group-hover:text-emerald-300 transition-colors">Start your free setup →</span>
+                        <Link to={`/onboarding${window.location.search}`} className="text-xs font-bold text-slate-900 transition-all group uppercase tracking-[0.4em] flex items-center justify-center gap-3">
+                            No account yet? <span className="w-8 h-px bg-slate-900/10" /> <span className="text-primary-600 group-hover:translate-x-1 transition-transform">Create New Store →</span>
                         </Link>
 
-                        <div className="pt-6 border-t border-white/5 flex gap-8 justify-center opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">PCI-DSS Level 1</span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">GDPR Compliant</span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">ISO 27001</span>
+                        <div className="pt-8 border-t border-slate-100 flex gap-8 justify-center opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">PCI-DSS L1</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">SOC2 Type II</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">ISO 27001</span>
                         </div>
                     </div>
                 </div>

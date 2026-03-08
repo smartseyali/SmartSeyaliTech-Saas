@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import {
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 export default function SuperAdminDashboard() {
     const { setCompany } = useTenant();
+    const navigate = useNavigate();
     const [companiesList, setCompaniesList] = useState<any[]>([]);
     const [stats, setStats] = useState({ companies: 0, users: 0, revenue: 0 });
     const [loading, setLoading] = useState(true);
@@ -188,7 +190,7 @@ export default function SuperAdminDashboard() {
                                                     className="rounded-xl font-bold h-10 gap-2 border-slate-200"
                                                     onClick={() => {
                                                         setCompany(company.id);
-                                                        window.location.href = "/ecommerce";
+                                                        navigate("/ecommerce");
                                                     }}
                                                 >
                                                     Access Node <ExternalLink className="w-3.5 h-3.5" />

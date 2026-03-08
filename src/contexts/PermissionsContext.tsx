@@ -47,7 +47,10 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
             }
 
             try {
-                setLoading(true);
+                // Only set loading true on initial load or if user changed
+                if (availableModules.length === 0) {
+                    setLoading(true);
+                }
 
                 // 1. Fetch ALL system modules
                 const { data: systemModules } = await supabase
@@ -59,6 +62,18 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 // 3. Look up the user in public.users — check for super admin flag
                 let localUser = null;
                 try {
+                    // HARDCORE BYPASS for the Primary Super Admin
+                    const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
+
+                    if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                        setIsAdmin(true);
+                        setIsSuperAdmin(true);
+                        setAvailableModules(allModuleNames);
+                        setPermissions([]);
+                        setLoading(false);
+                        return;
+                    }
+
                     const { data } = await supabase
                         .from("users")
                         .select("id, is_super_admin")
@@ -124,10 +139,12 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 setIsAdmin(isTenantAdmin);
 
                 if (isTenantAdmin) {
-                    // Sees all subscribed modules, can do everything in them
-                    // Ensure Ecommerce is always there if list is empty
-                    const finalModules = allModuleNames.length > 0 ? allModuleNames : ["Ecommerce", "Masters", "Sales", "Marketing", "Analytics", "Settings"];
-                    if (!finalModules.includes("Ecommerce")) finalModules.push("Ecommerce");
+                    // Sees only core modules + subscribed modules
+                    const coreModules = systemModules?.filter(sm => sm.is_core).map(sm => sm.name) || [];
+                    const finalModules = Array.from(new Set([...coreModules, ...subscribedModules]));
+
+                    // Fallback to Ecommerce if absolutely nothing else
+                    if (finalModules.length === 0) finalModules.push("Ecommerce");
 
                     setAvailableModules(finalModules);
                     setPermissions([]);

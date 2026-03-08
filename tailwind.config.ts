@@ -25,6 +25,16 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          50: '#e0fbfc',
+          100: '#b2f1f7',
+          200: '#7de6f2',
+          300: '#3fd8ea',
+          400: '#1ac7db',
+          500: '#00b4cc',
+          600: '#009bb0',
+          700: '#007c8c',
+          800: '#005e68',
+          900: '#003f44',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -99,6 +109,16 @@ export default {
           from: { opacity: "0", transform: "translateX(-12px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
+        "slide-in-up": {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(20px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
         "scale-in": {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
@@ -109,9 +129,11 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
         "slide-in-left": "slide-in-left 0.3s ease-out",
+        "slide-in-up": "slide-in-up 0.6s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
