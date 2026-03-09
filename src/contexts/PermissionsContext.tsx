@@ -47,33 +47,30 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
             }
 
             try {
-                // Only set loading true on initial load or if user changed
-                if (availableModules.length === 0) {
-                    setLoading(true);
-                }
+                // Always set loading true when starting a fresh check
+                setLoading(true);
 
-                // 1. Fetch ALL system modules
+                // 1. Fetch ALL system modules (needed for Super Admin or for general lookup)
                 const { data: systemModules } = await supabase
                     .from("system_modules")
-                    .select("id, name, is_core");
+                    .select("id, name, slug, is_core");
 
-                const allModuleNames = systemModules?.map(sm => sm.name) || [];
+                const allModuleIdentifiers = systemModules?.flatMap(sm => [sm.name, sm.slug]) || [];
+
+                // 2. HARDCORE BYPASS for the Primary Super Admin
+                const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
+                if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                    setIsAdmin(true);
+                    setIsSuperAdmin(true);
+                    setAvailableModules(allModuleIdentifiers.filter(Boolean) as string[]);
+                    setPermissions([]);
+                    setLoading(false);
+                    return;
+                }
 
                 // 3. Look up the user in public.users — check for super admin flag
                 let localUser = null;
                 try {
-                    // HARDCORE BYPASS for the Primary Super Admin
-                    const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
-
-                    if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-                        setIsAdmin(true);
-                        setIsSuperAdmin(true);
-                        setAvailableModules(allModuleNames);
-                        setPermissions([]);
-                        setLoading(false);
-                        return;
-                    }
-
                     const { data } = await supabase
                         .from("users")
                         .select("id, is_super_admin")
@@ -88,24 +85,28 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 if (localUser?.is_super_admin) {
                     setIsAdmin(true);
                     setIsSuperAdmin(true);
-                    setAvailableModules(allModuleNames);
+                    setAvailableModules(allModuleIdentifiers.filter(Boolean) as string[]);
                     setPermissions([]);
                     setLoading(false);
                     return;
                 }
 
+                // If not super admin, ensure the flag is false
                 setIsSuperAdmin(false);
 
-                // 4. No active company → default to all modules visible (shouldn't happen post-onboarding)
+                // 5. No active company → default to Ecommerce visible + core modules
                 if (!activeCompany) {
                     setIsAdmin(false);
-                    setAvailableModules(["Ecommerce"]);
+                    // Core modules are always available to help navigation
+                    const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
+                    const finalModules = Array.from(new Set([...coreModules, "Ecommerce", "ecommerce"])).filter(Boolean) as string[];
+                    setAvailableModules(finalModules);
                     setPermissions([]);
                     setLoading(false);
                     return;
                 }
 
-                // 5. Check company_users mapping for this user in the active company
+                // 6. Check company_users mapping for this user in the active company
                 let companyMapping: any = null;
                 if (localUser) {
                     const { data } = await supabase
@@ -117,7 +118,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     companyMapping = data;
                 }
 
-                // 6. Fetch the subscribed modules for this company
+                // 7. Fetch the subscribed modules for this company
                 const { data: companyModules } = await supabase
                     .from("company_modules")
                     .select("module_id")
@@ -127,9 +128,9 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 const purchasedModuleIds = new Set(companyModules?.map(tm => tm.module_id));
                 const subscribedModules = systemModules
                     ?.filter(sm => sm.is_core || purchasedModuleIds.has(sm.id))
-                    .map(sm => sm.name) || [];
+                    .flatMap(sm => [sm.name, sm.slug]) || [];
 
-                // 7. Determine tenant role
+                // 8. Determine tenant role
                 const isTenantAdmin =
                     (companyMapping && (
                         companyMapping.role === "owner"
@@ -139,19 +140,19 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 setIsAdmin(isTenantAdmin);
 
                 if (isTenantAdmin) {
-                    // Sees only core modules + subscribed modules
-                    const coreModules = systemModules?.filter(sm => sm.is_core).map(sm => sm.name) || [];
-                    const finalModules = Array.from(new Set([...coreModules, ...subscribedModules]));
+                    // Sees core modules + subscribed modules
+                    const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
+                    const finalModules = Array.from(new Set([...coreModules, ...subscribedModules])).filter(Boolean) as string[];
 
                     // Fallback to Ecommerce if absolutely nothing else
-                    if (finalModules.length === 0) finalModules.push("Ecommerce");
+                    if (finalModules.length === 0) finalModules.push("Ecommerce", "ecommerce");
 
                     setAvailableModules(finalModules);
                     setPermissions([]);
                 } else {
                     // STAFF MEMBER: Fetch granular permissions
-                    const coreModules = systemModules?.filter(sm => sm.is_core).map(sm => sm.name) || [];
-                    setAvailableModules(coreModules);
+                    const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
+                    setAvailableModules(coreModules.filter(Boolean) as string[]);
 
                     if (companyMapping) {
                         const { data: userPerms } = await supabase
@@ -170,7 +171,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 // Fail-open: if something breaks, keep user accessible
                 if (user) {
                     setIsAdmin(true);
-                    setAvailableModules(["Sales", "Purchase", "Inventory", "Accounting", "HR", "Masters", "Ecommerce"]);
+                    setAvailableModules(["Sales", "Purchase", "Inventory", "Accounting", "HR", "Masters", "Ecommerce", "ecommerce"]);
                 }
             } finally {
                 setLoading(false);
@@ -178,7 +179,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
         };
 
         loadPermissions();
-    }, [activeCompany, user, refreshTick]); // refreshTick triggers re-fetch on demand
+    }, [activeCompany?.id, user?.id, refreshTick]); // More specific dependencies
 
     const can = (action: string, resource: string) => {
         if (isAdmin) return true;
@@ -188,7 +189,14 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
         );
     };
 
-    const hasModule = (moduleName: string) => availableModules.includes(moduleName);
+    const hasModule = (moduleName: string) => {
+        if (!moduleName) return true;
+        // Super Admins ALWAYS have all modules
+        if (isSuperAdmin) return true;
+
+        const normalized = moduleName.toLowerCase();
+        return availableModules.some(m => m.toLowerCase() === normalized);
+    };
 
     return (
         <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, isAdmin, isSuperAdmin, loading, refreshPermissions }}>
@@ -204,4 +212,3 @@ export function usePermissions() {
     }
     return context;
 }
-

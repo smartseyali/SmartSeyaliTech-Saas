@@ -33,7 +33,7 @@ function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubs
         <motion.div
             whileHover={isAvailable ? { y: -4, scale: 1.01 } : {}}
             whileTap={isAvailable ? { scale: 0.98 } : {}}
-            onClick={() => isAvailable && (canAccess ? onOpen(mod) : navigate('/apps/ecommerce/billing'))}
+            onClick={() => isAvailable && (canAccess ? onOpen(mod) : navigate(`/apps/ecommerce/billing?module=${mod.id}`))}
             className={`
                 relative flex flex-col gap-5 p-6 rounded-2xl border transition-all duration-300 group
                 ${canAccess

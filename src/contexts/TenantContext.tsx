@@ -120,6 +120,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
                 setActiveCompany(savedCompany || companiesData[0] || null);
                 setNeedsOnboarding(false);
+                setLoading(false);
                 return;
             }
 
@@ -258,4 +259,3 @@ export function useTenant() {
     }
     return context;
 }
-

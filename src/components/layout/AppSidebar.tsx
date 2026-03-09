@@ -148,10 +148,10 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "crm",
             icon: Zap,
             items: [
-                { title: "Leads", url: "/apps/crm/leads", icon: Users },
-                { title: "Deals", url: "/apps/crm/deals", icon: ShoppingBag },
-                { title: "Pipeline View", url: "/apps/crm/pipeline", icon: LayoutGrid },
-                { title: "Forecast", url: "/apps/crm/forecast", icon: BarChart3 },
+                { title: "Leads", url: "/apps/crm/leads", icon: Users, resource: "leads" },
+                { title: "Deals", url: "/apps/crm/deals", icon: ShoppingBag, resource: "deals" },
+                { title: "Pipeline View", url: "/apps/crm/pipeline", icon: LayoutGrid, resource: "deals" },
+                { title: "Forecast", url: "/apps/crm/forecast", icon: BarChart3, resource: "analytics" },
             ],
         },
         {
@@ -159,9 +159,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "crm",
             icon: Users,
             items: [
-                { title: "Contacts", url: "/apps/crm/contacts", icon: Users },
-                { title: "Accounts", url: "/apps/crm/accounts", icon: Library },
-                { title: "Segments", url: "/apps/crm/segments", icon: Tag },
+                { title: "Contacts", url: "/apps/crm/contacts", icon: Users, resource: "customers" },
+                { title: "Accounts", url: "/apps/crm/accounts", icon: Library, resource: "customers" },
+                { title: "Segments", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
             ],
         }
     ],
@@ -171,9 +171,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "pos",
             icon: LayoutGrid,
             items: [
-                { title: "Terminal", url: "/apps/pos/terminal", icon: Zap },
-                { title: "Register", url: "/apps/pos/register", icon: CreditCard },
-                { title: "POS Orders", url: "/apps/pos/orders", icon: ShoppingBag },
+                { title: "Terminal", url: "/apps/pos/terminal", icon: Zap, resource: "orders" },
+                { title: "Register", url: "/apps/pos/register", icon: CreditCard, resource: "orders" },
+                { title: "POS Orders", url: "/apps/pos/orders", icon: ShoppingBag, resource: "orders" },
             ],
         }
     ],
@@ -183,10 +183,10 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "inventory",
             icon: Boxes,
             items: [
-                { title: "Items", url: "/apps/inventory/items", icon: Boxes },
-                { title: "Stock Levels", url: "/apps/inventory/levels", icon: BarChart3 },
-                { title: "Warehouses", url: "/apps/inventory/warehouses", icon: MapPin },
-                { title: "Transfers", url: "/apps/inventory/transfers", icon: Truck },
+                { title: "Items", url: "/apps/inventory/items", icon: Boxes, resource: "products" },
+                { title: "Stock Levels", url: "/apps/inventory/levels", icon: BarChart3, resource: "products" },
+                { title: "Warehouses", url: "/apps/inventory/warehouses", icon: MapPin, resource: "settings" },
+                { title: "Transfers", url: "/apps/inventory/transfers", icon: Truck, resource: "products" },
             ],
         }
     ],
@@ -196,9 +196,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "hrms",
             icon: Users,
             items: [
-                { title: "Directory", url: "/apps/hrms/directory", icon: Users },
-                { title: "Departments", url: "/apps/hrms/departments", icon: LayoutGrid },
-                { title: "Onboarding", url: "/apps/hrms/onboarding", icon: Rocket },
+                { title: "Directory", url: "/apps/hrms/directory", icon: Users, resource: "team" },
+                { title: "Departments", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
+                { title: "Onboarding", url: "/apps/hrms/onboarding", icon: Rocket, resource: "team" },
             ],
         },
         {
@@ -206,9 +206,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "hrms",
             icon: Zap,
             items: [
-                { title: "Attendance", url: "/apps/hrms/attendance", icon: Check },
-                { title: "Leave Tracker", url: "/apps/hrms/leave", icon: MapPin },
-                { title: "Payroll", url: "/apps/hrms/payroll", icon: CreditCard },
+                { title: "Attendance", url: "/apps/hrms/attendance", icon: Check, resource: "attendance" },
+                { title: "Leave Tracker", url: "/apps/hrms/leave", icon: MapPin, resource: "attendance" },
+                { title: "Payroll", url: "/apps/hrms/payroll", icon: CreditCard, resource: "payroll" },
             ],
         }
     ],
@@ -218,9 +218,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "purchase",
             icon: ShoppingBag,
             items: [
-                { title: "Vendors", url: "/apps/purchase/vendors", icon: Users },
-                { title: "Purchase Orders", url: "/apps/purchase/orders", icon: ShoppingBag },
-                { title: "Goods Receipt", url: "/apps/purchase/receipts", icon: Box },
+                { title: "Vendors", url: "/apps/purchase/vendors", icon: Users, resource: "customers" },
+                { title: "Purchase Orders", url: "/apps/purchase/orders", icon: ShoppingBag, resource: "orders" },
+                { title: "Goods Receipt", url: "/apps/purchase/receipts", icon: Box, resource: "orders" },
             ],
         }
     ],
@@ -230,9 +230,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "sales",
             icon: ShoppingBag,
             items: [
-                { title: "Quotations", url: "/apps/sales/quotations", icon: Library },
-                { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag },
-                { title: "Customers", url: "/apps/sales/customers", icon: Users },
+                { title: "Quotations", url: "/apps/sales/quotations", icon: Library, resource: "orders" },
+                { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag, resource: "orders" },
+                { title: "Customers", url: "/apps/sales/customers", icon: Users, resource: "customers" },
             ]
         }
     ],
@@ -242,9 +242,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "books",
             icon: BarChart3,
             items: [
-                { title: "Chart of Accounts", url: "/apps/books/accounts", icon: LayoutGrid },
-                { title: "Journals", url: "/apps/books/journals", icon: Library },
-                { title: "Expenses", url: "/apps/books/expenses", icon: CreditCard },
+                { title: "Chart of Accounts", url: "/apps/books/accounts", icon: LayoutGrid, resource: "settings" },
+                { title: "Journals", url: "/apps/books/journals", icon: Library, resource: "orders" },
+                { title: "Expenses", url: "/apps/books/expenses", icon: CreditCard, resource: "orders" },
             ]
         }
     ],
@@ -254,8 +254,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "invoicing",
             icon: CreditCard,
             items: [
-                { title: "Invoices", url: "/apps/invoicing/invoices", icon: CreditCard },
-                { title: "Payments", url: "/apps/invoicing/payments", icon: Zap },
+                { title: "Invoices", url: "/apps/invoicing/invoices", icon: CreditCard, resource: "orders" },
+                { title: "Payments", url: "/apps/invoicing/payments", icon: Zap, resource: "orders" },
             ]
         }
     ],
@@ -265,8 +265,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "payroll",
             icon: CreditCard,
             items: [
-                { title: "Salary Structures", url: "/apps/payroll/structures", icon: LayoutGrid },
-                { title: "Run Payroll", url: "/apps/payroll/run", icon: Zap },
+                { title: "Salary Structures", url: "/apps/payroll/structures", icon: LayoutGrid, resource: "payroll" },
+                { title: "Run Payroll", url: "/apps/payroll/run", icon: Zap, resource: "payroll" },
             ]
         }
     ],
@@ -276,8 +276,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "helpdesk",
             icon: ShieldCheck,
             items: [
-                { title: "Tickets", url: "/apps/helpdesk/tickets", icon: Tag },
-                { title: "SLA Policies", url: "/apps/helpdesk/sla", icon: ShieldCheck },
+                { title: "Tickets", url: "/apps/helpdesk/tickets", icon: Tag, resource: "orders" },
+                { title: "SLA Policies", url: "/apps/helpdesk/sla", icon: ShieldCheck, resource: "settings" },
             ]
         }
     ],
@@ -287,8 +287,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "hospital",
             icon: Zap,
             items: [
-                { title: "Patients", url: "/apps/hospital/patients", icon: Users },
-                { title: "Appointments", url: "/apps/hospital/appointments", icon: MapPin },
+                { title: "Patients", url: "/apps/hospital/patients", icon: Users, resource: "customers" },
+                { title: "Appointments", url: "/apps/hospital/appointments", icon: MapPin, resource: "orders" },
             ]
         }
     ],
@@ -298,8 +298,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "whatsapp",
             icon: Zap,
             items: [
-                { title: "Templates", url: "/apps/whatsapp/templates", icon: Library },
-                { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Zap },
+                { title: "Templates", url: "/apps/whatsapp/templates", icon: Library, resource: "marketing" },
+                { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Zap, resource: "marketing" },
             ]
         }
     ],
@@ -309,15 +309,15 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "landing-page",
             icon: Globe2,
             items: [
-                { title: "Pages", url: "/apps/landing-page/pages", icon: LayoutGrid },
-                { title: "Themes", url: "/apps/landing-page/themes", icon: ImageIcon },
+                { title: "Pages", url: "/apps/landing-page/pages", icon: LayoutGrid, resource: "settings" },
+                { title: "Themes", url: "/apps/landing-page/themes", icon: ImageIcon, resource: "settings" },
             ]
         }
     ]
 };
 
 // Help detect active module from route
-const getCurrentModule = (pathname: string): string => {
+export const getCurrentModule = (pathname: string): string => {
     // Expected path structure: /apps/<module_name>/...
     const parts = pathname.split('/');
     if (parts.length >= 3 && parts[1] === 'apps') {

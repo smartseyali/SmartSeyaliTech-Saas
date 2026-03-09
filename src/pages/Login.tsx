@@ -39,13 +39,15 @@ export default function Login() {
         try {
             // HARDCORE BYPASS for the Primary Super Admin
             const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
+            const isSuperAdminByEmail = user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
 
-            if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+            if (isSuperAdminByEmail) {
                 console.log("Super Admin detected via email bypass");
                 navigate("/super-admin");
                 return;
             }
 
+            // Check DB for Super Admin status
             const { data: localUser } = await supabase
                 .from('users')
                 .select('is_super_admin')
@@ -57,7 +59,7 @@ export default function Login() {
                 return;
             }
 
-            // Check if the user has any company (owned OR as a member)
+            // Regular User Logic: Check if they have a company
             const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
                 supabase.from('company_users').select('role').eq('user_id', user.id),
                 supabase.from('companies').select('id').eq('user_id', user.id).limit(1)
@@ -71,7 +73,7 @@ export default function Login() {
                 return;
             }
 
-            // Go to ecommerce dashboard (App Launcher)
+            // Go to dashboard (App Launcher)
             navigate("/apps");
         } catch (err) {
             console.error("Redirect Error:", err);
