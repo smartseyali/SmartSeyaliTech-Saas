@@ -6,16 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
   Send,
   MessageSquare,
   Users,
   Calendar
 } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      value: "smartseyali@gmail.com",
+      value: `support@${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com`,
       description: "Send us an email anytime"
     },
     {
@@ -114,7 +115,7 @@ const Contact = () => {
               Get in Touch
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Ready to start your next project? We'd love to hear from you. 
+              Ready to start your next project? We'd love to hear from you.
               Send us a message and we'll respond as soon as possible.
             </p>
           </div>
@@ -203,8 +204,8 @@ const Contact = () => {
                       />
                     </div>
 
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full bg-primary-600 hover:bg-primary-700"
                       disabled={isSubmitting}
                     >
@@ -276,7 +277,7 @@ const Contact = () => {
               Located in the heart of Tiruppur district
             </p>
           </div>
-          
+
           {/* Placeholder for Google Maps */}
           <div className="bg-gray-300 rounded-lg h-96 flex items-center justify-center">
             <div className="text-center">
@@ -312,7 +313,7 @@ const Contact = () => {
                   How long does a typical project take?
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  Project timelines vary based on complexity, but most web applications 
+                  Project timelines vary based on complexity, but most web applications
                   take 3-6 months, mobile apps 4-8 months, and desktop applications 2-5 months.
                 </p>
               </CardContent>
@@ -324,7 +325,7 @@ const Contact = () => {
                   Do you provide ongoing support?
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  Yes, we offer comprehensive support and maintenance packages to ensure 
+                  Yes, we offer comprehensive support and maintenance packages to ensure
                   your software continues to perform optimally after launch.
                 </p>
               </CardContent>
@@ -336,7 +337,7 @@ const Contact = () => {
                   What technologies do you work with?
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  We work with modern technologies including React, Node.js, React Native, 
+                  We work with modern technologies including React, Node.js, React Native,
                   .NET, Python, and cloud platforms like AWS and Azure.
                 </p>
               </CardContent>
@@ -348,7 +349,7 @@ const Contact = () => {
                   How do you handle project communication?
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  We maintain regular communication through weekly progress reports, 
+                  We maintain regular communication through weekly progress reports,
                   video calls, and project management tools to keep you updated.
                 </p>
               </CardContent>

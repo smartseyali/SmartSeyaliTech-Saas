@@ -8,6 +8,8 @@ import { supabase } from "@/lib/supabase";
 import { Check, ArrowRight, ArrowLeft, Loader2, Rocket, Eye, X, Mail, Lock, User as UserIcon, LogOut, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import PLATFORM_CONFIG from "@/config/platform";
+import { PLATFORM_MODULES, type PlatformModule } from "@/config/modules";
 
 // ── Types ──────────────────────────────────────────────────
 interface TemplateEntry {
@@ -450,8 +452,8 @@ export default function Onboarding() {
                             <Rocket className="w-5 h-5 text-white" />
                         </div>
                         <div className="hidden sm:block">
-                            <span className="text-[10px] font-black text-primary-600 uppercase tracking-[0.4em] block leading-none mb-1">Smartseyali</span>
-                            <span className="text-[8px] font-bold text-primary-600 uppercase tracking-widest block leading-none">Business Platform</span>
+                            <span className="text-[10px] font-black text-primary-600 uppercase tracking-[0.4em] block leading-none mb-1">{PLATFORM_CONFIG.name}</span>
+                            <span className="text-[8px] font-bold text-primary-600 uppercase tracking-widest block leading-none">{PLATFORM_CONFIG.tagline}</span>
                         </div>
                     </div>
 
@@ -837,7 +839,7 @@ export default function Onboarding() {
                                         className="w-full h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary-600/10 transition-all">
                                         Use This Theme
                                     </Button>
-                                    <p className="text-center text-[8px] font-black text-slate-200 uppercase tracking-[0.3em]">Smartseyali Proprietary Design</p>
+                                    <p className="text-center text-[8px] font-black text-slate-200 uppercase tracking-[0.3em]">{PLATFORM_CONFIG.name} Proprietary Design</p>
                                 </div>
                             </div>
                         </motion.div>

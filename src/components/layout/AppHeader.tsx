@@ -16,6 +16,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PLATFORM_MODULES } from "@/config/modules";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export function AppHeader() {
     const { user, signOut } = useAuth();
@@ -59,7 +60,7 @@ export function AppHeader() {
                         </PopoverTrigger>
                         <PopoverContent align="end" sideOffset={8} className="w-[340px] p-4 rounded-2xl shadow-2xl border border-slate-100">
                             <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Smartseyali Apps</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{PLATFORM_CONFIG.name} Apps</p>
                                 <Link to="/apps" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1">
                                     All Apps <ExternalLink className="w-3 h-3" />
                                 </Link>

@@ -27,7 +27,8 @@ import {
     Award,
     Layout,
     Rocket,
-    Box
+    Box,
+    FileInput
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -35,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
+import PLATFORM_CONFIG from "@/config/platform";
 
 interface NavItem {
     title: string;
@@ -219,8 +221,10 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             icon: ShoppingBag,
             items: [
                 { title: "Vendors", url: "/apps/purchase/vendors", icon: Users, resource: "customers" },
+                { title: "Purchase Requests", url: "/apps/purchase/requests", icon: FileInput, resource: "orders" },
                 { title: "Purchase Orders", url: "/apps/purchase/orders", icon: ShoppingBag, resource: "orders" },
                 { title: "Goods Receipt", url: "/apps/purchase/receipts", icon: Box, resource: "orders" },
+                { title: "Purchase Bills", url: "/apps/purchase/bills", icon: CreditCard, resource: "orders" },
             ],
         }
     ],
@@ -232,6 +236,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             items: [
                 { title: "Quotations", url: "/apps/sales/quotations", icon: Library, resource: "orders" },
                 { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag, resource: "orders" },
+                { title: "Delivery Notes", url: "/apps/sales/deliveries", icon: Truck, resource: "orders" },
+                { title: "Sales Invoices", url: "/apps/invoicing/invoices", icon: CreditCard, resource: "orders" },
                 { title: "Customers", url: "/apps/sales/customers", icon: Users, resource: "customers" },
             ]
         }
@@ -370,7 +376,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const isSuperAdminView = location.pathname.startsWith('/super-admin');
 
     const logoUrl = settings?.logo_url;
-    const storeName = isSuperAdminView ? "Platform Admin" : (settings?.store_name || activeCompany?.name || "LiteAdmin");
+    const storeName = isSuperAdminView ? "Platform Admin" : (settings?.store_name || activeCompany?.name || PLATFORM_CONFIG.name);
 
     // Dynamic Navigation Generation based on Active Module & Industry
     const activeModule = getCurrentModule(location.pathname);

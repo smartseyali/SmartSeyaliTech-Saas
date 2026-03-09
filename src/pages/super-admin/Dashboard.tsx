@@ -7,6 +7,7 @@ import {
     MoreVertical, ExternalLink, ShieldCheck,
     TrendingUp, ArrowUpRight, Globe, Settings
 } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -81,7 +82,7 @@ export default function SuperAdminDashboard() {
                         </div>
                         <h1 className="text-3xl font-black tracking-tight uppercase italic">Control Center</h1>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60 ml-1">Universal Smartseyali Administration</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60 ml-1">Universal {PLATFORM_CONFIG.name} Administration</p>
                 </div>
 
                 <div className="flex gap-4">
@@ -128,9 +129,14 @@ export default function SuperAdminDashboard() {
             <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-2xl shadow-black/5">
                 <div className="p-8 border-b border-border flex items-center justify-between bg-secondary/5">
                     <h2 className="text-xl font-black tracking-tight uppercase italic">Enterprise Registry</h2>
-                    <Button className="rounded-xl font-bold gap-2">
-                        <LayoutDashboard className="w-4 h-4" /> System Logs
-                    </Button>
+                    <div className="flex gap-3">
+                        <Button variant="outline" className="rounded-xl font-bold gap-2" onClick={() => navigate('/super-admin/modules')}>
+                            <LayoutDashboard className="w-4 h-4" /> Manage Modules
+                        </Button>
+                        <Button className="rounded-xl font-bold gap-2">
+                            <Settings className="w-4 h-4" /> System Logs
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -164,7 +170,7 @@ export default function SuperAdminDashboard() {
                                             <div className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer">
                                                 <Globe className="w-3.5 h-3.5" />
                                                 <span className="text-xs font-bold tracking-tight underline decoration-indigo-500/30 underline-offset-4">
-                                                    {company.subdomain}.smartseyali.tech
+                                                    {company.subdomain}.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.tech
                                                 </span>
                                             </div>
                                         </td>

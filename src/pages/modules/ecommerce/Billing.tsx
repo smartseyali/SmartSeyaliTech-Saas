@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PLATFORM_MODULES, type PlatformModule } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export default function Billing() {
     const { activeCompany } = useTenant();
@@ -443,7 +444,7 @@ export default function Billing() {
 
             {/* Platform Footer Mark */}
             <div className="pt-20 pb-10 text-center opacity-20 group">
-                <p className="text-[10px] font-black uppercase tracking-[1em] text-slate-400 group-hover:text-blue-600 transition-colors">Digital Infrastructure Managed by Smartseyali Engine v4.0.1</p>
+                <p className="text-[10px] font-black uppercase tracking-[1em] text-slate-400 group-hover:text-blue-600 transition-colors">Digital Infrastructure Managed by {PLATFORM_CONFIG.name} Engine v4.0.1</p>
             </div>
         </div>
     );

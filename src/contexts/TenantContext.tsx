@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import PLATFORM_CONFIG from "@/config/platform";
 import { Rocket } from "lucide-react";
 
 interface Company {
@@ -88,8 +89,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle();
 
             // HARDCORE BYPASS for the Primary Super Admin
-            const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
-            const isSuperAdminByEmail = user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+            const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
 
             // AUTO-SYNC: If user exists in Auth but not in public profiles, create it
             if (!localUser && !isSuperAdminByEmail) {
@@ -237,7 +237,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                             <Rocket className="w-10 h-10" />
                         </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-800 mb-2">Smartseyali Tech</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-800 mb-2">{PLATFORM_CONFIG.name} {PLATFORM_CONFIG.tagline}</span>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1">
                             <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.3s]" />

@@ -1,12 +1,13 @@
 import React from "react";
+import PLATFORM_CONFIG from "@/config/platform";
 
-const PrivacyPolicy= () => {
+const PrivacyPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 text-gray-800">
       <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
       <p className="mb-4">Effective Date: 24-07-2025</p>
-      <p className="mb-4">Smartseyali Tech</p>
-      <p className="mb-4">Website: <a href="https://www.smartseyali.com" className="text-blue-600 underline">https://www.smartseyali.com</a></p>
+      <p className="mb-4">{PLATFORM_CONFIG.name} Tech</p>
+      <p className="mb-4">Website: <a href={`https://www.${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com`} className="text-blue-600 underline">https://www.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</a></p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-2">1. Information We Collect</h2>
       <p className="mb-2 font-semibold">a) User-Provided Information</p>
@@ -84,10 +85,10 @@ const PrivacyPolicy= () => {
         If you have any questions about this Privacy Policy, please contact us:
       </p>
       <ul className="list-disc pl-6 mb-4">
-        <li><strong>Smartseyali Tech</strong></li>
-        <li>Email: support@smartseyali.com</li>
+        <li><strong>{PLATFORM_CONFIG.name} Tech</strong></li>
+        <li>Email: support@{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</li>
         <li>Phone: +91-9047736612</li>
-        <li>Website: <a href="https://www.smartseyali.com" className="text-blue-600 underline">https://www.smartseyali.com</a></li>
+        <li>Website: <a href={`https://www.${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com`} className="text-blue-600 underline">https://www.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</a></li>
       </ul>
     </div>
   );

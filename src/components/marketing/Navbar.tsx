@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Code, Smartphone, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +26,7 @@ export const Navbar = () => {
           <Link to="/" className="flex items-center">
             <img
               src="/logo.png"
-              alt="Smartseyali Tech Logo"
+              alt={`${PLATFORM_CONFIG.name} Tech Logo`}
               className="h-12 w-auto object-contain"
             />
           </Link>

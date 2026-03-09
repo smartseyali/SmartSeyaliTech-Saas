@@ -1,7 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  Smartseyali Platform — Module Registry
-//  Every SaaS module is defined here. This is the single source
-//  of truth for all apps in the platform.
+//  Unified SaaS Platform — Module Registry
 // ═══════════════════════════════════════════════════════════════
 
 export interface PlatformModule {
@@ -195,10 +193,11 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
         isCore: false,
         features: [
-            'Quotation management',
-            'Sales orders',
-            'Customer database',
-            'Payment recording',
+            'Quotation Management (Header-Line)',
+            'Sales Orders & Confirmation',
+            'Delivery Notes & Logistics',
+            'Automated Sales Invoicing',
+            'Customer Ledger Tracking',
         ],
         needsTemplate: false,
     },
@@ -266,10 +265,11 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         includedInPlans: ['professional', 'enterprise', 'custom'],
         isCore: false,
         features: [
-            'Vendor management',
-            'Purchase orders',
-            'GRN & 3-way matching',
-            'Vendor invoices',
+            'Purchase Requests (Internal Demand)',
+            'Vendor Management & RFQs',
+            'Purchase Orders (Header-Line)',
+            'Goods Receipt (GRN)',
+            'Vendor Bills (Accounts Payable)',
         ],
         needsTemplate: false,
     },

@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Target, Eye, Users, Lightbulb, Award, Rocket } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 
 const About = () => {
   const values = [
@@ -33,10 +34,10 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              About Smartseyali Tech
+              About {PLATFORM_CONFIG.name} Tech
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We are a passionate team of technology innovators dedicated to creating 
+              We are a passionate team of technology innovators dedicated to creating
               software solutions that make a real difference in how businesses operate and grow.
             </p>
           </div>
@@ -51,26 +52,26 @@ const About = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-600">
                 <p>
-                  Smartseyali Tech was founded with a simple yet powerful vision: to bridge 
-                  the gap between complex business challenges and innovative technology solutions. 
-                  We recognized that many businesses struggle to leverage technology effectively, 
+                  {PLATFORM_CONFIG.name} Tech was founded with a simple yet powerful vision: to bridge
+                  the gap between complex business challenges and innovative technology solutions.
+                  We recognized that many businesses struggle to leverage technology effectively,
                   often due to generic solutions that don't address their specific needs.
                 </p>
                 <p>
-                  Our journey began when our founders, experienced software developers and 
-                  business strategists, decided to create a company that would focus on 
-                  understanding the unique requirements of each client and delivering 
+                  Our journey began when our founders, experienced software developers and
+                  business strategists, decided to create a company that would focus on
+                  understanding the unique requirements of each client and delivering
                   custom solutions that truly make a difference.
                 </p>
                 <p>
-                  Today, we continue to grow and evolve, always staying at the forefront 
-                  of technology trends while maintaining our core commitment to delivering 
+                  Today, we continue to grow and evolve, always staying at the forefront
+                  of technology trends while maintaining our core commitment to delivering
                   exceptional value to our clients across all industries.
                 </p>
               </div>
             </div>
             <div>
-              <img 
+              <img
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop"
                 alt="Team collaboration"
                 className="rounded-lg shadow-lg"
@@ -91,9 +92,9 @@ const About = () => {
                   <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
                 </div>
                 <p className="text-gray-600 leading-relaxed">
-                  To empower businesses with innovative software solutions that drive 
-                  efficiency, growth, and success. We are committed to understanding 
-                  our clients' unique challenges and delivering technology that transforms 
+                  To empower businesses with innovative software solutions that drive
+                  efficiency, growth, and success. We are committed to understanding
+                  our clients' unique challenges and delivering technology that transforms
                   their operations and enhances their competitive advantage.
                 </p>
               </CardContent>
@@ -106,9 +107,9 @@ const About = () => {
                   <h3 className="text-2xl font-bold text-gray-900">Our Vision</h3>
                 </div>
                 <p className="text-gray-600 leading-relaxed">
-                  To become the leading technology partner for businesses seeking 
-                  innovative software solutions. We envision a future where every 
-                  organization, regardless of size, can harness the power of 
+                  To become the leading technology partner for businesses seeking
+                  innovative software solutions. We envision a future where every
+                  organization, regardless of size, can harness the power of
                   technology to achieve their goals and create lasting impact.
                 </p>
               </CardContent>
@@ -123,7 +124,7 @@ const About = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Core Values</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These fundamental principles guide everything we do and shape how we work 
+              These fundamental principles guide everything we do and shape how we work
               with our clients and each other.
             </p>
           </div>
@@ -154,7 +155,7 @@ const About = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-6">What Makes Us Different</h2>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto">
-              We don't just write code – we create solutions that understand your business, 
+              We don't just write code – we create solutions that understand your business,
               solve real problems, and grow with your success.
             </p>
           </div>

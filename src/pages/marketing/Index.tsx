@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Code, Smartphone, Monitor, Zap, Users, Award, CheckCircle, Box } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import PLATFORM_CONFIG from "@/config/platform";
 
 const Index = () => {
   const [services, setServices] = useState<any[]>([]);
@@ -73,7 +74,7 @@ const Index = () => {
                 <span className="text-primary-600">Smarter Businesses</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Smartseyali Tech develops cutting-edge software products that transform
+                {PLATFORM_CONFIG.name} Tech develops cutting-edge software products that transform
                 businesses across all domains. We specialize in web, mobile, and Windows
                 applications designed to solve real-world problems.
               </p>
@@ -137,7 +138,7 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Why Choose Smartseyali Tech?
+                Why Choose {PLATFORM_CONFIG.name} Tech?
               </h2>
               <p className="text-lg text-gray-600 mb-8">
                 We combine technical expertise with business insight to deliver

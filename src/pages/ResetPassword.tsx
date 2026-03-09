@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Lock, Eye, EyeOff, Check, ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export default function ResetPassword() {
     const navigate = useNavigate();
@@ -101,7 +102,7 @@ export default function ResetPassword() {
                                     <Sparkles className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
-                                    <span className="font-bold text-2xl tracking-tight text-primary-600 block leading-none">Smartseyali</span>
+                                    <span className="font-bold text-2xl tracking-tight text-primary-600 block leading-none">{PLATFORM_CONFIG.name}</span>
                                     <span className="font-bold text-[9px] text-slate-400 uppercase tracking-widest leading-none">Security Center</span>
                                 </div>
                             </div>

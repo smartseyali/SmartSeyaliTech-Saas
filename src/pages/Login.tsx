@@ -10,6 +10,7 @@ import {
     Chrome, Github, Twitter, Zap, Globe, Layers, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import PLATFORM_CONFIG from "@/config/platform";
 import { cn } from "@/lib/utils";
 
 export default function Login() {
@@ -38,8 +39,7 @@ export default function Login() {
 
         try {
             // HARDCORE BYPASS for the Primary Super Admin
-            const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
-            const isSuperAdminByEmail = user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+            const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
 
             if (isSuperAdminByEmail) {
                 console.log("Super Admin detected via email bypass");
@@ -126,8 +126,8 @@ export default function Login() {
                             <Zap className="w-7 h-7 fill-current" />
                         </div>
                         <div>
-                            <span className="text-slate-900 font-bold text-3xl tracking-tight block leading-none mb-1 text-primary-600 font-outfit">Smartseyali</span>
-                            <span className="text-slate-400 text-[11px] uppercase font-bold tracking-[0.4em]">Business Platform</span>
+                            <span className="text-slate-900 font-bold text-3xl tracking-tight block leading-none mb-1 text-primary-600 font-outfit">{PLATFORM_CONFIG.name}</span>
+                            <span className="text-slate-400 text-[11px] uppercase font-bold tracking-[0.4em]">{PLATFORM_CONFIG.tagline}</span>
                         </div>
                     </Link>
                 </div>
@@ -169,7 +169,7 @@ export default function Login() {
                 </div>
 
                 <div className="text-slate-300 text-[10px] font-black uppercase tracking-[0.6em]">
-                    © 2026 Smartseyali Systems · Standard Cloud
+                    © 2026 {PLATFORM_CONFIG.name} Systems · Standard Cloud
                 </div>
             </div>
 

@@ -7,6 +7,7 @@ import {
     Eye, Settings, Copy, Share2, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PLATFORM_CONFIG from "@/config/platform";
 import { cn } from "@/lib/utils";
 
 export default function LandingPageDashboard() {
@@ -36,7 +37,7 @@ export default function LandingPageDashboard() {
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Marketing Conversion Engine</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Page Builder</h1>
-                    <p className="text-slate-500 text-sm font-medium">Domain: {activeCompany?.subdomain}.smartseyali.com</p>
+                    <p className="text-slate-500 text-sm font-medium">Domain: {activeCompany?.subdomain}.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button variant="outline" className="h-10 px-4 rounded-xl border-slate-200">

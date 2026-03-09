@@ -8,6 +8,7 @@ import {
     ModuleCategory,
     type PlatformModule,
 } from "@/config/modules";
+import PLATFORM_CONFIG from "@/config/platform";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -154,7 +155,7 @@ export default function AppLauncher() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-lg shadow-lg shadow-blue-500/20">🚀</div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-600">Smartseyali Platform</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-600">{PLATFORM_CONFIG.name} Platform</span>
                         </div>
                         <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 tracking-tighter leading-none mt-2">
                             App Launcher
@@ -273,7 +274,7 @@ export default function AppLauncher() {
 
                 {/* Copyright */}
                 <div className="mt-20 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-300">© 2026 Smartseyali Systems Inc · Business Platform v4.0.1</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-300">© 2026 {PLATFORM_CONFIG.name} Systems Inc · {PLATFORM_CONFIG.tagline} v4.0.1</p>
                 </div>
 
             </div>

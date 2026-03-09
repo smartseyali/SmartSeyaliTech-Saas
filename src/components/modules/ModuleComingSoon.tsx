@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Zap, Bell } from "lucide-react";
 import { getModule } from "@/config/modules";
+import PLATFORM_CONFIG from "@/config/platform";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -95,7 +96,7 @@ export default function ModuleComingSoon({ moduleId }: Props) {
                 <div className="flex items-center justify-center gap-2 text-white/15">
                     <Zap className="w-4 h-4 text-white/10" />
                     <span className="text-[10px] font-bold uppercase tracking-widest">
-                        Smartseyali Platform · {mod.category.replace('-', ' ')} module
+                        {PLATFORM_CONFIG.name} Platform · {mod.category.replace('-', ' ')} module
                     </span>
                 </div>
             </motion.div>

@@ -41,7 +41,7 @@ export function StoreFooter() {
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                     {/* Brand */}
                     <div className="col-span-2 md:col-span-1 space-y-4">
-                        <span className="text-xl font-black italic tracking-tight">{settings?.store_name || "SmartSeyali"}</span>
+                        <span className="text-xl font-black italic tracking-tight">{settings?.store_name || "Our Store"}</span>
                         <p className="text-xs text-slate-400 leading-relaxed">
                             {settings?.footer_text || "Bharat ka apna online store — taaza products, best daam, aur ghar tak delivery."}
                         </p>
@@ -146,7 +146,7 @@ export function StoreFooter() {
             <div className="border-t border-white/10">
                 <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-5 flex flex-col md:flex-row items-center gap-3 justify-between">
                     <p className="text-[11px] text-slate-400">
-                        © {new Date().getFullYear()} {settings?.store_name || "SmartSeyali"} Pvt. Ltd. | CIN: U74999MH2024PTC000000 | All Rights Reserved.
+                        © {new Date().getFullYear()} {settings?.store_name || "Our Store"} Pvt. Ltd. | CIN: U74999MH2024PTC000000 | All Rights Reserved.
                     </p>
                     <div className="flex items-center gap-4 flex-wrap justify-center">
                         {["Privacy Policy", "Terms of Use", "Grievance Officer", "Cookie Policy"].map(item => (

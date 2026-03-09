@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "./TenantContext";
 import { useAuth } from "./AuthContext";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export interface Permission {
     resource: string;
@@ -58,8 +59,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 const allModuleIdentifiers = systemModules?.flatMap(sm => [sm.name, sm.slug]) || [];
 
                 // 2. HARDCORE BYPASS for the Primary Super Admin
-                const SUPER_ADMIN_EMAIL = "nateshraja1999@gmail.com";
-                if (user.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                if (user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase()) {
                     setIsAdmin(true);
                     setIsSuperAdmin(true);
                     setAvailableModules(allModuleIdentifiers.filter(Boolean) as string[]);

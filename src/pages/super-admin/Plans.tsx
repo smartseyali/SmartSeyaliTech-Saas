@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Plus, CreditCard, Trash2, Edit, Check, X, Shield, Star, Zap, Crown } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -127,7 +128,7 @@ export default function PlatformPlans() {
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Subscription Ecosystem</h1>
-                    <p className="text-sm font-medium text-slate-500 mt-1">Manage the commercial performance tiers available to Smartseyali customers.</p>
+                    <p className="text-sm font-medium text-slate-500 mt-1">Manage the commercial performance tiers available to {PLATFORM_CONFIG.name} customers.</p>
                 </div>
                 <Button onClick={() => handleOpenDialog()} className="h-14 bg-black hover:bg-slate-900 text-white font-black px-8 rounded-2xl shadow-xl flex gap-3 transition-transform hover:scale-105 active:scale-95">
                     <Plus className="w-5 h-5" /> Register Package

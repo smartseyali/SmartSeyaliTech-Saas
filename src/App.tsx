@@ -9,6 +9,8 @@ import { PermissionsProvider, usePermissions } from "@/contexts/PermissionsConte
 import { CartProvider } from "@/contexts/CartContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Rocket } from "lucide-react";
+import { cn } from "@/lib/utils";
+import PLATFORM_CONFIG from "@/config/platform";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -75,6 +77,7 @@ import CRMPipelines from "./pages/modules/crm/Pipelines";
 import SalesDashboard from "./pages/modules/sales/SalesDashboard";
 import SalesQuotations from "./pages/modules/sales/Quotations";
 import SalesOrders from "./pages/modules/sales/Orders";
+import SalesDeliveries from "./pages/modules/sales/Deliveries";
 import SalesCustomers from "./pages/modules/sales/Customers";
 
 // ── BOOKS Module ──
@@ -115,6 +118,8 @@ import LeaveManagement from "./pages/modules/hrms/LeaveManagement";
 import PurchaseDashboard from "./pages/modules/purchase/PurchaseDashboard";
 import PurchaseVendors from "./pages/modules/purchase/Vendors";
 import PurchaseOrders from "./pages/modules/purchase/PurchaseOrders";
+import PurchaseRequests from "./pages/modules/purchase/PurchaseRequests";
+import PurchaseBills from "./pages/modules/purchase/PurchaseBills";
 
 // ── INVENTORY Module ──
 import InventoryDashboard from "./pages/modules/inventory/InventoryDashboard";
@@ -131,6 +136,7 @@ import MarketingIndex from "./pages/marketing/Index";
 import MarketingAbout from "./pages/marketing/About";
 import MarketingServices from "./pages/marketing/Services";
 import MarketingProducts from "./pages/marketing/Products";
+import MarketingModuleDetail from "./pages/marketing/ModuleDetail";
 import MarketingContact from "./pages/marketing/Contact";
 import MarketingPolicy from "./pages/marketing/License";
 
@@ -153,10 +159,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
         return (
             <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50">
-                <div className="w-12 h-12 bg-primary-600 rounded-xl animate-bounce flex items-center justify-center shadow-lg shadow-primary-500/20">
+                <div className={cn("w-12 h-12 rounded-xl animate-bounce flex items-center justify-center shadow-lg shadow-primary-500/20", isSuperAdmin ? "bg-slate-900" : "bg-primary-600")}>
                     <Rocket className="w-6 h-6 text-white" />
                 </div>
-                <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse">Synchronizing Workspace</span>
+                <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse">Synchronizing {PLATFORM_CONFIG.name}</span>
             </div>
         );
     }
@@ -229,12 +235,13 @@ const App = () => (
                                             <Route path="contact" element={<StoreContact />} />
                                         </Route>
 
-                                        {/* ══ MARKETING (Smartseyali) ═══════════════════ */}
+                                        {/* ══ MARKETING ═══════════════════ */}
                                         <Route element={<MarketingLayout />}>
                                             <Route path="/" element={<MarketingIndex />} />
                                             <Route path="/about" element={<MarketingAbout />} />
                                             <Route path="/services" element={<MarketingServices />} />
                                             <Route path="/products" element={<MarketingProducts />} />
+                                            <Route path="/products/:slug" element={<MarketingModuleDetail />} />
                                             <Route path="/contact" element={<MarketingContact />} />
                                             <Route path="/policy" element={<MarketingPolicy />} />
                                         </Route>
@@ -311,6 +318,7 @@ const App = () => (
                                             <Route path="/apps/sales" element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/sales/quotations" element={<ProtectedRoute><SalesQuotations /></ProtectedRoute>} />
                                             <Route path="/apps/sales/orders" element={<ProtectedRoute><SalesOrders /></ProtectedRoute>} />
+                                            <Route path="/apps/sales/deliveries" element={<ProtectedRoute><SalesDeliveries /></ProtectedRoute>} />
                                             <Route path="/apps/sales/customers" element={<ProtectedRoute><SalesCustomers /></ProtectedRoute>} />
 
                                             {/* Books */}
@@ -350,7 +358,9 @@ const App = () => (
                                             {/* Purchase */}
                                             <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/purchase/vendors" element={<ProtectedRoute><PurchaseVendors /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/requests" element={<ProtectedRoute><PurchaseRequests /></ProtectedRoute>} />
                                             <Route path="/apps/purchase/orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/bills" element={<ProtectedRoute><PurchaseBills /></ProtectedRoute>} />
 
                                             {/* Inventory */}
                                             <Route path="/apps/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />

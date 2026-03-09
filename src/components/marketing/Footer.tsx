@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Code, Smartphone, Monitor, Mail, Phone, MapPin, Facebook, Instagram, Github } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,24 +13,24 @@ export const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="flex items-center space-x-1">
-               <img src="/favicon.ico" alt="logo" className="h-10 w-10 object-contain" />
+                <img src="/favicon.ico" alt="logo" className="h-10 w-10 object-contain" />
               </div>
-              <span className="text-xl font-bold">Smartseyali Tech</span>
+              <span className="text-xl font-bold">{PLATFORM_CONFIG.name} Tech</span>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
-              Innovative technology startup focused on developing cutting-edge software 
-              solutions that help businesses thrive in the digital age. We specialize 
+              Innovative technology startup focused on developing cutting-edge software
+              solutions that help businesses thrive in the digital age. We specialize
               in web, mobile, and desktop applications.
             </p>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/smartseyalitech" className="text-gray-400 hover:text-primary-500 transition-colors">
+              <a href={`https://www.facebook.com/${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}`} className="text-gray-400 hover:text-primary-500 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="https://www.instagram.com/smartseyalitech" className="text-gray-400 hover:text-primary-500 transition-colors">
+              <a href={`https://www.instagram.com/${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}`} className="text-gray-400 hover:text-primary-500 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              
-              <a href="https://github.com/smartseyali" className="text-gray-400 hover:text-primary-500 transition-colors">
+
+              <a href={`https://github.com/${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}`} className="text-gray-400 hover:text-primary-500 transition-colors">
                 <Github className="h-5 w-5" />
               </a>
             </div>
@@ -53,7 +54,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary-500" />
-                <span className="text-gray-300">smartseyali@gmail.com</span>
+                <span className="text-gray-300">support@{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary-500" />
@@ -69,7 +70,7 @@ export const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © {currentYear} Smartseyali Tech. All rights reserved. | Built with innovation and passion.
+            © {currentYear} {PLATFORM_CONFIG.name} Tech. All rights reserved. | Built with innovation and passion.
           </p>
         </div>
       </div>

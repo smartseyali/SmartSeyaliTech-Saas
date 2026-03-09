@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Copy, Plus, Upload, Server, Code2, Play, CreditCard, Box, Eye, Trash2, LayoutTemplate, Edit, Check, X } from "lucide-react";
+import PLATFORM_CONFIG from "@/config/platform";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -174,7 +175,7 @@ export default function PlatformTemplates() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Template Engine</h1>
-                    <p className="text-sm font-medium text-slate-500 mt-2">Manage the visual DNA of the Smartseyali SaaS ecosystem.</p>
+                    <p className="text-sm font-medium text-slate-500 mt-2">Manage the visual DNA of the {PLATFORM_CONFIG.name} SaaS ecosystem.</p>
                 </div>
 
                 <div className="flex items-center gap-4">

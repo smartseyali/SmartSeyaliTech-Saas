@@ -1,29 +1,23 @@
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
-import {
-  ExternalLink,
-  Github,
-  Code,
-  Smartphone,
-  Monitor,
-  Globe,
-  Database,
-  Cloud,
-  Zap,
-  Users,
-  BarChart3,
-  Box,
-  ShoppingCart
-} from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { Link } from "react-router-dom";
+import {
+  Box,
+  Zap,
+  Search,
+  ChevronRight,
+  ArrowUpRight,
+  Info,
+  Layout
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const Products = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -36,27 +30,9 @@ const Products = () => {
           .order("sort_order", { ascending: true });
 
         if (error) throw error;
-
-        if (data && data.length > 0) {
-          const mapped = data.map(mod => ({
-            title: mod.name,
-            category: mod.category.toUpperCase() + " SaaS",
-            description: mod.description || mod.tagline,
-            image: "https://images.unsplash.com/photo-1557821552-17105176677c?w=600&h=400&fit=crop", // Fallback image
-            status: mod.status === 'live' ? "Available Now" : (mod.status === 'beta' ? "Beta Release" : "Coming Soon"),
-            technologies: ["SaaS", "Cloud", "Business"],
-            icon: Box,
-            color: "bg-blue-600",
-            id: mod.id
-          }));
-          setFeaturedProducts(mapped);
-        } else {
-          // Fallback to static if empty
-          setFeaturedProducts(STATIC_PRODUCTS);
-        }
+        setModules(data || []);
       } catch (err) {
         console.error("Error fetching products:", err);
-        setFeaturedProducts(STATIC_PRODUCTS);
       } finally {
         setLoading(false);
       }
@@ -65,261 +41,147 @@ const Products = () => {
     fetchModules();
   }, []);
 
-  const STATIC_PRODUCTS = [
-    {
-      id: "ecommerce",
-      title: "Ecommerce SaaS Suite",
-      category: "Enterprise Solution",
-      description: "A complete multi-tenant ecommerce platform with modules for Inventory, Purchase, CRM, HRMS, and POS. Empowering businesses to run their entire operations in one place.",
-      image: "https://images.unsplash.com/photo-1557821552-17105176677c?w=600&h=400&fit=crop",
-      status: "Available Now",
-      technologies: ["React", "Supabase", "PostgreSQL", "Tailwind"],
-      icon: ShoppingCart,
-      color: "bg-orange-500"
-    },
-    {
-      id: "crm",
-      title: "SmartCRM Pro",
-      category: "Web Application",
-      description: "A comprehensive customer relationship management system designed for small to medium businesses. Features advanced analytics, automation workflows, and seamless integrations.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop",
-      status: "In Development",
-      technologies: ["React", "Node.js", "PostgreSQL", "Redis"],
-      icon: Users,
-      color: "bg-blue-500"
-    },
-    {
-      id: "inventory",
-      title: "RetailSync Mobile",
-      category: "Mobile Application",
-      description: "Advanced inventory management mobile app for retail businesses. Real-time stock tracking, barcode scanning, and automated reordering capabilities.",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop",
-      status: "Coming Soon",
-      technologies: ["React Native", "Express", "MongoDB", "AWS"],
-      icon: ShoppingCart,
-      color: "bg-green-500"
-    },
-  ];
+  const categories = ["commerce", "finance", "operations", "people", "customer", "analytics"];
 
-  const productCategories = [
-    {
-      icon: Globe,
-      title: "Web Applications",
-      count: "12+ Projects",
-      description: "Modern, responsive web applications built with cutting-edge technologies."
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile Apps",
-      count: "8+ Projects",
-      description: "Native and cross-platform mobile applications for iOS and Android."
-    },
-    {
-      icon: Monitor,
-      title: "Desktop Software",
-      count: "6+ Projects",
-      description: "Powerful Windows desktop applications for enterprise and business use."
-    },
-    {
-      icon: Cloud,
-      title: "Cloud Solutions",
-      count: "10+ Projects",
-      description: "Scalable cloud-based applications and microservices architecture."
-    }
-  ];
+  const filteredModules = modules.filter(m =>
+    m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.category?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const upcomingFeatures = [
-    "AI-powered analytics dashboard",
-    "Advanced reporting capabilities",
-    "Multi-platform synchronization",
-    "Enhanced security features",
-    "Integration marketplace",
-    "Mobile-first design approach"
-  ];
+  const modulesByCategory = categories.reduce((acc: any, cat) => {
+    const filtered = filteredModules.filter(m => m.category === cat);
+    if (filtered.length > 0) acc[cat] = filtered;
+    return acc;
+  }, {});
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-50 to-blue-100 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Our Products
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 blur-[120px] rounded-full" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-400/10 blur-[120px] rounded-full" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-8"
+          >
+            <Badge className="px-4 py-1.5 rounded-full bg-blue-600/10 text-blue-600 border-none font-black uppercase tracking-[0.2em] text-[10px]">
+              Platform Ecosystem
+            </Badge>
+            <h1 className="text-6xl lg:text-8xl font-black text-slate-900 tracking-tighter uppercase italic leading-[0.9]">
+              Inventory <span className="text-blue-600">Hub</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Innovative software products designed to solve real business challenges
-              and drive efficiency across various industries.
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed italic">
+              Group-optimized SaaS engines designed to scale your business operations with architectural precision.
             </p>
-          </div>
-        </div>
-      </section>
 
-      {/* Featured Products */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Featured Products
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Take a look at our current and upcoming product lineup designed to
-              transform how businesses operate.
-            </p>
-          </div>
-
-          <div className="space-y-16">
-            {featuredProducts.map((product, index) => (
-              <div key={index} className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
-                <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                  <div className="flex items-center mb-4">
-                    <div className={`inline-flex items-center justify-center w-10 h-10 ${product.color} rounded-lg mr-3`}>
-                      <product.icon className="h-5 w-5 text-white" />
-                    </div>
-                    <Badge variant="outline" className="text-sm">
-                      {product.category}
-                    </Badge>
-                  </div>
-
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{product.title}</h3>
-                  <p className="text-lg text-gray-600 mb-6">{product.description}</p>
-
-                  <div className="mb-6">
-                    <div className="flex items-center mb-3">
-                      <span className="text-sm font-medium text-gray-900 mr-2">Status:</span>
-                      <Badge
-                        variant={product.status === 'In Development' ? 'default' : 'secondary'}
-                        className="text-xs"
-                      >
-                        {product.status}
-                      </Badge>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {product.technologies.map((tech, techIndex) => (
-                        <span key={techIndex} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-4">
-                    <Button
-                      asChild
-                      className="bg-primary-600 hover:bg-primary-700"
-                    >
-                      <Link to={`/login?module=${product.id}`}>
-                        Get Started <ExternalLink className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className={index % 2 === 1 ? 'lg:col-start-1' : ''}>
-                  <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="rounded-lg shadow-lg w-full"
-                    />
-                    <div className="absolute inset-0 bg-primary-600/10 rounded-lg"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Product Categories */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Product Categories
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We develop products across multiple platforms and technologies to meet
-              diverse business requirements.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {productCategories.map((category, index) => (
-              <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-full mb-4">
-                    <category.icon className="h-6 w-6 text-primary-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {category.title}
-                  </h3>
-                  <p className="text-primary-600 font-medium text-sm mb-3">
-                    {category.count}
-                  </p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {category.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Features */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                What's Coming Next
-              </h2>
-              <p className="text-lg text-gray-600 mb-8">
-                We're constantly innovating and adding new features to our product lineup.
-                Here's what we're working on for the future.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {upcomingFeatures.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <Zap className="h-4 w-4 text-primary-600" />
-                    <span className="text-gray-700 text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <img
-                src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop"
-                alt="Future technology"
-                className="rounded-lg shadow-lg"
+            <div className="max-w-xl mx-auto relative group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+              <input
+                type="text"
+                placeholder="Search across categories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-16 pl-14 pr-6 rounded-2xl bg-white border border-slate-200 shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-blue-500/10 focus:outline-none font-bold text-lg transition-all"
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Custom Product Development */}
-      <section className="py-20 bg-primary-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Need a Custom Solution?
-          </h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-3xl mx-auto">
-            Don't see exactly what you're looking for? We specialize in creating
-            custom software products tailored to your specific business needs.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary">
-              <Link to="/contact">
-                Discuss Your Project
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary-600">
-              <Link to="/services">
-                View Our Services
-              </Link>
-            </Button>
+      {/* Grouped Listings (Odoo Style) */}
+      <section className="pb-32 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+          {loading ? (
+            <div className="h-96 flex flex-col items-center justify-center gap-6">
+              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <span className="font-black text-slate-400 uppercase tracking-widest text-xs">Calibrating Hub...</span>
+            </div>
+          ) : Object.keys(modulesByCategory).length > 0 ? (
+            Object.entries(modulesByCategory).map(([category, items]: [string, any]) => (
+              <div key={category} className="space-y-10 group/section">
+                <div className="flex items-center gap-6">
+                  <h2 className="text-2xl font-black uppercase italic tracking-widest text-slate-900">{category}</h2>
+                  <div className="h-px bg-slate-200 grow group-hover/section:bg-blue-200 transition-colors" />
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {items.map((mod: any) => (
+                    <motion.div
+                      key={mod.id}
+                      whileHover={{ y: -8 }}
+                      className="bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden hover:shadow-[0_40px_80px_-15px_rgba(37,99,235,0.1)] transition-all duration-500 flex flex-col group"
+                    >
+                      <Link to={`/products/${mod.slug}`} className="relative h-48 overflow-hidden">
+                        <div className={cn(
+                          "absolute inset-0 bg-gradient-to-br opacity-5 group-hover:opacity-20 transition-opacity",
+                          mod.color_from || "from-blue-500",
+                          mod.color_to || "to-indigo-600"
+                        )} />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-6xl group-hover:scale-125 transition-transform duration-700">{mod.icon || "📦"}</span>
+                        </div>
+                        <div className="absolute bottom-6 left-6">
+                          <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none text-[10px] font-black uppercase tracking-widest">
+                            {mod.status}
+                          </Badge>
+                        </div>
+                      </Link>
+
+                      <div className="p-8 space-y-6 flex-1 flex flex-col">
+                        <div className="space-y-1">
+                          <h3 className="text-2xl font-black uppercase italic tracking-tighter text-slate-900 group-hover:text-blue-600 transition-colors">{mod.name}</h3>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{mod.tagline || "Platform Core Engine"}</p>
+                        </div>
+
+                        <p className="text-sm font-medium italic text-slate-500 line-clamp-2">"{mod.description}"</p>
+
+                        <div className="flex flex-wrap gap-2">
+                          {(mod.features || []).slice(0, 3).map((feat: string, i: number) => (
+                            <span key={i} className="text-[8px] font-black uppercase bg-slate-50 text-slate-400 px-2 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
+                              <Zap className="w-2.5 h-2.5 text-blue-500" /> {feat}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                          <Link to={`/products/${mod.slug}`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
+                            Details <ChevronRight className="w-3 h-3" />
+                          </Link>
+                          <Link to={`/login?module=${mod.slug}`} className="bg-slate-900 text-white h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center gap-2 hover:bg-black transition-all">
+                            Initialize <ArrowUpRight className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-20 grayscale opacity-50">
+              <Box className="w-16 h-16 mx-auto text-slate-200 mb-6" />
+              <h3 className="text-xl font-black uppercase italic tracking-tighter">No modules matching your search</h3>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Custom CTA */}
+      <section className="py-20 border-t border-slate-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
+          <h2 className="text-4xl font-black uppercase italic tracking-tighter">Ready to <span className="text-blue-600">Scale</span>?</h2>
+          <div className="flex justify-center gap-8">
+            <Link to="/contact" className="h-16 px-12 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-500/20">
+              Contact Architects
+            </Link>
+            <Link to="/services" className="h-16 px-12 rounded-2xl border-2 border-slate-900 text-slate-900 font-black uppercase tracking-widest text-xs flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all">
+              View Capabilities
+            </Link>
           </div>
         </div>
       </section>

@@ -1,11 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  Supabase Compatibility Wrapper
+ * ═══════════════════════════════════════════════════════════════
+ * This file is now a thin wrapper around the Unified Database Bridge (/lib/db).
+ * It ensures that existing hardcoded 'await supabase.' calls remain
+ * functional while allowing the underlying provider to be swapped
+ * globally via PLATFORM_CONFIG.
+ */
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { db } from './db';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase credentials in .env');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
+export const supabase = db;
+export default db;
