@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ShieldCheck, Smartphone } from "lucide-react";
+import { Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { useTenant } from "@/contexts/TenantContext";
 
@@ -13,22 +13,22 @@ export function StoreFooter() {
     };
 
     return (
-        <footer className="bg-[#0f1f0f] text-white mt-0">
-            {/* Trust bar */}
-            <div className="border-b border-white/10">
-                <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-5">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <footer className="bg-slate-950 text-white mt-0 border-t border-white/5">
+            {/* Trust Standards */}
+            <div className="border-b border-white/5">
+                <div className="max-w-screen-xl mx-auto px-6 md:px-12 py-10">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
                         {[
-                            { icon: "🚚", label: "Free Delivery", sub: "On orders above ₹999" },
-                            { icon: "🔄", label: "Easy Returns", sub: "7-day hassle-free return" },
-                            { icon: "🔒", label: "100% Secure", sub: "UPI, Cards, NetBanking & COD" },
-                            { icon: "📞", label: "24/7 Support", sub: "Dedicated customer helpline" },
+                            { icon: "🏎️", label: "Fast Delivery", sub: "Optimized logistics pipeline" },
+                            { icon: "🔄", label: "Easy Returns", sub: "Simple return protocols" },
+                            { icon: "🛡️", label: "Secure Payments", sub: "Enterprise-grade encryption" },
+                            { icon: "💬", label: "24/7 Support", sub: "Professional technical help" },
                         ].map((item) => (
-                            <div key={item.label} className="flex items-center gap-3">
-                                <span className="text-2xl">{item.icon}</span>
+                            <div key={item.label} className="flex items-center gap-5">
+                                <span className="text-3xl grayscale opacity-50">{item.icon}</span>
                                 <div>
-                                    <p className="text-xs font-black text-white">{item.label}</p>
-                                    <p className="text-[10px] text-slate-400">{item.sub}</p>
+                                    <p className="text-[11px] font-black text-white uppercase tracking-widest leading-none italic">{item.label}</p>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1.5 italic">{item.sub}</p>
                                 </div>
                             </div>
                         ))}
@@ -36,104 +36,113 @@ export function StoreFooter() {
                 </div>
             </div>
 
-            {/* Main links */}
-            <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-12">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-                    {/* Brand */}
-                    <div className="col-span-2 md:col-span-1 space-y-4">
-                        <span className="text-xl font-black italic tracking-tight">{settings?.store_name || "Our Store"}</span>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                            {settings?.footer_text || "Bharat ka apna online store — taaza products, best daam, aur ghar tak delivery."}
+            {/* Main Links */}
+            <div className="max-w-screen-xl mx-auto px-6 md:px-12 py-20">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-16">
+                    {/* Brand Identity */}
+                    <div className="col-span-2 md:col-span-1 space-y-8">
+                        <div className="space-y-3">
+                            <span className="text-2xl font-black italic tracking-tighter uppercase leading-none block">{settings?.store_name || "SmartStore"}</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 italic">Corporate Office</span>
+                        </div>
+                        <p className="text-xs text-slate-400 font-medium leading-relaxed italic pr-4">
+                            "{settings?.footer_text || "Reliable SaaS infrastructure for professional business operations and sustainable growth."}"
                         </p>
-                        {settings?.contact_phone && (
-                            <div className="flex items-center gap-2 text-xs text-slate-300">
-                                <Phone className="w-3.5 h-3.5 text-green-400" /> {settings.contact_phone}
-                            </div>
-                        )}
-                        {settings?.contact_email && (
-                            <div className="flex items-center gap-2 text-xs text-slate-300">
-                                <Mail className="w-3.5 h-3.5 text-green-400" /> {settings.contact_email}
-                            </div>
-                        )}
-                        {/* Social icons */}
-                        <div className="flex items-center gap-2 pt-2">
+                        <div className="space-y-4">
+                            {settings?.contact_phone && (
+                                <div className="flex items-center gap-3 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">
+                                    <Phone className="w-3.5 h-3.5 text-blue-500" /> {settings.contact_phone}
+                                </div>
+                            )}
+                            {settings?.contact_email && (
+                                <div className="flex items-center gap-3 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">
+                                    <Mail className="w-3.5 h-3.5 text-blue-500" /> {settings.contact_email}
+                                </div>
+                            )}
+                        </div>
+                        {/* Social Links */}
+                        <div className="flex items-center gap-3">
                             {[
                                 { Icon: Facebook, href: "#" },
                                 { Icon: Instagram, href: "#" },
                                 { Icon: Youtube, href: "#" },
                                 { Icon: Twitter, href: "#" },
                             ].map(({ Icon, href }, i) => (
-                                <a key={i} href={href} className="w-8 h-8 bg-white/10 hover:bg-green-700 rounded-full flex items-center justify-center transition-all">
-                                    <Icon className="w-3.5 h-3.5" />
+                                <a key={i} href={href} className="w-10 h-10 bg-white/5 hover:bg-blue-600 rounded-xl flex items-center justify-center transition-all border border-white/5">
+                                    <Icon className="w-4 h-4" />
                                 </a>
                             ))}
                         </div>
                     </div>
 
-                    {/* About */}
-                    <div className="space-y-3">
-                        <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Company</h5>
-                        {[
-                            { label: "About Us", path: "/about" },
-                            { label: "Contact Us", path: "/contact" },
-                            { label: "Careers", path: "#" },
-                            { label: "Press & Media", path: "#" },
-                            { label: "Blog", path: "#" },
-                        ].map(l => (
-                            <div key={l.label}><Link to={storeLink(l.path)} className="text-xs text-slate-300 hover:text-white transition-colors">{l.label}</Link></div>
-                        ))}
+                    {/* Navigation */}
+                    <div className="space-y-6">
+                        <h5 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 italic">Company</h5>
+                        <div className="space-y-4">
+                            {[
+                                { label: "About Us", path: "/about" },
+                                { label: "Contact Us", path: "/contact" },
+                                { label: "Careers", path: "#" },
+                                { label: "Media Kit", path: "#" },
+                                { label: "Tech Blog", path: "#" },
+                            ].map(l => (
+                                <div key={l.label}><Link to={storeLink(l.path)} className="text-[11px] font-black text-slate-400 hover:text-white transition-colors uppercase tracking-widest italic">{l.label}</Link></div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Help */}
-                    <div className="space-y-3">
-                        <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Help & Support</h5>
-                        {[
-                            { label: "Track My Order", path: "/orders" },
-                            { label: "Payment Options", path: "#" },
-                            { label: "Cancellation & Returns", path: "#" },
-                            { label: "FAQs", path: "#" },
-                            { label: "Report an Issue", path: "#" },
-                        ].map(l => (
-                            <div key={l.label}><Link to={storeLink(l.path)} className="text-xs text-slate-300 hover:text-white transition-colors">{l.label}</Link></div>
-                        ))}
+                    <div className="space-y-6">
+                        <h5 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 italic">Support</h5>
+                        <div className="space-y-4">
+                            {[
+                                { label: "Track Order", path: "/orders" },
+                                { label: "Shipping Info", path: "#" },
+                                { label: "Returns & Refunds", path: "#" },
+                                { label: "Help Center", path: "#" },
+                                { label: "Support Ticket", path: "#" },
+                            ].map(l => (
+                                <div key={l.label}><Link to={storeLink(l.path)} className="text-[11px] font-black text-slate-400 hover:text-white transition-colors uppercase tracking-widest italic">{l.label}</Link></div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Policy */}
-                    <div className="space-y-3">
-                        <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Legal</h5>
-                        {[
-                            "Return & Refund Policy",
-                            "Terms & Conditions",
-                            "Privacy Policy",
-                            "Security",
-                            "Sitemap",
-                            "GST & Invoicing",
-                        ].map(l => (
-                            <div key={l}><Link to="#" className="text-xs text-slate-300 hover:text-white transition-colors">{l}</Link></div>
-                        ))}
+                    <div className="space-y-6">
+                        <h5 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 italic">Legal</h5>
+                        <div className="space-y-4">
+                            {[
+                                "Terms of Service",
+                                "Privacy Policy",
+                                "Security Standards",
+                                "Cookie Policy",
+                                "Compliance",
+                                "Site Map",
+                            ].map(l => (
+                                <div key={l}><Link to="#" className="text-[11px] font-black text-slate-400 hover:text-white transition-colors uppercase tracking-widest italic">{l}</Link></div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Payments */}
-                    <div className="space-y-4">
-                        <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">We Accept</h5>
-                        <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-8">
+                        <h5 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 italic">Payments</h5>
+                        <div className="grid grid-cols-2 gap-2">
                             {["UPI", "RuPay", "Visa", "MC", "NB", "COD"].map(p => (
-                                <div key={p} className="bg-white/10 rounded-lg px-2 py-1.5 text-center">
-                                    <span className="text-[9px] font-black text-slate-300">{p}</span>
+                                <div key={p} className="bg-white/5 rounded-lg px-2 py-2 text-center border border-white/5">
+                                    <span className="text-[10px] font-black text-slate-400 tracking-widest italic">{p}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="pt-3 space-y-2">
-                            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">Download App</h5>
+                        <div className="pt-4 space-y-4">
+                            <h5 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Mobile Access</h5>
                             {[
-                                { label: "Google Play", sub: "Android" },
-                                { label: "App Store", sub: "iOS" }
+                                { label: "Google Play", sub: "Android App" },
+                                { label: "App Store", sub: "iOS App" }
                             ].map(a => (
-                                <a key={a.label} href="#" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-2 transition-all">
-                                    <Smartphone className="w-4 h-4 text-green-400" />
+                                <a key={a.label} href="#" className="flex items-center gap-4 bg-white/5 hover:bg-white/10 rounded-2xl px-6 py-4 transition-all border border-white/5 group">
+                                    <Smartphone className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
                                     <div>
-                                        <p className="text-[9px] text-slate-400">Get it on</p>
-                                        <p className="text-[10px] font-black text-white">{a.label}</p>
+                                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest italic">Download on</p>
+                                        <p className="text-[11px] font-black text-white uppercase tracking-widest italic">{a.label}</p>
                                     </div>
                                 </a>
                             ))}
@@ -142,15 +151,15 @@ export function StoreFooter() {
                 </div>
             </div>
 
-            {/* Bottom */}
-            <div className="border-t border-white/10">
-                <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-5 flex flex-col md:flex-row items-center gap-3 justify-between">
-                    <p className="text-[11px] text-slate-400">
-                        © {new Date().getFullYear()} {settings?.store_name || "Our Store"} Pvt. Ltd. | CIN: U74999MH2024PTC000000 | All Rights Reserved.
+            {/* Compliance Bottom */}
+            <div className="border-t border-white/5 bg-black/20">
+                <div className="max-w-screen-xl mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row items-center gap-6 justify-between">
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">
+                        © {new Date().getFullYear()} {settings?.store_name || "SmartStore"} | All Rights Reserved.
                     </p>
-                    <div className="flex items-center gap-4 flex-wrap justify-center">
-                        {["Privacy Policy", "Terms of Use", "Grievance Officer", "Cookie Policy"].map(item => (
-                            <Link key={item} to="#" className="text-[11px] text-slate-400 hover:text-white transition-colors">{item}</Link>
+                    <div className="flex items-center gap-8 flex-wrap justify-center">
+                        {["Terms", "Privacy", "Security", "Ethics"].map(item => (
+                            <Link key={item} to="#" className="text-[10px] font-black text-slate-600 hover:text-blue-500 transition-colors uppercase tracking-widest italic">{item}</Link>
                         ))}
                     </div>
                 </div>

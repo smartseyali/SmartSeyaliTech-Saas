@@ -1,186 +1,198 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Target, Eye, Users, Lightbulb, Award, Rocket } from "lucide-react";
+import { Target, Eye, Users, Lightbulb, Award, Rocket, ShieldCheck, Globe, Cpu, Activity, ArrowRight } from "lucide-react";
 import PLATFORM_CONFIG from "@/config/platform";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const About = () => {
   const values = [
     {
       icon: Lightbulb,
-      title: "Innovation",
-      description: "We constantly push boundaries and embrace new technologies to deliver cutting-edge solutions."
+      title: "Innovation First",
+      description: "We constantly research and implement new technologies to keep our clients ahead of the curve."
     },
     {
       icon: Users,
-      title: "Collaboration",
-      description: "We work closely with our clients to understand their needs and deliver tailored solutions."
+      title: "Client Partnership",
+      description: "We believe in long-term collaboration, working as an extension of our clients' core teams."
     },
     {
       icon: Award,
-      title: "Excellence",
-      description: "We are committed to delivering high-quality software that exceeds expectations."
+      title: "Quality Excellence",
+      description: "Our rigorous engineering standards ensure that every product we ship is reliable and performant."
     },
     {
       icon: Rocket,
-      title: "Growth",
-      description: "We help businesses scale and grow through technology that drives efficiency and innovation."
+      title: "Sustainable Growth",
+      description: "We build scalable foundations that support your business growth now and in the future."
     }
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white font-sans selection:bg-primary-600 selection:text-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-50 to-blue-100 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              About {PLATFORM_CONFIG.name} Tech
+      <section className="relative pt-32 pb-24 overflow-hidden bg-slate-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="flex items-center justify-center gap-3">
+              <Activity className="w-5 h-5 text-primary-600" />
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">Our Identity</span>
+            </div>
+
+            <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
+              Crafting Future-Ready <br /> <span className="text-primary-600">Technologies</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We are a passionate team of technology innovators dedicated to creating
-              software solutions that make a real difference in how businesses operate and grow.
+
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed italic font-medium">
+              {PLATFORM_CONFIG.name} Tech is a team of passionate software engineers dedicated to building robust digital ecosystems for enterprises worldwide.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-              <div className="space-y-4 text-gray-600">
+      {/* Story Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">Our <span className="text-primary-600">Journey</span></h2>
+                <p className="text-xl text-gray-500 leading-relaxed font-medium italic">
+                  {PLATFORM_CONFIG.name} Tech was founded to bridge the gap between complex software challenges and innovative, user-friendly solutions.
+                </p>
+              </div>
+
+              <div className="space-y-6 text-lg text-gray-500 leading-relaxed border-l-4 border-primary-100 pl-8">
                 <p>
-                  {PLATFORM_CONFIG.name} Tech was founded with a simple yet powerful vision: to bridge
-                  the gap between complex business challenges and innovative technology solutions.
-                  We recognized that many businesses struggle to leverage technology effectively,
-                  often due to generic solutions that don't address their specific needs.
+                  We started with a simple belief: that technology should empower businesses, not complicate them. Our architecture is designed to eliminate operational friction and foster seamless growth.
                 </p>
                 <p>
-                  Our journey began when our founders, experienced software developers and
-                  business strategists, decided to create a company that would focus on
-                  understanding the unique requirements of each client and delivering
-                  custom solutions that truly make a difference.
-                </p>
-                <p>
-                  Today, we continue to grow and evolve, always staying at the forefront
-                  of technology trends while maintaining our core commitment to delivering
-                  exceptional value to our clients across all industries.
+                  Today, we serve a global network of enterprise partners, delivering mission-critical solutions that define excellence in modern software engineering.
                 </p>
               </div>
             </div>
-            <div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative group"
+            >
+              <div className="absolute -inset-4 bg-primary-600/5 blur-2xl rounded-full" />
               <img
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop"
                 alt="Team collaboration"
-                className="rounded-lg shadow-lg"
+                className="rounded-[3rem] shadow-2xl relative z-10 w-full border border-gray-100"
               />
-            </div>
+              <div className="absolute -bottom-8 -left-8 bg-white p-8 rounded-3xl shadow-xl z-20 border border-gray-50 flex items-center gap-6">
+                <ShieldCheck className="w-10 h-10 text-primary-600" />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300 italic mb-1">Status</p>
+                  <p className="text-xl font-bold text-gray-900 tracking-tight">Enterprise Verified</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12">
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-8">
-                <div className="flex items-center mb-6">
-                  <Target className="h-8 w-8 text-primary-600 mr-3" />
-                  <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  To empower businesses with innovative software solutions that drive
-                  efficiency, growth, and success. We are committed to understanding
-                  our clients' unique challenges and delivering technology that transforms
-                  their operations and enhances their competitive advantage.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-8">
-                <div className="flex items-center mb-6">
-                  <Eye className="h-8 w-8 text-primary-600 mr-3" />
-                  <h3 className="text-2xl font-bold text-gray-900">Our Vision</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  To become the leading technology partner for businesses seeking
-                  innovative software solutions. We envision a future where every
-                  organization, regardless of size, can harness the power of
-                  technology to achieve their goals and create lasting impact.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Values */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Core Values</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These fundamental principles guide everything we do and shape how we work
-              with our clients and each other.
-            </p>
+      {/* Core Values */}
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20 space-y-4">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">Our Core <span className="text-primary-600">Values</span></h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto italic font-medium">The principles that drive our engineering culture and client success.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-full mb-4">
-                    <value.icon className="h-6 w-6 text-primary-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    {value.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {value.description}
-                  </p>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                whileHover={{ y: -10 }}
+                className="bg-white rounded-3xl p-10 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col group"
+              >
+                <div className="w-14 h-14 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center mb-8 group-hover:bg-primary-600 group-hover:text-white transition-all shadow-sm">
+                  <value.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
+                  {value.title}
+                </h3>
+                <p className="text-gray-500 font-medium italic leading-relaxed text-sm mb-6 flex-grow">
+                  "{value.description}"
+                </p>
+                <div className="h-px bg-gray-50 w-full" />
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* What Makes Us Different */}
-      <section className="py-20 bg-primary-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-6">What Makes Us Different</h2>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
-              We don't just write code – we create solutions that understand your business,
-              solve real problems, and grow with your success.
-            </p>
-          </div>
+      {/* Stats Section */}
+      <section className="py-24 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">Strategic <span className="text-primary-600">Expertise</span></h2>
+                <p className="text-lg text-gray-500 leading-relaxed italic font-medium">
+                  We don't just write code — we design and implement robust digital strategies that help businesses achieve sustainable scalability.
+                </p>
+              </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary-200 mb-2">100%</div>
-              <h3 className="text-lg font-semibold mb-3">Custom Solutions</h3>
-              <p className="text-primary-100">
-                Every project is tailored specifically to your business needs and requirements.
-              </p>
+              <div className="grid grid-cols-2 gap-10">
+                <div className="space-y-2 border-l-2 border-primary-500 pl-6">
+                  <h4 className="text-4xl font-bold text-gray-900 tracking-tight">100%</h4>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 italic">Custom Solutions</p>
+                </div>
+                <div className="space-y-2 border-l-2 border-primary-500 pl-6">
+                  <h4 className="text-4xl font-bold text-gray-900 tracking-tight">24/7</h4>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 italic">Technical Support</p>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary-200 mb-2">24/7</div>
-              <h3 className="text-lg font-semibold mb-3">Support Available</h3>
-              <p className="text-primary-100">
-                Our team is always ready to help you when you need it most.
-              </p>
+
+            <div className="grid grid-cols-2 gap-6">
+              {[
+                { icon: Activity, label: "Realtime Systems", color: "text-blue-600", bg: "bg-blue-50" },
+                { icon: ShieldCheck, label: "Secure Protocol", color: "text-green-600", bg: "bg-green-50" },
+                { icon: Globe, label: "Global Nodes", color: "text-primary-600", bg: "bg-primary-50" },
+                { icon: Cpu, label: "Modular Logic", color: "text-orange-600", bg: "bg-orange-50" }
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-slate-50 border border-gray-100 p-10 rounded-3xl text-center space-y-4 hover:bg-white hover:shadow-xl transition-all duration-300"
+                >
+                  <div className={cn("w-12 h-12 rounded-xl mx-auto flex items-center justify-center", item.bg, item.color)}>
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 italic">{item.label}</p>
+                </div>
+              ))}
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary-200 mb-2">10+</div>
-              <h3 className="text-lg font-semibold mb-3">Years Experience</h3>
-              <p className="text-primary-100">
-                Decades of combined experience in software development and business strategy.
-              </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-32 bg-white">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight">Ready to Work with Us?</h2>
+            <p className="text-xl text-primary-100 max-w-2xl mx-auto opacity-90 italic">Let's collaborate to build the digital infrastructure your business deserves.</p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+              <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
+                <Link to="/contact">Initialize Project</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-16 px-12 rounded-xl border-white/20 text-white hover:bg-white/10 font-bold text-lg backdrop-blur-sm">
+                <Link to="/login">Login Access</Link>
+              </Button>
             </div>
           </div>
         </div>

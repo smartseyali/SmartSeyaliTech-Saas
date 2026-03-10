@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Code, Smartphone, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PLATFORM_CONFIG from "@/config/platform";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,8 +25,9 @@ export const Navbar = () => {
           <Link to="/" className="flex items-center">
             <img
               src="/logo.png"
-              alt={`${PLATFORM_CONFIG.name} Tech Logo`}
-              className="h-12 w-auto object-contain"
+              alt="Smartseyali Tech Logo"
+              className="h-24 w-24 object-contain" // Increased size
+              style={{ minWidth: "300px", minHeight: "300px" }} // Ensures larger display
             />
           </Link>
 
@@ -38,19 +38,22 @@ export const Navbar = () => {
                 key={link.name}
                 to={link.href}
                 className={cn(
-                  "text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium",
+                  "text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium text-sm",
                   location.pathname === link.href && "text-primary-600"
                 )}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="flex items-center gap-3 ml-4">
-              <Button asChild variant="ghost">
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild className="bg-primary-600 hover:bg-primary-700">
-                <Link to="/onboarding">Get Started</Link>
+            <div className="flex items-center gap-4 ml-4">
+              <Link
+                to="/login"
+                className="text-sm font-bold text-gray-500 hover:text-primary-600 transition-colors"
+              >
+                Login
+              </Link>
+              <Button asChild className="bg-primary-600 hover:bg-primary-700 h-10 px-6 rounded-lg font-bold text-sm">
+                <Link to="/contact">Initialize</Link>
               </Button>
             </div>
           </div>
@@ -85,15 +88,15 @@ export const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <div className="px-3 py-2 space-y-2">
-                <Button asChild variant="ghost" className="w-full justify-start">
+              <div className="px-3 py-4 space-y-3">
+                <Button asChild variant="outline" className="w-full h-11 border-gray-200 text-gray-600 font-bold">
                   <Link to="/login" onClick={() => setIsOpen(false)}>
                     Login
                   </Link>
                 </Button>
-                <Button asChild className="w-full bg-primary-600 hover:bg-primary-700">
-                  <Link to="/onboarding" onClick={() => setIsOpen(false)}>
-                    Get Started
+                <Button asChild className="w-full h-11 bg-primary-600 hover:bg-primary-700 font-bold">
+                  <Link to="/contact" onClick={() => setIsOpen(false)}>
+                    Initialize
                   </Link>
                 </Button>
               </div>

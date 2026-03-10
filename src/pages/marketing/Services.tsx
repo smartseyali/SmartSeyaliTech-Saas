@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -9,10 +10,11 @@ import {
   Zap,
   Users,
   CheckCircle,
-  Box,
   Cpu,
   ArrowUpRight,
-  Info
+  Info,
+  Settings,
+  Layers
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
@@ -41,18 +43,15 @@ const Services = () => {
             title: mod.name,
             slug: mod.slug,
             description: mod.description || mod.tagline,
-            features: Array.isArray(mod.features) ? mod.features.slice(0, 5) : [],
-            technologies: mod.technologies || ["SaaS", "Enterprise", "Cloud"],
+            features: Array.isArray(mod.features) ? mod.features.slice(0, 5) : ["Scalable Core", "Custom API", "Security Layer"],
             image: mod.screenshots?.[0] || mod.image_url || "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80",
-            id: mod.id,
-            color: mod.color || "#3B82F6"
+            id: mod.id
           }));
           setMainServices(mapped);
         } else {
           setMainServices(STATIC_SERVICES);
         }
       } catch (err) {
-        console.error("Error fetching services:", err);
         setMainServices(STATIC_SERVICES);
       } finally {
         setLoading(false);
@@ -65,17 +64,16 @@ const Services = () => {
   const STATIC_SERVICES = [
     {
       id: "dev",
-      slug: "architectural-development",
+      slug: "web-development",
       icon: Code,
-      title: "Architectural Development",
-      description: "High-performance software engines built with modern frameworks and multi-tenant logic.",
+      title: "Web Development",
+      description: "High-performance software solutions built with modern frameworks and robust logic.",
       features: [
-        "Scalable Microservices",
-        "Advanced Multi-tenancy",
-        "Real-time Data Processing",
-        "Custom API Ecosystems"
+        "Scalable Frameworks",
+        "Responsive Interfaces",
+        "Secure Databank",
+        "Cloud Integration"
       ],
-      technologies: ["React", "Node.js", "Supabase"],
       image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80"
     }
   ];
@@ -84,177 +82,155 @@ const Services = () => {
     {
       icon: Database,
       title: "Data Intelligence",
-      description: "Big data warehousing and predictive analytics for enterprise growth."
+      description: "Comprehensive data warehousing and analytics to drive informed business decisions."
     },
     {
       icon: Cloud,
-      title: "Cloud Hub",
-      description: "Seamless orchestration and management of multi-cloud environments."
+      title: "Cloud Solutions",
+      description: "Scalable cloud infrastructure management to ensure maximum uptime and performance."
     },
     {
       icon: Shield,
-      title: "Fortified Security",
-      description: "Zero-trust architecture and enterprise-grade encryption protocols."
+      title: "Cyber Security",
+      description: "Advanced protection protocols to keep your business data secure and compliant."
     },
     {
       icon: Users,
-      title: "Strategic Advisory",
-      description: "Deep technology consulting for digital transformation and scaling."
+      title: "Tech Consulting",
+      description: "Strategic guidance to navigate complex technology landscapes and digital transformation."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-sans selection:bg-primary-600 selection:text-white">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
+      <section className="relative pt-32 pb-24 overflow-hidden bg-slate-50 border-b border-gray-100 text-center">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 space-y-8">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-black uppercase tracking-widest text-[10px]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
           >
-            <Zap className="w-3 h-3" /> Capability Matrix
+            <div className="flex items-center justify-center gap-3">
+              <Settings className="w-5 h-5 text-primary-600 animate-spin-slow" />
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Our Capabilities</span>
+            </div>
+            <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
+              Comprehensive <span className="text-primary-600">Services</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              We specialize in delivering robust software engineering and strategic technology solutions
+              that empower modern enterprises to scale effortlessly.
+            </p>
           </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-6xl lg:text-8xl font-black text-white tracking-tighter uppercase italic leading-none"
-          >
-            Precision <span className="text-blue-500">Services</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-xl text-slate-400 max-w-3xl mx-auto font-medium leading-relaxed italic"
-          >
-            Engineering digital solutions that redefine industry standards through architectural excellence and innovative technology.
-          </motion.p>
         </div>
       </section>
 
-      {/* Core Capabilities */}
+      {/* Main Services */}
       <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-32">
-            {loading ? (
-              <div className="flex justify-center p-20">
-                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : mainServices.map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className={cn(
-                  "flex flex-col lg:flex-row items-center gap-20",
-                  index % 2 === 1 && "lg:flex-row-reverse"
-                )}
-              >
-                <div className="flex-1 space-y-8">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
-                        <service.icon className="w-8 h-8" />
-                      </div>
-                      <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter uppercase italic">{service.title}</h2>
-                    </div>
-                    <p className="text-xl text-slate-500 font-medium italic leading-relaxed">{service.description}</p>
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {(service.features || []).map((feature: string, featureIndex: number) => (
-                      <div key={featureIndex} className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-blue-200 transition-colors">
-                        <CheckCircle className="h-5 w-5 text-blue-500" />
-                        <span className="text-sm font-bold text-slate-700 uppercase tracking-tight">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-8 flex flex-wrap gap-4">
-                    <Button asChild size="lg" className="h-16 px-10 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest text-xs group">
-                      <Link to={service.id ? `/login?module=${service.id}` : "/contact"} className="flex items-center gap-3">
-                        Deploy Framework <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                      </Link>
-                    </Button>
-                    {service.slug && (
-                      <Button asChild variant="outline" size="lg" className="h-16 px-10 rounded-2xl border-2 border-slate-200 font-black uppercase tracking-widest text-xs group">
-                        <Link to={`/products/${service.slug}`} className="flex items-center gap-3">
-                          View Blueprint <Info className="w-5 h-5" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex-1 w-full">
-                  <Link to={`/products/${service.slug}`} className="relative group block">
-                    <div className="absolute -inset-4 bg-blue-500/5 rounded-[3rem] blur-2xl group-hover:bg-blue-500/10 transition-colors duration-500" />
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="relative rounded-[2.5rem] shadow-2xl w-full object-cover aspect-[4/3] group-hover:scale-[1.02] transition-transform duration-700"
-                    />
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Support Services Grid */}
-      <section className="py-32 bg-slate-50/50 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center mb-20 space-y-4">
-          <h2 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tighter uppercase italic">Extension <span className="text-blue-600">Modules</span></h2>
-          <p className="text-slate-500 max-w-2xl mx-auto font-medium italic">Universal auxiliary services designed to fortify your core infrastructure.</p>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {additionalServices.map((service, index) => (
+        <div className="max-w-7xl mx-auto px-6 space-y-32">
+          {loading ? (
+            <div className="text-center py-40">
+              <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+              <p className="text-gray-500 font-medium">Scanning service catalog...</p>
+            </div>
+          ) : mainServices.map((service, index) => (
             <motion.div
               key={index}
-              whileHover={{ y: -10 }}
-              className="bg-white p-10 rounded-[2.5rem] border border-slate-200/60 shadow-xl shadow-slate-200/20 text-center space-y-6 group transition-all"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className={cn(
+                "flex flex-col lg:flex-row items-center gap-20",
+                index % 2 === 1 && "lg:flex-row-reverse"
+              )}
             >
-              <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 mx-auto group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                <service.icon className="w-8 h-8" />
+              <div className="flex-1 space-y-10">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary-50 p-4 rounded-2xl text-primary-600 shadow-sm">
+                      <service.icon className="w-8 h-8" />
+                    </div>
+                    <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{service.title}</h2>
+                  </div>
+                  <p className="text-xl text-gray-500 font-medium italic leading-relaxed">"{service.description}"</p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {(service.features || []).map((feature: string, featureIndex: number) => (
+                    <div key={featureIndex} className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-gray-50 hover:border-primary-100 transition-colors">
+                      <CheckCircle className="h-5 w-5 text-primary-600" />
+                      <span className="text-sm font-bold text-gray-700 uppercase tracking-tight">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-8 flex flex-wrap gap-6">
+                  <Button asChild className="h-16 px-10 rounded-xl bg-gray-900 hover:bg-primary-600 text-white font-bold transition-all shadow-xl">
+                    <Link to={service.id ? `/login?module=${service.id}` : "/contact"} className="flex items-center gap-4">
+                      Initialize <ArrowUpRight className="w-5 h-5" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-16 px-10 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-700 font-bold transition-all">
+                    <Link to="/login" className="flex items-center gap-4">
+                      Login Access <Info className="w-5 h-5" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
-              <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tight">{service.title}</h3>
-              <p className="text-sm font-medium text-slate-500 italic leading-relaxed">{service.description}</p>
+
+              <div className="flex-1 w-full group">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-primary-600/5 blur-2xl rounded-3xl" />
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="relative rounded-[2.5rem] shadow-2xl w-full object-cover aspect-video border border-gray-100"
+                  />
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="bg-blue-600 rounded-[4rem] p-16 lg:p-32 text-center text-white space-y-12 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[150px] -z-0" />
-            <h2 className="text-5xl lg:text-7xl font-black uppercase italic tracking-tighter leading-none relative z-10">
-              Ready to <span className="text-blue-200">Engineer</span>?
-            </h2>
-            <p className="text-xl lg:text-2xl text-blue-100 max-w-3xl mx-auto font-medium italic relative z-10 leading-relaxed">
-              Connect with our lead architects to discuss your technical requirements and initiate the blueprint for your next SaaS engine.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10 pt-8">
-              <Button asChild size="lg" className="h-20 px-16 rounded-3xl bg-white text-blue-600 hover:bg-black hover:text-white font-black uppercase tracking-widest text-sm shadow-[0_20px_40px_-15px_rgba(255,255,255,0.3)] transition-all">
-                <Link to="/contact">Contact Architects</Link>
+      {/* Auxiliary Services */}
+      <section className="py-32 bg-slate-50/50">
+        <div className="max-w-7xl mx-auto px-6 text-center space-y-6 mb-24">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">Auxiliary <span className="text-primary-600">Solutions</span></h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto italic font-medium">Supporting services designed to enhance your core operational ecosystem.</p>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {additionalServices.map((service, index) => (
+            <div
+              key={index}
+              className="bg-white p-8 rounded-2xl border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center space-y-4 group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 mx-auto flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all shadow-sm">
+                <service.icon className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 tracking-tight transition-colors group-hover:text-primary-600">{service.title}</h3>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer CTA */}
+      <section className="py-32 bg-white">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
+            <h2 className="text-4xl md:text-6xl font-bold leading-tight">Ready to Innovate?</h2>
+            <p className="text-xl text-primary-50 max-w-2xl mx-auto opacity-90 italic">Let's discuss your requirements and build a roadmap for your next business milestone.</p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+              <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
+                <Link to="/contact">Initialize Project</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-20 px-16 rounded-3xl border-2 border-white/30 text-white hover:bg-white hover:text-blue-600 font-black uppercase tracking-widest text-sm transition-all">
-                <Link to="/products">Explore Inventory</Link>
+              <Button asChild variant="outline" size="lg" className="h-16 px-12 rounded-xl border-white/20 text-white hover:bg-white/10 font-bold text-lg backdrop-blur-sm">
+                <Link to="/login">Login Access</Link>
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSearchParams, Link } from "react-router-dom";
-import { Filter, Search, ChevronDown, Star, ShoppingCart, Heart, X, SlidersHorizontal, Leaf, Sparkles } from "lucide-react";
+import { Filter, Search, ChevronDown, Star, ShoppingCart, Heart, X, SlidersHorizontal, Leaf, Sparkles, Box, Activity } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useCart } from "@/contexts/CartContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { PageBanner } from "@/components/storefront/PageBanner";
 
 const SORT_OPTIONS = [
-    { value: "newest", label: "Fresh Arrivals" },
-    { value: "price-low", label: "Price: Low to High" },
-    { value: "price-high", label: "Price: High to Low" },
+    { value: "newest", label: "NEW_ARRIVALS" },
+    { value: "price-low", label: "PRICE_LOW_TO_HIGH" },
+    { value: "price-high", label: "PRICE_HIGH_TO_LOW" },
 ];
 
 export default function Shop() {
@@ -62,66 +62,67 @@ export default function Shop() {
     }, [selectedCategory, searchQuery, sort, activeCompany?.id]);
 
     return (
-        <div className="bg-[#fafaf9] min-h-screen font-sans py-20 pt-28">
-            {/* Shop Header Banner — set position='shop_header' in admin */}
-            <div className="container mx-auto px-6 mb-10">
-                <PageBanner position="shop_header" height="h-48 md:h-64" />
+        <div className="bg-[#f8fafc] min-h-screen font-sans py-20 pt-28">
+            {/* Shop Header Banner */}
+            <div className="container mx-auto px-6 mb-16">
+                <PageBanner position="shop_header" height="h-48 md:h-72" className="rounded-[3rem] shadow-2xl" />
             </div>
             <div className="container mx-auto px-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-16">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <Leaf className="w-4 h-4 text-[#f97316]" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#14532d]/40">Our Collection</span>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-20 border-b border-slate-100 pb-12">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <Activity className="w-5 h-5 text-blue-600" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Store Inventory</span>
                         </div>
-                        <h1 className="text-4xl font-black text-[#14532d] uppercase tracking-tighter">The <span className="text-[#f97316]">Market</span></h1>
+                        <h1 className="text-5xl lg:text-7xl font-black text-slate-900 uppercase tracking-tighter italic leading-[0.8] mb-2">Our <span className="text-blue-600">Store</span></h1>
+                        <p className="text-sm font-medium text-slate-500 italic">Premium assets curated for professional-scale operations.</p>
                     </div>
 
                     <div className="flex items-center gap-4 flex-grow md:max-w-xl">
-                        <div className="relative flex-grow">
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <div className="relative flex-grow group">
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
                             <input
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                placeholder="Search nature's bounty..."
-                                className="w-full h-16 pl-14 pr-8 bg-white border border-slate-100 rounded-3xl text-sm font-bold text-[#14532d] shadow-sm outline-none focus:border-[#14532d]/20 transition-all"
+                                placeholder="Search products..."
+                                className="w-full h-16 pl-16 pr-8 bg-white border border-slate-100 rounded-3xl text-sm font-black text-slate-900 shadow-xl shadow-slate-200/50 outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600/20 transition-all font-sans uppercase tracking-widest"
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-12 items-start">
+                <div className="flex flex-col lg:flex-row gap-16 items-start">
                     {/* Sidebar */}
-                    <aside className="w-full lg:w-64 shrink-0 space-y-12">
-                        <div className="space-y-6 bg-white p-8 rounded-[32px] border border-slate-50 shadow-sm">
-                            <h3 className="text-[10px] font-black text-[#14532d] uppercase tracking-[0.3em] border-b border-slate-50 pb-4">Categories</h3>
+                    <aside className="w-full lg:w-72 shrink-0 space-y-10">
+                        <div className="space-y-8 bg-white p-10 rounded-[2.5rem] border border-slate-50 shadow-xl shadow-slate-200/40">
+                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] border-b border-slate-50 pb-6 italic">Categories</h3>
                             <div className="space-y-4">
                                 {categories.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={cn(
-                                            "w-full text-left text-xs font-black uppercase tracking-widest transition-all flex items-center justify-between group",
-                                            selectedCategory === cat ? "text-[#f97316]" : "text-slate-300 hover:text-[#14532d]"
+                                            "w-full text-left text-[11px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-between group py-2 italic",
+                                            selectedCategory === cat ? "text-blue-600" : "text-slate-300 hover:text-slate-900"
                                         )}
                                     >
                                         {cat}
-                                        {selectedCategory === cat && <div className="w-1 h-1 rounded-full bg-[#f97316]" />}
+                                        {selectedCategory === cat && <div className="w-2 h-2 rounded-full bg-blue-600 shadow-lg shadow-blue-600/50" />}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="space-y-6 bg-white p-8 rounded-[32px] border border-slate-50 shadow-sm">
-                            <h3 className="text-[10px] font-black text-[#14532d] uppercase tracking-[0.3em] border-b border-slate-50 pb-4">Sort By</h3>
-                            <div className="space-y-4">
+                        <div className="space-y-8 bg-white p-10 rounded-[2.5rem] border border-slate-50 shadow-xl shadow-slate-200/40">
+                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] border-b border-slate-50 pb-6 italic">Sort By</h3>
+                            <div className="space-y-5">
                                 {SORT_OPTIONS.map(opt => (
                                     <button
                                         key={opt.value}
                                         onClick={() => setSort(opt.value)}
                                         className={cn(
-                                            "w-full text-left text-[10px] font-black uppercase tracking-widest transition-all",
-                                            sort === opt.value ? "text-[#14532d]" : "text-slate-300 hover:text-[#14532d]"
+                                            "w-full text-left text-[10px] font-black uppercase tracking-[0.2em] transition-all italic",
+                                            sort === opt.value ? "text-slate-900" : "text-slate-300 hover:text-slate-900"
                                         )}
                                     >
                                         {opt.label}
@@ -130,70 +131,77 @@ export default function Shop() {
                             </div>
                         </div>
 
-                        {/* Sidebar Promo Banner — set position='shop_mid' in admin */}
-                        <PageBanner position="shop_mid" height="h-64" className="rounded-[32px]" autoPlay={false} />
+                        <PageBanner position="shop_mid" height="h-72" className="rounded-[2.5rem] shadow-2xl" autoPlay={false} />
                     </aside>
 
-                    {/* Product Grid */}
+                    {/* Inventory Grid */}
                     <div className="flex-grow">
                         {loading ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                                 {[1, 2, 3, 4, 5, 6].map(i => (
-                                    <div key={i} className="aspect-[4/5] bg-white rounded-[40px] animate-pulse border border-slate-50" />
+                                    <div key={i} className="aspect-[4/5] bg-white rounded-[3rem] animate-pulse border border-slate-50" />
                                 ))}
                             </div>
                         ) : !products.length ? (
-                            <div className="flex flex-col items-center justify-center py-40 bg-white rounded-[48px] border border-dashed border-slate-100">
-                                <Search className="w-12 h-12 text-[#14532d]/10 mb-6" />
-                                <h3 className="text-xl font-bold text-[#14532d]">No harvest matches</h3>
-                                <p className="text-sm text-slate-400 font-medium mt-2">Try adjusting your filters.</p>
+                            <div className="flex flex-col items-center justify-center py-48 bg-white rounded-[4rem] border border-dashed border-slate-100">
+                                <Search className="w-16 h-16 text-slate-100 mb-8" />
+                                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">No Products Found</h3>
+                                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-4 italic">Adjust your search parameters.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-20 gap-x-10">
                                 {products.map((p, i) => {
                                     const price = Number(p.rate || p.price || 0);
                                     return (
                                         <motion.div
                                             key={p.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
                                             transition={{ delay: (i % 6) * 0.05 }}
                                             className="group"
                                         >
-                                            <Link to={storeLink(`/product/${p.id}`)} className="block space-y-6">
-                                                <div className="aspect-[4/5] relative overflow-hidden rounded-[40px] bg-white border border-slate-50 shadow-sm transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-[#14532d]/5 group-hover:-translate-y-2">
+                                            <Link to={storeLink(`/product/${p.id}`)} className="block space-y-8">
+                                                <div className="aspect-[4/5] relative overflow-hidden rounded-[3.5rem] bg-white border border-slate-50 shadow-sm transition-all duration-700 group-hover:shadow-[0_40px_80px_-20px_rgba(37,99,235,0.15)] group-hover:-translate-y-3">
                                                     <img
-                                                        src={p.image_url || `https://source.unsplash.com/800x1200/?organic,${p.category}`}
+                                                        src={p.image_url || `https://source.unsplash.com/800x1200/?tech,product,${p.category}`}
                                                         alt={p.name}
-                                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[50%] group-hover:grayscale-0"
                                                     />
-                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                                    <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/5 transition-colors" />
 
-                                                    <div className="absolute bottom-8 left-8 right-8 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                                                    <div className="absolute bottom-10 left-10 right-10 translate-y-20 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                                                         <Button
                                                             onClick={e => {
                                                                 e.preventDefault();
                                                                 addToCart({ id: p.id, product_id: p.id, name: p.name, price, image_url: p.image_url || "" }, 1);
                                                             }}
-                                                            style={{ backgroundColor: primaryColor }}
-                                                            className="w-full h-14 rounded-2xl text-white font-black uppercase text-[10px] tracking-widest shadow-xl border-none"
+                                                            className="w-full h-16 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl border-none transition-all italic"
                                                         >
-                                                            <ShoppingCart className="w-4 h-4 mr-2" /> Add to Box
+                                                            <ShoppingCart className="w-4 h-4 mr-3" /> Add to Cart
                                                         </Button>
                                                     </div>
 
-                                                    <button
-                                                        onClick={e => e.preventDefault()}
-                                                        className="absolute top-8 right-8 w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <Heart className="w-4 h-4" />
-                                                    </button>
+                                                    <div className="absolute top-10 right-10 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-10 group-hover:translate-x-0 duration-500">
+                                                        <button
+                                                            onClick={e => e.preventDefault()}
+                                                            className="w-12 h-12 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-slate-900 hover:text-red-500 transition-all shadow-xl"
+                                                        >
+                                                            <Heart className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
                                                 </div>
 
-                                                <div className="space-y-2 text-center">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#f97316]">{p.category}</p>
-                                                    <h3 className="font-bold text-xl text-[#14532d] leading-none px-4 line-clamp-2 uppercase tracking-tight">{p.name}</h3>
-                                                    <p className="text-2xl font-black text-[#14532d] tracking-tighter">₹ {price.toLocaleString()}</p>
+                                                <div className="space-y-4 px-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 italic">{p.category || "General Asset"}</span>
+                                                        <div className="h-px grow bg-slate-100" />
+                                                    </div>
+                                                    <h3 className="font-black text-2xl text-slate-900 leading-none line-clamp-2 uppercase tracking-tighter italic group-hover:text-blue-600 transition-colors">{p.name}</h3>
+                                                    <p className="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2 italic">Price</span>
+                                                        ₹ {price.toLocaleString()}
+                                                    </p>
                                                 </div>
                                             </Link>
                                         </motion.div>

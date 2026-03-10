@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
-import { CheckCircle2, Package, Truck, ShieldCheck, Download, MessageCircle, ArrowRight, Home, Leaf, Sparkles } from "lucide-react";
+import { CheckCircle2, Package, Truck, ShieldCheck, Download, MessageCircle, ArrowRight, Home, Box, Zap, Sparkles, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -21,8 +21,6 @@ export default function OrderSuccess() {
         const slug = activeCompany?.subdomain || "";
         return `/${slug}${path === "/" ? "" : path}`;
     };
-
-    const primaryColor = settings?.primary_color || "#14532d";
 
     useEffect(() => {
         if (id && activeCompany) {
@@ -55,9 +53,9 @@ export default function OrderSuccess() {
     };
 
     if (loading) return (
-        <div className="bg-[#fafaf9] min-h-screen flex flex-col items-center justify-center gap-6">
-            <Leaf className="w-12 h-12 text-[#14532d]/20 animate-bounce" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#14532d]/40">Getting your order details...</p>
+        <div className="bg-[#f8fafc] min-h-screen flex flex-col items-center justify-center gap-8 font-sans">
+            <Box className="w-16 h-16 text-blue-600 animate-pulse" />
+            <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Interrogating Logistics Matrix...</p>
         </div>
     );
 
@@ -68,61 +66,66 @@ export default function OrderSuccess() {
                 <PageBanner position="payment_top" height="h-36 md:h-48" />
             </div>
             <div className="max-w-4xl mx-auto px-6">
-                {/* Harvest Confirmation Banner */}
+                {/* Deployment Confirmation Banner */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="bg-white rounded-[48px] p-12 md:p-20 text-center space-y-8 shadow-xl border border-slate-50 relative overflow-hidden"
+                    className="bg-white rounded-[4rem] p-16 md:p-24 text-center space-y-10 shadow-2xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#14532d]/5 rounded-bl-[100px]" />
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-slate-50 rounded-bl-[120px]" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50/50 rounded-tr-[100px]" />
 
                     <div className="relative inline-flex">
-                        <div className="w-32 h-32 bg-[#14532d]/5 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                            <CheckCircle2 className="w-16 h-16 text-[#14532d]" />
+                        <div className="w-40 h-40 bg-slate-50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner border border-slate-100">
+                            <CheckCircle2 className="w-20 h-20 text-blue-600" />
                         </div>
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: [0, 1.2, 1] }}
                             transition={{ delay: 0.4, duration: 0.6 }}
-                            className="absolute -top-1 -right-1 w-12 h-12 bg-[#f97316] rounded-full flex items-center justify-center shadow-lg border-4 border-white"
+                            className="absolute -top-2 -right-2 w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-2xl border-4 border-white"
                         >
-                            <Sparkles className="text-white w-5 h-5" />
+                            <Zap className="text-blue-500 w-8 h-8" />
                         </motion.div>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-center gap-2">
-                            <Leaf className="w-4 h-4 text-[#f97316]" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#14532d]/40">Order Placed Successfully</span>
+                    <div className="space-y-6 relative z-10">
+                        <div className="flex items-center justify-center gap-3">
+                            <ShieldCheck className="w-5 h-5 text-blue-600" />
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Authorization Verified</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black text-[#14532d] tracking-tighter uppercase leading-none">Order <br /><span className="text-[#f97316]">Confirmed</span></h1>
-                        <p className="text-slate-400 font-medium text-lg italic mt-4 max-w-lg mx-auto leading-relaxed">Thank you for your purchase! Your order is being processed for delivery.</p>
+                        <h1 className="text-5xl md:text-8xl font-black text-slate-900 tracking-tighter uppercase italic leading-[0.8]">Deployment <br /><span className="text-blue-600">Authorized</span></h1>
+                        <p className="text-slate-400 font-medium text-lg italic mt-6 max-w-xl mx-auto leading-relaxed">
+                            "Protocol initialized successfully. Asset synchronization in progress. Node logistics currently being staged for transit."
+                        </p>
 
                         {order && (
-                            <div className="inline-flex items-center gap-3 bg-[#f8fafc] px-8 py-3 rounded-2xl border border-slate-100 text-[10px] font-black uppercase tracking-widest text-[#14532d]/60 shadow-sm mt-4">
-                                Order Number: <span className="text-[#14532d] select-all">#{order.order_number || id?.slice(0, 8).toUpperCase()}</span>
+                            <div className="inline-flex items-center gap-4 bg-slate-900 px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white shadow-2xl mt-8 italic">
+                                Node ID: <span className="text-blue-400 select-all ml-2">#{(order.order_number || id?.slice(0, 8).toUpperCase())}</span>
                             </div>
                         )}
                     </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
                     {/* Fulfillment Timeline */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-white rounded-[40px] p-10 border border-slate-50 shadow-sm space-y-10"
+                        className="bg-white rounded-[4rem] p-12 border border-slate-50 shadow-2xl shadow-slate-200/30 space-y-12"
                     >
-                        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#14532d] border-b border-slate-50 pb-6">Order Status</h3>
+                        <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 border-b border-slate-100 pb-8 italic flex items-center gap-4">
+                            <Layout className="w-5 h-5 text-blue-600" /> Logistics Protocol
+                        </h3>
                         <div className="space-y-0">
                             {[
-                                { icon: CheckCircle2, title: "Order Placed", sub: "Order verified & confirmed" },
-                                { icon: Package, title: "Packing", sub: "Preparing items for shipping" },
-                                { icon: Truck, title: "Shipped", sub: "Handed over to courier" },
-                                { icon: Truck, title: "Out for Delivery", sub: "Coming to your address" },
-                                { icon: Home, title: "Delivered", sub: "Package received" },
+                                { icon: ShieldCheck, title: "Authorization Node", sub: "Signature verified & confirmed" },
+                                { icon: Box, title: "Staging Array", sub: "Calibrating items for transit" },
+                                { icon: Truck, title: "In-Transit Logic", sub: "Handover to Tier-1 Logistics" },
+                                { icon: Zap, title: "Final Sector Sync", sub: "Deployment within destination grid" },
+                                { icon: Home, title: "Deployment Finalized", sub: "Node localized successfully" },
                             ].map((step, idx) => {
                                 const statusIndices: Record<string, number> = {
                                     'pending': 0, 'confirmed': 0,
@@ -134,16 +137,21 @@ export default function OrderSuccess() {
                                 const currentStatusIdx = statusIndices[order?.status] || 0;
                                 const isDone = idx <= currentStatusIdx;
                                 return (
-                                    <div key={idx} className="flex gap-6 items-start">
+                                    <div key={idx} className="flex gap-8 items-start group">
                                         <div className="flex flex-col items-center">
-                                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all border-2", isDone ? "bg-[#14532d] border-[#14532d] text-white shadow-lg shadow-[#14532d]/20" : "bg-white border-slate-100 text-slate-200")}>
-                                                <step.icon className="w-5 h-5" />
+                                            <div className={cn(
+                                                "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 border-2",
+                                                isDone
+                                                    ? "bg-slate-900 border-slate-900 text-white shadow-2xl"
+                                                    : "bg-white border-slate-50 text-slate-100"
+                                            )}>
+                                                <step.icon className={cn("w-6 h-6", isDone ? "text-blue-500" : "")} />
                                             </div>
-                                            {idx < 4 && <div className={cn("w-0.5 h-10 mt-1", isDone ? "bg-[#14532d]" : "bg-slate-100")} />}
+                                            {idx < 4 && <div className={cn("w-1 h-12 my-1 rounded-full", isDone ? "bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" : "bg-slate-50")} />}
                                         </div>
-                                        <div className="pt-2">
-                                            <p className={cn("text-sm font-black uppercase tracking-tight", isDone ? "text-[#14532d]" : "text-slate-300")}>{step.title}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">{step.sub}</p>
+                                        <div className="pt-3">
+                                            <p className={cn("text-[13px] font-black uppercase tracking-widest italic transition-colors", isDone ? "text-slate-900" : "text-slate-200")}>{step.title}</p>
+                                            <p className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-[0.2em] italic opacity-60">{step.sub}</p>
                                         </div>
                                     </div>
                                 );
@@ -152,35 +160,40 @@ export default function OrderSuccess() {
                     </motion.div>
 
                     {/* Summary & Destination */}
-                    <div className="space-y-8">
+                    <div className="space-y-12">
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-[#14532d] rounded-[40px] p-10 text-white shadow-xl relative overflow-hidden"
+                            className="bg-slate-900 rounded-[4rem] p-12 text-white shadow-[0_40px_80px_-20px_rgba(15,23,42,0.4)] relative overflow-hidden"
                         >
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-[60px]" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 border-b border-white/5 pb-6 mb-8 flex items-center gap-2">
-                                <Truck className="w-4 h-4 text-[#f97316]" /> Shipping Details
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[80px]" />
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 border-b border-white/5 pb-8 mb-10 flex items-center gap-4 italic">
+                                <Truck className="w-5 h-5 text-blue-500" /> Deployment Vector
                                 {order?.tracking_number && (
-                                    <span className="ml-auto px-3 py-1 bg-[#f97316] text-white text-[9px] rounded-full">AWB: {order.tracking_number}</span>
+                                    <span className="ml-auto px-4 py-1.5 bg-blue-600 text-white text-[9px] rounded-xl font-black italic">TRK_{order.tracking_number}</span>
                                 )}
                             </h3>
-                            <div className="space-y-6">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30 leading-none">Courier Partner</p>
-                                    <p className="text-sm font-bold opacity-80">{order?.courier_name || "Assigning Courier..."}</p>
+                            <div className="space-y-10">
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 italic leading-none">Logistics Partner</p>
+                                    <p className="text-base font-black italic opacity-90 text-blue-400">{order?.courier_name || "ASSIGNING_PARTNER..."}</p>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30 leading-none">Delivery Address</p>
-                                    <p className="text-base font-bold leading-relaxed">{typeof order?.shipping_address === 'string' ? order.shipping_address : (order?.shipping_address?.line1 || "Address not provided")}</p>
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 italic leading-none">Sector Coordinates</p>
+                                    <p className="text-lg font-black leading-tight italic opacity-90 uppercase tracking-tighter">
+                                        {typeof order?.shipping_address === 'string'
+                                            ? order.shipping_address
+                                            : `${order?.shipping_address?.line1 || "SECTOR_UNDEFINED"}, ${order?.shipping_address?.city || ""}`
+                                        }
+                                    </p>
                                 </div>
-                                <div className="flex justify-between items-end pt-6 border-t border-white/5">
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[#f97316]">Total Paid</p>
-                                        <p className="text-3xl font-black italic tracking-tighter">₹{Number(order?.grand_total || order?.total_amount || 0).toLocaleString()}</p>
+                                <div className="flex justify-between items-end pt-10 border-t border-white/5">
+                                    <div className="space-y-3">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500 italic">Exposure Cleared</p>
+                                        <p className="text-5xl font-black italic tracking-tighter tabular-nums leading-none">₹{Number(order?.grand_total || order?.total_amount || 0).toLocaleString()}</p>
                                     </div>
-                                    <span className="text-[9px] font-black uppercase tracking-widest px-4 py-1.5 bg-white/10 rounded-full border border-white/10">Paid Early</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest px-6 py-2.5 bg-white/5 rounded-2xl border border-white/10 italic">SETTLED</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -189,41 +202,39 @@ export default function OrderSuccess() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-6"
                         >
                             <Button
                                 onClick={() => navigate(storeLink(`/order-detail/${order?.id}`))}
-                                style={{ backgroundColor: primaryColor }}
-                                className="h-14 rounded-2xl text-white font-black uppercase tracking-widest text-[10px] shadow-xl transition-all"
+                                className="h-20 rounded-3xl bg-blue-600 hover:bg-slate-900 text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl shadow-blue-600/20 transition-all border-none italic"
                             >
-                                Track Order <ArrowRight className="w-4 h-4 ml-2" />
+                                Asset Matrix <ArrowRight className="w-5 h-5 ml-4" />
                             </Button>
                             <Button
                                 onClick={() => navigate(storeLink("/shop"))}
-                                variant="outline"
-                                className="h-14 rounded-2xl border-slate-200 font-black text-[#14532d] uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all"
+                                className="h-20 rounded-3xl bg-white border-2 border-slate-100 hover:border-blue-600 font-black text-slate-900 uppercase tracking-[0.3em] text-[11px] transition-all italic shadow-xl shadow-slate-200/30"
                             >
-                                Continue Shopping
+                                Re-Enter Hub
                             </Button>
                         </motion.div>
                     </div>
                 </div>
 
-                {/* Security Footer */}
+                {/* Security Matrix Footer */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="flex flex-wrap items-center justify-center gap-10 mt-20 pt-10 border-t border-slate-100"
+                    className="flex flex-wrap items-center justify-center gap-16 mt-20 pt-16 border-t border-slate-100"
                 >
-                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[#14532d]/30">
-                        <ShieldCheck className="w-4 h-4 text-[#f97316]" /> Secure Payment
+                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 italic">
+                        <ShieldCheck className="w-5 h-5 text-blue-600" /> Secure Matrix
                     </div>
-                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[#14532d]/30">
-                        <MessageCircle className="w-4 h-4 text-[#f97316]" /> 24/7 Support
+                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 italic">
+                        <MessageCircle className="w-5 h-5 text-blue-600" /> Uplink 24/7
                     </div>
-                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[#14532d]/30">
-                        <Download className="w-4 h-4 text-[#f97316]" /> Order Invoice
+                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 italic">
+                        <Download className="w-5 h-5 text-blue-600" /> Data Invoice
                     </div>
                 </motion.div>
             </div>

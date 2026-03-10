@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Search, Menu, X, ChevronDown, Package, LogOut } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, X, ChevronDown, Package, LogOut, Activity } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function StoreHeader() {
     const { user, signOut } = useAuth();
@@ -42,49 +43,58 @@ export function StoreHeader() {
 
     const navLinks = [
         { label: "Home", path: "/" },
-        { label: "Categories", path: "/shop" },
+        { label: "Shop", path: "/shop" },
         { label: "About", path: "/about" },
         { label: "Contact", path: "/contact" },
     ];
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-[#f8fafc] border-b border-border shadow-[0_4px_20px_-10px_rgba(20,83,45,0.1)] transition-all">
-            {/* Top Green Strip */}
-            <div className="bg-[#14532d]">
-                <div className="max-w-screen-xl mx-auto px-4 py-1.5 md:py-2 text-center">
-                    <p className="text-white/90 text-[10px] md:text-xs font-semibold tracking-wider uppercase">
-                        🚚 Free Delivery on orders above ₹999 &nbsp;|&nbsp; 🇳🇳 Made in India &nbsp;|&nbsp; 📞 24/7 Customer Support
+        <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-[0_4px_30px_-15px_rgba(37,99,235,0.1)] transition-all">
+            {/* Top Strip */}
+            <div className="bg-slate-900 overflow-hidden">
+                <div className="max-w-screen-xl mx-auto px-4 py-2 text-center">
+                    <p className="text-white/80 text-[10px] md:text-[11px] font-black tracking-[0.4em] uppercase italic flex items-center justify-center gap-6">
+                        <span className="flex items-center gap-2"><Activity className="w-3 h-3 text-blue-500" /> GLOBAL_STANDARDS</span>
+                        <span className="hidden md:inline text-white/20">|</span>
+                        <span className="hidden md:inline">ENTERPRISE_SOLUTIONS</span>
+                        <span className="hidden md:inline text-white/20">|</span>
+                        <span className="hidden md:inline">PREMIUM_PRODUCTIVITY</span>
                     </p>
                 </div>
             </div>
 
             {/* Main Navigation Bar */}
             <div className="max-w-screen-xl mx-auto px-4 md:px-6">
-                <div className="flex items-center justify-between h-16 md:h-20 gap-4">
+                <div className="flex items-center justify-between h-20 md:h-24 gap-4">
 
                     {/* Left: Mobile Menu + Logo */}
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-[#14532d] p-1">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-slate-900 p-1">
                             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                         <Link to={storeLink("/")} className="flex items-center gap-2">
                             {settings?.logo_url ? (
-                                <img src={settings.logo_url} alt={settings.store_name} className="h-8 md:h-10 w-auto object-contain" />
+                                <img src={settings.logo_url} alt={settings.store_name} className="h-10 md:h-12 w-auto object-contain" />
                             ) : (
-                                <span className="text-[#14532d] font-black text-xl md:text-2xl tracking-tighter">
-                                    {settings?.store_name || "OrganicStore"}
+                                <span className="text-slate-900 font-black text-2xl md:text-3xl tracking-tighter uppercase italic leading-none">
+                                    {settings?.store_name || "SmartStore"}
                                 </span>
                             )}
                         </Link>
                     </div>
 
                     {/* Center: Desktop Links */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    <nav className="hidden md:flex items-center gap-10">
                         {navLinks.map(link => (
                             <Link
                                 key={link.label}
                                 to={storeLink(link.path)}
-                                className="text-sm font-semibold text-[#14532d] hover:text-[#f97316] transition-colors"
+                                className={cn(
+                                    "text-[11px] font-black uppercase tracking-widest transition-all italic hover:text-blue-600",
+                                    location.pathname === storeLink(link.path) || (link.path === "/" && location.pathname === storeLink("/"))
+                                        ? "text-blue-600"
+                                        : "text-slate-400"
+                                )}
                             >
                                 {link.label}
                             </Link>
@@ -92,24 +102,22 @@ export function StoreHeader() {
                     </nav>
 
                     {/* Right: Search, Account, Cart */}
-                    <div className="flex items-center gap-2 md:gap-5">
+                    <div className="flex items-center gap-3 md:gap-6">
 
-                        {/* Search Bar - Hidden on small mobile, expands on md */}
-                        <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-white border border-[#14532d]/20 rounded-full overflow-hidden h-10 w-64 focus-within:ring-2 focus-within:ring-[#f97316]/50 transition-all shadow-inner">
+                        {/* Search Bar */}
+                        <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-slate-50 border border-slate-100 rounded-2xl overflow-hidden h-12 w-72 focus-within:ring-4 focus-within:ring-blue-600/10 focus-within:border-blue-600/20 transition-all shadow-inner px-2">
+                            <Search className="w-4 h-4 text-slate-300 ml-4 shrink-0" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                placeholder="Kya dhundh rahe ho?"
-                                className="flex-grow px-4 text-sm outline-none bg-transparent text-[#14532d] placeholder:text-[#14532d]/40"
+                                placeholder="Search products..."
+                                className="flex-grow px-4 text-xs font-black uppercase tracking-widest outline-none bg-transparent text-slate-900 placeholder:text-slate-200"
                             />
-                            <button type="submit" className="px-3 text-[#14532d] hover:text-[#f97316] transition-colors">
-                                <Search className="w-4 h-4" />
-                            </button>
                         </form>
 
                         {/* Mobile Search Icon */}
-                        <button className="lg:hidden p-2 text-[#14532d] hover:text-[#f97316] transition-colors" onClick={() => navigate(storeLink('/shop'))}>
+                        <button className="lg:hidden p-2 text-slate-900 hover:text-blue-600 transition-colors" onClick={() => navigate(storeLink('/shop'))}>
                             <Search className="w-5 h-5" />
                         </button>
 
@@ -117,29 +125,29 @@ export function StoreHeader() {
                         <div className="relative" ref={accountRef}>
                             <button
                                 onClick={() => user ? setAccountOpen(!accountOpen) : navigate("/login")}
-                                className="p-2 text-[#14532d] hover:text-[#f97316] transition-colors flex items-center gap-1 focus:outline-none"
+                                className="p-3 bg-slate-50 rounded-2xl text-slate-900 hover:text-blue-600 transition-all flex items-center gap-1 border border-slate-100 shadow-sm"
                             >
-                                <User className="w-5 h-5 md:w-6 md:h-6" />
+                                <User className="w-5 h-5" />
                             </button>
                             <AnimatePresence>
                                 {accountOpen && user && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: 8 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 8 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-border z-50 overflow-hidden"
+                                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute right-0 mt-4 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-50 z-50 overflow-hidden"
                                     >
-                                        <div className="px-4 py-4 bg-[#f8fafc] border-b border-border">
-                                            <p className="text-xs text-[#14532d]/60 font-medium">Signed in as</p>
-                                            <p className="font-bold text-[#14532d] text-sm truncate">{user.email}</p>
+                                        <div className="px-8 py-6 bg-slate-50 border-b border-slate-100">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">User Identity</p>
+                                            <p className="font-black text-slate-900 text-sm truncate mt-1 italic uppercase">{user.email}</p>
                                         </div>
-                                        <div className="py-2">
-                                            <Link to={storeLink("/orders")} onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[#14532d] hover:bg-[#f8fafc] hover:text-[#f97316] transition-colors">
-                                                <Package className="w-4 h-4" /> My Orders
+                                        <div className="p-4 space-y-2">
+                                            <Link to={storeLink("/orders")} onClick={() => setAccountOpen(false)} className="flex items-center gap-4 px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-[1.25rem] transition-all italic">
+                                                <Package className="w-4 h-4" /> Order History
                                             </Link>
-                                            <button onClick={() => { setAccountOpen(false); signOut(); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
-                                                <LogOut className="w-4 h-4" /> Sign Out
+                                            <button onClick={() => { setAccountOpen(false); signOut(); }} className="w-full flex items-center gap-4 px-6 py-4 text-xs font-black uppercase tracking-widest text-red-600 hover:bg-red-50 rounded-[1.25rem] transition-all italic border-none text-left">
+                                                <LogOut className="w-4 h-4" /> Logout
                                             </button>
                                         </div>
                                     </motion.div>
@@ -148,10 +156,10 @@ export function StoreHeader() {
                         </div>
 
                         {/* Cart */}
-                        <Link to={storeLink("/cart")} className="p-2 text-[#14532d] hover:text-[#f97316] transition-colors relative flex items-center">
-                            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+                        <Link to={storeLink("/cart")} className="p-3 bg-slate-900 text-white hover:bg-blue-600 rounded-2xl transition-all relative flex items-center shadow-xl shadow-slate-900/10">
+                            <ShoppingCart className="w-5 h-5" />
                             {itemCount > 0 && (
-                                <span className="absolute 0 top-0 right-0 bg-[#f97316] text-white text-[10px] font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm transform translate-x-1/4 -translate-y-1/4">
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
                                     {itemCount > 9 ? "9+" : itemCount}
                                 </span>
                             )}
@@ -160,26 +168,26 @@ export function StoreHeader() {
                 </div>
             </div>
 
-            {/* Mobile Nav Dropsown */}
+            {/* Mobile Nav Dropdown */}
             <AnimatePresence>
                 {mobileOpen && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="md:hidden border-t border-[#14532d]/10 bg-white"
+                        className="md:hidden border-t border-slate-50 bg-white"
                     >
-                        <div className="px-4 py-2 space-y-1">
+                        <div className="px-6 py-4 space-y-2">
                             {navLinks.map(link => (
                                 <Link
                                     key={link.label}
                                     to={storeLink(link.path)}
-                                    className="block px-4 py-3 text-sm font-semibold text-[#14532d] hover:bg-[#14532d]/5 hover:text-[#f97316] rounded-lg transition-colors"
+                                    className="block px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all italic"
                                 >
                                     {link.label}
                                 </Link>
                             ))}
-                            {!user && <Link to="/login" className="block px-4 py-3 text-sm font-semibold text-[#f97316] border-t border-[#14532d]/10 mt-2">Login / Register</Link>}
+                            {!user && <Link to="/login" className="block px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 border-t border-slate-50 mt-4 italic">Login Access</Link>}
                         </div>
                     </motion.div>
                 )}

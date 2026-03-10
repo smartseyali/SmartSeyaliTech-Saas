@@ -1,23 +1,26 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
-  Zap,
   Search,
-  ChevronRight,
   ArrowUpRight,
-  Info,
-  Layout
+  Code,
+  ArrowRight,
+  Globe,
+  Settings,
+  ChevronRight
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const Products = () => {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -32,7 +35,7 @@ const Products = () => {
         if (error) throw error;
         setModules(data || []);
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.error("Error fetching modules:", err);
       } finally {
         setLoading(false);
       }
@@ -55,107 +58,115 @@ const Products = () => {
   }, {});
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-white font-sans selection:bg-primary-600 selection:text-white">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-400/10 blur-[120px] rounded-full" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <section className="relative pt-32 pb-24 overflow-hidden bg-slate-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-8"
+            className="space-y-4"
           >
-            <Badge className="px-4 py-1.5 rounded-full bg-blue-600/10 text-blue-600 border-none font-black uppercase tracking-[0.2em] text-[10px]">
-              Platform Ecosystem
-            </Badge>
-            <h1 className="text-6xl lg:text-8xl font-black text-slate-900 tracking-tighter uppercase italic leading-[0.9]">
-              Inventory <span className="text-blue-600">Hub</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
+              Explore Our <span className="text-primary-600">Product Lineup</span>
             </h1>
-            <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed italic">
-              Group-optimized SaaS engines designed to scale your business operations with architectural precision.
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Powerful, modular software solutions designed to scale your business and automate your workflows.
             </p>
+          </motion.div>
 
-            <div className="max-w-xl mx-auto relative group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-xl mx-auto"
+          >
+            <div className="relative flex items-center bg-white rounded-2xl border border-gray-200 shadow-xl p-2 pl-6 focus-within:border-primary-500 transition-all">
+              <Search className="w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search across categories..."
+                placeholder="Search modules and capabilities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-16 pl-14 pr-6 rounded-2xl bg-white border border-slate-200 shadow-xl shadow-slate-200/50 focus:ring-4 focus:ring-blue-500/10 focus:outline-none font-bold text-lg transition-all"
+                className="flex-1 h-12 bg-transparent outline-none px-4 text-gray-900 placeholder:text-gray-400"
               />
+              <Button className="bg-primary-600 hover:bg-primary-700 rounded-xl h-12 px-8 font-semibold">
+                Search
+              </Button>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Grouped Listings (Odoo Style) */}
-      <section className="pb-32 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+      {/* Modules Grid */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 space-y-24">
           {loading ? (
-            <div className="h-96 flex flex-col items-center justify-center gap-6">
-              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              <span className="font-black text-slate-400 uppercase tracking-widest text-xs">Calibrating Hub...</span>
+            <div className="text-center py-40">
+              <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+              <p className="text-gray-500 font-medium">Loading module inventory...</p>
             </div>
           ) : Object.keys(modulesByCategory).length > 0 ? (
             Object.entries(modulesByCategory).map(([category, items]: [string, any]) => (
-              <div key={category} className="space-y-10 group/section">
-                <div className="flex items-center gap-6">
-                  <h2 className="text-2xl font-black uppercase italic tracking-widest text-slate-900">{category}</h2>
-                  <div className="h-px bg-slate-200 grow group-hover/section:bg-blue-200 transition-colors" />
+              <div key={category} className="space-y-12 animate-fade-in">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary-100 p-3 rounded-xl">
+                      <Settings className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 capitalize">
+                      {category} <span className="text-primary-600 font-medium ml-1">Solutions</span>
+                    </h2>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-400 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 uppercase tracking-wider">
+                    {items.length} {items.length === 1 ? 'Module' : 'Modules'}
+                  </span>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {items.map((mod: any) => (
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {items.map((mod: any, i: number) => (
                     <motion.div
                       key={mod.id}
-                      whileHover={{ y: -8 }}
-                      className="bg-white rounded-[2.5rem] border border-slate-200/60 overflow-hidden hover:shadow-[0_40px_80px_-15px_rgba(37,99,235,0.1)] transition-all duration-500 flex flex-col group"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
                     >
-                      <Link to={`/products/${mod.slug}`} className="relative h-48 overflow-hidden">
-                        <div className={cn(
-                          "absolute inset-0 bg-gradient-to-br opacity-5 group-hover:opacity-20 transition-opacity",
-                          mod.color_from || "from-blue-500",
-                          mod.color_to || "to-indigo-600"
-                        )} />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-6xl group-hover:scale-125 transition-transform duration-700">{mod.icon || "📦"}</span>
+                      <Link to={`/products/${mod.slug}`} className="block flex-1">
+                        <div className="aspect-[1.8/1] bg-slate-50 relative overflow-hidden">
+                          {/* Card image/placeholder */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-indigo-50 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                            <div className="p-4 bg-white rounded-2xl shadow-lg border border-white/50 transform group-hover:scale-105 transition-transform duration-500">
+                              <span className="text-4xl filter grayscale group-hover:grayscale-0 transition-all">
+                                {mod.icon || "📦"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="absolute top-4 left-4">
+                            <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-white/50 shadow-sm text-[9px] font-bold text-primary-600 uppercase tracking-wider">
+                              {mod.status || "Operational"}
+                            </div>
+                          </div>
                         </div>
-                        <div className="absolute bottom-6 left-6">
-                          <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none text-[10px] font-black uppercase tracking-widest">
-                            {mod.status}
-                          </Badge>
+
+                        <div className="p-4 space-y-2">
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+                            {mod.name}
+                          </h3>
+                          <p className="text-[9px] font-semibold text-primary-600/60 uppercase tracking-widest">
+                            {mod.tagline || (category + " Engine")}
+                          </p>
                         </div>
                       </Link>
 
-                      <div className="p-8 space-y-6 flex-1 flex flex-col">
-                        <div className="space-y-1">
-                          <h3 className="text-2xl font-black uppercase italic tracking-tighter text-slate-900 group-hover:text-blue-600 transition-colors">{mod.name}</h3>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{mod.tagline || "Platform Core Engine"}</p>
-                        </div>
-
-                        <p className="text-sm font-medium italic text-slate-500 line-clamp-2">"{mod.description}"</p>
-
-                        <div className="flex flex-wrap gap-2">
-                          {(mod.features || []).slice(0, 3).map((feat: string, i: number) => (
-                            <span key={i} className="text-[8px] font-black uppercase bg-slate-50 text-slate-400 px-2 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
-                              <Zap className="w-2.5 h-2.5 text-blue-500" /> {feat}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                          <Link to={`/products/${mod.slug}`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
-                            Details <ChevronRight className="w-3 h-3" />
-                          </Link>
-                          <Link to={`/login?module=${mod.slug}`} className="bg-slate-900 text-white h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center gap-2 hover:bg-black transition-all">
-                            Initialize <ArrowUpRight className="w-4 h-4" />
-                          </Link>
-                        </div>
+                      <div className="p-4 pt-0 mt-auto">
+                        <Button
+                          onClick={() => navigate(`/login?module=${mod.slug}`)}
+                          className="w-full h-9 rounded-lg bg-gray-50 text-gray-900 border border-gray-100 font-bold text-[10px] hover:bg-primary-600 hover:text-white transition-all group/btn"
+                        >
+                          Initialize <ArrowRight className="ml-1.5 w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
                     </motion.div>
                   ))}
@@ -163,25 +174,41 @@ const Products = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-20 grayscale opacity-50">
-              <Box className="w-16 h-16 mx-auto text-slate-200 mb-6" />
-              <h3 className="text-xl font-black uppercase italic tracking-tighter">No modules matching your search</h3>
+            <div className="text-center py-40 border-2 border-dashed border-gray-100 rounded-[3rem]">
+              <Box className="w-16 h-16 mx-auto text-gray-200 mb-6" />
+              <h3 className="text-2xl font-bold text-gray-900">No Modules Found</h3>
+              <p className="text-gray-500 mt-2">Try adjusting your search filters to find what you're looking for.</p>
+              <Button variant="link" onClick={() => setSearchTerm("")} className="mt-4 text-primary-600 font-bold">
+                Clear all filters
+              </Button>
             </div>
           )}
         </div>
       </section>
 
-      {/* Custom CTA */}
-      <section className="py-20 border-t border-slate-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
-          <h2 className="text-4xl font-black uppercase italic tracking-tighter">Ready to <span className="text-blue-600">Scale</span>?</h2>
-          <div className="flex justify-center gap-8">
-            <Link to="/contact" className="h-16 px-12 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-500/20">
-              Contact Architects
-            </Link>
-            <Link to="/services" className="h-16 px-12 rounded-2xl border-2 border-slate-900 text-slate-900 font-black uppercase tracking-widest text-xs flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all">
-              View Capabilities
-            </Link>
+      {/* Final Call to Action */}
+      <section className="py-24 bg-slate-50 border-t border-gray-100">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+
+            <div className="relative z-10 space-y-6">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+                Ready to Experience <br /> the Dashboard?
+              </h2>
+              <p className="text-primary-100 text-lg max-w-2xl mx-auto opacity-90">
+                Contact our team to get a personalized demo of any module or start your journey today by creating an instance.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+                <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
+                  <Link to="/contact">Book a Demo</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-16 px-12 rounded-xl border-white/20 text-white hover:bg-white/10 font-bold text-lg backdrop-blur-sm">
+                  <Link to="/services">Platform FAQ</Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

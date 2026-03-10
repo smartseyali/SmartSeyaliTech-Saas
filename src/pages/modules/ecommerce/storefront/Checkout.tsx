@@ -9,7 +9,8 @@ import {
     ChevronLeft, ShieldCheck, CreditCard,
     Truck, MapPin, CheckCircle2, Lock,
     Smartphone, Tag, AlertCircle, ArrowRight,
-    Package, User, Phone, Mail, Home, Building, X, Percent
+    Package, User, Phone, Mail, Home, Building, X, Percent,
+    Box, Zap, Layout
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -227,21 +228,20 @@ export default function Checkout() {
 
     if (items.length === 0) {
         return (
-            <div className="bg-[#fafaf9] min-h-screen flex items-center justify-center p-6">
-                <div className="bg-white rounded-[48px] text-center p-16 max-w-lg w-full space-y-8 shadow-xl border border-slate-50">
-                    <div className="w-24 h-24 bg-[#14532d]/5 rounded-full flex items-center justify-center mx-auto">
-                        <CheckCircle2 className="w-10 h-10 text-[#14532d]/20" />
+            <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center p-6 font-sans">
+                <div className="bg-white rounded-[4rem] text-center p-20 max-w-xl w-full space-y-10 shadow-2xl shadow-slate-200/50 border border-slate-50">
+                    <div className="w-32 h-32 bg-slate-50 rounded-[3rem] flex items-center justify-center mx-auto border border-slate-100 shadow-inner">
+                        <Box className="w-12 h-12 text-slate-200" />
                     </div>
-                    <div>
-                        <h2 className="text-2xl font-black text-[#14532d] uppercase tracking-tight">Checkout is empty</h2>
-                        <p className="text-slate-400 text-sm font-medium mt-2">Finish your selection at the market first.</p>
+                    <div className="space-y-4">
+                        <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">Checkout <span className="text-blue-600">Inactive</span></h2>
+                        <p className="text-slate-400 text-sm font-medium italic">"No active stagings identified. Please initialize acquisitions in the inventory matrix."</p>
                     </div>
                     <Button
                         onClick={() => navigate(storeLink("/shop"))}
-                        style={{ backgroundColor: primaryColor }}
-                        className="w-full h-14 text-white rounded-2xl font-black uppercase tracking-widest text-xs"
+                        className="w-full h-20 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl hover:bg-blue-600 transition-all border-none"
                     >
-                        Return to Shop
+                        Return to Inventory Hub <ArrowRight className="w-5 h-5 ml-4" />
                     </Button>
                 </div>
             </div>
@@ -249,42 +249,51 @@ export default function Checkout() {
     }
 
     return (
-        <div className="bg-[#fafaf9] min-h-screen pb-40 pt-28 font-sans">
+        <div className="bg-[#f8fafc] min-h-screen pb-40 pt-32 font-sans text-slate-900">
             {/* Checkout Top Banner */}
-            <div className="container mx-auto px-6 mb-8">
-                <PageBanner position="checkout_top" height="h-28 md:h-36" />
+            <div className="max-w-7xl mx-auto px-6 mb-12">
+                <PageBanner position="checkout_top" height="h-32 md:h-40" className="rounded-[2.5rem] shadow-xl" />
             </div>
 
-            <div className="container mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-6">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-3 text-[10px] font-black text-[#14532d]/40 hover:text-[#14532d] mb-12 transition-all uppercase tracking-widest"
+                    className="flex items-center gap-4 text-[11px] font-black text-slate-400 hover:text-blue-600 mb-16 transition-all uppercase tracking-[0.3em] font-sans"
                 >
-                    <ChevronLeft className="w-4 h-4" /> Back to Cart
+                    <ChevronLeft className="w-5 h-5" /> RE-ENTER STAGING MATRIX
                 </button>
 
                 {/* Progress Steps */}
-                <div className="flex items-center gap-4 mb-12">
-                    {[{ id: "address", label: "Delivery Details", icon: MapPin },
-                    { id: "payment", label: "Payment", icon: CreditCard }].map((s, i) => (
-                        <div key={s.id} className="flex items-center gap-3">
-                            {i > 0 && <div className={cn("h-px w-10 md:w-20 transition-all", step === "payment" ? "bg-[#14532d]" : "bg-slate-200")} />}
-                            <button
-                                onClick={() => { if (i === 1 && step === "address" && validateAddress()) setStep("payment"); if (i === 0) setStep("address"); }}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-2xl transition-all text-xs font-black uppercase tracking-wider",
-                                    step === s.id
-                                        ? "text-white shadow-lg"
-                                        : i === 0 || step === "payment"
-                                            ? "bg-white text-[#14532d] border border-slate-100"
-                                            : "bg-white text-slate-300 border border-slate-100"
-                                )}
-                                style={step === s.id ? { backgroundColor: primaryColor } : {}}
-                            >
-                                <s.icon className="w-3 h-3" /> {s.label}
-                            </button>
+                <div className="flex flex-wrap items-center gap-8 mb-20 border-b border-slate-100 pb-12">
+                    <div className="space-y-4 mr-auto">
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck className="w-5 h-5 text-blue-600 font-bold" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Lock Protocol</span>
                         </div>
-                    ))}
+                        <h1 className="text-5xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter italic leading-[0.8]">Stage <span className="text-blue-600">Initialization</span></h1>
+                    </div>
+
+                    <div className="flex items-center gap-6">
+                        {[{ id: "address", label: "Allocation Signal", icon: MapPin },
+                        { id: "payment", label: "Financial Node", icon: CreditCard }].map((s, i) => (
+                            <div key={s.id} className="flex items-center gap-6">
+                                {i > 0 && <div className={cn("h-px w-8 md:w-16", step === "payment" ? "bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" : "bg-slate-100")} />}
+                                <button
+                                    onClick={() => { if (i === 1 && step === "address" && validateAddress()) setStep("payment"); if (i === 0) setStep("address"); }}
+                                    className={cn(
+                                        "flex items-center gap-3 px-8 py-4 rounded-xl transition-all text-[11px] font-black uppercase tracking-widest italic border-2",
+                                        step === s.id
+                                            ? "bg-slate-900 border-slate-900 text-white shadow-2xl"
+                                            : i === 0 || step === "payment"
+                                                ? "bg-white border-slate-100 text-slate-900 hover:border-blue-600"
+                                                : "bg-white border-slate-50 text-slate-200"
+                                    )}
+                                >
+                                    <s.icon className="w-4 h-4" /> {s.label}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 items-start">
@@ -299,110 +308,119 @@ export default function Checkout() {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
-                                    className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-50 space-y-8"
+                                    className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-12"
                                 >
-                                    <h2 className="text-lg font-black text-[#14532d] uppercase tracking-wider flex items-center gap-3">
-                                        <MapPin className="w-5 h-5 text-[#f97316]" /> Delivery Details
+                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4 italic">
+                                        <MapPin className="w-5 h-5 text-blue-600" /> Allocation Signal
                                     </h2>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {/* Full Name */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><User className="w-3 h-3" /> Full Name *</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                                <User className="w-3.5 h-3.5" /> Identity Signature *
+                                            </label>
                                             <input
                                                 value={address.full_name}
                                                 onChange={e => setAddress(a => ({ ...a, full_name: e.target.value }))}
-                                                placeholder="John Doe"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="AUTHORIZED PERSONNEL"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Phone */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Phone className="w-3 h-3" /> Phone *</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                                <Phone className="w-3.5 h-3.5" /> Comms Uplink *
+                                            </label>
                                             <input
                                                 value={address.phone}
                                                 onChange={e => setAddress(a => ({ ...a, phone: e.target.value }))}
-                                                placeholder="+91 98765 43210"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="+91 [NODE_NUMBER]"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Email */}
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email Address</label>
+                                        <div className="space-y-3 md:col-span-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                                <Mail className="w-3.5 h-3.5" /> Network Address
+                                            </label>
                                             <input
                                                 value={address.email}
                                                 onChange={e => setAddress(a => ({ ...a, email: e.target.value }))}
-                                                placeholder="john@example.com"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="INTEL@ECOSYSTEM.CORP"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Street */}
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Home className="w-3 h-3" /> Street Address *</label>
+                                        <div className="space-y-3 md:col-span-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                                <Home className="w-3.5 h-3.5" /> Deployment Sector *
+                                            </label>
                                             <input
                                                 value={address.line1}
                                                 onChange={e => setAddress(a => ({ ...a, line1: e.target.value }))}
-                                                placeholder="Flat No / House / Building Name"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="SECTOR / GRID / BLOCK"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Landmark */}
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Building className="w-3 h-3" /> Landmark / Area</label>
+                                        <div className="space-y-3 md:col-span-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                                <Building className="w-3.5 h-3.5" /> Proximity Marker
+                                            </label>
                                             <input
                                                 value={address.line2}
                                                 onChange={e => setAddress(a => ({ ...a, line2: e.target.value }))}
-                                                placeholder="Near landmark, area (optional)"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="LANDMARK LOGIC (OPTIONAL)"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* City */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">City *</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">City *</label>
                                             <input
                                                 value={address.city}
                                                 onChange={e => setAddress(a => ({ ...a, city: e.target.value }))}
-                                                placeholder="Mumbai"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="METROPOLIS"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* State */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">State *</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Territory *</label>
                                             <input
                                                 value={address.state}
                                                 onChange={e => setAddress(a => ({ ...a, state: e.target.value }))}
-                                                placeholder="Maharashtra"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="STATE_PROTOCOL"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Pincode */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pincode *</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Node Index *</label>
                                             <input
                                                 value={address.pincode}
                                                 onChange={e => setAddress(a => ({ ...a, pincode: e.target.value }))}
-                                                placeholder="400001"
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all"
+                                                placeholder="6-DIGIT_INDEX"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
                                             />
                                         </div>
                                         {/* Country */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Country</label>
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Geographic Domain</label>
                                             <input
                                                 value={address.country}
                                                 onChange={e => setAddress(a => ({ ...a, country: e.target.value }))}
-                                                className="w-full h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-medium text-slate-800 outline-none"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none uppercase tracking-widest"
                                             />
                                         </div>
                                     </div>
 
                                     <Button
                                         onClick={() => { if (validateAddress()) setStep("payment"); }}
-                                        style={{ backgroundColor: primaryColor }}
-                                        className="w-full h-14 rounded-2xl text-white font-black uppercase tracking-widest text-xs border-none group"
+                                        className="w-full h-20 rounded-[1.5rem] bg-blue-600 text-white font-black uppercase tracking-[0.4em] text-[11px] border-none group shadow-2xl shadow-blue-600/30 hover:bg-slate-900 transition-all"
                                     >
-                                        Continue to Payment <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                        Synchronize Node <ArrowRight className="w-5 h-5 ml-4 group-hover:translate-x-2 transition-transform" />
                                     </Button>
                                 </motion.div>
                             ) : (
@@ -411,44 +429,46 @@ export default function Checkout() {
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
-                                    className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-50 space-y-8"
+                                    className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-12"
                                 >
-                                    <h2 className="text-lg font-black text-[#14532d] uppercase tracking-wider flex items-center gap-3">
-                                        <CreditCard className="w-5 h-5 text-[#f97316]" /> Payment Method
+                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4 italic text-slate-900">
+                                        <CreditCard className="w-5 h-5 text-blue-600" /> Financial Node
                                     </h2>
 
-                                    {/* Address Summary */}
-                                    <div className="bg-slate-50 rounded-2xl p-5 flex items-start gap-4 border border-slate-100">
-                                        <MapPin className="w-4 h-4 text-[#14532d] mt-0.5 shrink-0" />
-                                        <div className="space-y-0.5">
-                                            <p className="text-xs font-black text-[#14532d] uppercase tracking-wider">Delivering to</p>
-                                            <p className="text-sm font-bold text-slate-700">{address.full_name} · {address.phone}</p>
-                                            <p className="text-xs text-slate-500">{address.line1}{address.line2 ? `, ${address.line2}` : ""}, {address.city}, {address.state} - {address.pincode}</p>
+                                    {/* Address Summary as Read-only Logic */}
+                                    <div className="bg-slate-50 rounded-3xl p-8 flex items-start gap-6 border border-slate-100">
+                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm shrink-0">
+                                            <MapPin className="w-5 h-5 text-blue-600" />
                                         </div>
-                                        <button onClick={() => setStep("address")} className="ml-auto text-[10px] font-black text-[#f97316] uppercase tracking-wider hover:underline">Edit</button>
+                                        <div className="space-y-2 grow">
+                                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] italic">Active Sector</p>
+                                            <p className="text-sm font-black text-slate-900 uppercase tracking-tighter">{address.full_name} · {address.phone}</p>
+                                            <p className="text-xs text-slate-400 font-medium italic">{address.line1}{address.line2 ? `, ${address.line2}` : ""}, {address.city}, {address.state}</p>
+                                        </div>
+                                        <button onClick={() => setStep("address")} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline pt-1 italic">Re-Configure</button>
                                     </div>
 
                                     {/* Payment Options */}
-                                    <div className="space-y-3">
-                                        {/* COD */}
+                                    <div className="space-y-6">
+                                        {/* COD as Manual Settlement */}
                                         <button
                                             onClick={() => setPaymentMethod("cod")}
                                             className={cn(
-                                                "w-full flex items-center gap-5 p-5 rounded-2xl border-2 transition-all",
+                                                "w-full flex items-center gap-8 p-8 rounded-[2.5rem] border-2 transition-all group",
                                                 paymentMethod === "cod"
-                                                    ? "border-[#14532d] bg-[#14532d]/5"
-                                                    : "border-slate-100 bg-white hover:border-slate-200"
+                                                    ? "border-slate-900 bg-slate-900 shadow-2xl shadow-slate-900/20"
+                                                    : "border-slate-50 bg-white hover:border-blue-600"
                                             )}
                                         >
-                                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", paymentMethod === "cod" ? "bg-[#14532d]" : "bg-slate-100")}>
-                                                <Package className={cn("w-5 h-5", paymentMethod === "cod" ? "text-white" : "text-slate-400")} />
+                                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all", paymentMethod === "cod" ? "bg-blue-600" : "bg-slate-50 group-hover:bg-blue-50")}>
+                                                <Package className={cn("w-6 h-6", paymentMethod === "cod" ? "text-white" : "text-slate-200 group-hover:text-blue-600")} />
                                             </div>
-                                            <div className="text-left">
-                                                <p className="text-sm font-black text-slate-800">Cash on Delivery</p>
-                                                <p className="text-xs text-slate-400 font-medium">Pay when your order arrives</p>
+                                            <div className="text-left grow">
+                                                <p className={cn("text-sm font-black uppercase tracking-[0.1em] italic", paymentMethod === "cod" ? "text-white" : "text-slate-900")}>Manual Settlement (COD)</p>
+                                                <p className={cn("text-[10px] font-medium italic mt-1", paymentMethod === "cod" ? "text-white/40" : "text-slate-400")}>Finalize credentials upon physical delivery</p>
                                             </div>
-                                            <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === "cod" ? "border-[#14532d]" : "border-slate-200")}>
-                                                {paymentMethod === "cod" && <div className="w-2.5 h-2.5 rounded-full bg-[#14532d]" />}
+                                            <div className={cn("w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all", paymentMethod === "cod" ? "border-blue-600 bg-white" : "border-slate-100")}>
+                                                {paymentMethod === "cod" && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
                                             </div>
                                         </button>
 
@@ -461,37 +481,37 @@ export default function Checkout() {
                                                     key={gw.id}
                                                     onClick={() => setPaymentMethod(gw.gateway)}
                                                     className={cn(
-                                                        "w-full flex items-center gap-5 p-5 rounded-2xl border-2 transition-all",
+                                                        "w-full flex items-center gap-8 p-8 rounded-[2.5rem] border-2 transition-all group",
                                                         paymentMethod === gw.gateway
-                                                            ? "border-[#14532d] bg-[#14532d]/5"
-                                                            : "border-slate-100 bg-white hover:border-slate-200"
+                                                            ? "border-slate-900 bg-slate-900 shadow-2xl shadow-slate-900/20"
+                                                            : "border-slate-50 bg-white hover:border-blue-600"
                                                     )}
                                                 >
-                                                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg", paymentMethod === gw.gateway ? "bg-[#14532d]" : "bg-slate-100")}>
-                                                        <span>{meta.icon}</span>
+                                                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-xl transition-all", paymentMethod === gw.gateway ? "bg-blue-600" : "bg-slate-50 group-hover:bg-blue-50")}>
+                                                        <span className={cn(paymentMethod === gw.gateway ? "grayscale brightness-200" : "grayscale opacity-50")}>{meta.icon}</span>
                                                     </div>
-                                                    <div className="text-left">
-                                                        <p className="text-sm font-black text-slate-800">{meta.name}</p>
-                                                        <p className="text-xs text-slate-400 font-medium">Secure online payment · Instant confirmation</p>
+                                                    <div className="text-left grow">
+                                                        <p className={cn("text-sm font-black uppercase tracking-[0.1em] italic", paymentMethod === gw.gateway ? "text-white" : "text-slate-900")}>{meta.name} Bridge</p>
+                                                        <p className={cn("text-[10px] font-medium italic mt-1", paymentMethod === gw.gateway ? "text-white/40" : "text-slate-400")}>Encrypted direct-link confirmation</p>
                                                     </div>
-                                                    <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === gw.gateway ? "border-[#14532d]" : "border-slate-200")}>
-                                                        {paymentMethod === gw.gateway && <div className="w-2.5 h-2.5 rounded-full bg-[#14532d]" />}
+                                                    <div className={cn("w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all", paymentMethod === gw.gateway ? "border-blue-600 bg-white" : "border-slate-100")}>
+                                                        {paymentMethod === gw.gateway && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
                                                     </div>
                                                 </button>
                                             );
                                         })}
                                     </div>
 
-                                    {/* Trust Badges */}
-                                    <div className="grid grid-cols-3 gap-3">
+                                    {/* Security Matrix Badges */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                         {[
-                                            { icon: Lock, text: "256-bit SSL" },
-                                            { icon: ShieldCheck, text: "Secure Payment" },
-                                            { icon: Truck, text: "Safe Delivery" },
+                                            { icon: Lock, text: "256-BIT QUANTUM" },
+                                            { icon: ShieldCheck, text: "PROTOCOL SECURE" },
+                                            { icon: Truck, text: "STAGED LOGISTICS" },
                                         ].map((b, i) => (
-                                            <div key={i} className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-2xl text-center">
-                                                <b.icon className="w-5 h-5 text-[#14532d]" />
-                                                <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">{b.text}</span>
+                                            <div key={i} className="flex items-center gap-5 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                                <b.icon className="w-5 h-5 text-blue-600 font-bold" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic leading-none">{b.text}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -499,16 +519,17 @@ export default function Checkout() {
                                     <Button
                                         onClick={handlePlaceOrder}
                                         disabled={loading}
-                                        style={{ backgroundColor: primaryColor }}
-                                        className="w-full h-16 rounded-2xl text-white font-black uppercase tracking-widest text-xs border-none shadow-2xl"
+                                        className="w-full h-24 rounded-[2rem] bg-blue-600 hover:bg-slate-900 text-white font-black uppercase tracking-[0.4em] text-[12px] border-none shadow-2xl shadow-blue-600/30 transition-all flex items-center justify-center gap-4"
                                     >
                                         {loading ? (
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                                                Placing Order...
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                                                PROCESSING...
                                             </div>
                                         ) : (
-                                            <span>Place Order · ₹{grandTotal.toLocaleString()}</span>
+                                            <>
+                                                Initialize Settlement <ArrowRight className="w-6 h-6" /> <span className="text-white/30 font-black pl-4">₹{grandTotal.toLocaleString()}</span>
+                                            </>
                                         )}
                                     </Button>
                                 </motion.div>
@@ -517,117 +538,111 @@ export default function Checkout() {
                     </div>
 
                     {/* ── RIGHT COLUMN: Order Summary ── */}
-                    <div className="xl:col-span-4 space-y-6 xl:sticky xl:top-36">
+                    <div className="xl:col-span-4 space-y-8 xl:sticky xl:top-36">
 
                         {/* Items Summary */}
-                        <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-50 space-y-6">
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#14532d] flex items-center gap-2 border-b border-slate-50 pb-5">
-                                <Package className="w-4 h-4 text-[#f97316]" /> Your Order ({items.length})
+                        <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-10">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 flex items-center gap-4 border-b border-slate-100 pb-8 italic">
+                                <Layout className="w-5 h-5 text-blue-600" /> Staging Array ({items.length})
                             </h3>
 
-                            <div className="space-y-4 max-h-64 overflow-y-auto">
+                            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
                                 {items.map(item => (
-                                    <div key={`${item.id}-${item.variant_id}`} className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 shrink-0">
+                                    <div key={`${item.id}-${item.variant_id}`} className="flex items-center gap-6 group">
+                                        <div className="w-20 h-24 rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 shrink-0 p-3 flex items-center justify-center group-hover:border-blue-200 transition-colors">
                                             <img
-                                                src={item.image_url || "https://via.placeholder.com/56"}
+                                                src={item.image_url || `https://source.unsplash.com/400x600/?tech,${item.id}`}
                                                 alt={item.name}
-                                                className="w-full h-full object-cover"
+                                                className="max-w-full max-h-full object-contain grayscale-[40%] group-hover:grayscale-0 transition-all"
                                             />
                                         </div>
-                                        <div className="flex-grow min-w-0">
-                                            <p className="text-xs font-black text-slate-800 truncate">{item.name}</p>
-                                            {item.variant_name && <p className="text-[10px] text-[#f97316] font-bold">{item.variant_name}</p>}
-                                            <p className="text-[10px] text-slate-400 font-bold">Qty: {item.quantity}</p>
+                                        <div className="flex-grow min-w-0 space-y-1">
+                                            <p className="text-[11px] font-black text-slate-900 truncate uppercase tracking-tight italic group-hover:text-blue-600 transition-colors">{item.name}</p>
+                                            {item.variant_name && <p className="text-[9px] text-blue-600 font-black uppercase tracking-widest">{item.variant_name}</p>}
+                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">QUANTITY: {item.quantity}</p>
                                         </div>
-                                        <p className="text-sm font-black text-[#14532d] tabular-nums shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                        <p className="text-xs font-black text-slate-900 tabular-nums shrink-0 italic">₹{item.price * item.quantity}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Coupon Code */}
-                        <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-50 space-y-4">
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#14532d] flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-[#f97316]" /> Coupon Code
+                        {/* Coupon Code as Auth Token */}
+                        <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl space-y-6 border border-white/5">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white flex items-center gap-4 italic">
+                                <Tag className="w-4 h-4 text-blue-500" /> Redemption Hash
                             </h3>
                             {couponApplied ? (
-                                <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-2xl px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <Percent className="w-4 h-4 text-green-600" />
+                                <div className="flex items-center justify-between bg-blue-600 rounded-2xl px-6 py-4 shadow-xl shadow-blue-600/20">
+                                    <div className="flex items-center gap-4">
+                                        <Zap className="w-5 h-5 text-white animate-pulse" />
                                         <div>
-                                            <p className="text-xs font-black text-green-800">{couponApplied.code}</p>
-                                            <p className="text-[10px] text-green-600 font-medium">
-                                                {couponApplied.type === "percentage" ? `${couponApplied.value}% off` : `₹${couponApplied.value} off`} applied
+                                            <p className="text-[10px] font-black text-white uppercase tracking-widest">{couponApplied.code}</p>
+                                            <p className="text-[9px] text-white/60 font-black uppercase tracking-widest italic">
+                                                {couponApplied.type === "percentage" ? `${couponApplied.value}% VALIDATED` : `₹${couponApplied.value} REDEEMED`}
                                             </p>
                                         </div>
                                     </div>
-                                    <button onClick={removeCoupon} className="text-red-400 hover:text-red-600 transition-colors">
-                                        <X className="w-4 h-4" />
+                                    <button onClick={removeCoupon} className="text-white/40 hover:text-white transition-colors">
+                                        <X className="w-5 h-5" />
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex gap-2">
+                                <div className="flex gap-3">
                                     <input
                                         value={couponCode}
                                         onChange={e => { setCouponCode(e.target.value); setCouponError(""); }}
                                         onKeyDown={e => e.key === "Enter" && applyCoupon()}
-                                        placeholder="Enter promo code"
-                                        className="flex-1 h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50 text-sm font-bold text-slate-800 outline-none focus:border-[#14532d]/30 focus:bg-white transition-all uppercase"
+                                        placeholder="ENTER_HASH"
+                                        className="flex-1 h-14 px-6 rounded-2xl border border-white/10 bg-white/5 text-[11px] font-black text-white outline-none focus:border-blue-500 focus:bg-white/10 transition-all uppercase tracking-[0.2em]"
                                     />
                                     <Button
                                         onClick={applyCoupon}
                                         disabled={couponLoading || !couponCode}
-                                        variant="outline"
-                                        className="h-12 px-5 rounded-2xl text-xs font-black uppercase tracking-wider border-slate-200"
+                                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-[10px] font-black uppercase tracking-widest transition-all border-none"
                                     >
-                                        {couponLoading ? "..." : "Apply"}
+                                        {couponLoading ? "..." : "AUTH"}
                                     </Button>
                                 </div>
                             )}
                             {couponError && (
-                                <p className="text-xs text-red-500 font-bold flex items-center gap-1.5">
-                                    <AlertCircle className="w-3 h-3" /> {couponError}
+                                <p className="text-[9px] text-red-400 font-black flex items-center gap-2 uppercase tracking-widest italic">
+                                    <AlertCircle className="w-3.5 h-3.5" /> {couponError}
                                 </p>
                             )}
                         </div>
 
-                        {/* Price Breakdown */}
-                        <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-50 space-y-5">
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#14532d] border-b border-slate-50 pb-5">Bill Details</h3>
+                        {/* Price Breakdown as Data Matrix */}
+                        <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-8">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 border-b border-slate-100 pb-8 italic">Allocation Matrix</h3>
 
-                            <div className="space-y-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                <div className="flex justify-between">
-                                    <span>Subtotal</span>
-                                    <span className="text-slate-700 tabular-nums">₹{cartTotal.toLocaleString()}</span>
+                            <div className="space-y-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
+                                <div className="flex justify-between items-center">
+                                    <span>Base Valuation</span>
+                                    <span className="text-slate-900 tabular-nums">₹{cartTotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>GST (5%)</span>
-                                    <span className="text-slate-700 tabular-nums">₹{tax.toLocaleString()}</span>
+                                <div className="flex justify-between items-center">
+                                    <span>Protocol Tax (5%)</span>
+                                    <span className="text-slate-900 tabular-nums">₹{tax.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Delivery</span>
+                                <div className="flex justify-between items-center">
+                                    <span>Logistics Protocol</span>
                                     {shipping === 0
-                                        ? <span className="text-green-500">FREE</span>
-                                        : <span className="text-slate-700 tabular-nums">₹{shipping}</span>
+                                        ? <span className="text-blue-600">FREE DEPLOYMENT</span>
+                                        : <span className="text-slate-900 tabular-nums">₹{shipping}</span>
                                     }
                                 </div>
                                 {discount > 0 && (
-                                    <div className="flex justify-between text-green-600">
-                                        <span>Coupon Discount</span>
+                                    <div className="flex justify-between items-center text-blue-600">
+                                        <span>Redemption Offset</span>
                                         <span className="tabular-nums">− ₹{discount.toLocaleString()}</span>
                                     </div>
                                 )}
-                                {shipping > 0 && (
-                                    <p className="text-[9px] text-[#f97316] font-bold">
-                                        Add ₹{(999 - cartTotal).toLocaleString()} more for FREE delivery!
-                                    </p>
-                                )}
                             </div>
 
-                            <div className="pt-5 border-t border-dashed border-slate-100 flex justify-between items-end">
-                                <span className="text-[10px] font-black text-[#f97316] uppercase tracking-[0.2em]">Total Payable</span>
-                                <span className="text-4xl font-black text-[#14532d] tracking-tighter tabular-nums">₹{grandTotal.toLocaleString()}</span>
+                            <div className="pt-10 border-t border-dashed border-slate-100 flex flex-col gap-2">
+                                <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em] italic leading-none">Total Exposure</span>
+                                <span className="text-6xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">₹{grandTotal.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

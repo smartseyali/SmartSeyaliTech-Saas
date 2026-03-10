@@ -1,13 +1,13 @@
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Headphones, ChevronRight } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, MessageSquare, ShieldCheck, Activity, User, Zap, Box, Layout, Headphones } from "lucide-react";
 import { useState } from "react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 export default function Contact() {
     const { activeCompany } = useTenant();
     const { settings } = useStoreSettings();
-    const primaryColor = settings?.primary_color || "#14532d";
 
     const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
     const [submitted, setSubmitted] = useState(false);
@@ -20,53 +20,54 @@ export default function Contact() {
     const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
 
     return (
-        <div className="bg-white min-h-screen pt-24 pb-20 font-sans">
+        <div className="bg-[#f8fafc] min-h-screen pt-40 pb-40 font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
             {/* Hero */}
-            <section className="relative py-20 overflow-hidden" style={{ background: `linear-gradient(135deg, ${primaryColor}08, ${primaryColor}15)` }}>
+            <section className="relative py-20 overflow-hidden">
                 <div className="container mx-auto px-6 text-center">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ backgroundColor: `${primaryColor}15`, color: primaryColor }}>
-                            <Headphones className="w-3 h-3" /> Hum Yahan Hain — 24/7
-                        </span>
-                        <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight mb-6">
-                            Baat Karo <span style={{ color: primaryColor }}>Hum Se</span>
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-8">
+                        <div className="flex items-center justify-center gap-3">
+                            <Activity className="w-5 h-5 text-blue-600 animate-pulse" />
+                            <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px] italic">Operational Status: Online</span>
+                        </div>
+                        <h1 className="text-6xl md:text-[8rem] font-black text-slate-900 tracking-tighter leading-[0.8] mb-12 uppercase italic">
+                            Contact <br /><span className="text-blue-600">Center</span>
                         </h1>
-                        <p className="text-lg text-slate-500 max-w-xl mx-auto">
-                            Order tracking, product query, ya koi bhi sawal — hamari team hamesha ready hai.
+                        <p className="text-xl md:text-2xl font-medium italic text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                            Professional support channels initialized. Our team is standing by for corporate inquiries, product support, and partnership verification.
                         </p>
                     </motion.div>
                 </div>
             </section>
 
-            <div className="container mx-auto px-6 mt-16">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="container mx-auto px-6 mt-32">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
 
                     {/* Contact Info Cards */}
-                    <div className="space-y-6">
+                    <div className="lg:col-span-4 space-y-8">
                         {[
                             {
-                                icon: Phone, title: "Call / WhatsApp",
-                                value: activeCompany?.contact_phone || "+91 98765 43210",
-                                sub: "Mon–Sat, 9am–6pm IST",
-                                color: "#3b82f6"
+                                icon: Phone, title: "Primary_Line",
+                                value: activeCompany?.contact_phone || "+1 (555) 902-8831",
+                                sub: "24/7 Global Support",
+                                color: "blue"
                             },
                             {
-                                icon: Mail, title: "Email Karein",
-                                value: activeCompany?.contact_email || "support@store.in",
-                                sub: "24 ghante mein jawab milega",
-                                color: "#8b5cf6"
+                                icon: Mail, title: "Email_Channel",
+                                value: activeCompany?.contact_email || "support@ecosystem.io",
+                                sub: <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping" /> Response &lt; 120ms</span>,
+                                color: "blue"
                             },
                             {
-                                icon: MapPin, title: "Hamare Paas Aayein",
-                                value: activeCompany?.address || "123 Market Street, Sector 5",
-                                sub: `${activeCompany?.city || "Mumbai"}, ${activeCompany?.state || "Maharashtra"} — India`,
-                                color: "#f59e0b"
+                                icon: MapPin, title: "Corporate_Hub",
+                                value: activeCompany?.address || "Building_404, Tech_Sect_9",
+                                sub: `${activeCompany?.city || "Silicon_Valley"}, Global_Matrix`,
+                                color: "blue"
                             },
                             {
-                                icon: Clock, title: "Business Hours",
-                                value: "Mon–Sat: 9am – 6pm IST",
-                                sub: "Sunday: Band rehta hai",
-                                color: "#10b981"
+                                icon: Clock, title: "Business_Window",
+                                value: "09:00 - 21:00 UTC",
+                                sub: "Automated Handlers 24/7",
+                                color: "blue"
                             },
                         ].map((info, i) => (
                             <motion.div
@@ -74,93 +75,100 @@ export default function Contact() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.1 }}
-                                className="flex items-start gap-5 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all"
+                                className="flex items-start gap-8 p-10 bg-white rounded-[3rem] border border-slate-50 shadow-2xl shadow-slate-200/20 group hover:shadow-blue-600/10 transition-all duration-500"
                             >
-                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${info.color}15` }}>
-                                    <info.icon className="w-5 h-5" style={{ color: info.color }} />
+                                <div className="w-16 h-16 rounded-[1.5rem] bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-blue-600 transition-colors">
+                                    <info.icon className="w-7 h-7 text-blue-600 group-hover:text-white" />
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">{info.title}</p>
-                                    <p className="font-bold text-slate-800">{info.value}</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{info.sub}</p>
+                                <div className="space-y-2">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-1 italic leading-none">{info.title}</p>
+                                    <p className="font-black text-xl text-slate-900 tracking-tight italic uppercase">{info.value}</p>
+                                    <div className="text-[10px] font-black text-slate-400 italic uppercase tracking-widest leading-none pt-2">{info.sub}</div>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
 
                     {/* Contact Form */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-8">
                         {submitted ? (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="h-full flex flex-col items-center justify-center text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm"
+                                className="h-full flex flex-col items-center justify-center text-center py-40 bg-white rounded-[4rem] border border-slate-50 shadow-2xl shadow-slate-200/20"
                             >
-                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: `${primaryColor}15` }}>
-                                    <MessageSquare className="w-8 h-8" style={{ color: primaryColor }} />
+                                <div className="w-32 h-32 rounded-[2.5rem] bg-slate-900 flex items-center justify-center mb-12 shadow-2xl shadow-slate-900/20">
+                                    <ShieldCheck className="w-16 h-16 text-blue-400 animate-pulse" />
                                 </div>
-                                <h2 className="text-2xl font-black text-slate-800 mb-3">Sandesh Mila!</h2>
-                                <p className="text-slate-500 max-w-sm">Shukriya! Hamari team 24 ghante ke andar aapko jawab degi.</p>
-                                <button
+                                <h2 className="text-5xl font-black text-slate-900 mb-6 uppercase tracking-tighter italic">Message Received</h2>
+                                <p className="text-slate-400 text-xl font-medium italic max-w-sm">Submission accepted. Our handlers are analyzing your query for immediate response.</p>
+                                <Button
                                     onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", subject: "", message: "" }); }}
-                                    className="mt-8 px-8 py-3 rounded-xl text-white font-bold text-sm"
-                                    style={{ backgroundColor: primaryColor }}
+                                    className="mt-12 h-20 px-16 rounded-3xl bg-slate-900 text-white font-black uppercase tracking-[0.4em] text-[11px] italic transition-all hover:bg-blue-600 shadow-2xl shadow-slate-900/10 border-none"
                                 >
-                                    Send Another Message
-                                </button>
+                                    New Message
+                                </Button>
                             </motion.div>
                         ) : (
                             <motion.form
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 onSubmit={handleSubmit}
-                                className="bg-white rounded-3xl border border-slate-100 shadow-sm p-10 space-y-8"
+                                className="bg-white rounded-[4rem] border border-slate-50 shadow-2xl shadow-slate-200/20 p-20 space-y-16"
                             >
-                                <div>
-                                    <h2 className="text-2xl font-black text-slate-800 mb-1">Send Us a Message</h2>
-                                    <p className="text-slate-400 text-sm">Fill out the form and we'll respond as soon as possible.</p>
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-1 bg-blue-600" />
+                                        <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px] italic">Inquiry Registry</span>
+                                    </div>
+                                    <h2 className="text-5xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">Send <span className="text-blue-600">Message</span></h2>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                     {[
-                                        { key: "name", label: "Poora Naam *", placeholder: "Ramesh Sharma", required: true, type: "text" },
-                                        { key: "email", label: "Email ID *", placeholder: "ramesh@gmail.com", required: true, type: "email" },
-                                        { key: "phone", label: "Mobile Number", placeholder: "+91 98765 43210", required: false, type: "tel" },
-                                        { key: "subject", label: "Vishay *", placeholder: "Order tracking, refund, COD query...", required: true, type: "text" },
+                                        { key: "name", label: "FULL_NAME", placeholder: "IDENTIFIER", required: true, type: "text", icon: User },
+                                        { key: "email", label: "EMAIL_ADDRESS", placeholder: "NAME@CORPORATE.COM", required: true, type: "email", icon: Mail },
+                                        { key: "phone", label: "CONTACT_ID", placeholder: "+1 (000) 000-0000", required: false, type: "tel", icon: Zap },
+                                        { key: "subject", label: "SUBJECT_QUERY", placeholder: "INQUIRY_TYPE", required: true, type: "text", icon: ShieldCheck },
                                     ].map(field => (
-                                        <div key={field.key} className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">{field.label}</label>
+                                        <div key={field.key} className="space-y-4 group">
+                                            <div className="flex items-center justify-between px-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 group-focus-within:text-blue-600 transition-colors italic leading-none">{field.label}</label>
+                                                <field.icon className="w-3.5 h-3.5 text-slate-100 group-focus-within:text-blue-200 transition-all" />
+                                            </div>
                                             <input
                                                 type={field.type}
                                                 required={field.required}
                                                 placeholder={field.placeholder}
                                                 value={(form as any)[field.key]}
                                                 onChange={e => set(field.key, e.target.value)}
-                                                className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-slate-400 focus:bg-white transition-all"
+                                                className="w-full h-16 px-8 rounded-2xl border border-slate-50 bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200"
                                             />
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Message *</label>
+                                <div className="space-y-4 group">
+                                    <div className="flex items-center justify-between px-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 group-focus-within:text-blue-600 transition-colors italic leading-none">MESSAGE_BODY</label>
+                                        <MessageSquare className="w-3.5 h-3.5 text-slate-100 group-focus-within:text-blue-200 transition-all" />
+                                    </div>
                                     <textarea
                                         required
-                                        placeholder="Apna sawal ya sujhav yahan likhein..."
+                                        placeholder="INPUT_QUERY_HERE"
                                         value={form.message}
                                         onChange={e => set("message", e.target.value)}
-                                        rows={5}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 outline-none focus:border-slate-400 focus:bg-white transition-all resize-none"
+                                        rows={6}
+                                        className="w-full px-8 py-8 rounded-[2rem] border border-slate-50 bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200 resize-none"
                                     />
                                 </div>
 
-                                <button
+                                <Button
                                     type="submit"
-                                    className="w-full h-14 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-3 hover:opacity-90 transition-all shadow-lg"
-                                    style={{ backgroundColor: primaryColor }}
+                                    className="w-full h-24 rounded-[2rem] bg-slate-900 text-white font-black uppercase tracking-[0.5em] text-[13px] flex items-center justify-center gap-6 hover:bg-blue-600 transition-all shadow-2xl shadow-slate-900/10 italic border-none group/btn"
                                 >
-                                    <Send className="w-4 h-4" /> Sandesh Bhejo
-                                </button>
+                                    <Send className="w-6 h-6 group-hover:translate-x-2 transition-transform" /> Submit Message
+                                </Button>
                             </motion.form>
                         )}
                     </div>

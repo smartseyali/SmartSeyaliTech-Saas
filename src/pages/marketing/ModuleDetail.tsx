@@ -1,330 +1,229 @@
-import { useState, useEffect } from "react";
+
 import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import {
-    Zap,
+    ArrowLeft,
     CheckCircle2,
-    ArrowRight,
-    Layout,
-    Cpu,
-    ShieldCheck,
-    Smartphone,
-    Globe,
     ChevronRight,
-    Play,
-    Terminal,
+    Shield,
+    Zap,
+    Globe,
+    Box,
+    Cpu,
     Layers,
-    Box
+    Activity,
+    ArrowRight,
+    Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const ModuleDetail = () => {
     const { slug } = useParams();
     const [module, setModule] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState("overview");
 
     useEffect(() => {
-        const fetchModule = async () => {
+        const fetchModuleDetail = async () => {
             setLoading(true);
-            const { data, error } = await supabase
-                .from("system_modules")
-                .select("*")
-                .eq("slug", slug)
-                .single();
+            try {
+                const { data, error } = await supabase
+                    .from("system_modules")
+                    .select("*")
+                    .eq("slug", slug)
+                    .single();
 
-            if (data) {
+                if (error) throw error;
                 setModule(data);
+            } catch (err) {
+                console.error("Error fetching module detail:", err);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
-        if (slug) fetchModule();
+        if (slug) fetchModuleDetail();
     }, [slug]);
 
     if (loading) {
         return (
-            <div className="h-screen flex items-center justify-center bg-white">
-                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     if (!module) {
         return (
-            <div className="h-screen flex flex-col items-center justify-center text-center space-y-6">
-                <h1 className="text-4xl font-black uppercase italic">Engine Not Found</h1>
-                <Button asChild>
-                    <Link to="/products">Return to Inventory</Link>
-                </Button>
+            <div className="min-h-screen flex items-center justify-center bg-white p-6">
+                <div className="text-center space-y-6">
+                    <Info className="w-16 h-16 text-gray-200 mx-auto" />
+                    <h1 className="text-3xl font-bold text-gray-900">Module Not Found</h1>
+                    <p className="text-gray-500">The module you are looking for does not exist in our current inventory.</p>
+                    <Button asChild className="bg-primary-600 hover:bg-primary-700 rounded-xl px-8 h-12">
+                        <Link to="/products">Back to Inventory</Link>
+                    </Button>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Navigation Header (Compact) */}
-            <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <span className="text-2xl">{module.icon}</span>
-                        <h1 className="text-lg font-black uppercase italic tracking-tighter text-slate-900">{module.name}</h1>
-                    </div>
-                    <div className="hidden md:flex items-center gap-8">
-                        {["overview", "features", "interface"].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={cn(
-                                    "text-[10px] font-black uppercase tracking-widest transition-colors",
-                                    activeTab === tab ? "text-blue-600" : "text-slate-400 hover:text-slate-900"
-                                )}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-                    <Button asChild className="bg-slate-900 hover:bg-black text-white h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[10px]">
-                        <Link to="/login">Try it free</Link>
-                    </Button>
-                </div>
-            </div>
+        <div className="min-h-screen bg-white font-sans selection:bg-primary-600 selection:text-white">
+            {/* Dynamic Header */}
+            <section className="relative pt-32 pb-24 overflow-hidden bg-slate-50 border-b border-gray-100">
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <Link
+                        to="/products"
+                        className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors mb-12 group"
+                    >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> BACK TO ALL PRODUCTS
+                    </Link>
 
-            {/* Hero Section */}
-            <section className="relative pt-20 pb-32 overflow-hidden bg-slate-50">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500 rounded-full blur-[100px]" />
-                    <div className="absolute top-1/2 -right-20 w-96 h-96 bg-indigo-500 rounded-full blur-[100px]" />
-                </div>
-
-                <div className="max-w-7xl mx-auto px-4 relative z-10">
-                    <div className="flex flex-col lg:flex-row items-center gap-20">
-                        <div className="flex-1 space-y-8">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-600 rounded-full"
-                            >
-                                <Zap className="w-3 h-3" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{module.category} Engine</span>
-                            </motion.div>
-
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter uppercase italic leading-none"
-                            >
-                                {module.name} <span className="text-blue-600">Magic</span>
-                            </motion.h2>
-
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="text-xl text-slate-500 font-medium italic leading-relaxed"
-                            >
-                                {module.tagline || module.description}
-                            </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="flex flex-wrap gap-4 pt-4"
-                            >
-                                <Button asChild size="lg" className="h-16 px-10 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20">
-                                    <Link to="/login">Start Now — It's Free</Link>
-                                </Button>
-                                <Button variant="outline" size="lg" className="h-16 px-10 rounded-2xl border-2 border-slate-200 bg-white font-black uppercase tracking-widest text-xs">
-                                    <Link to="/contact">Meet an Advisor</Link>
-                                </Button>
-                            </motion.div>
-                        </div>
-
-                        <div className="flex-1 w-full">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
-                                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                                className="relative rounded-[2.5rem] bg-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-slate-200/60 p-4"
-                            >
-                                <img
-                                    src={module.screenshots?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80"}
-                                    alt="Interface Preview"
-                                    className="rounded-2xl w-full object-cover aspect-video"
-                                />
-                                <div className="absolute -bottom-6 -left-6 bg-slate-900 text-white p-6 rounded-3xl shadow-2xl flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center font-bold italic">S</div>
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest opacity-50">Deployed State</p>
-                                        <p className="text-sm font-bold italic">AI-Native Optimization</p>
+                    <div className="grid lg:grid-cols-[1.3fr,0.7fr] gap-16 items-center">
+                        <div className="space-y-8 animate-fade-in">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-primary-100 p-1.5 rounded-lg">
+                                        <Cpu className="w-3.5 h-3.5 text-primary-600" />
                                     </div>
+                                    <span className="text-[10px] font-bold text-primary-600 uppercase tracking-widest">{module.category || 'Platform'} Category</span>
                                 </div>
-                            </motion.div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Feature Showcase Grid (Odoo Style) */}
-            <section className="py-32 bg-white">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center space-y-4 mb-20">
-                        <h3 className="text-4xl font-black uppercase italic tracking-tighter">Engine <span className="text-blue-600">Performance</span></h3>
-                        <p className="text-slate-400 font-medium italic">High-precision architecture designed for scaling businesses.</p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-12">
-                        {module.use_cases && Array.isArray(module.use_cases) && module.use_cases.length > 0 ? (
-                            module.use_cases.map((useCase: any, i: number) => (
-                                <motion.div
-                                    key={i}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="space-y-6 group"
-                                >
-                                    <div className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                                        {/* Dynamic Icon Mapping would go here, fallback to Box */}
-                                        <Box className="w-8 h-8" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h4 className="text-xl font-black uppercase italic tracking-tighter text-slate-900">{useCase.title}</h4>
-                                        <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{useCase.description}</p>
-                                    </div>
-                                </motion.div>
-                            ))
-                        ) : (
-                            // Default Fallback Features
-                            [
-                                { title: "Automated Logic", desc: "No manual data entry required. AI agents handle the bulk of operations.", icon: Cpu },
-                                { title: "Global Sync", desc: "Synchronize data across all nodes in real-time with zero latency.", icon: Globe },
-                                { title: "Secure Tier", desc: "Enterprise-grade encryption protecting every byte of business data.", icon: ShieldCheck }
-                            ].map((item, i) => (
-                                <div key={i} className="space-y-6">
-                                    <div className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-400">
-                                        <item.icon className="w-8 h-8" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h4 className="text-xl font-black uppercase italic tracking-tighter text-slate-900">{item.title}</h4>
-                                        <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            </section>
-
-            {/* In-Depth Content */}
-            <section className="py-32 bg-slate-50/50">
-                <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-32 items-center">
-                    <div className="order-2 lg:order-1">
-                        <div className="relative group">
-                            <img
-                                src={module.screenshots?.[1] || "https://images.unsplash.com/photo-1551288049-bbbda546697a?w=1200&q=80"}
-                                alt="Deployed View"
-                                className="rounded-[3rem] shadow-2xl relative z-10 w-full"
-                            />
-                            <div className="absolute -inset-4 bg-blue-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                    </div>
-
-                    <div className="order-1 lg:order-2 space-y-10">
-                        <div className="space-y-4">
-                            <h3 className="text-4xl font-black uppercase italic tracking-tighter leading-none">After-Deployment <br /><span className="text-blue-600">Interface</span></h3>
-                            <p className="text-xl text-slate-500 font-medium italic leading-relaxed">
-                                {module.interface_overview || "Experience a clean, professional dashboard designed specifically for high-frequency operations."}
-                            </p>
-                        </div>
-
-                        <div className="grid gap-6">
-                            {(module.features || []).map((feature: string, i: number) => (
-                                <div key={i} className="flex items-start gap-4 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <CheckCircle2 className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase italic tracking-tight text-slate-900">{feature}</p>
-                                        <p className="text-xs font-medium text-slate-400 italic">Advanced optimization including real-time analytic tracking.</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Full Story Section */}
-            {module.long_description && (
-                <section className="py-32 bg-white">
-                    <div className="max-w-4xl mx-auto px-4 text-center space-y-12">
-                        <div className="inline-flex items-center gap-3 px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
-                            <Terminal className="w-4 h-4 text-blue-400" /> System Blueprint
-                        </div>
-                        <h3 className="text-5xl font-black uppercase italic tracking-tighter text-slate-900">The Modern <span className="text-blue-600">SaaS Engine</span></h3>
-                        <div className="prose prose-slate max-w-none prose-lg italic font-medium text-slate-600 leading-loose">
-                            {module.long_description.split('\n').map((para: string, i: number) => (
-                                <p key={i} className="mb-6">{para}</p>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Screenshot Gallery */}
-            {module.screenshots && module.screenshots.length > 2 && (
-                <section className="py-32 overflow-hidden bg-slate-900">
-                    <div className="max-w-7xl mx-auto px-4 mb-20 text-center">
-                        <h3 className="text-4xl font-black uppercase italic tracking-tighter text-white">Visual <span className="text-blue-500">Inventory</span></h3>
-                    </div>
-                    <div className="flex gap-8 px-4 animate-scroll-x">
-                        {module.screenshots.map((url: string, i: number) => (
-                            <div key={i} className="w-[600px] shrink-0 rounded-3xl overflow-hidden shadow-2xl">
-                                <img src={url} alt="Screenshot" className="w-full h-full object-cover" />
+                                <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
+                                    {module.name} <br />
+                                    <span className="text-primary-600">Overview</span>
+                                </h1>
+                                <p className="text-lg text-gray-500 font-medium italic leading-relaxed max-w-xl">
+                                    "{module.tagline || 'Experience high-performance enterprise management logic.'}"
+                                </p>
                             </div>
-                        ))}
-                    </div>
-                </section>
-            )}
 
-            {/* Tech Stack */}
-            <section className="py-20 border-t border-slate-100">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-                        <div className="space-y-1">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Foundation</p>
-                            <h4 className="text-xl font-black uppercase italic">Architectural Stack</h4>
+                            <div className="flex flex-wrap gap-4">
+                                <Button asChild size="lg" className="h-14 px-8 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-md shadow-lg shadow-primary-600/10">
+                                    <Link to="/contact">Initialize</Link>
+                                </Button>
+                                <Button asChild size="lg" variant="outline" className="h-14 px-8 rounded-xl border-gray-200 hover:bg-white text-gray-700 font-bold text-md">
+                                    <Link to="/login">Login</Link>
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex flex-wrap gap-8">
-                            {(module.technologies || ["React", "Supabase", "PostgreSQL", "Tailwind"]).map((tech: string, i: number) => (
-                                <div key={i} className="flex items-center gap-2 group cursor-default">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-600 group-hover:scale-150 transition-transform" />
-                                    <span className="text-sm font-black uppercase italic tracking-tighter text-slate-400 group-hover:text-slate-900 transition-colors">{tech}</span>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, rotate: 1 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                            className="relative lg:justify-self-end w-full max-w-md"
+                        >
+                            <div className="absolute -inset-6 bg-primary-600/5 blur-[80px] rounded-full" />
+                            <div className="bg-white rounded-2xl p-2 shadow-xl relative z-10 border border-white">
+                                <img
+                                    src={module.screenshots?.[0] || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80'}
+                                    alt={module.name}
+                                    className="rounded-xl w-full object-cover aspect-video"
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Specifications Grid */}
+            <section className="py-20 bg-white">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid lg:grid-cols-3 gap-12">
+                        <div className="lg:col-span-2 space-y-16">
+                            <div className="space-y-8">
+                                <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-primary-600 pl-4">Core Capabilities</h2>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {(module.features || ["Automated Workflows", "Real-time Analytics", "Seamless Integration", "Cloud Deployment"]).map((feature: string, i: number) => (
+                                        <div key={i} className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 border border-gray-50 hover:bg-white hover:border-primary-100 hover:shadow-lg transition-all duration-300 group">
+                                            <div className="bg-white p-2 rounded-lg shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                                                <CheckCircle2 className="w-4 h-4 text-primary-600 group-hover:text-white" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900 text-md">{feature}</p>
+                                                <p className="text-gray-400 text-xs mt-1 italic leading-relaxed">Industrial grade capability for high-scale operations.</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+
+                            <div className="space-y-8">
+                                <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-primary-600 pl-4">Industrial Specification</h2>
+                                <div className="bg-slate-50 rounded-2xl p-8 border border-gray-100">
+                                    <p className="text-lg text-gray-600 leading-relaxed italic">
+                                        "{module.description || module.long_description || 'Detailed technical analysis and module behavior specifications are available upon request through our lead architects.'}"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-10">
+                            <Card className="rounded-2xl border border-gray-100 shadow-lg p-8 bg-white sticky top-32">
+                                <CardContent className="p-0 space-y-8">
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-bold text-gray-900">Technical Stack</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {(module.technologies || ["React", "PostgreSQL", "Node.js", "Redis"]).map((tech: string) => (
+                                                <span key={tech} className="px-3 py-1 bg-gray-50 rounded-lg text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-widest">{tech}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-8 border-t border-gray-50">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <Shield className="w-4 h-4 text-primary-600" />
+                                                <span className="font-bold text-gray-900 text-sm">Security Grade</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md">Tier-1</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <Globe className="w-4 h-4 text-primary-600" />
+                                                <span className="font-bold text-gray-900 text-sm">Network Type</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md">Global</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <Zap className="w-4 h-4 text-primary-600" />
+                                                <span className="font-bold text-gray-900 text-sm">Architecture</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md">Modular</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4">
+                                        <Button asChild className="w-full h-14 rounded-xl bg-gray-900 hover:bg-primary-600 text-white font-bold text-sm transition-all cursor-pointer">
+                                            <Link to="/contact" className="flex items-center justify-center">
+                                                Initialize <ArrowRight className="ml-2 w-4 h-4" />
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Bottom CTA */}
-            <section className="py-32">
-                <div className="max-w-5xl mx-auto px-4">
-                    <div className="bg-blue-600 rounded-[4rem] p-16 md:p-24 text-center space-y-12 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[100px] group-hover:scale-125 transition-transform duration-1000" />
-                        <div className="space-y-4">
-                            <h3 className="text-4xl md:text-6xl font-black uppercase italic text-white tracking-tighter leading-none">Ready to <br className="md:hidden" />Initialize?</h3>
-                            <p className="text-blue-100 text-lg md:text-xl font-medium italic opacity-80">Join 500+ enterprises running on {module.name} engines.</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Button asChild className="h-20 px-16 rounded-[2rem] bg-white text-blue-600 hover:bg-black hover:text-white font-black uppercase tracking-widest text-sm shadow-2xl transition-all">
-                                <Link to="/login">Deploy Now</Link>
+            {/* Call to Action */}
+            <section className="py-24 border-t border-gray-100">
+                <div className="max-w-5xl mx-auto px-6 text-center">
+                    <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-8 relative overflow-hidden shadow-2xl">
+                        <h2 className="text-4xl md:text-5xl font-bold leading-tight">Ready to Upgrade?</h2>
+                        <p className="text-xl text-primary-100 max-w-2xl mx-auto">
+                            Deployment takes less than 5 minutes. Connect with our architects to configure your custom instance.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+                            <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg">
+                                <Link to="/contact">Initialize Project</Link>
                             </Button>
-                            <Button asChild variant="outline" className="h-20 px-16 rounded-[2rem] border-white/20 text-white hover:bg-white/10 font-black uppercase tracking-widest text-sm backdrop-blur-sm transition-all">
-                                <Link to="/contact">Request Demo</Link>
+                            <Button asChild variant="outline" size="lg" className="h-16 px-12 rounded-xl border-white/20 text-white hover:bg-white/10 font-bold text-lg backdrop-blur-sm">
+                                <Link to="/login">Login Access</Link>
                             </Button>
                         </div>
                     </div>
