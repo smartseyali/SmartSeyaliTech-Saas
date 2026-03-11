@@ -1,85 +1,144 @@
 import { useState } from "react";
-import {
-    MessageSquare, Search, Filter, Plus,
-    MoreHorizontal, CheckCircle2, Clock,
-    MessageCircle, Settings, Share2,
-    Smartphone, Zap, HelpCircle
+import { 
+    MessageSquare, Smartphone, Layout, 
+    Plus, Search, Filter, RefreshCw, 
+    CheckCircle2, AlertCircle, Clock,
+    Type, Image as ImageIcon,
+    MousePointer2, Settings2, ShieldCheck,
+    Facebook, Globe
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useCrud } from "@/hooks/useCrud";
+import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
-export default function Templates() {
-    const templates = [
-        { id: "TMPL-901", name: "order_confirmation", category: "Transactional", status: "Approved", quality: "High" },
-        { id: "TMPL-902", name: "welcome_greeting", category: "Marketing", status: "Pending", quality: "-" },
-        { id: "TMPL-903", name: "payment_failed_alert", category: "Transactional", status: "Approved", quality: "Medium" },
+export default function WhatsAppTemplates() {
+    const [view, setView] = useState<"list" | "form">("list");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingTemplate, setEditingTemplate] = useState<any>(null);
+    
+    // Fetch templates from whatsapp_templates table
+    const { data: templates, loading, fetchItems, createItem, updateItem } = useCrud("whatsapp_templates");
+
+    const templateFields = [
+        { key: "name", label: "Registry Template identity", required: true, ph: "Summer_Promo_2026..." },
+        { 
+            key: "category", label: "Protocol Category", type: "select" as const,
+            options: [
+                { label: "Marketing Campaign Node", value: "MARKETING" },
+                { label: "Utility Transactional hub", value: "UTILITY" },
+                { label: "Authentication Protocol", value: "AUTHENTICATION" }
+            ]
+        },
+        { key: "language", label: "Localization Protocol", ph: "en_US..." },
+        { key: "meta_template_id", label: "Meta Infrastructure Identity", ph: "h_1029348123..." },
+        { 
+            key: "status", label: "Authorization State", type: "select" as const,
+            options: [
+                { label: "Pending Meta Approval", value: "pending" },
+                { label: "Protocol Authorized", value: "approved" },
+                { label: "Rejected Node", value: "rejected" }
+            ]
+        }
     ];
 
-    return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <MessageCircle className="w-6 h-6 text-emerald-600" />
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Meta Business API</span>
-                    </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase italic">Message Templates</h1>
-                    <p className="text-sm font-medium text-slate-500">Manage pre-approved WhatsApp message structures for campaigns and alerts.</p>
-                </div>
+    const handleSave = async (header: any) => {
+        if (editingTemplate) {
+            await updateItem(editingTemplate.id, header);
+        } else {
+            await createItem(header);
+        }
+        setView("list");
+        setEditingTemplate(null);
+    };
+
+    const templateColumns = [
+        { 
+            key: "identity", 
+            label: "Template Node / Logic",
+            render: (t: any) => (
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" className="h-12 px-6 rounded-2xl border-slate-200">
-                        <HelpCircle className="w-5 h-5 mr-2" /> Policy Guide
-                    </Button>
-                    <Button className="h-12 px-8 rounded-2xl bg-emerald-600 hover:bg-black text-white font-bold shadow-xl shadow-emerald-600/20 transition-all gap-3 border-0">
-                        <Plus className="w-5 h-5" /> New Template
-                    </Button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {templates.map((tpl) => (
-                    <div key={tpl.id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden hover:shadow-2xl transition-all group flex flex-col">
-                        <div className="p-10 flex-1">
-                            <div className="flex items-start justify-between mb-8">
-                                <div className="p-4 rounded-[20px] bg-slate-900 text-emerald-500 transition-transform group-hover:rotate-12">
-                                    <Smartphone className="w-8 h-8" />
-                                </div>
-                                <span className={cn(
-                                    "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                    tpl.status === 'Approved' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                        "bg-amber-50 text-amber-600 border-amber-100"
-                                )}>
-                                    {tpl.status}
-                                </span>
-                            </div>
-
-                            <h3 className="text-xl font-black text-slate-900 mb-2 uppercase italic leading-tight">{tpl.name}</h3>
-                            <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-8">
-                                <Zap className="w-4 h-4" /> Category: {tpl.category}
-                            </div>
-
-                            <div className="p-6 bg-slate-50 rounded-[28px] border border-slate-100 italic text-[11px] font-medium text-slate-500 leading-relaxed relative">
-                                <span className="absolute -top-3 left-6 px-3 bg-white border border-slate-100 rounded-full text-[8px] font-black uppercase tracking-widest text-slate-400">Preview Structure</span>
-                                "Hi {"{1}"}, your order {"{2}"} has been successfully processed and is out for delivery. Tracking ID: {"{3}"}."
-                            </div>
-                        </div>
-
-                        <div className="p-10 bg-slate-50/50 border-t border-slate-50 flex items-center justify-between">
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 leading-none">Quality Score</p>
-                                <p className={cn(
-                                    "text-sm font-black italic",
-                                    tpl.quality === 'High' ? "text-emerald-600" : "text-amber-600"
-                                )}>{tpl.quality}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button size="icon" variant="ghost" className="h-10 w-10 text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><Share2 className="w-5 h-5" /></Button>
-                                <Button size="icon" variant="ghost" className="h-10 w-10 text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><Settings className="w-5 h-5" /></Button>
-                            </div>
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 relative">
+                        <MessageSquare className="w-6 h-6" />
+                        <div className="absolute -top-1 -right-1">
+                           <Facebook size={12} className="text-blue-600 fill-white" />
                         </div>
                     </div>
-                ))}
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{t.name}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                                {t.category || "GENERAL"}
+                            </span>
+                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest leading-none flex items-center gap-1">
+                                <Globe size={10}/> {t.language || 'en_US'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            key: "structure", 
+            label: "Message Components",
+            render: () => (
+                <div className="flex gap-1.5">
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><ImageIcon size={12}/></div>
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><Type size={12}/></div>
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><MousePointer2 size={12}/></div>
+                </div>
+            )
+        },
+        { 
+            key: "meta_id", 
+            label: "Meta Entity ID",
+            render: (t: any) => (
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono">
+                    {t.meta_template_id || 'PENDING_IND...'}
+                </span>
+            )
+        },
+        { 
+            key: "status", 
+            label: "Registry Status",
+            render: (t: any) => <StatusBadge status={t.status || "approved"} />
+        }
+    ];
+
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingTemplate ? "Refine Meta Protocol" : "Initialize Meta Template"}
+                    subtitle="WhatsApp Business Infrastructure Protocol"
+                    headerFields={templateFields}
+                    onAbort={() => { setView("list"); setEditingTemplate(null); }}
+                    onSave={handleSave}
+                    initialData={editingTemplate}
+                    showItems={false}
+                />
             </div>
-        </div>
+        );
+    }
+
+    return (
+        <ERPListView
+            title="WhatsApp Protocol Registry"
+            data={templates || []}
+            columns={templateColumns}
+            onNew={() => { setEditingTemplate(null); setView("form"); }}
+            onRefresh={fetchItems}
+            onRowClick={(t) => { setEditingTemplate(t); setView("form"); }}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+            headerActions={
+                <div className="flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                        <RefreshCw className="w-3.5 h-3.5" /> Sync with Meta Hub
+                    </button>
+                </div>
+            }
+        />
     );
 }

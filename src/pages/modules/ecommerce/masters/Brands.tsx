@@ -1,26 +1,55 @@
 import { useState } from "react";
-import { ModuleListPage } from "@/components/modules/ModuleListPage";
-import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
 import { useCrud } from "@/hooks/useCrud";
-import { Award, Image as ImageIcon } from "lucide-react";
-
-const brandColumns = [
-    { key: "logo_url", label: "", render: (val: string) => val ? <img src={val} className="w-8 h-8 rounded-lg object-contain bg-secondary/30" /> : <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center"><Award className="w-4 h-4 text-muted-foreground" /></div> },
-    { key: "name", label: "Brand Name" },
-    { key: "description", label: "Overview" },
-    { key: "is_active", label: "Status", render: (val: boolean) => val ? 'Live' : 'Hidden' },
-];
-
-const brandFields: FieldConfig[] = [
-    { key: "logo_url", label: "Brand Logo", type: "image", folder: "brands" },
-    { key: "name", label: "Brand Name", required: true },
-    { key: "description", label: "Short History/Bio", type: "textarea" },
-];
+import { Award } from "lucide-react";
+import ERPListView from "@/components/modules/ERPListView";
+import { DynamicFormDialog } from "@/components/modules/DynamicFormDialog";
 
 export const Brands = () => {
-    const { data, loading, createItem, updateItem, deleteItem } = useCrud("brands");
+    const { data, loading, createItem, updateItem, fetchItems } = useCrud("brands");
+    const [searchTerm, setSearchTerm] = useState("");
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+
+    const brandColumns = [
+        { 
+            key: "logo_url", 
+            label: "", 
+            render: (row: any) => row.logo_url ? (
+                <img src={row.logo_url} className="w-10 h-10 rounded-xl object-contain bg-slate-50 border border-slate-100 shadow-sm p-1" />
+            ) : (
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                    <Award className="w-4 h-4 text-slate-300" />
+                </div>
+            )
+        },
+        { 
+            key: "name", 
+            label: "Brand Identity",
+            render: (row: any) => (
+                <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[200px]">{row.description || "Vendor Registry Bio"}</span>
+                </div>
+            )
+        },
+        { 
+            key: "is_active", 
+            label: "Ledger State", 
+            render: (row: any) => (
+                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${
+                    row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
+                }`}>
+                    {row.is_active ? 'Live' : 'Hidden'}
+                </div>
+            ) 
+        }
+    ];
+
+    const brandFields = [
+        { key: "logo_url", label: "Brand Logo", type: "image" as const, folder: "brands" },
+        { key: "name", label: "Brand Name", required: true },
+        { key: "description", label: "Short History/Bio", type: "textarea" as const },
+    ];
 
     const handleNew = () => {
         setEditingItem(null);
@@ -33,30 +62,32 @@ export const Brands = () => {
     };
 
     const handleSubmit = async (formData: any) => {
-        if (editingItem) {
+        if (editingItem?.id) {
             await updateItem(editingItem.id, formData);
         } else {
             await createItem(formData);
         }
+        setFormOpen(false);
+        fetchItems();
     };
 
-    const handleDelete = async (item: any) => {
-        if (confirm("Permanently delete this brand? This will affect products linked to it.")) {
-            await deleteItem(item.id);
-        }
-    };
+    const filteredData = (data || []).filter(b => 
+        b.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <>
-            <ModuleListPage
-                title="Brands"
-                subtitle="Manage brand identities for your marketplace"
+        <div className="h-full flex flex-col">
+            <ERPListView
+                title="Store Brands"
+                data={filteredData}
                 columns={brandColumns}
-                data={data}
-                loading={loading}
                 onNew={handleNew}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onRefresh={fetchItems}
+                onRowClick={handleEdit}
+                isLoading={loading}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                primaryKey="id"
             />
             <DynamicFormDialog
                 open={formOpen}
@@ -66,7 +97,7 @@ export const Brands = () => {
                 initialData={editingItem}
                 onSubmit={handleSubmit}
             />
-        </>
+        </div>
     );
 };
 

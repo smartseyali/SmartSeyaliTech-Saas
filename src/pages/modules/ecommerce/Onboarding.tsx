@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import PLATFORM_CONFIG from "@/config/platform";
 import { PLATFORM_MODULES, type PlatformModule } from "@/config/modules";
+import { cn } from "@/lib/utils";
+import { PlatformLoader } from "@/components/PlatformLoader";
 
 // ── Types ──────────────────────────────────────────────────
 interface TemplateEntry {
@@ -84,26 +86,49 @@ const LOCAL_REGISTRY: TemplateEntry[] = [
     }
 ];
 
+const LOCAL_PLANS: PlanEntry[] = [
+    { id: '1', name: 'Standard', slug: 'standard', price_monthly: 29.00, features: ["Up to 5 Projects", "Basic Analytics", "Standard Templates", "Email Support"] },
+    { id: '2', name: 'Professional', slug: 'professional', price_monthly: 99.00, features: ["Up to 20 Projects", "Advanced Analytics", "Premium Templates", "Priority Support", "Custom Domain"] },
+    { id: '3', name: 'Enterprise', slug: 'enterprise', price_monthly: 299.00, features: ["Unlimited Projects", "Full White-label", "Custom Integrations", "Dedicated Account Manager", "SLA Guarantee"] }
+];
+
+const LOCAL_MODULE_REGISTRY = [
+    { id: 'ecommerce', slug: 'ecommerce', name: 'Ecommerce', category: 'commerce', tagline: 'Unified Online Selling Engine', icon: '🛒', is_core: true, needsTemplate: true },
+    { id: 'crm', slug: 'crm', name: 'CRM', category: 'commerce', tagline: 'Industrial Relationship Manager', icon: '🤝', is_core: false, needsTemplate: false },
+    { id: 'inventory', slug: 'inventory', name: 'Inventory', category: 'operations', tagline: 'Strategic Stock Controller', icon: '📦', is_core: false, needsTemplate: false },
+    { id: 'landing-page', slug: 'landing-page', name: 'Website Manager', category: 'commerce', tagline: 'Clinical Content Orchestrator', icon: '🌐', is_core: true, needsTemplate: true }
+];
+
+// ─── Step Indicator ────────────────────────────────────────
 // ─── Step Indicator ────────────────────────────────────────
 function StepDots({ current, steps }: { current: number, steps: string[] }) {
     return (
-        <div className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex items-center gap-2 mb-2 overflow-x-auto pb-1 scrollbar-hide">
             {steps.map((label, i) => {
                 const stepNum = i + 1;
                 const isActive = stepNum === current;
                 const isDone = stepNum < current;
                 return (
-                    <div key={i} className="flex flex-col items-center gap-1">
-                        <div className={`transition-all duration-500 rounded-full flex items-center justify-center
-                            ${isActive ? 'w-6 h-6 bg-primary-600 shadow-[0_0_15px_rgba(0,155,176,0.3)]' :
-                                isDone ? 'w-4 h-4 bg-emerald-500/80' : 'w-3 h-3 bg-white/10'}`}>
-                            {isDone
-                                ? <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
-                                : isActive
-                                    ? <span className="text-[9px] font-black text-white">{stepNum}</span>
-                                    : null}
+                    <div key={i} className="flex items-center gap-2 flex-shrink-0">
+                        <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 border-2",
+                            isActive ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/20 scale-110" :
+                                isDone ? "bg-emerald-500 border-emerald-500 text-white" :
+                                    "bg-white border-slate-100 text-slate-400"
+                        )}>
+                            {isDone ? <Check className="w-4 h-4 stroke-[3]" /> : stepNum}
                         </div>
-                        {isActive && <span className="text-[7px] font-black uppercase tracking-widest text-blue-500">{label}</span>}
+                        {isActive && (
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-900 mr-2">
+                                {label}
+                            </span>
+                        )}
+                        {i < steps.length - 1 && (
+                            <div className={cn(
+                                "w-4 h-px",
+                                isDone ? "bg-emerald-500" : "bg-slate-100"
+                            )} />
+                        )}
                     </div>
                 );
             })}
@@ -127,8 +152,14 @@ export default function Onboarding() {
             }
 
             supabase.from('companies').select('id').eq('user_id', user.id).limit(1).maybeSingle().then(({ data }) => {
-                if (data) navigate('/apps', { replace: true });
-            });
+                if (data) {
+                    navigate('/apps', { replace: true });
+                } else {
+                    setIsRedirecting(false);
+                }
+            }).catch(() => setIsRedirecting(false));
+        } else if (!pLoading && !user) {
+            setIsRedirecting(false);
         }
     }, [user, isSuperAdmin, pLoading]);
 
@@ -158,7 +189,48 @@ export default function Onboarding() {
     const [slug, setSlug] = useState("");
 
     const [loading, setLoading] = useState(false);
+    const [initializing, setInitializing] = useState(true);
+    const [isRedirecting, setIsRedirecting] = useState(!!user); // Assume redirecting if logged in until proven otherwise
     const [error, setError] = useState("");
+
+    // Background Carousel State
+    const [bgImageIndex, setBgImageIndex] = useState(0);
+    const brandingContent = [
+        {
+            image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&q=80",
+            title: "Launch your digital future today.",
+            subtitle: "Join thousands of enterprises building their custom cloud ecosystem.",
+            stats: [
+                { val: "Instantly", label: "Provisioning" },
+                { val: "Secure", label: "Military-Grade" }
+            ]
+        },
+        {
+            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80",
+            title: "Scalable Infrastructure for Growth.",
+            subtitle: "Built on high-performance architecture that scales with your business.",
+            stats: [
+                { val: "99.9%", label: "Uptime" },
+                { val: "Global", label: "Edge Network" }
+            ]
+        },
+        {
+            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80",
+            title: "Advanced Data Intelligence.",
+            subtitle: "Turn raw data into actionable insights with our integrated BI tools.",
+            stats: [
+                { val: "Real-time", label: "Analytics" },
+                { val: "AI-Ready", label: "Processing" }
+            ]
+        }
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setBgImageIndex((prev) => (prev + 1) % brandingContent.length);
+        }, 7000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Determine if we need the theme step
     const needsTheme = selectedModules.some(modId => {
@@ -215,37 +287,49 @@ export default function Onboarding() {
                     }));
                     setPlans(mapped);
                     setSelectedPlan(mapped[0].id);
+                } else {
+                    setPlans(LOCAL_PLANS);
+                    setSelectedPlan(LOCAL_PLANS[0].id);
                 }
 
                 // Fetch System Modules for selection
                 const { data: mData } = await supabase.from('system_modules').select('*').eq('is_active', true);
-                if (mData) {
-                    setAvailableSystemModules(mData);
+                const modulesToUse = (mData && mData.length > 0) ? mData : LOCAL_MODULE_REGISTRY;
+                setAvailableSystemModules(modulesToUse);
 
-                    // Pre-select module from URL if exists
-                    const params = new URLSearchParams(window.location.search);
-                    const urlModule = params.get('module');
-                    if (urlModule) {
-                        // Find by slug OR id
-                        const mod = mData.find(m => m.slug === urlModule || m.id.toString() === urlModule);
-                        if (mod) {
-                            setSelectedModules([mod.id.toString()]);
-                            // Set industry type based on module category if possible
-                            if (mod.category === 'commerce') setIndustryType('retail');
-                            else if (mod.category === 'operations') setIndustryType('services');
-                            else if (mod.category.includes('people') || mod.category === 'education') setIndustryType('education');
-                        }
+                // Pre-select module from URL if exists
+                const params = new URLSearchParams(window.location.search);
+                const urlModule = params.get('module');
+                if (urlModule) {
+                    const mod = modulesToUse.find(m => m.slug === urlModule || m.id.toString() === urlModule);
+                    if (mod) {
+                        setSelectedModules([mod.id.toString()]);
+                        if (mod.category === 'commerce') setIndustryType('retail');
+                        else if (mod.category === 'operations') setIndustryType('services');
+                        else if (mod.category.includes('people') || mod.category === 'education') setIndustryType('education');
                     }
+                } else if (selectedModules.length === 0) {
+                    // Default to ecommerce if nothing selected
+                    const ecom = modulesToUse.find(m => m.slug === 'ecommerce');
+                    if (ecom) setSelectedModules([ecom.id.toString()]);
                 }
             } catch (err) {
-                console.error("Failed to load onboarding content:", err);
+                console.warn("Database sync deficit detected. Operating under Clinical Autonomy Mode (Local Fallbacks).");
                 setTemplates(LOCAL_REGISTRY as any);
+                setPlans(LOCAL_PLANS);
+                setSelectedPlan(LOCAL_PLANS[0].id);
+                setAvailableSystemModules(LOCAL_MODULE_REGISTRY);
+                if (selectedModules.length === 0) setSelectedModules(['ecommerce']);
             } finally {
                 setTemplatesLoading(false);
+                setTimeout(() => setInitializing(false), 800);
             }
         }
         loadContent();
     }, []);
+
+    // ── Components ─────────────────────────────────────────────
+    // Internal legacy loader replaced by clinical PlatformLoader
 
     // ── Helpers ───────────────────────────────────────────────
     const goNext = () => {
@@ -327,19 +411,41 @@ export default function Onboarding() {
             const newSlug = storeName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
             setSlug(newSlug);
 
-            const { data: newCompany, error: cErr } = await supabase
+            let insertPayload: any = {
+                name: storeName,
+                subdomain: newSlug,
+                contact_email: email || activeUser.email,
+                user_id: activeUser.id,
+                plan: plans.find(p => p.id === selectedPlan)?.name || 'starter'
+            };
+
+            // Try to include new columns if they exist in state/registry
+            if (industryType) insertPayload.industry_type = industryType;
+            const pSlug = plans.find(p => p.id === selectedPlan)?.slug;
+            if (pSlug) insertPayload.plan_slug = pSlug;
+
+            let { data: newCompany, error: cErr } = await supabase
                 .from("companies")
-                .insert([{
-                    name: storeName,
-                    subdomain: newSlug,
-                    contact_email: email || activeUser.email,
-                    user_id: activeUser.id,
-                    industry_type: industryType,
-                    plan: plans.find(p => p.id === selectedPlan)?.name || 'starter'
-                }])
+                .insert([insertPayload])
                 .select()
                 .single();
-            if (cErr) throw cErr;
+
+            if (cErr) {
+                console.warn("Full company insert failed, attempting legacy fallback...", cErr);
+                // Fallback: Try without industry_type and plan_slug if DB isn't updated
+                const { data: fallbackCompany, error: fErr } = await supabase
+                    .from("companies")
+                    .insert([{
+                        name: storeName,
+                        subdomain: newSlug,
+                        contact_email: email || activeUser.email,
+                        user_id: activeUser.id
+                    }])
+                    .select()
+                    .single();
+                if (fErr) throw fErr;
+                newCompany = fallbackCompany;
+            }
 
             await runProgress(60, needsTheme ? "Loading Your Theme..." : "Configuring Workspace...", 1200);
 
@@ -369,36 +475,65 @@ export default function Onboarding() {
 
             // 6. Link selected modules to company (Company Modules)
             if (selectedModules.length > 0) {
-                const modulesPayload = selectedModules.map(modId => ({
-                    company_id: newCompany.id,
-                    module_id: modId,
-                    is_active: true
-                }));
-                await supabase.from("company_modules").insert(modulesPayload);
+                const modulesPayload = selectedModules.map(modId => {
+                    const mod = availableSystemModules.find(m => m.id.toString() === modId.toString());
+                    return {
+                        company_id: newCompany.id,
+                        module_slug: mod?.slug || modId,
+                        is_active: true
+                    };
+                });
+                const { error: mErr } = await supabase.from("company_modules").insert(modulesPayload);
+                
+                if (mErr) {
+                    console.warn("Module slug insert failed, attempting legacy module_id fallback...", mErr);
+                    const legacyPayload = selectedModules.map(modId => ({
+                        company_id: newCompany.id,
+                        module_id: parseInt(modId.toString()) || modId,
+                        is_active: true
+                    }));
+                    await supabase.from("company_modules").insert(legacyPayload);
+                }
 
-                // 7. Link selected modules to user (User Modules)
-                const userModulesPayload = selectedModules.map(modId => ({
-                    company_id: newCompany.id,
-                    user_id: activeUser.id,
-                    module_id: modId,
-                    is_active: true
-                }));
-                await supabase.from("user_modules").insert(userModulesPayload);
+                // 7. Link selected modules to user (User Modules - New Architecture)
+                const userModulesPayload = selectedModules.map(modId => {
+                    const mod = availableSystemModules.find(m => m.id.toString() === modId.toString());
+                    return {
+                        company_id: newCompany.id,
+                        user_id: activeUser.id,
+                        module_slug: mod?.slug || modId,
+                        is_active: true
+                    };
+                });
+                const { error: umErr } = await supabase.from("user_modules").insert(userModulesPayload);
+                if (umErr) {
+                    console.warn("User modules table induction bypassed (Legacy Environment)", umErr);
+                    // Legacy fallback: some systems might use a different mapping, but if it doesn't exist, we move on
+                }
             } else {
                 // If nothing selected, enable ecommerce by default
                 const ecommerceMod = availableSystemModules.find(m => m.slug === 'ecommerce');
                 const defaultModId = ecommerceMod?.id || 'ecommerce';
+                const defaultModSlug = ecommerceMod?.slug || 'ecommerce';
 
-                await supabase.from("company_modules").insert([{
+                const { error: mErr } = await supabase.from("company_modules").insert([{
                     company_id: newCompany.id,
-                    module_id: defaultModId,
+                    module_slug: defaultModSlug,
                     is_active: true
                 }]);
+
+                if (mErr) {
+                    await supabase.from("company_modules").insert([{
+                        company_id: newCompany.id,
+                        module_id: parseInt(defaultModId.toString()) || defaultModId,
+                        is_active: true
+                    }]);
+                }
 
                 await supabase.from("user_modules").insert([{
                     company_id: newCompany.id,
                     user_id: activeUser.id,
-                    module_id: defaultModId,
+                    module_slug: defaultModSlug,
                     is_active: true
                 }]);
             }
@@ -428,358 +563,448 @@ export default function Onboarding() {
     };
 
     // ── UI Styles ──────────────────────────────────────────────
-    const cardCls = "w-full bg-white border border-slate-100 shadow-2xl relative z-10 rounded-2xl";
-    const backBtnCls = "h-11 px-6 border-slate-100 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-bold uppercase text-[9px] tracking-widest flex items-center gap-2 transition-all border shadow-sm";
-    const nextBtnCls = "flex-1 h-11 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg shadow-primary-600/10";
+    // ── UI Styles ──────────────────────────────────────────────
+    const nextBtnCls = "w-full h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary-600/10";
+    const backBtnCls = "h-14 px-6 border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all border shadow-sm";
+
+    // Orchestration Guard: If auth is loading, a redirect is imminent, or system is initializing
+    if (initializing || pLoading || isRedirecting) {
+        return <PlatformLoader message="Initializing Workspace" subtext="Clinical Resource Orchestration" />;
+    }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden font-sans">
-            {/* Background pattern */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.4] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:32px_32px]" />
+        <div className="min-h-screen flex bg-white font-sans selection:bg-primary-600/10 overflow-hidden">
 
-            {/* Background blobs */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
-                <div className="absolute top-0 -left-4 w-[800px] h-[800px] bg-primary-100 rounded-full blur-[200px] opacity-40 animate-blob" />
-                <div className="absolute top-0 -right-4 w-[800px] h-[800px] bg-teal-100 rounded-full blur-[200px] opacity-30 animate-blob animation-delay-2000" />
-            </div>
+            {/* Left Side: Visual/Branding */}
+            <div className="hidden lg:flex w-1/3 relative overflow-hidden bg-slate-900">
+                <AnimatePresence mode="popLayout">
+                    <motion.img
+                        key={brandingContent[bgImageIndex].image}
+                        src={brandingContent[bgImageIndex].image}
+                        initial={{ opacity: 0, scale: 1.1, x: 20 }}
+                        animate={{ opacity: 0.6, scale: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, x: -20 }}
+                        transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+                        className="absolute inset-0 w-full h-full object-cover"
+                    />
+                </AnimatePresence>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
 
-            {/* Top nav — always visible on steps 1–5 */}
-            {step < 6 && (
-                <div className="fixed top-8 left-8 right-8 flex items-center justify-between z-50">
-                    {/* Brand */}
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-tr from-primary-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
-                            <Rocket className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="hidden sm:block">
-                            <span className="text-[10px] font-black text-primary-600 uppercase tracking-[0.4em] block leading-none mb-1">{PLATFORM_CONFIG.name}</span>
-                            <span className="text-[8px] font-bold text-primary-600 uppercase tracking-widest block leading-none">{PLATFORM_CONFIG.tagline}</span>
-                        </div>
+                <div className="relative z-10 p-8 lg:p-12 flex flex-col justify-between h-full">
+                    <Link to="/" className="flex items-center gap-4">
+                        <img src="/logo.png" alt="Logo" className="h-10 lg:h-12 w-auto brightness-0 invert" />
+                        <span className="text-lg lg:text-xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
+                    </Link>
+
+                    <div className="space-y-4 lg:space-y-6">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={bgImageIndex}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.8 }}
+                                className="space-y-4 lg:space-y-6"
+                            >
+                                <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                                    {brandingContent[bgImageIndex].title.split(' ').map((word, i, arr) => (
+                                        i === arr.length - 1 
+                                            ? <React.Fragment key={i}><br /><span className="text-primary-400">{word}</span></React.Fragment> 
+                                            : <span key={i}>{word} </span>
+                                    ))}
+                                </h2>
+                                <p className="text-base lg:text-lg text-slate-300 max-w-sm leading-relaxed">
+                                    {brandingContent[bgImageIndex].subtitle}
+                                </p>
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
 
-                    {/* Right side actions */}
-                    <div className="flex items-center gap-3">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={bgImageIndex}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.8 }}
+                            className="flex items-center gap-4 lg:gap-8 text-white"
+                        >
+                            {brandingContent[bgImageIndex].stats.map((stat, i) => (
+                                <div key={i} className="flex items-center gap-4 lg:gap-8">
+                                    <div className="space-y-1">
+                                        <p className="text-xl lg:text-2xl font-bold">{stat.val}</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                                    </div>
+                                    {i < brandingContent[bgImageIndex].stats.length - 1 && (
+                                        <div className="w-px h-8 bg-slate-700" />
+                                    )}
+                                </div>
+                            ))}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </div>
+
+            {/* Right Side: Form */}
+            <div className="flex-1 flex flex-col bg-white relative overflow-y-auto">
+                {/* Header for mobile or as top nav */}
+                <div className="p-2 lg:px-4 lg:py-2 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-50/50">
+                    <div className="lg:hidden">
+                        <Link to="/" className="flex items-center gap-3">
+                            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+                            <span className="text-lg font-bold text-gray-900">{PLATFORM_CONFIG.name}</span>
+                        </Link>
+                    </div>
+                    <div className="hidden lg:block text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">
+                        Project Configuration Environment
+                    </div>
+                    <div className="flex items-center gap-4">
                         {user && (
                             <button
                                 onClick={async () => { await signOut(); navigate('/login'); }}
-                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-red-600 hover:bg-red-50 px-4 py-3 rounded-lg transition-all border border-slate-100 bg-white"
+                                className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
                             >
-                                <LogOut className="w-3.5 h-3.5" /> Sign Out
+                                Sign Out
                             </button>
                         )}
-                        <Link to="/login" className="text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors px-6 py-3 rounded-lg bg-white border border-slate-200 shadow-sm">
+                        <Link to="/login" className="text-[10px] font-bold uppercase tracking-widest text-primary-600 hover:underline">
                             Login Support →
                         </Link>
                     </div>
                 </div>
-            )}
 
-            <div className="w-full flex flex-col items-center">
-                {/* Step indicator — visible for steps 1-5 */}
-                {step >= 1 && step <= 5 && <StepDots current={step <= 2 ? step : (needsTheme ? step : step - 1)} steps={dynamicSteps} />}
+                <div className="flex-1 flex flex-col items-start px-4 lg:px-6 pt-0 pb-6 overflow-x-hidden">
+                    <div className={cn(
+                        "w-full transition-all duration-500",
+                        (step === 2 || step === 3) ? "max-w-[1200px]" : "max-w-[900px]"
+                    )}>
+                        {/* Step indicator */}
+                        {step <= 5 && <StepDots current={step <= 2 ? step : (needsTheme ? step : step - 1)} steps={dynamicSteps} />}
 
-                <AnimatePresence mode="wait">
+                        <AnimatePresence mode="wait">
 
-                    {/* ── STEP 1: Project Name ─────────────────────────────── */}
-                    {step === 1 && (
-                        <motion.div key="s1" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className={`${cardCls} max-w-2xl p-8`}>
-                            <div className="flex flex-col items-center mb-8">
-                                <div className="w-16 h-16 bg-gradient-to-tr from-primary-600 to-teal-600 rounded-2xl flex items-center justify-center text-white mb-5 shadow-xl shadow-primary-500/30">
-                                    <Rocket className="w-7 h-7" />
-                                </div>
-                                <h1 className="text-[9px] font-black text-primary-600 uppercase tracking-[0.5em] mb-2 font-outfit">Store Setup</h1>
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none text-center font-outfit">
-                                    Launch Your <br /><span className="text-primary-600">Business</span>
-                                </h2>
-                            </div>
+                            {/* ── STEP 1: Project Name ─────────────────────────────── */}
+                            {step === 1 && (
+                                <motion.div key="s1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-4">
+                                    <div className="space-y-1">
+                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Tell us about your project</h1>
+                                        <p className="text-gray-500 font-medium">Define your workspace and select the core modules to get started.</p>
+                                    </div>
 
-                            <div className="space-y-8">
-                                <div className="flex flex-col gap-3">
-                                    <label className="text-[9px] uppercase font-bold tracking-[0.4em] text-slate-500 ml-1">Business Name</label>
-                                    <input
-                                        type="text"
-                                        value={storeName}
-                                        onChange={(e) => setStoreName(e.target.value)}
-                                        placeholder="e.g. Nexus Global"
-                                        className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-5 font-bold text-lg text-slate-900 placeholder:text-slate-200 focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-inner"
-                                    />
-                                </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Business Name</label>
+                                            <input
+                                                type="text"
+                                                value={storeName}
+                                                onChange={(e) => setStoreName(e.target.value)}
+                                                placeholder="e.g. Nexus Global"
+                                                className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl px-6 font-bold text-lg text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none"
+                                            />
+                                        </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-[9px] uppercase font-bold tracking-[0.4em] text-slate-500 ml-1">Select Your Solution Suites</label>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {availableSystemModules.map((mod) => {
-                                            const isSelected = selectedModules.includes(mod.id.toString());
-                                            return (
-                                                <div key={mod.id} onClick={() => {
-                                                    setSelectedModules(prev =>
-                                                        isSelected ? prev.filter(id => id !== mod.id.toString()) : [...prev, mod.id.toString()]
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Select Solution Suites</label>
+                                                <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                                    {selectedModules.length} Selected
+                                                </span>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                                {availableSystemModules.length === 0 ? (
+                                                    Array.from({ length: 4 }).map((_, i) => (
+                                                        <div key={i} className="h-20 bg-slate-50 border border-gray-100 rounded-2xl animate-pulse" />
+                                                    ))
+                                                ) : availableSystemModules.map((mod) => {
+                                                    const isSelected = selectedModules.includes(mod.id.toString());
+                                                    return (
+                                                        <div key={mod.id} onClick={() => {
+                                                            setSelectedModules(prev =>
+                                                                isSelected ? prev.filter(id => id !== mod.id.toString()) : [...prev, mod.id.toString()]
+                                                            );
+                                                            if (!isSelected && selectedModules.length === 0) {
+                                                                if (mod.category === 'commerce') setIndustryType('retail');
+                                                                else if (mod.category === 'operations') setIndustryType('services');
+                                                                else if (mod.category === 'people' || mod.category === 'education') setIndustryType('education');
+                                                            }
+                                                        }}
+                                                            className={cn(
+                                                                "p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4 relative group",
+                                                                isSelected ? "border-primary-600 bg-primary-50/30 ring-1 ring-primary-600 shadow-md" : "border-gray-100 bg-slate-50/50 hover:border-gray-200"
+                                                            )}>
+                                                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-xl border border-gray-100 group-hover:scale-110 transition-transform">
+                                                                {mod.icon || '📦'}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="font-bold text-[13px] text-gray-900 truncate">{mod.name}</h3>
+                                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tight truncate">{mod.tagline || 'Essential app'}</p>
+                                                            </div>
+                                                            {isSelected && (
+                                                                <div className="w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center shadow-lg">
+                                                                    <Check className="w-3 h-3 text-white stroke-[3]" />
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     );
-                                                    // Auto-set industry if it's the first selection
-                                                    if (!isSelected && selectedModules.length === 0) {
-                                                        if (mod.category === 'commerce') setIndustryType('retail');
-                                                        else if (mod.category === 'operations') setIndustryType('services');
-                                                        else if (mod.category === 'people' || mod.category === 'education') setIndustryType('education');
-                                                    }
-                                                }}
-                                                    className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 relative ${isSelected ? 'border-primary-600 bg-primary-50/50 shadow-md' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'}`}>
-                                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm">
-                                                        <span className="text-xl">{mod.icon || '📦'}</span>
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="font-black text-[10px] uppercase text-slate-900 tracking-tight">{mod.name}</h3>
-                                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{mod.tagline || 'Essential app'}</p>
-                                                    </div>
-                                                    {isSelected && <div className="ml-auto w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center shadow-lg"><Check className="w-3 h-3 text-white" /></div>}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {error && <p className="text-red-500 text-[9px] font-black uppercase tracking-widest text-center bg-red-50 py-3 rounded-lg border border-red-100">{error}</p>}
-
-                                <Button onClick={() => {
-                                    if (!storeName.trim()) return setError("Business name required.");
-                                    if (selectedModules.length === 0) return setError("Please select at least one module to continue.");
-                                    goNext();
-                                }} className={nextBtnCls}>
-                                    Check Plans <ArrowRight className="w-5 h-5 stroke-[3]" />
-                                </Button>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* ── STEP 3: Plan ─────────────────────────────────────── */}
-                    {step === 2 && (
-                        <motion.div key="s2" initial={{ opacity: 0, scale: 0.95, x: 40 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: -40 }} className={`${cardCls} max-w-4xl p-8`}>
-                            <h2 className="text-2xl font-black text-center mb-1 tracking-tighter uppercase text-slate-900 italic leading-none font-outfit">Select <span className="text-primary-600">Plan</span></h2>
-                            <p className="text-slate-500 text-center mb-8 text-[9px] font-black uppercase tracking-[0.4em]">Choose a plan that fits your business.</p>
-
-                            {plans.length === 0 ? (
-                                <div className="flex justify-center py-10"><Loader2 className="w-10 h-10 animate-spin text-primary-600" /></div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                                    {plans.map((plan) => (
-                                        <div key={plan.id} onClick={() => setSelectedPlan(plan.id)}
-                                            className={`p-5 rounded-2xl border transition-all duration-500 cursor-pointer flex flex-col gap-4 relative group ${selectedPlan === plan.id ? 'border-primary-600 bg-primary-50/50 shadow-xl' : 'border-slate-50 bg-slate-50/30 hover:border-slate-100'}`}>
-                                            {selectedPlan === plan.id && (
-                                                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-[7px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Selected</div>
-                                            )}
-                                            <div className="space-y-0.5">
-                                                <h3 className="font-black text-[8px] uppercase tracking-[0.3em] text-slate-400 group-hover:text-primary-600 transition-colors">{plan.name}</h3>
-                                                <p className="text-2xl font-black text-slate-900 tracking-tighter">${plan.price_monthly}<span className="text-[9px] font-bold text-slate-300 ml-1">/mo</span></p>
-                                            </div>
-                                            <ul className="space-y-2 flex-1">
-                                                {plan.features.slice(0, 4).map((feat, i) => (
-                                                    <li key={i} className="flex items-start gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-tight leading-none">
-                                                        <Check className="w-2.5 h-2.5 text-primary-600 mt-0.5" />
-                                                        {feat}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-
-                            <div className="flex gap-6 mt-10">
-                                <button onClick={goBack} className={backBtnCls}><ArrowLeft className="w-5 h-5" /> Back</button>
-                                <Button onClick={goNext} className={nextBtnCls}>Continue <ArrowRight className="w-5 h-5" /></Button>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* ── STEP 4: Template ─────────────────────────────────── */}
-                    {step === 3 && (
-                        <motion.div key="s3" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className={`${cardCls} max-w-4xl p-8`}>
-                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
-                                <div>
-                                    <h1 className="text-[9px] font-black text-primary-600 uppercase tracking-[0.4em] mb-1 font-outfit">Theme Design</h1>
-                                    <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic font-outfit">Select <span className="text-primary-600">Theme</span></h2>
-                                </div>
-                                <div className="flex bg-slate-100 p-1 rounded-xl">
-                                    {['retail', 'education', 'services'].map(t => (
-                                        <button key={t} onClick={() => setIndustryType(t as any)}
-                                            className={`px-4 py-1.5 rounded-lg text-[8px] uppercase font-black tracking-[0.2em] transition-all ${industryType === t ? 'bg-primary-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-600'}`}>
-                                            {t === 'retail' ? 'Stores' : t === 'education' ? 'Consult' : 'Tech'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {templatesLoading ? (
-                                <div className="flex flex-col items-center py-10 gap-3">
-                                    <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.4em] text-slate-500">Loading Themes...</span>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                                    {templates.filter(t => t.industry === industryType || !t.industry).slice(0, 6).map((tmpl) => (
-                                        <div key={tmpl.id}
-                                            className={`group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-500 border ${selectedTemplate === tmpl.id ? 'border-primary-600 shadow-xl scale-[1.02]' : 'border-slate-50 bg-slate-50/30'}`}>
-                                            <div className="aspect-[4/3] relative overflow-hidden">
-                                                <img src={tmpl.preview_image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
-                                                    <Button onClick={() => setPreviewingTemplate(tmpl)} variant="outline" className="h-8 px-4 bg-white/20 backdrop-blur-md border-white/30 text-white font-bold text-[8px] uppercase tracking-widest rounded-lg">Preview</Button>
-                                                    <Button onClick={() => setSelectedTemplate(tmpl.id)} className="h-8 px-4 bg-primary-600 text-white font-bold text-[8px] uppercase tracking-widest rounded-lg">{selectedTemplate === tmpl.id ? 'Selected' : 'Select'}</Button>
-                                                </div>
-                                            </div>
-                                            <div className="p-4 border-t border-slate-50">
-                                                <h3 className="font-black text-slate-900 uppercase tracking-widest text-[10px]">{tmpl.name}</h3>
-                                                <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">v{tmpl.version || '1.0'}</p>
+                                                })}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+
+                                        {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 py-4 rounded-xl border border-red-100">{error}</p>}
+
+                                        <Button onClick={() => {
+                                            if (!storeName.trim()) return setError("Business name required.");
+                                            if (selectedModules.length === 0) return setError("Please select at least one module.");
+                                            goNext();
+                                        }} className={nextBtnCls}>
+                                            Choose Your Plan <ArrowRight className="w-5 h-5 ml-2" />
+                                        </Button>
+                                    </div>
+                                </motion.div>
                             )}
 
-                            <div className="flex items-center gap-4 pt-8 border-t border-slate-50">
-                                <button onClick={goBack} className={backBtnCls}><ArrowLeft className="w-4 h-4" /> Back</button>
-                                <Button onClick={() => selectedTemplate ? goNext() : setError("Select a theme first.")}
-                                    disabled={!selectedTemplate}
-                                    className={nextBtnCls}>
-                                    Account Setup <ArrowRight className="w-4 h-4 ml-2" />
-                                </Button>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* ── STEP 5: Create Account ────────────────────────────── */}
-                    {step === 4 && (
-                        <motion.div key="s4" initial={{ opacity: 0, scale: 0.95, x: 40 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9 }} className={`${cardCls} max-w-md p-8`}>
-                            <div className="flex flex-col items-center mb-6">
-                                <div className="w-12 h-12 bg-gradient-to-tr from-primary-600 to-teal-600 rounded-xl flex items-center justify-center text-white mb-4 shadow-xl shadow-primary-500/30">
-                                    <UserIcon className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic text-center font-outfit">Finalize <span className="text-primary-600">Setup</span></h2>
-                                <p className="text-slate-500 text-[9px] mt-1.5 text-center font-bold max-w-xs uppercase tracking-widest">Connect your business account.</p>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="space-y-1">
-                                    <label className="text-[8px] uppercase font-bold tracking-[0.3em] text-slate-500 ml-1">Full Name</label>
-                                    <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
-                                        <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Full name"
-                                            className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 font-bold text-slate-900 placeholder:text-slate-300 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-sm" />
+                            {/* ── STEP 2: Plan ─────────────────────────────────────── */}
+                            {step === 2 && (
+                                <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Select a plan</h1>
+                                        <p className="text-gray-500 font-medium">Scale as you grow. Start with our flexible tier and upgrade anytime.</p>
                                     </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[8px] uppercase font-bold tracking-[0.3em] text-slate-500 ml-1">Email</label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
-                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email"
-                                            className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 font-bold text-slate-900 placeholder:text-slate-300 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-sm" />
+
+                                    {plans.length === 0 ? (
+                                        <PlatformLoader fullScreen={false} message="Fetching Tiers" subtext="Economic Node Sync" />
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                                            {plans.map((plan) => (
+                                                <div key={plan.id} onClick={() => setSelectedPlan(plan.id)}
+                                                    className={cn(
+                                                        "p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col gap-6 relative group",
+                                                        selectedPlan === plan.id ? "border-primary-600 bg-primary-50/20 ring-1 ring-primary-600 shadow-xl" : "border-gray-100 bg-slate-50/50 hover:border-gray-200"
+                                                    )}>
+                                                    {selectedPlan === plan.id && (
+                                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Most Popular</div>
+                                                    )}
+                                                    <div className="space-y-1">
+                                                        <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400 group-hover:text-primary-600">{plan.name}</h3>
+                                                        <p className="text-3xl font-bold text-slate-900 tracking-tight">${plan.price_monthly}<span className="text-sm font-bold text-slate-400 ml-1">/mo</span></p>
+                                                    </div>
+                                                    <ul className="space-y-3 flex-1">
+                                                        {plan.features.slice(0, 5).map((feat, i) => (
+                                                            <li key={i} className="flex items-start gap-2.5 text-xs font-medium text-slate-600">
+                                                                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                                                                {feat}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-4 pt-6">
+                                        <button onClick={goBack} className={backBtnCls}>Back</button>
+                                        <Button onClick={goNext} className={nextBtnCls}>Continue Design <ArrowRight className="w-5 h-5 ml-2" /></Button>
                                     </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[8px] uppercase font-bold tracking-[0.3em] text-slate-500 ml-1">Secure Password</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
-                                        <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••"
-                                            className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-11 font-bold text-slate-900 placeholder:text-slate-300 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-sm" />
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors">
-                                            <Eye className="w-3.5 h-3.5" />
-                                        </button>
+                                </motion.div>
+                            )}
+
+                            {/* ── STEP 3: Template ─────────────────────────────────── */}
+                            {step === 3 && (
+                                <motion.div key="s3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6">
+                                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                                        <div className="space-y-3">
+                                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Pick a visual identity</h1>
+                                            <p className="text-gray-500 font-medium">Choose a starting theme. You can fully customize everything later.</p>
+                                        </div>
+                                        <div className="flex bg-slate-100/50 p-1.5 rounded-xl border border-gray-100">
+                                            {['retail', 'education', 'services'].map(t => (
+                                                <button key={t} onClick={() => setIndustryType(t as any)}
+                                                    className={cn(
+                                                        "px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                        industryType === t ? "bg-white text-primary-600 shadow-sm border border-gray-100" : "text-slate-500 hover:text-slate-700"
+                                                    )}>
+                                                    {t === 'retail' ? 'Modern' : t === 'education' ? 'Corporate' : 'Creative'}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[8px] uppercase font-bold tracking-[0.3em] text-slate-500 ml-1">Confirm</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
-                                        <input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••"
-                                            className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 font-bold text-slate-900 placeholder:text-slate-300 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-sm" />
+
+                                    {templatesLoading ? (
+                                        <PlatformLoader fullScreen={false} message="Curating Architectures" subtext="Visual Identity Induction" />
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {templates.filter(t => t.industry === industryType || !t.industry).slice(0, 6).map((tmpl) => (
+                                                <div key={tmpl.id}
+                                                    className={cn(
+                                                        "group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 border bg-white",
+                                                        selectedTemplate === tmpl.id ? "border-primary-600 ring-1 ring-primary-600 shadow-2xl scale-[1.02]" : "border-gray-100 hover:border-gray-200"
+                                                    )}>
+                                                    <div className="aspect-[16/10] relative overflow-hidden">
+                                                        <img src={tmpl.preview_image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-3">
+                                                            <Button onClick={() => setPreviewingTemplate(tmpl)} variant="outline" className="h-10 px-6 bg-white/10 backdrop-blur-md border-white/20 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/20">Preview</Button>
+                                                            <Button onClick={() => setSelectedTemplate(tmpl.id)} className="h-10 px-6 bg-primary-600 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl shadow-lg">
+                                                                {selectedTemplate === tmpl.id ? 'Selected' : 'Choose Theme'}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-6 border-t border-gray-50">
+                                                        <h3 className="font-bold text-gray-900 text-sm tracking-tight">{tmpl.name}</h3>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <div className="w-2 h-2 rounded-full bg-primary-600" />
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tmpl.tags?.[0] || 'Modern'} Layout</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-4 pt-4 border-t border-gray-50">
+                                        <button onClick={goBack} className={backBtnCls}>Back</button>
+                                        <Button
+                                            onClick={() => selectedTemplate ? goNext() : setError("Please select a theme.")}
+                                            disabled={!selectedTemplate}
+                                            className={nextBtnCls}
+                                        >
+                                            Next Step: Account <ArrowRight className="w-5 h-5 ml-2" />
+                                        </Button>
                                     </div>
-                                </div>
+                                </motion.div>
+                            )}
 
-                                {error && <p className="text-red-500 text-[9px] font-bold text-center bg-red-50 py-2 rounded-lg border border-red-100">{error}</p>}
-
-                                <div className="flex gap-4 pt-4">
-                                    <button onClick={goBack} className={backBtnCls}><ArrowLeft className="w-4 h-4" /></button>
-                                    <Button onClick={handleDeploy} disabled={loading} className={nextBtnCls}>
-                                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
-                                        {loading ? "Launching..." : "Deploy Store"}
-                                    </Button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* ── STEP 6: Progress ──────────────────────── */}
-                    {step === 5 && (
-                        <motion.div key="s5" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                            className="max-w-md w-full bg-white p-8 rounded-2xl shadow-2xl border border-slate-100 text-center relative z-10 overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-50 overflow-hidden">
-                                <motion.div className="h-full bg-primary-600"
-                                    initial={{ width: "0%" }} animate={{ width: `${deploymentStep}%` }} transition={{ duration: 0.5 }} />
-                            </div>
-
-                            <div className="mb-4 relative inline-flex items-center justify-center pt-6">
-                                <div className="w-20 h-20 border-6 border-slate-50 border-t-primary-600 rounded-full animate-spin shadow-inner" />
-                                <div className="absolute inset-0 flex items-center justify-center pt-6">
-                                    <span className="text-xl font-black text-slate-900 tracking-tighter">{deploymentStep}%</span>
-                                </div>
-                            </div>
-
-                            <h2 className="text-[9px] font-black text-primary-600 uppercase tracking-[0.8em] mb-1 font-outfit">Provisioning</h2>
-                            <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase italic mb-6 font-outfit">{deploymentStatus}</h3>
-
-                            <div className="flex flex-col gap-3 max-w-xs mx-auto text-left py-5 border-t border-slate-50">
-                                {[
-                                    { val: 10, label: "Account Setup" },
-                                    { val: 25, label: "Profile Cache" },
-                                    { val: 40, label: "Environment" },
-                                    { val: 60, label: "Asset Loading" },
-                                    { val: 80, label: "Optimization" },
-                                    { val: 100, label: "Deployment Ready" }
-                                ].map((s, i) => (
-                                    <div key={i} className={`flex items-center gap-3 text-[8px] font-black uppercase tracking-[0.3em] transition-all duration-700 ${deploymentStep >= s.val ? 'text-primary-600' : 'text-slate-500'}`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${deploymentStep >= s.val ? 'bg-primary-600 shadow-lg shadow-primary-500/20' : 'bg-slate-100'}`} />
-                                        {s.label}
-                                        {deploymentStep >= s.val && <Check className="w-2.5 h-2.5 ml-auto stroke-[4]" />}
+                            {/* ── STEP 5: Create Account ────────────────────────────── */}
+                            {step === 4 && (
+                                <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
+                                    <div className="space-y-3">
+                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Finalize your account</h1>
+                                        <p className="text-gray-500 font-medium">Create your administrative credentials to manage your workspace.</p>
                                     </div>
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
 
-                    {/* ── STEP 7: Success ───────────────────────────────────── */}
-                    {step === 6 && (
-                        <motion.div key="s6" initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="max-w-lg w-full bg-white p-8 rounded-2xl shadow-2xl border border-slate-100 text-center relative z-10 overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary-600 to-teal-600" />
+                                    <div className="space-y-5 max-w-2xl">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                                            <div className="relative group">
+                                                <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
+                                                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Natesh Kumar"
+                                                    className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
+                                            </div>
+                                        </div>
 
-                            <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-primary-100">
-                                <Check className="w-8 h-8 stroke-[4]" />
-                            </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Work Email</label>
+                                            <div className="relative group">
+                                                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
+                                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@company.com"
+                                                    className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
+                                            </div>
+                                        </div>
 
-                            <h1 className="text-[9px] font-black text-primary-600 uppercase tracking-[0.8em] mb-3 font-outfit">Live Now</h1>
-                            <h2 className="text-2xl font-black text-slate-900 mb-5 tracking-tighter uppercase italic leading-none font-outfit">
-                                Ready to <span className="text-primary-600">Grow</span>
-                            </h2>
-                            <p className="text-slate-500 font-bold text-xs leading-relaxed mb-8 max-w-xs mx-auto uppercase tracking-wide">
-                                Congratulations! Your <b className="text-slate-900">{storeName}</b> store is ready.
-                            </p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+                                                <div className="relative group">
+                                                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
+                                                    <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
+                                                        className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-12 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
+                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors">
+                                                        {showPassword ? <Eye className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm</label>
+                                                <div className="relative group">
+                                                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
+                                                    <input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••"
+                                                        className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <Button onClick={() => window.location.href = `/stores/${slug}/index.html`}
-                                    className="h-14 bg-slate-900 hover:bg-black text-white rounded-xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl transition-all">
-                                    <Rocket className="w-3.5 h-3.5 mr-2" /> View Shop
-                                </Button>
-                                <Button onClick={async () => {
-                                    await refreshTenant();
-                                    navigate("/apps");
-                                }}
-                                    className="h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary-600/20 transition-all font-outfit">
-                                    <Check className="w-3.5 h-3.5 mr-2" /> Manage
-                                </Button>
-                            </div>
-                        </motion.div>
-                    )}
+                                        {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 py-4 rounded-xl border border-red-100">{error}</p>}
 
-                </AnimatePresence>
+                                        <div className="flex gap-4 pt-6">
+                                            <button onClick={goBack} className={backBtnCls}>Back</button>
+                                            <Button onClick={handleDeploy} disabled={loading} className={nextBtnCls}>
+                                                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
+                                                {loading ? "Launching Enterprise..." : "Deploy Workspace"}
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center pt-10 border-t border-gray-50 grayscale opacity-50">
+                                        Secured by {PLATFORM_CONFIG.name} Identity Protocol
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* ── STEP 5: Progress ──────────────────────── */}
+                            {step === 5 && (
+                                <motion.div key="s5" 
+                                    initial={{ opacity: 0 }} 
+                                    animate={{ opacity: 1 }} 
+                                    className="fixed inset-0 z-[200]"
+                                >
+                                    <PlatformLoader 
+                                        message={deploymentStatus} 
+                                        subtext={`Industrial Provisioning: ${deploymentStep}% Complete`} 
+                                    />
+                                </motion.div>
+                            )}
+
+                            {/* ── STEP 7: Success ───────────────────────────────────── */}
+                            {step === 6 && (
+                                <motion.div key="s6" initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="text-center space-y-8 py-4">
+                                    <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto shadow-inner border border-emerald-100">
+                                        <Check className="w-10 h-10 stroke-[4]" />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <h1 className="text-xs font-bold text-emerald-500 uppercase tracking-[0.8em]">Deployment Complete</h1>
+                                        <h2 className="text-4xl font-bold text-gray-900 tracking-tighter italic">
+                                            Ready to <span className="text-primary-600">Scale</span>
+                                        </h2>
+                                        <p className="text-gray-500 font-medium max-w-sm mx-auto">
+                                            Your enterprise workspace <b className="text-gray-900">{storeName}</b> has been successfully provisioned.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-lg mx-auto pt-6">
+                                        <Button onClick={() => window.location.href = `/stores/${slug}/index.html`}
+                                            className="h-16 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-2xl transition-all">
+                                            <Rocket className="w-4 h-4 mr-2" /> View Shop
+                                        </Button>
+                                        <Button onClick={async () => {
+                                            await refreshTenant();
+                                            navigate("/apps");
+                                        }}
+                                            className="h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-2xl shadow-primary-600/20 transition-all">
+                                            <Layers className="w-4 h-4 mr-2" /> Launch Console
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                <div className="p-6 border-t border-gray-50 flex justify-center gap-10 opacity-30 grayscale pointer-events-none mt-auto">
+                    <div className="flex flex-col items-center">
+                        <Check className="w-6 h-6 mb-1" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Enterprise</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <Lock className="w-6 h-6 mb-1" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <Rocket className="w-6 h-6 mb-1" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Global</span>
+                    </div>
+                </div>
             </div>
 
             {/* ── Template Preview Modal ─────────────────────────── */}
@@ -798,7 +1023,10 @@ export default function Onboarding() {
                                 <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x pb-2">
                                     {(previewingTemplate.gallery_images || []).map((img, idx) => (
                                         <div key={idx}
-                                            className={`min-w-[120px] aspect-video rounded-2xl overflow-hidden border-2 cursor-pointer snap-start transition-all hover:scale-105 ${previewingTemplate.preview_image === img ? 'border-primary-600' : 'border-white hover:border-slate-200'}`}
+                                            className={cn(
+                                                "min-w-[120px] aspect-video rounded-2xl overflow-hidden border-2 cursor-pointer snap-start transition-all hover:scale-105",
+                                                previewingTemplate.preview_image === img ? "border-primary-600" : "border-white hover:border-slate-200"
+                                            )}
                                             onClick={() => setPreviewingTemplate({ ...previewingTemplate, preview_image: img })}>
                                             <img src={img} className="w-full h-full object-cover" />
                                         </div>
@@ -806,7 +1034,7 @@ export default function Onboarding() {
                                 </div>
                                 <div className="absolute top-12 left-12 text-slate-900 p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-100 shadow-xl">
                                     <h3 className="text-2xl font-black tracking-tighter uppercase italic leading-none">{previewingTemplate.name}</h3>
-                                    <p className="text-primary-600 text-[9px] font-black mt-1 tracking-[0.3em] uppercase">Enterprise Theme</p>
+                                    <p className="text-primary-600 text-[9px] font-bold mt-1 tracking-[0.3em] uppercase">Enterprise Theme</p>
                                 </div>
                             </div>
 
@@ -818,18 +1046,18 @@ export default function Onboarding() {
 
                                 <div className="mt-8 space-y-10 flex-1">
                                     <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-600 mb-4">About Theme</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary-600 mb-4">About Theme</h4>
                                         <p className="text-slate-500 font-bold text-xs leading-relaxed border-l-4 border-slate-100 pl-6 uppercase tracking-wide">{previewingTemplate.description}</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">
                                         <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300 mb-1">Industry</p>
-                                            <p className="text-sm font-black text-slate-800 uppercase tracking-tight">{previewingTemplate.industry}</p>
+                                            <p className="text-sm font-bold text-slate-800 uppercase tracking-tight">{previewingTemplate.industry}</p>
                                         </div>
                                         <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300 mb-1">Architecture</p>
-                                            <p className="text-sm font-black text-slate-800 uppercase tracking-tight">{previewingTemplate.component_count || 12}+ Standard Modules</p>
+                                            <p className="text-sm font-bold text-slate-800 uppercase tracking-tight">{previewingTemplate.component_count || 12}+ Standard Modules</p>
                                         </div>
                                     </div>
                                 </div>
@@ -839,7 +1067,7 @@ export default function Onboarding() {
                                         className="w-full h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary-600/10 transition-all">
                                         Use This Theme
                                     </Button>
-                                    <p className="text-center text-[8px] font-black text-slate-200 uppercase tracking-[0.3em]">{PLATFORM_CONFIG.name} Proprietary Design</p>
+                                    <p className="text-center text-[8px] font-bold text-slate-200 uppercase tracking-[0.3em]">{PLATFORM_CONFIG.name} Proprietary Design</p>
                                 </div>
                             </div>
                         </motion.div>

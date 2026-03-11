@@ -28,7 +28,21 @@ import {
     Layout,
     Rocket,
     Box,
-    FileInput
+    FileInput,
+    Building2,
+    Database,
+    Key,
+    Ruler,
+    Palette,
+    Flag,
+    Hash,
+    Scale,
+    GitPullRequest,
+    Activity,
+    MessageSquare,
+    Smartphone,
+    Binary,
+    Flame
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -198,9 +212,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "hrms",
             icon: Users,
             items: [
-                { title: "Directory", url: "/apps/hrms/directory", icon: Users, resource: "team" },
-                { title: "Departments", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
-                { title: "Onboarding", url: "/apps/hrms/onboarding", icon: Rocket, resource: "team" },
+                { title: "Employee Directory", url: "/apps/hrms/employees", icon: Users, resource: "team" },
+                { title: "Induction Protocol", url: "/apps/hrms/induction", icon: Rocket, resource: "team" },
+                { title: "Departments Hub", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
             ],
         },
         {
@@ -209,8 +223,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             icon: Zap,
             items: [
                 { title: "Attendance", url: "/apps/hrms/attendance", icon: Check, resource: "attendance" },
-                { title: "Leave Tracker", url: "/apps/hrms/leave", icon: MapPin, resource: "attendance" },
-                { title: "Payroll", url: "/apps/hrms/payroll", icon: CreditCard, resource: "payroll" },
+                { title: "Leave Tracker", url: "/apps/hrms/leaves", icon: MapPin, resource: "attendance" },
+                { title: "Payroll Cycles", url: "/apps/hrms/payroll", icon: CreditCard, resource: "payroll" },
             ],
         }
     ],
@@ -271,8 +285,9 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "payroll",
             icon: CreditCard,
             items: [
+                { title: "Payslip Registry", url: "/apps/payroll/payslips", icon: FileInput, resource: "payroll" },
                 { title: "Salary Structures", url: "/apps/payroll/structures", icon: LayoutGrid, resource: "payroll" },
-                { title: "Run Payroll", url: "/apps/payroll/run", icon: Zap, resource: "payroll" },
+                { title: "Run Payroll Batch", url: "/apps/payroll/run", icon: Zap, resource: "payroll" },
             ]
         }
     ],
@@ -302,10 +317,11 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
         {
             label: "Messaging",
             module: "whatsapp",
-            icon: Zap,
+            icon: MessageSquare,
             items: [
-                { title: "Templates", url: "/apps/whatsapp/templates", icon: Library, resource: "marketing" },
-                { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Zap, resource: "marketing" },
+                { title: "Account Registry", url: "/apps/whatsapp/accounts", icon: Smartphone, resource: "settings" },
+                { title: "Meta Templates", url: "/apps/whatsapp/templates", icon: Library, resource: "marketing" },
+                { title: "Campaign Hub", url: "/apps/whatsapp/campaigns", icon: Zap, resource: "marketing" },
             ]
         }
     ],
@@ -317,6 +333,82 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             items: [
                 { title: "Pages", url: "/apps/landing-page/pages", icon: LayoutGrid, resource: "settings" },
                 { title: "Themes", url: "/apps/landing-page/themes", icon: ImageIcon, resource: "settings" },
+            ]
+        }
+    ],
+    masters: [
+        {
+            label: "Operational Resources",
+            module: "masters",
+            icon: Boxes,
+            items: [
+                { title: "Item Registry", url: "/apps/masters/items", icon: Box, resource: "products" },
+                { title: "Category Matrix", url: "/apps/masters/categories", icon: LayoutGrid, resource: "products" },
+                { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
+                { title: "UOM Protocols", url: "/apps/masters/uoms", icon: Scale, resource: "products" },
+            ]
+        },
+        {
+            label: "Catalog Engineering",
+            module: "masters",
+            icon: Settings,
+            items: [
+                { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
+                { title: "Variant Registry", url: "/apps/masters/variants", icon: Binary, resource: "products" },
+                { title: "Feedback Moderation", url: "/apps/masters/reviews", icon: Star, resource: "products" },
+            ]
+        },
+        {
+            label: "Entity Management",
+            module: "masters",
+            icon: Users,
+            items: [
+                { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
+                { title: "Organizational Nodes", url: "/apps/masters/departments", icon: Building2, resource: "team" },
+            ]
+        }
+    ],
+    workflow: [
+        {
+            label: "Governance Hub",
+            module: "workflow",
+            icon: GitPullRequest,
+            items: [
+                { title: "Approval Matrix", url: "/apps/workflow/approvals", icon: ShieldCheck, resource: "settings" },
+                { title: "Transition Logs", url: "/apps/workflow/logs", icon: Activity, resource: "settings" },
+            ]
+        }
+    ],
+    automation: [
+        {
+            label: "Orchestration Layer",
+            module: "automation",
+            icon: Zap,
+            items: [
+                { title: "Jobs Registry", url: "/apps/automation/jobs", icon: Flame, resource: "settings" },
+                { title: "Execution Matrix", url: "/apps/automation/history", icon: Activity, resource: "settings" },
+            ]
+        }
+    ],
+    documents: [
+        {
+            label: "Content Repository",
+            module: "documents",
+            icon: Box,
+            items: [
+                { title: "Enterprise Hub", url: "/apps/documents", icon: Box, resource: "documents" },
+                { title: "Shared Protocols", url: "/apps/documents/shared", icon: Users, resource: "documents" },
+            ]
+        }
+    ],
+    projects: [
+        {
+            label: "Delivery Portfolio",
+            module: "projects",
+            icon: Rocket,
+            items: [
+                { title: "Active Projects", url: "/apps/projects", icon: Rocket, resource: "projects" },
+                { title: "Task Boards", url: "/apps/projects/tasks", icon: LayoutGrid, resource: "projects" },
             ]
         }
     ]
@@ -399,7 +491,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         <aside
             className={cn(
                 "fixed left-0 top-0 min-h-screen h-full flex flex-col z-50 transition-all duration-300 ease-in-out border-r border-slate-200 shadow-sm overflow-y-auto overflow-x-hidden select-none bg-white",
-                collapsed ? "w-[80px]" : "w-[260px]"
+                collapsed ? "w-[50px]" : "w-[200px]"
             )}
         >
             {/* Header / Logo + Collapse Toggle */}
@@ -407,7 +499,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 /* Collapsed: centered logo icon, click to expand */
                 <button
                     onClick={onToggle}
-                    className="flex items-center justify-center h-16 w-full border-b border-slate-100 shrink-0 group"
+                    className="flex items-center justify-center h-10 w-full border-b border-slate-100 shrink-0 group"
                     title="Expand sidebar"
                 >
                     {logoUrl && !isSuperAdminView ? (
@@ -424,38 +516,33 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 </button>
             ) : (
                 /* Expanded: logo + name on left, chevron on right */
-                <div className="flex items-center h-16 px-4 justify-between shrink-0 border-b border-slate-100">
-                    <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
+                <div className="flex items-center h-12 px-3 justify-between shrink-0 border-b border-slate-100">
+                    <div className="flex items-center gap-2 overflow-hidden min-w-0">
                         {logoUrl && !isSuperAdminView ? (
                             <img
                                 src={logoUrl}
                                 alt={storeName}
-                                className="w-9 h-9 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0"
+                                className="w-7 h-7 rounded-lg object-contain bg-slate-50 border border-slate-100 shrink-0"
                             />
                         ) : (
-                            <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm", isSuperAdminView ? "bg-slate-900" : "bg-blue-600")}>
-                                {isSuperAdminView ? <ShieldCheck className="text-white w-4 h-4" /> : <Rocket className="text-white w-4 h-4" />}
+                            <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-sm", isSuperAdminView ? "bg-slate-900" : "bg-blue-600")}>
+                                {isSuperAdminView ? <ShieldCheck className="text-white w-3 h-3" /> : <Rocket className="text-white w-3 h-3" />}
                             </div>
                         )}
                         <div className="flex flex-col min-w-0">
-                            <span className="font-semibold text-slate-900 tracking-tight text-[15px] truncate">
+                            <span className="font-bold text-slate-900 tracking-tight text-[13px] truncate">
                                 {storeName}
                             </span>
-                            {!isSuperAdminView && settings?.store_tagline && (
-                                <span className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
-                                    {settings.store_tagline}
-                                </span>
-                            )}
                         </div>
                     </div>
 
                     {/* Collapse chevron */}
                     <button
                         onClick={onToggle}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all shrink-0 ml-2"
+                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all shrink-0"
                         title="Collapse sidebar"
                     >
-                        <ChevronLeft className="w-4 h-4" />
+                        <ChevronLeft className="w-3 h-3" />
                     </button>
                 </div>
             )}

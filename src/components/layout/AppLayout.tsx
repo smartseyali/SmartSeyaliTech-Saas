@@ -40,7 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[80px]" : "w-[260px]")} />
+        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[50px]" : "w-[200px]")} />
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
         </div>
@@ -52,7 +52,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[80px]" : "w-[260px]")} />
+        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[50px]" : "w-[200px]")} />
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
           <div className="max-w-md w-full p-12 bg-white rounded-[40px] shadow-3xl text-center space-y-8 animate-in zoom-in-95 duration-500 border border-slate-100 relative overflow-hidden">
             {/* Background design element */}
@@ -106,7 +106,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div
         className={cn(
           "shrink-0 h-full transition-all duration-300",
-          collapsed ? "w-[80px]" : "w-[260px]"
+          collapsed ? "w-[50px]" : "w-[200px]"
         )}
       />
 

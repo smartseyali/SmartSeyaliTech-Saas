@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search, Grid3X3, ArrowRight, Zap, Star, Lock } from "lucide-react";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Grid3X3, Lock, Settings, LogOut, LayoutGrid, ChevronDown, PlusCircle } from "lucide-react";
+import { useState, useMemo } from "react";
 import {
     PLATFORM_MODULES,
     CATEGORY_LABELS,
@@ -12,88 +12,57 @@ import PLATFORM_CONFIG from "@/config/platform";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionsContext";
+import { cn } from "@/lib/utils";
 
 const CATEGORY_ORDER: ModuleCategory[] = [
     'commerce', 'finance', 'operations', 'people', 'customer', 'analytics', 'collaboration'
 ];
 
-const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-    'live': { label: 'Live', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-    'beta': { label: 'Beta', cls: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-    'coming-soon': { label: 'Coming Soon', cls: 'bg-white/5 text-white/30 border-white/10' },
-    'planned': { label: 'Planned', cls: 'bg-white/5 text-white/20 border-white/10' },
-};
-
 function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubscribed: boolean, onOpen: (m: PlatformModule) => void }) {
     const isAvailable = mod.status === 'live' || mod.status === 'beta';
-    const badge = STATUS_BADGE[mod.status];
     const canAccess = isSubscribed && isAvailable;
     const navigate = useNavigate();
 
     return (
         <motion.div
-            whileHover={isAvailable ? { y: -4, scale: 1.01 } : {}}
-            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            whileHover={{ scale: 1.08, y: -8 }}
+            whileTap={{ scale: 0.92 }}
             onClick={() => isAvailable && (canAccess ? onOpen(mod) : navigate(`/apps/ecommerce/billing?module=${mod.id}`))}
-            className={`
-                relative flex flex-col gap-5 p-6 rounded-2xl border transition-all duration-300 group
-                ${canAccess
-                    ? 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-xl cursor-pointer'
-                    : isAvailable ? 'border-amber-100 bg-amber-50/30 hover:shadow-lg hover:border-amber-300 cursor-pointer' : 'border-slate-100 bg-white/50 grayscale-[0.5]'
-                }
-            `}
+            className={cn(
+                "relative flex flex-col items-center gap-4 p-4 rounded-[2rem] transition-all duration-500 group cursor-pointer",
+                !isAvailable && "opacity-30 grayscale pointer-events-none"
+            )}
         >
-            {/* Status badge */}
-            <div className="absolute top-4 right-4 flex gap-2">
-                {!isSubscribed && isAvailable && (
-                    <div className="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest bg-amber-500 text-white shadow-sm">
-                        Get App
+            {/* Odoo-style App Icon */}
+            <div className={cn(
+                "relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-4xl shadow-lg transition-all duration-500",
+                "bg-gradient-to-br", mod.colorFrom, mod.colorTo,
+                "group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] group-hover:ring-4 group-hover:ring-emerald-500/10",
+                !canAccess && "ring-1 ring-gray-200 shadow-none border border-gray-100"
+            )}>
+                <span className="group-hover:scale-110 transition-transform duration-500">{mod.icon}</span>
+                
+                {!canAccess && isAvailable && (
+                    <div className="absolute -top-1 -right-1 w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center shadow-xl border-2 border-white">
+                        <Lock className="w-3.5 h-3.5 text-white" />
                     </div>
                 )}
-                <div className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${badge.cls.replace('text-emerald-400', 'text-emerald-600').replace('text-blue-400', 'text-blue-600').replace('text-white/30', 'text-slate-400').replace('text-white/20', 'text-slate-300').replace('rounded-full', 'rounded-md')}`}>
-                    {badge.label}
-                </div>
+                
+                {/* Micro-sparkle on hover */}
+                <div className="absolute inset-0 rounded-3xl bg-white/0 group-hover:bg-white/10 transition-colors duration-500" />
             </div>
 
-            {/* Icon */}
-            <div className={`
-                w-14 h-14 rounded-xl flex items-center justify-center text-2xl
-                bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo}
-                shadow-lg transition-transform duration-300 ${canAccess ? 'group-hover:scale-105' : ''}
-            `}>
-                {isAvailable ? mod.icon : <Lock className="w-5 h-5 text-white/40" />}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 mt-1">
-                <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-1 group-hover:text-blue-600 transition-colors uppercase">{mod.name}</h3>
-                <p className="text-[11px] font-medium text-slate-500 leading-relaxed line-clamp-2">{mod.tagline}</p>
-            </div>
-
-            {/* Key features preview (live only) */}
-            {isAvailable && (
-                <div className="flex flex-col gap-2 mt-2">
-                    {mod.features.slice(0, 3).map((f, i) => (
-                        <div key={i} className="flex items-center gap-2.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-100" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{f}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Open button */}
-            {isAvailable && (
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 group-hover:text-blue-600 transition-colors">
-                        {isSubscribed ? 'Open App' : 'Learn More'}
+            {/* Technical labeling */}
+            <div className="text-center">
+                <h3 className="text-[11px] font-black text-gray-800 uppercase tracking-[0.2em] group-hover:text-emerald-700 transition-colors">
+                    {mod.name}
+                </h3>
+                {mod.status === 'beta' && (
+                    <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600/60 mt-1 block">
+                        Module Pre-Release
                     </span>
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${isSubscribed ? 'bg-slate-50 group-hover:bg-blue-600 group-hover:text-white' : 'bg-slate-100 group-hover:bg-slate-900 group-hover:text-white'
-                        }`}>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                    </div>
-                </div>
-            )}
+                )}
+            </div>
         </motion.div>
     );
 }
@@ -101,182 +70,228 @@ function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubs
 export default function AppLauncher() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
-    const { user } = useAuth();
+    const { signOut } = useAuth();
     const { hasModule, isSuperAdmin } = usePermissions();
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<ModuleCategory | 'all'>('all');
+    const [showAllModules, setShowAllModules] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const filtered = PLATFORM_MODULES.filter(m => {
-        // Super Admin sees everything in launcher
-        // Merchants see their subscribed modules OR core modules
-        // const isPermitted = isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id); // Removed permission filtering from here
+    const { installedModules, marketplaceModules } = useMemo(() => {
+        const filtered = PLATFORM_MODULES.filter(m => {
+            const matchesSearch = !search ||
+                m.name.toLowerCase().includes(search.toLowerCase()) ||
+                m.tagline?.toLowerCase().includes(search.toLowerCase());
+            const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
 
-        const matchesSearch = !search ||
-            m.name.toLowerCase().includes(search.toLowerCase()) ||
-            m.tagline.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
+        const installed = filtered.filter(m => isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id));
+        const marketplace = filtered.filter(m => !(isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id)));
 
-        return matchesSearch && matchesCategory;
-    });
-
-    const subscribedApps = filtered.filter(m => isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id));
-    const availableApps = filtered.filter(m => !(isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id)));
-
-    const renderGrid = (modules: typeof filtered) => (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
-            {modules.map(mod => (
-                <ModuleCard
-                    key={mod.id}
-                    mod={mod}
-                    isSubscribed={isSuperAdmin || mod.isCore || hasModule(mod.name) || hasModule(mod.id)}
-                    onOpen={m => navigate(m.dashboardRoute)}
-                />
-            ))}
-        </div>
-    );
-
-    const liveCount = PLATFORM_MODULES.filter(m => m.status === 'live' || m.status === 'beta').length;
+        return { installedModules: installed, marketplaceModules: marketplace };
+    }, [search, selectedCategory, isSuperAdmin, hasModule]);
 
     return (
-        <div className="min-h-screen bg-slate-50 relative overflow-hidden font-sans">
-            {/* Background pattern */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.4] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:32px_32px]" />
+        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 relative overflow-x-hidden font-sans selection:bg-emerald-100">
+            {/* Odoo-style background clean structure */}
+            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px]" />
 
-            {/* Background blobs */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-blue-100 rounded-full blur-[200px] opacity-40 animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] bg-indigo-100 rounded-full blur-[200px] opacity-30" />
-            </div>
-
-            <div className="relative z-10 max-w-[1600px] mx-auto px-8 py-16">
-
-                {/* ── Header ──────────────────────────────────────── */}
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 mb-16">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-lg shadow-lg shadow-blue-500/20">🚀</div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-600">{PLATFORM_CONFIG.name} Platform</span>
+            {/* Full-screen top navigation */}
+            <nav className="relative z-50 flex items-center justify-between px-10 py-5 bg-white border-b border-gray-100 shadow-sm">
+                <div className="flex items-center gap-10">
+                    <div className="flex items-center gap-4 group cursor-pointer" onClick={() => navigate('/')}>
+                        <div className="w-11 h-11 rounded-2xl bg-gray-900 flex items-center justify-center text-lg shadow-2xl transition-all group-hover:scale-105 group-hover:bg-emerald-600">
+                            <LayoutGrid className="w-5 h-5 text-white" />
                         </div>
-                        <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 tracking-tighter leading-none mt-2">
-                            App Launcher
-                        </h1>
-                        <p className="text-slate-500 font-medium text-base max-w-xl">
-                            Welcome back, <span className="text-indigo-600 font-bold">{activeCompany?.name || user?.email?.split('@')[0]}</span>
-                            {' '}· Access your {liveCount} business apps
-                        </p>
-                    </div>
-
-                    {/* Stats strip */}
-                    <div className="flex items-center gap-3 w-full lg:w-auto">
-                        {[
-                            { label: 'Available Now', count: PLATFORM_MODULES.filter(m => m.status === 'live').length, color: 'text-emerald-600' },
-                            { label: 'Beta Release', count: PLATFORM_MODULES.filter(m => m.status === 'beta').length, color: 'text-blue-600' },
-                            { label: 'Upcoming', count: PLATFORM_MODULES.filter(m => m.status === 'coming-soon').length + PLATFORM_MODULES.filter(m => m.status === 'planned').length, color: 'text-slate-400' },
-                        ].map(s => (
-                            <div key={s.label} className="flex-1 lg:flex-none px-6 py-5 rounded-2xl bg-white border border-slate-100 shadow-sm text-center">
-                                <div className={`text-3xl font-bold ${s.color} tracking-tight`}>{s.count}</div>
-                                <div className="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-400 mt-1">{s.label}</div>
-                            </div>
-                        ))}
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-emerald-600 transition-colors leading-none mb-1">Infrastructure</span>
+                            <span className="text-xl font-bold text-gray-900 tracking-tighter">{PLATFORM_CONFIG.name}</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* ── Search + Category Filter ─────────────────────── */}
-                <div className="flex flex-col xl:flex-row gap-6 mb-16">
-                    {/* Search */}
-                    <div className="relative flex-1 max-w-xl">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            placeholder="Search apps..."
-                            className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-6 text-slate-900 placeholder:text-slate-400 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-sm"
-                        />
+                {/* Centralized Technical Search */}
+                <div className="hidden lg:flex relative flex-1 max-w-2xl mx-20">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Search workspace nodes, apps, and registries..."
+                        className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl pl-14 pr-6 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:bg-white focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-600/20 transition-all uppercase tracking-widest text-[10px]"
+                    />
+                </div>
+
+                <div className="flex items-center gap-8">
+                    <div className="hidden sm:flex flex-col items-end">
+                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none mb-1">Current Node</span>
+                        <span className="text-[11px] font-black text-gray-900 uppercase tracking-tighter italic">{activeCompany?.name || 'Personal Cloud'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <button className="p-3 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all" title="System Settings">
+                            <Settings className="w-4 h-4" />
+                        </button>
+                        <button onClick={signOut} className="p-3 text-gray-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all" title="Terminate Session">
+                            <LogOut className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <main className="relative z-10 max-w-[1400px] mx-auto px-10 py-16">
+                {/* Categorization Matrix */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-20 border-b border-gray-100 pb-12">
+                    <div className="relative group">
+                        <button
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className="flex items-center gap-4 px-8 py-4 bg-white border border-gray-100 rounded-[1.5rem] text-[11px] font-black text-gray-800 hover:border-emerald-200 transition-all shadow-md group uppercase tracking-[0.2em]"
+                        >
+                            <Grid3X3 className="w-4 h-4 text-emerald-600" />
+                            <span>
+                                {selectedCategory === 'all' ? "Module Registry" : CATEGORY_LABELS[selectedCategory]}
+                            </span>
+                            <ChevronDown className={cn("w-4 h-4 transition-transform duration-500", isFilterOpen && "rotate-180")} />
+                        </button>
+
+                        <AnimatePresence>
+                            {isFilterOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                                        className="absolute top-full left-0 mt-4 w-72 bg-white border border-gray-100 rounded-[2rem] shadow-2xl z-50 py-4 overflow-hidden"
+                                    >
+                                        {(['all', ...CATEGORY_ORDER] as const).map(cat => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => {
+                                                    setSelectedCategory(cat);
+                                                    setIsFilterOpen(false);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                                                    selectedCategory === cat
+                                                        ? "text-emerald-600 bg-emerald-50/50"
+                                                        : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
+                                                )}
+                                            >
+                                                {cat === 'all' ? "View All Modules" : CATEGORY_LABELS[cat]}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
                     </div>
 
-                    {/* Category tabs */}
-                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-                        {(['all', ...CATEGORY_ORDER] as const).map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`
-                                    shrink-0 h-10 px-5 rounded-xl text-[10px] font-bold uppercase tracking-[0.1em] transition-all
-                                    ${selectedCategory === cat
-                                        ? 'bg-slate-900 text-white shadow-lg translate-y-[-1px]'
-                                        : 'bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-slate-100 shadow-sm'
-                                    }
-                                `}
-                            >
-                                {cat === 'all' ? (
-                                    <span className="flex items-center gap-2"><Grid3X3 className="w-3.5 h-3.5" /> All</span>
-                                ) : CATEGORY_LABELS[cat].split(' ')[0]}
-                            </button>
-                        ))}
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 mb-2">Operational Density</span>
+                        <div className="flex gap-4">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">{installedModules.length} Active</span>
+                            </div>
+                            {marketplaceModules.length > 0 && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => setShowAllModules(true)}>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                    <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">{marketplaceModules.length} Marketplace</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* ── Subscribed Apps ─────────────────────────────── */}
-                <div className="space-y-10">
-                    <div>
-                        <div className="flex items-center gap-6 mb-8">
-                            <h2 className="text-[14px] font-black uppercase tracking-[0.3em] text-slate-800 leading-none">Your Subscriptions</h2>
-                            <div className="flex-1 h-px bg-slate-200" />
-                            <span className="px-4 py-1.5 rounded-full bg-blue-50 text-[10px] font-bold text-blue-600 uppercase tracking-widest">{subscribedApps.length} Live</span>
-                        </div>
-                        {subscribedApps.length > 0 ? renderGrid(subscribedApps) : (
-                            <div className="p-10 border border-slate-200 border-dashed rounded-3xl text-center bg-white/50">
-                                <p className="text-sm font-semibold text-slate-500">No applications match your search criteria.</p>
-                            </div>
-                        )}
+                {/* Primary Workspace Grid */}
+                <div className="mb-24">
+                    <div className="flex items-center gap-4 mb-12">
+                        <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-gray-400">Primary Workspace Node</h2>
+                        <div className="h-[1px] flex-1 bg-gray-100" />
                     </div>
-
-                    {/* ── Available Apps ─────────────────────────────── */}
-                    {availableApps.length > 0 && (
-                        <div className="pt-10">
-                            <div className="flex items-center gap-6 mb-8">
-                                <h2 className="text-[12px] font-black uppercase tracking-[0.5em] text-slate-400 leading-none">Available for Upgrade</h2>
-                                <div className="flex-1 h-px bg-slate-100" />
-                            </div>
-                            {renderGrid(availableApps)}
+                    
+                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-12 gap-y-16">
+                        <AnimatePresence mode="popLayout">
+                            {installedModules.map(mod => (
+                                <ModuleCard
+                                    key={mod.id}
+                                    mod={mod}
+                                    isSubscribed={true}
+                                    onOpen={m => navigate(m.dashboardRoute)}
+                                />
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
+                    
+                    {installedModules.length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-20 bg-gray-50/50 rounded-[3rem] border-2 border-dashed border-gray-100">
+                            <PlusCircle className="w-12 h-12 text-gray-200 mb-4" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">No active nodes in this sector</p>
                         </div>
                     )}
                 </div>
 
-                {/* ── Bottom CTA ───────────────────────────────────── */}
-                <div className="mt-24 p-10 lg:p-14 rounded-3xl bg-slate-900 text-white flex flex-col xl:flex-row items-center justify-between gap-10 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-                    <div className="relative z-10 text-center xl:text-left">
-                        <div className="flex items-center justify-center xl:justify-start gap-4 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                                <Zap className="w-5 h-5 text-yellow-400 fill-current" />
+                {/* Marketplace - Collapsible Registry */}
+                {marketplaceModules.length > 0 && (
+                    <div className="pt-20 border-t border-gray-100">
+                        <button 
+                            onClick={() => setShowAllModules(!showAllModules)}
+                            className="flex items-center justify-between w-full group mb-12 hover:bg-gray-50 p-6 rounded-[2rem] transition-all"
+                        >
+                            <div className="flex items-center gap-6">
+                                <div className={cn("w-2 h-8 rounded-full transition-all duration-500", showAllModules ? "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]" : "bg-gray-200")} />
+                                <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-gray-900 transition-colors">Marketplace Library</h2>
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-400">Growing Platform</span>
-                        </div>
-                        <h3 className="text-4xl lg:text-5xl font-bold text-white tracking-tighter leading-tight xl:leading-none">
-                            12+ Professional <br /><span className="text-white/40 group-hover:text-blue-400 transition-colors duration-700">Business Apps</span>
-                        </h3>
-                        <p className="text-white/40 font-medium mt-4 text-lg max-w-xl">
-                            Our architecture team is actively developing Accounting, Projects, HRMS, and more.
-                        </p>
-                    </div>
-                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
-                        <button className="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase text-[10px] tracking-wider shadow-xl transition-all active:scale-95 flex items-center gap-3">
-                            Subscribe to Roadmap <ArrowRight className="w-4 h-4" />
+                            <ChevronDown className={cn("w-6 h-6 text-gray-300 transition-transform duration-700 ease-in-out", showAllModules && "rotate-180")} />
                         </button>
-                        <div className="px-6 py-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-3">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider leading-none">Enterprise suite early access</span>
-                        </div>
+
+                        <motion.div 
+                            initial={false}
+                            animate={{ height: showAllModules ? 'auto' : 0, opacity: showAllModules ? 1 : 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-12 gap-y-16 pb-20">
+                                {marketplaceModules.map(mod => (
+                                    <ModuleCard
+                                        key={mod.id}
+                                        mod={mod}
+                                        isSubscribed={false}
+                                        onOpen={m => navigate(`/apps/ecommerce/billing?module=${m.id}`)}
+                                    />
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {!showAllModules && (
+                            <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border border-gray-100 shadow-sm cursor-pointer hover:shadow-xl transition-all duration-500 group" onClick={() => setShowAllModules(true)}>
+                                <div className="w-16 h-16 rounded-3xl bg-amber-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                    <PlusCircle className="w-8 h-8 text-amber-500" />
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400 group-hover:text-gray-900 transition-colors">Expand Operational Capabilities</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </main>
+
+            {/* Technical Sub-bar (Breadcrumbs / Status) */}
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-10 py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+                <div className="max-w-[1400px] mx-auto flex items-center justify-between text-[9px] font-black uppercase tracking-[0.3em] text-gray-300">
+                    <div className="flex gap-10">
+                        <span className="flex items-center gap-2 group cursor-help">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-ping" />
+                            <span className="text-gray-500">{installedModules.length} Nodes Synchronized</span>
+                        </span>
+                        <span className="hidden sm:flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
+                            <span className="text-gray-400">NATTU CORE ENGINE V4.2</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-emerald-600/40">
+                        SECURE END-TO-END ENCRYPTION ACTIVE
                     </div>
                 </div>
-
-                {/* Copyright */}
-                <div className="mt-20 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-300">© 2026 {PLATFORM_CONFIG.name} Systems Inc · {PLATFORM_CONFIG.tagline} v4.0.1</p>
-                </div>
-
             </div>
         </div>
     );

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
+import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
 export default function Invoices() {
     const [view, setView] = useState<"list" | "form">("list");
@@ -106,7 +107,7 @@ export default function Invoices() {
 
     if (view === "form") {
         return (
-            <div className="p-8 animate-in fade-in slide-in-from-right-10 duration-500">
+            <div className="p-4 sm:p-6 animate-in fade-in slide-in-from-right-10 duration-500">
                 <ERPEntryForm
                     title={editingInvoice ? "Modify Ledger Bill" : "Generate Settlement Bill"}
                     subtitle="Accounts Receivable Engine Protocol"
@@ -120,98 +121,48 @@ export default function Invoices() {
         );
     }
 
-    return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
-                            <CreditCard className="w-5 h-5" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Financial Liquidity</span>
-                    </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 uppercase italic">Accounts <span className="text-indigo-600">Receivable</span></h1>
-                    <p className="text-sm font-medium text-slate-500 italic leading-none">Automated financial invoicing with deep transactional auditing.</p>
+    const invoiceColumns = [
+        { 
+            key: "reference_no", 
+            label: "Invoice ID",
+            render: (i: any) => <span className="font-bold text-gray-900 italic">{i.reference_no}</span>
+        },
+        { 
+            key: "customer_name", 
+            label: "Customer",
+            render: (i: any) => (
+                <div className="flex flex-col text-sm">
+                    <span className="font-bold text-gray-800">{i.customer_name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i.due_date ? `Due: ${i.due_date}` : 'No Due Date'}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="hidden lg:flex items-center bg-white rounded-2xl px-6 h-14 border border-slate-200 shadow-sm focus-within:ring-4 focus-within:ring-indigo-600/10 transition-all">
-                        <Search className="w-4 h-4 text-slate-400 mr-3" />
-                        <input
-                            type="text"
-                            placeholder="Find ledger record..."
-                            className="bg-transparent border-0 focus:ring-0 text-sm w-48 font-bold placeholder:text-slate-300"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                    <Button
-                        onClick={() => { setEditingInvoice(null); setView("form"); }}
-                        className="h-14 px-10 rounded-2xl bg-indigo-600 hover:bg-black text-white font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-indigo-600/30 transition-all gap-3 border-0 active:scale-95"
-                    >
-                        <Plus className="w-5 h-5" /> Generate Bill
-                    </Button>
-                </div>
-            </div>
+            )
+        },
+        { 
+            key: "grand_total", 
+            label: "Payment Valuation",
+            render: (i: any) => <span className="font-black text-indigo-600 tabular-nums">{fmt(i.grand_total)}</span>,
+            className: "text-right"
+        },
+        { 
+            key: "status", 
+            label: "Ledger Status",
+            render: (i: any) => <StatusBadge status={i.status} />
+        }
+    ];
 
-            {/* List View */}
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="border-b border-slate-50 bg-slate-50/50">
-                            <th className="py-6 pl-10 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Bill ID</th>
-                            <th className="py-6 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Payer Entity</th>
-                            <th className="py-6 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Net Valuation</th>
-                            <th className="py-6 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 text-center">Payment Lifecycle</th>
-                            <th className="py-6 text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 pr-10 text-right">Ledger Operations</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {loading ? (
-                            <tr><td colSpan={5} className="py-20 text-center"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></td></tr>
-                        ) : filteredInvoices.map((i) => (
-                            <tr key={i.id} className="group hover:bg-slate-50/50 transition-colors">
-                                <td className="py-8 pl-10 font-black text-slate-900 uppercase italic tracking-tighter">{i.reference_no}</td>
-                                <td className="py-8">
-                                    <p className="text-sm font-black text-slate-900 uppercase italic">{i.customer_name}</p>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">DUE: {i.due_date || 'N/A'}</p>
-                                </td>
-                                <td className="py-8">
-                                    <p className="font-black text-indigo-600 text-lg tracking-tighter">{fmt(i.grand_total)}</p>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">QTY: {i.total_qty}</p>
-                                </td>
-                                <td className="py-8 text-center">
-                                    <span className={cn(
-                                        "px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                                        i.status === 'paid' ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-md shadow-emerald-500/10" :
-                                            i.status === 'unpaid' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                                                i.status === 'overdue' ? "bg-rose-50 text-rose-600 border-rose-100 animate-pulse" :
-                                                    "bg-slate-50 text-slate-400 border-slate-100"
-                                    )}>
-                                        {i.status}
-                                    </span>
-                                </td>
-                                <td className="py-8 pr-10 text-right">
-                                    <div className="flex justify-end gap-3 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                        <Button
-                                            onClick={() => toast.success("Recording Payment Settlement...")}
-                                            variant="ghost" className="h-11 px-6 bg-slate-50 hover:bg-black hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest gap-2 shadow-sm border-0"
-                                        >
-                                            <DollarSign className="w-4 h-4" /> Record Payment
-                                        </Button>
-                                        <Button
-                                            onClick={() => { setEditingInvoice(i); setView("form"); }}
-                                            variant="ghost" size="icon" className="h-11 w-11 text-slate-400 hover:text-indigo-600 hover:bg-white shadow-sm border-0 rounded-2xl"
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    return (
+        <ERPListView
+            title="Sales Invoices"
+            data={filteredInvoices}
+            columns={invoiceColumns}
+            onNew={() => { setEditingInvoice(null); setView("form"); }}
+            onRefresh={loadInvoices}
+            onRowClick={(i) => { setEditingInvoice(i); setView("form"); }}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+            statusField="status"
+        />
     );
 }

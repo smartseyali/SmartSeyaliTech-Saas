@@ -1,96 +1,154 @@
 import { useState } from "react";
-import {
-    Sheet, Search, Filter, Plus,
-    MoreHorizontal, Wallet, Landmark,
-    ArrowDownLeft, ArrowUpRight, BarChart3,
-    FileSpreadsheet, Settings
+import { 
+    CreditCard, BookOpen, Landmark, 
+    ArrowUpRight, ArrowDownLeft, Search, 
+    Filter, Plus, RefreshCw, Layers, 
+    ShieldCheck, BarChart3, PieChart
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useCrud } from "@/hooks/useCrud";
+import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
 export default function ChartOfAccounts() {
-    const accounts = [
-        { code: "1001", name: "HDFC Operating Account", type: "Asset", sub: "Bank", balance: 1250000, status: "Active" },
-        { code: "1002", name: "Petty Cash", type: "Asset", sub: "Cash", balance: 5000, status: "Active" },
-        { code: "2001", name: "Accounts Payable", type: "Liability", sub: "Current Liability", balance: -45000, status: "Active" },
-        { code: "3001", name: "Owner Capital", type: "Equity", sub: "Capital Account", balance: 5000000, status: "Active" },
-        { code: "4001", name: "Product Sales", type: "Income", sub: "Direct Income", balance: 856000, status: "Active" },
-        { code: "5001", name: "Office Rent", type: "Expense", sub: "Indirect Expense", balance: 120000, status: "Active" },
+    const [view, setView] = useState<"list" | "form">("list");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingAccount, setEditingAccount] = useState<any>(null);
+    
+    // Fetch accounts from accounts_chart table
+    const { data: accounts, loading, fetchItems, createItem, updateItem } = useCrud("accounts_chart");
+
+    const accountFields = [
+        { key: "code", label: "Ledger Code (Identifier)", required: true, ph: "1000-001" },
+        { key: "name", label: "Registry Account Name", required: true, ph: "Retained Earnings..." },
+        { 
+            key: "type", label: "Account Classification", type: "select" as const,
+            options: [
+                { label: "Asset Hierarchy", value: "asset" },
+                { label: "Liability Structure", value: "liability" },
+                { label: "Equity Base", value: "equity" },
+                { label: "Income Stream", value: "income" },
+                { label: "Expense Node", value: "expense" }
+            ]
+        },
+        { 
+            key: "is_group", label: "Operational State", type: "select" as const,
+            options: [
+                { label: "Group Ledger", value: "true" },
+                { label: "Transactable Node", value: "false" }
+            ]
+        },
+        { key: "description", label: "Registry Narrative", ph: "Detailed ledger description..." }
     ];
 
-    const fmt = (n: number) => `₹${Math.abs(n).toLocaleString("en-IN")}`;
+    const handleSave = async (header: any) => {
+        const payload = { ...header, is_group: header.is_group === "true" };
+        if (editingAccount) {
+            await updateItem(editingAccount.id, payload);
+        } else {
+            await createItem(payload);
+        }
+        setView("list");
+        setEditingAccount(null);
+    };
+
+    const fmt = (n: number) => `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
+
+    const accountColumns = [
+        { 
+            key: "code", 
+            label: "Ledger Identity",
+            render: (acc: any) => (
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
+                        acc.is_group ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-400 border-slate-100 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900'
+                    }`}>
+                        {acc.is_group ? <BookOpen className="w-5 h-5" /> : <Layers className="w-5 h-5" />}
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                            {acc.code || "LEDGER-XXX"}
+                        </span>
+                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{acc.name}</span>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            key: "type", 
+            label: "Node Classification",
+            render: (acc: any) => (
+                <div className="flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${
+                        acc.type === 'asset' ? 'bg-emerald-500' :
+                        acc.type === 'liability' ? 'bg-amber-500' :
+                        acc.type === 'equity' ? 'bg-indigo-500' :
+                        acc.type === 'income' ? 'bg-blue-500' : 'bg-rose-500'
+                    }`} />
+                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">{acc.type || "UNSET"}</span>
+                </div>
+            )
+        },
+        { 
+            key: "balance", 
+            label: "Current Registry Balance",
+            render: (acc: any) => (
+                <span className={`font-black tracking-tighter ${
+                    (acc.balance || 0) < 0 ? "text-rose-600" : "text-emerald-600"
+                }`}>
+                    {fmt(acc.balance || 0)}
+                </span>
+            )
+        },
+        { 
+            key: "status", 
+            label: "Registry Status",
+            render: (acc: any) => <StatusBadge status={acc.is_group ? "Group" : "Active Ledger"} />
+        }
+    ];
+
+    const filteredAccounts = (accounts || []).filter(acc =>
+        acc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        acc.code?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingAccount ? "Refine Ledger Node" : "Initialize Account Identity"}
+                    subtitle="Universal Chart of Accounts Protocol"
+                    headerFields={accountFields}
+                    onAbort={() => { setView("list"); setEditingAccount(null); }}
+                    onSave={handleSave}
+                    initialData={editingAccount}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <FileSpreadsheet className="w-6 h-6 text-emerald-600" />
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Financial Infrastructure</span>
-                    </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase italic">Chart of Accounts</h1>
-                    <p className="text-sm font-medium text-slate-500">Master database of all ledgers and financial buckets.</p>
+        <ERPListView
+            title="Chart of Accounts Registry"
+            data={filteredAccounts}
+            columns={accountColumns}
+            onNew={() => { setEditingAccount(null); setView("form"); }}
+            onRefresh={fetchItems}
+            onRowClick={(acc) => { setEditingAccount(acc); setView("form"); }}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+            headerActions={
+                <div className="flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
+                        <PieChart className="w-3.5 h-3.5" /> Balance Sheet Node
+                    </button>
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
+                        <BarChart3 className="w-3.5 h-3.5" /> P&L Matrix
+                    </button>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" className="h-12 px-6 rounded-2xl border-slate-200">
-                        <Settings className="w-5 h-5 mr-2" /> Settings
-                    </Button>
-                    <Button className="h-12 px-8 rounded-2xl bg-emerald-600 hover:bg-black text-white font-bold shadow-xl shadow-emerald-600/20 transition-all gap-3 border-0">
-                        <Plus className="w-5 h-5" /> New Account
-                    </Button>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden font-sans">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="border-b border-slate-50 bg-slate-50/50">
-                            <th className="py-6 pl-10 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Code</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Account Identity</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Classification</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Current Valuation</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 pr-10 text-right">State</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {accounts.map((acc) => (
-                            <tr key={acc.code} className="group hover:bg-slate-50/50 transition-all">
-                                <td className="py-8 pl-10">
-                                    <span className="text-[11px] font-black text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">{acc.code}</span>
-                                </td>
-                                <td className="py-8">
-                                    <p className="text-sm font-black text-slate-900 leading-none mb-1 uppercase tracking-tight italic">{acc.name}</p>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{acc.sub}</p>
-                                </td>
-                                <td className="py-8">
-                                    <span className={cn(
-                                        "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                                        acc.type === 'Asset' ? "bg-blue-50 text-blue-600 border-blue-100" :
-                                            acc.type === 'Liability' ? "bg-rose-50 text-rose-600 border-rose-100" :
-                                                acc.type === 'Income' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                                    "bg-amber-50 text-amber-600 border-amber-100"
-                                    )}>
-                                        {acc.type}
-                                    </span>
-                                </td>
-                                <td className="py-8">
-                                    <p className={cn(
-                                        "text-sm font-black italic",
-                                        acc.balance >= 0 ? "text-slate-900" : "text-rose-600"
-                                    )}>
-                                        {acc.balance < 0 ? "-" : ""}{fmt(acc.balance)}
-                                    </p>
-                                </td>
-                                <td className="py-8 pr-10 text-right">
-                                    <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-300 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-all rounded-xl">
-                                        <Plus className="w-4 h-4" />
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            }
+        />
     );
 }

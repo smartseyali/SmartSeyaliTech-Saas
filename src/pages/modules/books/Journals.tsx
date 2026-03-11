@@ -1,93 +1,146 @@
 import { useState } from "react";
-import {
-    Book, Search, Filter, Plus,
-    MoreHorizontal, ArrowLeftRight,
-    Calendar, FileCode, CheckCircle2,
-    Lock, Share2, Printer
+import { 
+    Book, FileSpreadsheet, Plus, 
+    Search, Filter, RefreshCw, 
+    ChevronRight, Calendar, Info,
+    CheckCircle2, AlertCircle, Clock,
+    ArrowRightLeft, Landmark, Receipt
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useCrud } from "@/hooks/useCrud";
+import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
 export default function Journals() {
-    const journals = [
-        { id: "JRN-0042", reference: "Opening Balance", total: 5000000, date: "2024-03-01", status: "Posted", type: "Manual" },
-        { id: "JRN-0043", reference: "Depreciation MAR", total: 12500, date: "2024-03-08", status: "Draft", type: "System" },
-        { id: "JRN-0044", reference: "Revenue Accrual", total: 850000, date: "2024-03-08", status: "Posted", type: "Calculated" },
+    const [view, setView] = useState<"list" | "form">("list");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingJournal, setEditingJournal] = useState<any>(null);
+    
+    // Fetch journals from core registry
+    const { data: journals, loading, fetchItems, createItem, updateItem } = useCrud("journals");
+
+    const journalFields = [
+        { key: "reference_no", label: "Registry Transaction Code", required: true, ph: "JV-2026-001..." },
+        { key: "date", label: "Posting Date", type: "date" as const, required: true },
+        { 
+            key: "type", label: "Ledger Category", type: "select" as const,
+            options: [
+                { label: "General Protocol", value: "general" },
+                { label: "Sales Registry", value: "sales" },
+                { label: "Purchase Registry", value: "purchase" },
+                { label: "Cash / Bank Node", value: "cash" }
+            ]
+        },
+        { key: "note", label: "Transaction Narrative", ph: "Outline the purpose of this entry..." }
     ];
 
-    const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+    const journalItemFields = [
+        { key: "account_id", label: "Target Ledger Hub", type: "select" as const, options: [] }, // Will need COA fetch in real usage
+        { key: "debit", label: "Debit Magnitude", type: "number" as const },
+        { key: "credit", label: "Credit Magnitude", type: "number" as const },
+        { key: "memo", label: "Line Memo", ph: "Line item specific details..." }
+    ];
+
+    const handleSave = async (header: any, items: any[]) => {
+        const payload = { ...header, items };
+        if (editingJournal) {
+            await updateItem(editingJournal.id, payload);
+        } else {
+            await createItem(payload);
+        }
+        setView("list");
+        setEditingJournal(null);
+    };
+
+    const journalColumns = [
+        { 
+            key: "ref", 
+            label: "Transaction identity",
+            render: (j: any) => (
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
+                        <Book className="w-6 h-6" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{j.reference_no}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest border-r pr-2 border-slate-200">
+                                {j.type?.toUpperCase()} ENTRY
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                                <Calendar size={10}/> {j.date}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            key: "description", 
+            label: "Narrative Hub",
+            render: (j: any) => (
+                <p className="text-[11px] font-medium text-slate-500 max-w-xs truncate uppercase tracking-tight">
+                    {j.note || "System Generated Protocol Entry"}
+                </p>
+            )
+        },
+        { 
+            key: "magnitude", 
+            label: "Transaction Volume",
+            render: (j: any) => (
+                <div className="flex flex-col text-right">
+                    <span className="text-[13px] font-black text-slate-900 tracking-tighter">
+                        ₹{(j.total_amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Balanced Ledger</span>
+                </div>
+            )
+        },
+        { 
+            key: "status", 
+            label: "Registry State",
+            render: (j: any) => <StatusBadge status={j.status || "posted"} />
+        }
+    ];
+
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingJournal ? "Refine Protocol Entry" : "Initialize Journal identity"}
+                    subtitle="Universal Financial Ledger Orchestration"
+                    headerFields={journalFields}
+                    itemFields={journalItemFields}
+                    onAbort={() => { setView("list"); setEditingJournal(null); }}
+                    onSave={handleSave}
+                    initialData={editingJournal}
+                    itemTitle="Ledger Double-Entry Matrix"
+                />
+            </div>
+        );
+    }
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <Book className="w-6 h-6 text-emerald-600" />
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Ledger Compliance</span>
-                    </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase italic">General Journals</h1>
-                    <p className="text-sm font-medium text-slate-500">Record adjusting and non-transactional accounting entries.</p>
+        <ERPListView
+            title="Journal Protocol Registry"
+            data={journals || []}
+            columns={journalColumns}
+            onNew={() => { setEditingJournal(null); setView("form"); }}
+            onRefresh={fetchItems}
+            onRowClick={(j) => { setEditingJournal(j); setView("form"); }}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+            headerActions={
+                <div className="flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                        <FileSpreadsheet className="w-3.5 h-3.5" /> Batch induction
+                    </button>
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
+                        <ArrowRightLeft className="w-3.5 h-3.5" /> Reconcile Hub
+                    </button>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" className="h-12 px-6 rounded-2xl border-slate-200">
-                        <Printer className="w-5 h-5 mr-2" /> Export
-                    </Button>
-                    <Button className="h-12 px-8 rounded-2xl bg-emerald-600 hover:bg-black text-white font-bold shadow-xl shadow-emerald-600/20 transition-all gap-3 border-0">
-                        <Plus className="w-5 h-5" /> Create Journal
-                    </Button>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="border-b border-slate-50 bg-slate-50/50">
-                            <th className="py-6 pl-10 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Entry Matrix</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Reference Source</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Aggregate Valuation</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Lifecycle</th>
-                            <th className="py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 pr-10 text-right">Protection</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {journals.map((j) => (
-                            <tr key={j.id} className="group hover:bg-slate-50/50 transition-all">
-                                <td className="py-8 pl-10">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
-                                            <ArrowLeftRight className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-black text-slate-900 italic leading-none mb-1">{j.id}</p>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{j.date}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="py-8">
-                                    <p className="text-sm font-bold text-slate-700">{j.reference}</p>
-                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter border-b border-slate-100">{j.type}</span>
-                                </td>
-                                <td className="py-8 font-black text-slate-900">{fmt(j.total)}</td>
-                                <td className="py-8">
-                                    <span className={cn(
-                                        "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                        j.status === 'Posted' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                            "bg-slate-50 text-slate-400 border-slate-100"
-                                    )}>
-                                        {j.status}
-                                    </span>
-                                </td>
-                                <td className="py-8 pr-10 text-right">
-                                    <div className="flex items-center justify-end gap-2 outline-none">
-                                        {j.status === 'Posted' ? <Lock className="w-4 h-4 text-slate-300" /> : <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400"><Share2 className="w-4 h-4" /></Button>}
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400"><MoreHorizontal className="w-4 h-4" /></Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            }
+        />
     );
 }

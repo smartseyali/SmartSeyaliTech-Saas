@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
-import { ModuleListPage } from "@/components/modules/ModuleListPage";
-import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
+import { useState, useMemo } from "react";
+import ERPListView from "@/components/modules/ERPListView";
+import { DynamicFormDialog } from "@/components/modules/DynamicFormDialog";
 import { useCrud } from "@/hooks/useCrud";
 import { useTenant } from "@/contexts/TenantContext";
 import { useDictionary } from "@/hooks/useDictionary";
@@ -17,16 +17,16 @@ import { cn } from "@/lib/utils";
 
 export const EcomProducts = () => {
     const { t } = useDictionary();
-    const { data: allProducts, loading, createItem, updateItem, deleteItem } = useCrud("products", "*, ecom_categories(id, name)");
+    const { data: allProducts, loading, createItem, updateItem, fetchItems } = useCrud("products", "*, ecom_categories(id, name)");
     const { data: categories } = useCrud("ecom_categories");
     const { activeCompany } = useTenant();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [searchTerm, setSearchTerm] = useState("");
 
     // UI States
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
-    const [variantDialogOpen, setVariantDialogOpen] = useState(false);
 
     // Selected product for detailing (Split View)
     const selectedId = searchParams.get("id");
@@ -34,50 +34,61 @@ export const EcomProducts = () => {
         selectedId ? allProducts.find(p => String(p.id) === selectedId) : null
         , [allProducts, selectedId]);
 
-    const ecomProductColumns = useMemo(() => [
-        { key: "image_url", label: "", render: (val: string) => val ? <img src={val} className="w-10 h-10 rounded-xl object-cover shadow-sm" /> : <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200"><Box className="w-5 h-5 text-slate-400" /></div> },
-        {
-            key: "name",
-            label: `${t("Product")} Name`,
-            render: (val: string, row: any) => (
-                <div className="flex flex-col">
-                    <span className="font-bold text-slate-900 leading-tight">{val}</span>
-                    <span className="text-[10px] font-bold text-slate-400 font-mono tracking-tighter uppercase">{row.sku || 'NO_SKU'}</span>
+    const ecomProductColumns = [
+        { 
+            key: "image_url", 
+            label: "", 
+            render: (row: any) => row.image_url ? (
+                <img src={row.image_url} className="w-10 h-10 rounded-xl object-cover border border-slate-100 shadow-sm" />
+            ) : (
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                    <Box className="w-5 h-5 text-slate-300" />
                 </div>
             )
         },
-        { key: "rate", label: t("Price"), align: "right" as const, render: (val: any) => <span className="text-blue-600 font-black">₹{Number(val || 0).toLocaleString('en-IN')}</span> },
-    ], [t]);
+        {
+            key: "name",
+            label: `Entity Identity`,
+            render: (row: any) => (
+                <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">SKU: {row.sku || 'UNASSIGNED'}</span>
+                </div>
+            )
+        },
+        { 
+            key: "rate", 
+            label: "Ledger Price", 
+            render: (row: any) => <span className="font-black text-indigo-600 tracking-tight">₹{Number(row.rate || 0).toLocaleString('en-IN')}</span> 
+        },
+    ];
 
-    const ecomProductFields: FieldConfig[] = [
-        { key: "image_url", label: "Primary Image", type: "image", folder: "products" },
+    const ecomProductFields = [
+        { key: "image_url", label: "Primary Image", type: "image" as const, folder: "products" },
         { key: "name", label: "Product Name", required: true },
         { key: "sku", label: `${t("SKU")} / Model` },
         {
             key: "category_id",
             label: `${t("Product")} ${t("Category")}`,
-            type: "select",
+            type: "select" as const,
             options: (categories || []).map(c => ({ label: c.name, value: String(c.id) }))
         },
-        { key: "rate", label: `Price (MRP)`, type: "number" },
-        { key: "description", label: "Description", type: "textarea" },
+        { key: "rate", label: `Price (MRP)`, type: "number" as const },
+        { key: "description", label: "Description", type: "textarea" as const },
         {
-            key: "is_featured", label: "Show on Home Page", type: "select", options: [
-                { label: "Hide", value: "false" },
-                { label: "Show in Featured section", value: "true" }
+            key: "is_featured", label: "Registry Visibility", type: "select" as const, options: [
+                { label: "Hide from Featured", value: "false" },
+                { label: "Show in Featured", value: "true" }
             ]
         },
-        {
-            key: "is_best_seller", label: "Is Best Seller", type: "select", options: [
-                { label: "No", value: "false" },
-                { label: "Yes", value: "true" }
-            ]
-        },
-        { key: "meta_title", label: "SEO Title", ph: "Enter title for Google search" },
-        { key: "meta_description", label: "SEO Description", type: "textarea" },
+        { key: "meta_title", label: "SEO Meta Title", ph: "Registry indexing title" },
+        { key: "meta_description", label: "SEO Bio", type: "textarea" as const },
     ];
 
-    const ecomData = allProducts.filter(p => (p as any).is_ecommerce !== false);
+    const ecomData = allProducts.filter(p => (p as any).is_ecommerce !== false && 
+        (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase())))
+    );
 
     const handleNew = () => {
         setEditingItem(null);
@@ -87,7 +98,8 @@ export const EcomProducts = () => {
     const handleEdit = (item: any) => {
         const editData = {
             ...item,
-            category_id: item.category_id ? String(item.category_id) : ""
+            category_id: item.category_id ? String(item.category_id) : "",
+            is_featured: String(item.is_featured)
         };
         setEditingItem(editData);
         setFormOpen(true);
@@ -98,21 +110,15 @@ export const EcomProducts = () => {
             ...formData,
             is_ecommerce: true,
             is_featured: formData.is_featured === "true",
-            is_best_seller: formData.is_best_seller === "true",
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
-            category: categories.find(c => String(c.id) === formData.category_id)?.name || ""
         };
-        if (editingItem) {
+        if (editingItem?.id) {
             await updateItem(editingItem.id, payload);
         } else {
             await createItem(payload);
         }
-    };
-
-    const handleDelete = async (item: any) => {
-        if (confirm(`Move this ${t("Product").toLowerCase()} to archive (Remove from E-commerce)?`)) {
-            await updateItem(item.id, { is_ecommerce: false });
-        }
+        setFormOpen(false);
+        fetchItems();
     };
 
     const selectProduct = (row: any) => {
@@ -121,50 +127,30 @@ export const EcomProducts = () => {
 
     return (
         <div className="h-full flex flex-col bg-white overflow-hidden">
-            {/* Split View Workbench */}
             <ResizablePanelGroup direction="horizontal" className="flex-1">
-                <ResizablePanel defaultSize={selectedProduct ? 40 : 100} minSize={30} className="bg-white">
-                    <ModuleListPage
-                        title={selectedProduct ? `Product View` : `All Products`}
-                        subtitle={selectedProduct ? "Manage your product variants" : "Manage and organize your store products"}
-                        columns={ecomProductColumns}
+                <ResizablePanel defaultSize={selectedProduct ? 40 : 100} minSize={35} className="bg-white">
+                    <ERPListView
+                        title="Master Catalog"
                         data={ecomData}
-                        loading={loading}
+                        columns={ecomProductColumns}
                         onNew={handleNew}
-                        onEdit={(row) => {
-                            if (selectedProduct?.id === row.id) {
-                                handleEdit(row);
-                            } else {
-                                selectProduct(row);
-                            }
-                        }}
-                        onDelete={handleDelete}
+                        onRefresh={fetchItems}
+                        onRowClick={selectProduct}
+                        isLoading={loading}
+                        searchTerm={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        primaryKey="id"
                         headerActions={
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => navigate("/apps/ecommerce/masters/products/import")}
-                                    className="rounded-xl gap-2 font-bold border-slate-200 hover:bg-slate-50 transition-all"
-                                >
-                                    <Upload className="w-4 h-4 text-blue-600" />
-                                    Bulk
-                                </Button>
-                            </div>
-                        }
-                        actions={(row) => (
                             <Button
-                                variant={selectedProduct?.id === row.id ? "default" : "outline"}
+                                variant="outline"
                                 size="sm"
-                                onClick={() => selectProduct(row)}
-                                className={cn(
-                                    "h-8 px-4 rounded-xl text-[10px] uppercase font-black tracking-widest transition-all",
-                                    selectedProduct?.id === row.id ? "bg-blue-600 shadow-lg shadow-blue-600/20" : "border-slate-200"
-                                )}
+                                onClick={() => navigate("/apps/ecommerce/masters/products/import")}
+                                className="h-8 px-4 rounded-xl gap-2 font-black text-[10px] uppercase tracking-widest border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
                             >
-                                {selectedProduct?.id === row.id ? "Selected" : "Select"}
+                                <Upload className="w-3.5 h-3.5 text-indigo-600" />
+                                Bulk Import
                             </Button>
-                        )}
+                        }
                     />
                 </ResizablePanel>
 
@@ -174,7 +160,7 @@ export const EcomProducts = () => {
                         <ResizablePanel defaultSize={60} minSize={40} className="bg-slate-50/50 backdrop-blur-sm border-l border-white shadow-[inset_1px_0_0_0_rgba(255,255,255,0.8)]">
                             <div className="h-full flex flex-col p-8 overflow-hidden">
                                 {/* Detail Header */}
-                                <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-200/60">
+                                <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/60">
                                     <div className="flex items-center gap-5">
                                         <div className="w-16 h-16 rounded-[24px] bg-white shadow-xl flex items-center justify-center border border-slate-100 shrink-0 overflow-hidden">
                                             {selectedProduct.image_url ? (
@@ -185,10 +171,10 @@ export const EcomProducts = () => {
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/80">Product Details</p>
+                                                <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/80">Registry Profile</p>
                                             </div>
-                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{selectedProduct.name}</h2>
+                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight italic uppercase">{selectedProduct.name}</h2>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -196,7 +182,7 @@ export const EcomProducts = () => {
                                             variant="outline"
                                             size="icon"
                                             onClick={() => handleEdit(selectedProduct)}
-                                            className="h-10 w-10 rounded-2xl bg-white border-slate-200 hover:border-blue-200 hover:text-blue-600 transition-all shadow-sm"
+                                            className="h-10 w-10 rounded-2xl bg-white border-slate-200 hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm"
                                         >
                                             <Settings2 className="w-4 h-4" />
                                         </Button>
@@ -212,22 +198,21 @@ export const EcomProducts = () => {
                                 </div>
 
                                 <Tabs defaultValue="inventory" className="flex-1 flex flex-col min-h-0">
-                                    <TabsList className="bg-white/60 p-1.5 rounded-2xl border border-slate-200/60 shadow-sm mb-6 w-fit h-auto flex gap-1">
+                                    <TabsList className="bg-white/60 p-1.5 rounded-2xl border border-white/60 shadow-sm mb-6 w-fit h-auto flex gap-1">
                                         <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
-                                            <Database className="w-3.5 h-3.5" /> Stocks
+                                            <Database className="w-3.5 h-3.5" /> Variants
                                         </TabsTrigger>
                                         <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
-                                            <Info className="w-3.5 h-3.5" /> Details
+                                            <Info className="w-3.5 h-3.5" /> Specifications
                                         </TabsTrigger>
                                         <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
-                                            <Layers className="w-3.5 h-3.5" /> Media
+                                            <Layers className="w-3.5 h-3.5" /> Asset Ledger
                                         </TabsTrigger>
                                     </TabsList>
 
                                     <div className="flex-1 overflow-hidden">
                                         <TabsContent value="inventory" className="h-full mt-0 focus-visible:ring-0">
-                                            <div className="h-full bg-white rounded-[32px] border border-slate-200/60 shadow-sm overflow-hidden flex flex-col shadow-inner">
-                                                {/* Variants Tab Content */}
+                                            <div className="h-full bg-white rounded-[32px] border border-white shadow-sm overflow-hidden flex flex-col">
                                                 <ProductVariantDialog
                                                     open={true}
                                                     onOpenChange={() => { }}
@@ -239,44 +224,43 @@ export const EcomProducts = () => {
                                             </div>
                                         </TabsContent>
 
-                                        <TabsContent value="details" className="h-full mt-0 focus-visible:ring-0 overflow-y-auto pr-2 scrollbar-thin">
+                                        <TabsContent value="details" className="h-full mt-0 focus-visible:ring-0 overflow-y-auto pr-2 scrollbar-none">
                                             <div className="grid grid-cols-2 gap-6 pb-20">
-                                                {/* Read-only specification summary or Mini-form */}
                                                 {[
-                                                    { label: "Category", value: selectedProduct.ecom_categories?.name || "Uncategorized", icon: Tag },
-                                                    { label: "Price", value: `₹${Number(selectedProduct.rate || 0).toLocaleString()}`, icon: TrendingUp },
-                                                    { label: "Status", value: selectedProduct.status || "Active", icon: CheckCircle2 },
-                                                    { label: "SKU", value: selectedProduct.sku || "N/A", icon: Box },
+                                                    { label: "Category Registry", value: selectedProduct.ecom_categories?.name || "Global Group", icon: Tag },
+                                                    { label: "Unit Value", value: `₹${Number(selectedProduct.rate || 0).toLocaleString()}`, icon: TrendingUp },
+                                                    { label: "Ledger Status", value: selectedProduct.status || "Active", icon: CheckCircle2 },
+                                                    { label: "Registry SKU", value: selectedProduct.sku || "UNASSIGNED", icon: Box },
                                                 ].map(stat => (
-                                                    <div key={stat.label} className="bg-white p-6 rounded-[24px] border border-slate-200/60 shadow-sm flex flex-col gap-3 group hover:border-blue-200 transition-all">
+                                                    <div key={stat.label} className="bg-white p-6 rounded-[24px] border border-white/60 shadow-sm flex flex-col gap-3 group hover:border-indigo-200 transition-all">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                                                 <stat.icon className="w-4 h-4" />
                                                             </div>
                                                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</span>
                                                         </div>
-                                                        <p className="text-xl font-bold text-slate-900">{stat.value}</p>
+                                                        <p className="text-xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
                                                     </div>
                                                 ))}
-                                                <div className="col-span-2 bg-white p-8 rounded-[32px] border border-slate-200/60 shadow-sm">
+                                                <div className="col-span-2 bg-white p-8 rounded-[32px] border border-white/60 shadow-sm">
                                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
-                                                        <Info className="w-4 h-4" /> Product Description
+                                                        <Info className="w-4 h-4 text-indigo-600" /> Registry Bio
                                                     </h4>
                                                     <p className="text-sm leading-relaxed text-slate-600 font-medium whitespace-pre-wrap">
-                                                        {selectedProduct.description || "No description provided for this entity."}
+                                                        {selectedProduct.description || "Historical data for this entity remains unpopulated in the current registry sequence."}
                                                     </p>
                                                 </div>
                                             </div>
                                         </TabsContent>
 
                                         <TabsContent value="media" className="h-full mt-0 focus-visible:ring-0">
-                                            <div className="h-full bg-white rounded-[32px] border border-slate-200/60 shadow-sm flex flex-col items-center justify-center text-center p-12 gap-6">
+                                            <div className="h-full bg-white rounded-[32px] border border-white/60 shadow-sm flex flex-col items-center justify-center text-center p-12 gap-6">
                                                 <div className="w-20 h-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200 border border-slate-100">
                                                     <Layers className="w-10 h-10" />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <h3 className="text-lg font-bold text-slate-900">Asset Management</h3>
-                                                    <p className="text-xs font-medium text-slate-400 max-w-[240px]">Expanded media gallery for this product is coming in the next update.</p>
+                                                    <h3 className="text-lg font-bold text-slate-900 uppercase italic">Media Asset Vault</h3>
+                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[240px]">Expanded gallery indexing sequence engaged.</p>
                                                 </div>
                                             </div>
                                         </TabsContent>
@@ -291,7 +275,7 @@ export const EcomProducts = () => {
             <DynamicFormDialog
                 open={formOpen}
                 onOpenChange={setFormOpen}
-                title={editingItem ? `Edit ${t("Product")}` : `Add New ${t("Product")}`}
+                title={editingItem ? `Refine ${t("Product")}` : `Register ${t("Product")}`}
                 fields={ecomProductFields}
                 initialData={editingItem}
                 onSubmit={handleSubmit}

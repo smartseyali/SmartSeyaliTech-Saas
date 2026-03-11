@@ -33,8 +33,8 @@ export function AppHeader() {
     const userRole = isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Member";
 
     return (
-        <header className="h-16 border-b bg-white sticky top-0 z-40 w-full transition-all">
-            <div className="h-full px-6 flex items-center justify-between gap-8">
+        <header className="h-12 border-b bg-white sticky top-0 z-40 w-full transition-all">
+            <div className="h-full px-4 flex items-center justify-between gap-6">
 
                 {/* Search Bar */}
                 <div className="flex-1 max-w-md relative group hidden sm:block">

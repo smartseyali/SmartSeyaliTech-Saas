@@ -8,9 +8,8 @@ import { TenantProvider, useTenant } from "@/contexts/TenantContext";
 import { PermissionsProvider, usePermissions } from "@/contexts/PermissionsContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Rocket } from "lucide-react";
-import { cn } from "@/lib/utils";
 import PLATFORM_CONFIG from "@/config/platform";
+import { PlatformLoader } from "@/components/PlatformLoader";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -92,6 +91,7 @@ import InvoiceList from "./pages/modules/invoicing/Invoices";
 
 // ── PAYROLL Module ──
 import PayrollDashboard from "./pages/modules/payroll/PayrollDashboard";
+import PayrollPayslips from "./pages/modules/payroll/Payslips";
 
 // ── HELPDESK Module ──
 import HelpdeskDashboard from "./pages/modules/helpdesk/HelpdeskDashboard";
@@ -103,14 +103,17 @@ import PatientRecords from "./pages/modules/hospital/Patients";
 
 // ── WHATSAPP Module ──
 import WhatsAppDashboard from "./pages/modules/whatsapp/WhatsAppDashboard";
+import WhatsAppAccounts from "./pages/modules/whatsapp/Accounts";
 import WhatsAppTemplates from "./pages/modules/whatsapp/Templates";
+import WhatsAppCampaigns from "./pages/modules/whatsapp/Campaigns";
 
 // ── LANDING PAGE Module ──
 import LandingPageDashboard from "./pages/modules/landing-page/LandingPageDashboard";
 
 // ── HRMS Module ──
 import HRMSDashboard from "./pages/modules/hrms/HRMSDashboard";
-import HRMSDirectory from "./pages/modules/hrms/Directory";
+import HRMSRegistry from "./pages/modules/hrms/Employees";
+import HRMSInduction from "./pages/modules/hrms/Induction";
 import Attendance from "./pages/modules/hrms/Attendance";
 import LeaveManagement from "./pages/modules/hrms/LeaveManagement";
 
@@ -125,6 +128,31 @@ import PurchaseBills from "./pages/modules/purchase/PurchaseBills";
 import InventoryDashboard from "./pages/modules/inventory/InventoryDashboard";
 import InventoryItems from "./pages/modules/inventory/Items";
 import Warehouses from "./pages/modules/inventory/Warehouses";
+
+// ── MASTER REGISTRY (Common Foundation) ──
+import RegistryDashboard from "./pages/modules/masters/RegistryDashboard";
+import MastersItems from "./pages/modules/masters/Items";
+import MastersContacts from "./pages/modules/masters/Contacts";
+import MastersCategories from "./pages/modules/masters/Categories";
+import UOMMaster from "./pages/modules/masters/UOMs";
+import AttributeMaster from "./pages/modules/masters/Attributes";
+import BrandMaster from "./pages/modules/masters/Brands";
+import VariantMaster from "./pages/modules/masters/Variants";
+import ReviewMaster from "./pages/modules/masters/Reviews";
+
+// ── WORKFLOW Module ──
+import WorkflowDashboard from "./pages/modules/workflow/WorkflowDashboard";
+import ApprovalMatrix from "./pages/modules/workflow/Approvals";
+
+// ── AUTOMATION Module ──
+import AutomationDashboard from "./pages/modules/automation/AutomationDashboard";
+import AutomationJobs from "./pages/modules/automation/Jobs";
+
+// ── DOCUMENTS Module ──
+import DocumentsHub from "./pages/modules/documents/Documents";
+
+// ── PROJECTS Module ──
+import ProjectPortfolio from "./pages/modules/projects/Projects";
 
 // ── POS Module ──
 import POSDashboard from "./pages/modules/pos/POSDashboard";
@@ -157,14 +185,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         // If we already know isSuperAdmin (from earlier state or fast load), we can skip waiting
         if (isSuperAdmin) return <>{children}</>;
 
-        return (
-            <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50">
-                <div className={cn("w-12 h-12 rounded-xl animate-bounce flex items-center justify-center shadow-lg shadow-primary-500/20", isSuperAdmin ? "bg-slate-900" : "bg-primary-600")}>
-                    <Rocket className="w-6 h-6 text-white" />
-                </div>
-                <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse">Synchronizing {PLATFORM_CONFIG.name}</span>
-            </div>
-        );
+        return <PlatformLoader message="Synchronizing Platform" subtext="Clinical Workspace Induction" />;
     }
 
     // Super Admins bypass the onboarding logic entirely
@@ -191,14 +212,7 @@ const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
     // Still loading critical info? Wait.
     if (pLoading || tLoading) {
         if (isSuperAdmin) return <>{children}</>;
-        return (
-            <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50">
-                <div className="w-12 h-12 bg-primary-600 rounded-xl animate-bounce flex items-center justify-center shadow-lg shadow-primary-500/20">
-                    <Rocket className="w-6 h-6 text-white" />
-                </div>
-                <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse">Verifying Admin Credentials</span>
-            </div>
-        );
+        return <PlatformLoader message="Verifying Admin Credentials" subtext="Security Node Access Authorization" />;
     }
 
     if (!isSuperAdmin) return <Navigate to="/apps" replace />;
@@ -331,8 +345,9 @@ const App = () => (
                                             <Route path="/apps/invoicing" element={<ProtectedRoute><InvoicingDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/invoicing/list" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
 
-                                            {/* Payroll */}
-                                            <Route path="/apps/payroll" element={<ProtectedRoute><PayrollDashboard /></ProtectedRoute>} />
+                                             {/* Payroll */}
+                                             <Route path="/apps/payroll" element={<ProtectedRoute><PayrollDashboard /></ProtectedRoute>} />
+                                             <Route path="/apps/payroll/payslips" element={<ProtectedRoute><PayrollPayslips /></ProtectedRoute>} />
 
                                             {/* Helpdesk */}
                                             <Route path="/apps/helpdesk" element={<ProtectedRoute><HelpdeskDashboard /></ProtectedRoute>} />
@@ -345,15 +360,18 @@ const App = () => (
                                             <Route path="/apps/hospital" element={<ProtectedRoute><HospitalDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/hospital/patients" element={<ProtectedRoute><PatientRecords /></ProtectedRoute>} />
 
-                                            {/* WhatsApp */}
-                                            <Route path="/apps/whatsapp" element={<ProtectedRoute><WhatsAppDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/whatsapp/templates" element={<ProtectedRoute><WhatsAppTemplates /></ProtectedRoute>} />
+                                             {/* WhatsApp */}
+                                             <Route path="/apps/whatsapp" element={<ProtectedRoute><WhatsAppDashboard /></ProtectedRoute>} />
+                                             <Route path="/apps/whatsapp/accounts" element={<ProtectedRoute><WhatsAppAccounts /></ProtectedRoute>} />
+                                             <Route path="/apps/whatsapp/templates" element={<ProtectedRoute><WhatsAppTemplates /></ProtectedRoute>} />
+                                             <Route path="/apps/whatsapp/campaigns" element={<ProtectedRoute><WhatsAppCampaigns /></ProtectedRoute>} />
 
-                                            {/* HRMS */}
-                                            <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/directory" element={<ProtectedRoute><HRMSDirectory /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
+                                             {/* HRMS */}
+                                             <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/employees" element={<ProtectedRoute><HRMSRegistry /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/induction" element={<ProtectedRoute><HRMSInduction /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
 
                                             {/* Purchase */}
                                             <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
@@ -366,6 +384,31 @@ const App = () => (
                                             <Route path="/apps/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/inventory/items" element={<ProtectedRoute><InventoryItems /></ProtectedRoute>} />
                                             <Route path="/apps/inventory/warehouses" element={<ProtectedRoute><Warehouses /></ProtectedRoute>} />
+
+                                            {/* Master Registry (Foundation) */}
+                                            <Route path="/apps/masters" element={<ProtectedRoute><RegistryDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/masters/items" element={<ProtectedRoute><MastersItems /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/contacts" element={<ProtectedRoute><MastersContacts /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/categories" element={<ProtectedRoute><MastersCategories /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/uoms" element={<ProtectedRoute><UOMMaster /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/attributes" element={<ProtectedRoute><AttributeMaster /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/brands" element={<ProtectedRoute><BrandMaster /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/variants" element={<ProtectedRoute><VariantMaster /></ProtectedRoute>} />
+                                             <Route path="/apps/masters/reviews" element={<ProtectedRoute><ReviewMaster /></ProtectedRoute>} />
+
+                                            {/* Workflow */}
+                                            <Route path="/apps/workflow" element={<ProtectedRoute><WorkflowDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/workflow/approvals" element={<ProtectedRoute><ApprovalMatrix /></ProtectedRoute>} />
+
+                                            {/* Automation */}
+                                            <Route path="/apps/automation" element={<ProtectedRoute><AutomationDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/automation/jobs" element={<ProtectedRoute><AutomationJobs /></ProtectedRoute>} />
+
+                                            {/* Documents */}
+                                            <Route path="/apps/documents" element={<ProtectedRoute><DocumentsHub /></ProtectedRoute>} />
+
+                                            {/* Projects */}
+                                            <Route path="/apps/projects" element={<ProtectedRoute><ProjectPortfolio /></ProtectedRoute>} />
 
                                             {/* POS */}
                                             <Route path="/apps/pos" element={<ProtectedRoute><POSDashboard /></ProtectedRoute>} />

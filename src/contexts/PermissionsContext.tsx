@@ -119,16 +119,34 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 }
 
                 // 7. Fetch the subscribed modules for this company
-                const { data: companyModules } = await supabase
+                let { data: companyModules, error: mErr } = await supabase
                     .from("company_modules")
-                    .select("module_id")
+                    .select("module_slug")
                     .eq("company_id", activeCompany.id)
                     .eq("is_active", true);
 
-                const purchasedModuleIds = new Set(companyModules?.map(tm => tm.module_id));
-                const subscribedModules = systemModules
-                    ?.filter(sm => sm.is_core || purchasedModuleIds.has(sm.id))
-                    .flatMap(sm => [sm.name, sm.slug]) || [];
+                let finalSubscribedModules: string[] = [];
+
+                // Resilience Fallback: If module_slug fails (legacy DB), try module_id
+                if (mErr) {
+                    const { data: legacyModules } = await supabase
+                        .from("company_modules")
+                        .select("module_id")
+                        .eq("company_id", activeCompany.id)
+                        .eq("is_active", true);
+                    
+                    const purchasedIds = new Set(legacyModules?.map(tm => tm.module_id));
+                    finalSubscribedModules = systemModules
+                        ?.filter(sm => sm.is_core || purchasedIds.has(sm.id))
+                        .flatMap(sm => [sm.name, sm.slug]) || [];
+                } else {
+                    const purchasedModuleSlugs = new Set(companyModules?.map(tm => tm.module_slug));
+                    finalSubscribedModules = systemModules
+                        ?.filter(sm => sm.is_core || purchasedModuleSlugs.has(sm.slug))
+                        .flatMap(sm => [sm.name, sm.slug]) || [];
+                }
+                setAvailableModules(finalSubscribedModules);
+                const subscribedModules = finalSubscribedModules; // For backwards compatibility in subsequent logic
 
                 // 8. Determine tenant role
                 const isTenantAdmin =

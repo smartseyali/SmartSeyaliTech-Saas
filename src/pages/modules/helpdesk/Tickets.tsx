@@ -1,95 +1,131 @@
 import { useState } from "react";
-import {
-    MessageSquare, Search, Filter, Plus,
-    MoreHorizontal, Clock, AlertCircle,
-    CheckCircle2, User, Headphones,
-    LifeBuoy, Zap, Tag
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Headphones, LifeBuoy, Plus, User, Search, Filter, RefreshCw, X, Save, Tag } from "lucide-react";
+import { useCrud } from "@/hooks/useCrud";
+import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
 export default function Tickets() {
-    const [tickets] = useState([
-        { id: "TKT-102", subject: "Payment Gateway Integration Error", user: "Sarah Jenkins", priority: "High", status: "Open", assignee: "Alex" },
-        { id: "TKT-103", subject: "Bulk Import Timeout", user: "Michael Chen", priority: "Critical", status: "In-Progress", assignee: "David" },
-        { id: "TKT-104", subject: "Custom Domain Config", user: "Innovate AI", priority: "Low", status: "Closed", assignee: "Unassigned" },
-    ]);
+    const [view, setView] = useState<"list" | "form">("list");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingTicket, setEditingTicket] = useState<any>(null);
+    
+    const { data: tickets, loading, fetchItems, createItem, updateItem } = useCrud("helpdesk_tickets");
+
+    const ticketHeaderFields = [
+        { key: "subject", label: "Registry Subject Identity", required: true, ph: "Payment Gateway Integration Error..." },
+        { 
+            key: "priority", label: "Operational Priority", type: "select" as const,
+            options: [
+                { label: "Low Impact", value: "low" },
+                { label: "Medium Flow", value: "medium" },
+                { label: "High Criticality", value: "high" },
+                { label: "Critical Logic", value: "critical" }
+            ]
+        },
+        { 
+            key: "status", label: "Support Node State", type: "select" as const,
+            options: [
+                { label: "Open Discovery", value: "open" },
+                { label: "In-Progress Node", value: "in-progress" },
+                { label: "Closed Logic", value: "closed" }
+            ]
+        },
+        { key: "message", label: "Registry Narrative", ph: "Detailed inquiry description..." }
+    ];
+
+    const handleSave = async (header: any) => {
+        if (editingTicket) {
+            await updateItem(editingTicket.id, header);
+        } else {
+            await createItem(header);
+        }
+        setView("list");
+        setEditingTicket(null);
+    };
+
+    const ticketColumns = [
+        { 
+            key: "subject", 
+            label: "Ticket Entity identity",
+            render: (t: any) => (
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center text-cyan-600 border border-cyan-100">
+                        <Tag className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-900 tracking-tight italic uppercase">{t.subject}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none border-r pr-2 border-gray-200">
+                                {t.id?.slice(0,8).toUpperCase()}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                                {new Date(t.created_at).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        { 
+            key: "priority", 
+            label: "Priority State",
+            render: (t: any) => (
+                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${
+                    t.priority === 'critical' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                    t.priority === 'high' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                    'bg-slate-50 text-slate-500 border-slate-100'
+                }`}>
+                    {t.priority || "Medium"}
+                </span>
+            )
+        },
+        { 
+            key: "status", 
+            label: "Ledger State",
+            render: (t: any) => <StatusBadge status={t.status || "Open"} />
+        }
+    ];
+
+    const filteredTickets = (tickets || []).filter(t => 
+        t.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.id?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingTicket ? "Refine Support Data" : "Initialize Ticket Matrix"}
+                    subtitle="Customer Service Protocol"
+                    headerFields={ticketHeaderFields}
+                    onAbort={() => { setView("list"); setEditingTicket(null); }}
+                    onSave={handleSave}
+                    initialData={editingTicket}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <Headphones className="w-6 h-6 text-cyan-600" />
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Support Operations</span>
-                    </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase italic">Support Tickets</h1>
-                    <p className="text-sm font-medium text-slate-500">Manage customer inquiries and technical support requests.</p>
+        <ERPListView
+            title="Support Registry"
+            data={filteredTickets}
+            columns={ticketColumns}
+            onNew={() => { setEditingTicket(null); setView("form"); }}
+            onRefresh={fetchItems}
+            onRowClick={(t) => { setEditingTicket(t); setView("form"); }}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+            headerActions={
+                <div className="flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-cyan-50 text-cyan-600 border border-cyan-100 hover:bg-cyan-100 transition-all flex items-center gap-2">
+                        <LifeBuoy className="w-3.5 h-3.5" /> help center
+                    </button>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" className="h-12 px-6 rounded-2xl border-slate-200">
-                        <LifeBuoy className="w-5 h-5 mr-2" /> Help Docs
-                    </Button>
-                    <Button className="h-12 px-8 rounded-2xl bg-cyan-600 hover:bg-black text-white font-bold shadow-xl shadow-cyan-600/20 transition-all gap-3 border-0">
-                        <Plus className="w-5 h-5" /> New Ticket
-                    </Button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-                {tickets.map((t) => (
-                    <div key={t.id} className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl transition-all group flex items-start gap-8">
-                        <div className={cn(
-                            "w-16 h-16 rounded-[24px] flex items-center justify-center transition-transform group-hover:scale-110 shrink-0",
-                            t.status === 'Open' ? "bg-cyan-50 text-cyan-600" :
-                                t.status === 'In-Progress' ? "bg-amber-50 text-amber-500" :
-                                    "bg-slate-50 text-slate-400"
-                        )}>
-                            <Tag className="w-8 h-8 rotate-12" />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-4 mb-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-r pr-4 border-slate-100">{t.id}</span>
-                                <span className={cn(
-                                    "px-2.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest",
-                                    t.priority === 'Critical' ? "bg-rose-50 text-rose-600" :
-                                        t.priority === 'High' ? "bg-amber-50 text-amber-600" :
-                                            "bg-slate-50 text-slate-500"
-                                )}>
-                                    {t.priority} Priority
-                                </span>
-                            </div>
-                            <h3 className="text-lg font-black text-slate-900 uppercase italic leading-tight mb-4 truncate group-hover:text-cyan-600 transition-colors">{t.subject}</h3>
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                    <User className="w-3.5 h-3.5" /> {t.user}
-                                </div>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                    <Zap className="w-3.5 h-3.5" /> Assigned to: {t.assignee}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col items-end gap-4 shrink-0">
-                            <span className={cn(
-                                "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
-                                t.status === 'Open' ? "text-cyan-600" :
-                                    t.status === 'In-Progress' ? "text-amber-500" :
-                                        "text-emerald-500"
-                            )}>
-                                <span className={cn("w-1.5 h-1.5 rounded-full",
-                                    t.status === 'Open' ? "bg-cyan-500 animate-pulse" :
-                                        t.status === 'In-Progress' ? "bg-amber-500" :
-                                            "bg-emerald-500"
-                                )} />
-                                {t.status}
-                            </span>
-                            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl text-slate-400 hover:bg-slate-50"><MoreHorizontal className="w-5 h-5" /></Button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+            }
+        />
     );
 }

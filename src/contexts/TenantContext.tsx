@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import PLATFORM_CONFIG from "@/config/platform";
-import { Rocket } from "lucide-react";
+import { PlatformLoader } from "@/components/PlatformLoader";
 
 interface Company {
     id: number;
@@ -48,7 +48,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (potentialSlug && !reserved.includes(potentialSlug)) {
             const { data: companyBySlug } = await supabase
                 .from('companies')
-                .select('id, name, subdomain, industry_type, user_id')
+                .select('id, name, subdomain, user_id')
                 .eq('subdomain', potentialSlug)
                 .maybeSingle();
 
@@ -66,7 +66,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             } else {
                 const { data: defaultComp } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, industry_type, user_id')
+                    .select('id, name, subdomain, user_id')
                     .limit(1)
                     .maybeSingle();
 
@@ -108,7 +108,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             if (localUser?.is_super_admin || isSuperAdminByEmail) {
                 const { data: allCompanies } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, industry_type, user_id')
+                    .select('id, name, subdomain, user_id')
                     .order('name');
 
                 const companiesData = (allCompanies || []) as Company[];
@@ -127,13 +127,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             // 3. Regular user: load only companies they belong to via company_users
             const { data: mappings } = await supabase
                 .from('company_users')
-                .select('company_id, companies(id, name, subdomain, industry_type, user_id)')
+                .select('company_id, companies(id, name, subdomain, user_id)')
                 .eq('user_id', user.id);
 
             // FALLBACK: Also check if they are the direct owner of any company
             const { data: ownedCompanies } = await supabase
                 .from('companies')
-                .select('id, name, subdomain, industry_type, user_id')
+                .select('id, name, subdomain, user_id')
                 .eq('user_id', user.id);
 
             let companiesData = (mappings || [])
@@ -161,7 +161,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 if (detectedCompany) {
                     setActiveCompany(detectedCompany);
                 } else {
-                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, industry_type, user_id').limit(1).maybeSingle();
+                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, user_id').limit(1).maybeSingle();
                     if (defaultComp) setActiveCompany(defaultComp as Company);
                 }
             }
@@ -230,23 +230,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             loading
         }}>
             {showSplash ? (
-                <div className="h-screen w-full flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm fixed inset-0 z-[9999] animate-in fade-in duration-500">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-blue-600/10 blur-3xl rounded-full animate-pulse" />
-                        <div className="relative w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[28px] flex items-center justify-center text-white shadow-2xl shadow-blue-600/20 mb-6 transform scale-90">
-                            <Rocket className="w-10 h-10" />
-                        </div>
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-800 mb-2">{PLATFORM_CONFIG.name} {PLATFORM_CONFIG.tagline}</span>
-                    <div className="flex items-center gap-2">
-                        <div className="flex gap-1">
-                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.3s]" />
-                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.15s]" />
-                            <span className="w-1 h-1 rounded-full bg-blue-600 animate-bounce" />
-                        </div>
-                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 italic">Architecting Workspace</span>
-                    </div>
-                </div>
+                <PlatformLoader message="Architecturing Workspace" subtext="Clinical Tenant Identity Induction" />
             ) : children}
         </TenantContext.Provider>
     );
