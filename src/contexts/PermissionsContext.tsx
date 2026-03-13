@@ -99,7 +99,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     setIsAdmin(false);
                     // Core modules are always available to help navigation
                     const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
-                    const finalModules = Array.from(new Set([...coreModules, "Ecommerce", "ecommerce"])).filter(Boolean) as string[];
+                    const finalModules = Array.from(new Set([...coreModules])).filter(Boolean) as string[];
                     setAvailableModules(finalModules);
                     setPermissions([]);
                     setLoading(false);
@@ -162,9 +162,6 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
                     const finalModules = Array.from(new Set([...coreModules, ...subscribedModules])).filter(Boolean) as string[];
 
-                    // Fallback to Ecommerce if absolutely nothing else
-                    if (finalModules.length === 0) finalModules.push("Ecommerce", "ecommerce");
-
                     setAvailableModules(finalModules);
                     setPermissions([]);
                 } else {
@@ -189,7 +186,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 // Fail-open: if something breaks, keep user accessible
                 if (user) {
                     setIsAdmin(true);
-                    setAvailableModules(["Sales", "Purchase", "Inventory", "Accounting", "HR", "Masters", "Ecommerce", "ecommerce"]);
+                    setAvailableModules(["Masters"]); // Only basic fallback
                 }
             } finally {
                 setLoading(false);

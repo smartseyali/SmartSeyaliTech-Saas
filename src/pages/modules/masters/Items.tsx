@@ -13,18 +13,18 @@ export default function Items() {
     const { data: products, loading, fetchItems, createItem, updateItem } = useCrud("products");
 
     const itemHeaderFields = [
-        { key: "name", label: "Registry Product Identity", required: true, ph: "Enterprise Logic Pro..." },
-        { key: "sku", label: "Operational SKU node", ph: "ELP-2026-00X" },
-        { key: "rate", label: "Standard Unit Rate", type: "number" as const, ph: "0.00" },
-        { key: "price", label: "Registry Sales Price", type: "number" as const, ph: "0.00" },
+        { key: "name", label: "Item Master Identity", required: true, ph: "Enterprise Logic Pro..." },
+        { key: "sku", label: "HSN / SKU Code", ph: "8471 / ELP-2026-00X" },
+        { key: "rate", label: "Standard Cost Rate", type: "number" as const, ph: "0.00" },
+        { key: "price", label: "Selling Unit Price", type: "number" as const, ph: "0.00" },
         { 
-            key: "status", label: "Operational State", type: "select" as const, 
+            key: "status", label: "Ledger State", type: "select" as const, 
             options: [
-                { label: "Active Registry Node", value: "active" },
-                { label: "Dormant / Archive Asset", value: "inactive" }
+                { label: "Active Asset", value: "active" },
+                { label: "Dormant / Archived", value: "inactive" }
             ]
         },
-        { key: "description", label: "Technical Registry Narrative", ph: "Detailed specifications..." }
+        { key: "description", label: "Item Technical Details", ph: "Detailed specifications..." }
     ];
 
     const handleSave = async (header: any) => {
@@ -42,7 +42,7 @@ export default function Items() {
     const itemColumns = [
         { 
             key: "name", 
-            label: "Item Entity Identity",
+            label: "Item Name / HSN",
             render: (item: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -74,11 +74,11 @@ export default function Items() {
         },
         { 
             key: "price", 
-            label: "Operational Market Price",
+            label: "Selling Rate",
             render: (item: any) => (
                 <div className="flex flex-col">
                     <span className="font-black text-rose-600 tracking-tight">{fmt(item.price)}</span>
-                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none mt-1">Registry Sale Unit</span>
+                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none mt-1">Sale Unit Price</span>
                 </div>
             ),
         },
@@ -112,7 +112,7 @@ export default function Items() {
 
     return (
         <ERPListView
-            title="Global Item Registry"
+            title="Item Master"
             data={filteredItems}
             columns={itemColumns}
             onNew={() => { setEditingItem(null); setView("form"); }}

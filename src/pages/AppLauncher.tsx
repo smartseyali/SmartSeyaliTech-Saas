@@ -25,26 +25,26 @@ function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubs
 
     return (
         <motion.div
-            whileHover={{ scale: 1.08, y: -8 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.05, y: -4 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => isAvailable && (canAccess ? onOpen(mod) : navigate(`/apps/ecommerce/billing?module=${mod.id}`))}
             className={cn(
-                "relative flex flex-col items-center gap-4 p-4 rounded-[2rem] transition-all duration-500 group cursor-pointer",
+                "relative flex flex-col items-center gap-3 p-3 rounded-[1.5rem] transition-all duration-500 group cursor-pointer",
                 !isAvailable && "opacity-30 grayscale pointer-events-none"
             )}
         >
             {/* Odoo-style App Icon */}
             <div className={cn(
-                "relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-4xl shadow-lg transition-all duration-500",
+                "relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-3xl shadow-lg transition-all duration-500",
                 "bg-gradient-to-br", mod.colorFrom, mod.colorTo,
-                "group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] group-hover:ring-4 group-hover:ring-emerald-500/10",
+                "group-hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.2)] group-hover:ring-4 group-hover:ring-emerald-500/10",
                 !canAccess && "ring-1 ring-gray-200 shadow-none border border-gray-100"
             )}>
-                <span className="group-hover:scale-110 transition-transform duration-500">{mod.icon}</span>
+                <span className="group-hover:scale-105 transition-transform duration-500">{mod.icon}</span>
                 
                 {!canAccess && isAvailable && (
-                    <div className="absolute -top-1 -right-1 w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center shadow-xl border-2 border-white">
-                        <Lock className="w-3.5 h-3.5 text-white" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                        <Lock className="w-3 h-3 text-white" />
                     </div>
                 )}
                 
@@ -54,7 +54,7 @@ function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubs
 
             {/* Technical labeling */}
             <div className="text-center">
-                <h3 className="text-[11px] font-black text-gray-800 uppercase tracking-[0.2em] group-hover:text-emerald-700 transition-colors">
+                <h3 className="text-[10px] font-black text-gray-800 uppercase tracking-[0.15em] group-hover:text-emerald-700 transition-colors">
                     {mod.name}
                 </h3>
                 {mod.status === 'beta' && (
@@ -98,28 +98,28 @@ export default function AppLauncher() {
             <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px]" />
 
             {/* Full-screen top navigation */}
-            <nav className="relative z-50 flex items-center justify-between px-10 py-5 bg-white border-b border-gray-100 shadow-sm">
-                <div className="flex items-center gap-10">
-                    <div className="flex items-center gap-4 group cursor-pointer" onClick={() => navigate('/')}>
-                        <div className="w-11 h-11 rounded-2xl bg-gray-900 flex items-center justify-center text-lg shadow-2xl transition-all group-hover:scale-105 group-hover:bg-emerald-600">
+            <nav className="relative z-50 flex items-center justify-between px-8 py-3 bg-white border-b border-gray-100 shadow-sm">
+                <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
+                        <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center text-lg shadow-2xl transition-all group-hover:scale-105 group-hover:bg-emerald-600">
                             <LayoutGrid className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-emerald-600 transition-colors leading-none mb-1">Infrastructure</span>
-                            <span className="text-xl font-bold text-gray-900 tracking-tighter">{PLATFORM_CONFIG.name}</span>
+                            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-gray-400 group-hover:text-emerald-600 transition-colors leading-none mb-1">Infrastructure</span>
+                            <span className="text-lg font-bold text-gray-900 tracking-tighter">{PLATFORM_CONFIG.name}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Centralized Technical Search */}
                 <div className="hidden lg:flex relative flex-1 max-w-2xl mx-20">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                     <input
                         type="text"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Search workspace nodes, apps, and registries..."
-                        className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl pl-14 pr-6 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:bg-white focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-600/20 transition-all uppercase tracking-widest text-[10px]"
+                        className="w-full h-10 bg-gray-50 border border-gray-100 rounded-xl pl-12 pr-6 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:bg-white focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-600/20 transition-all uppercase tracking-widest text-[9px]"
                     />
                 </div>
 
@@ -129,25 +129,25 @@ export default function AppLauncher() {
                         <span className="text-[11px] font-black text-gray-900 uppercase tracking-tighter italic">{activeCompany?.name || 'Personal Cloud'}</span>
                     </div>
                     <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <button className="p-3 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all" title="System Settings">
-                            <Settings className="w-4 h-4" />
+                        <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-lg transition-all" title="System Settings">
+                            <Settings className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={signOut} className="p-3 text-gray-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all" title="Terminate Session">
-                            <LogOut className="w-4 h-4" />
+                        <button onClick={signOut} className="p-2 text-gray-400 hover:text-rose-600 hover:bg-white rounded-lg transition-all" title="Terminate Session">
+                            <LogOut className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </div>
             </nav>
 
-            <main className="relative z-10 max-w-[1400px] mx-auto px-10 py-16">
+            <main className="relative z-10 max-w-[1200px] mx-auto px-10 py-10">
                 {/* Categorization Matrix */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-20 border-b border-gray-100 pb-12">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-10 border-b border-gray-100 pb-8">
                     <div className="relative group">
                         <button
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
-                            className="flex items-center gap-4 px-8 py-4 bg-white border border-gray-100 rounded-[1.5rem] text-[11px] font-black text-gray-800 hover:border-emerald-200 transition-all shadow-md group uppercase tracking-[0.2em]"
+                            className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-gray-800 hover:border-emerald-200 transition-all shadow-md group uppercase tracking-[0.2em]"
                         >
-                            <Grid3X3 className="w-4 h-4 text-emerald-600" />
+                            <Grid3X3 className="w-3.5 h-3.5 text-emerald-600" />
                             <span>
                                 {selectedCategory === 'all' ? "Module Registry" : CATEGORY_LABELS[selectedCategory]}
                             </span>
@@ -206,12 +206,12 @@ export default function AppLauncher() {
 
                 {/* Primary Workspace Grid */}
                 <div className="mb-24">
-                    <div className="flex items-center gap-4 mb-12">
+                    <div className="flex items-center gap-4 mb-8">
                         <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-gray-400">Primary Workspace Node</h2>
                         <div className="h-[1px] flex-1 bg-gray-100" />
                     </div>
                     
-                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-12 gap-y-16">
+                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-8 gap-y-10">
                         <AnimatePresence mode="popLayout">
                             {installedModules.map(mod => (
                                 <ModuleCard
@@ -251,7 +251,7 @@ export default function AppLauncher() {
                             animate={{ height: showAllModules ? 'auto' : 0, opacity: showAllModules ? 1 : 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-12 gap-y-16 pb-20">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-8 gap-y-10 pb-12">
                                 {marketplaceModules.map(mod => (
                                     <ModuleCard
                                         key={mod.id}

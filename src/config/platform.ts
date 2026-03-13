@@ -25,7 +25,10 @@ export const PLATFORM_CONFIG = {
     // 4. API Endpoints (If using a custom backend instead of Supabase client directly)
     apiUrl: import.meta.env.VITE_API_URL || "",
 
-    // 5. Environment Helpers
+    // 5. Security & Session
+    sessionTimeout: 15 * 60 * 1000, // 15 minutes
+
+    // 6. Environment Helpers
     isSupabase: () => PLATFORM_CONFIG.dbProvider === 'supabase',
     isProduction: import.meta.env.PROD,
 };

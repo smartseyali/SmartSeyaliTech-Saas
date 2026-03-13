@@ -152,13 +152,13 @@ export default function ERPEntryForm({
             className="min-h-screen bg-gray-50/50 pb-10"
         >
             <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+                <div className="w-full px-6 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button onClick={onAbort} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                             <X className="w-5 h-5 text-gray-500" />
                         </button>
                         <div className="flex flex-col -space-y-1">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{subtitle || "Draft Protocol"}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{subtitle || "Draft Voucher"}</span>
                             <h2 className="text-lg font-bold text-gray-900 tracking-tight">{title}</h2>
                         </div>
                     </div>
@@ -172,16 +172,16 @@ export default function ERPEntryForm({
                             className="h-9 px-6 text-xs font-bold bg-slate-900 hover:bg-black text-white shadow-sm rounded-xl"
                         >
                             <Save className="w-4 h-4 mr-2" />
-                            Finalize Registry
+                            Save Entry
                         </Button>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto pt-4 px-3 space-y-3">
+            <div className="w-full pt-4 px-6 space-y-3">
                 <div className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/30">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Primary Identity Nodes</h3>
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Main Details</h3>
                     </div>
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         {headerFields.map(field => (
@@ -205,7 +205,7 @@ export default function ERPEntryForm({
                                     className="h-8 rounded-xl text-[10px] font-black text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4"
                                 >
                                     <Plus className="w-3.5 h-3.5 mr-2" />
-                                    Add Matrix Row
+                                    Add New Row
                                 </Button>
                             </div>
                             
@@ -220,11 +220,11 @@ export default function ERPEntryForm({
                                                 ))
                                             ) : (
                                                 <>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[300px]">Entity Narrative</TableHead>
+                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[300px]">Item Description</TableHead>
                                                     <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Qty</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Magnitude</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Tax %</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right pr-8">Total</TableHead>
+                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Rate</TableHead>
+                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">GST %</TableHead>
+                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right pr-8">Amount</TableHead>
                                                 </>
                                             )}
                                             <TableHead className="w-12"></TableHead>
@@ -306,10 +306,10 @@ export default function ERPEntryForm({
                             <div className="flex flex-col md:flex-row gap-8 items-start">
                                 <div className="flex-1 space-y-4">
                                     <div className="bg-white p-6 rounded-[1.5rem] border border-gray-200 shadow-sm space-y-3">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Registry Notes</h4>
+                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Remarks</h4>
                                         <textarea 
                                             className="w-full min-h-[100px] p-4 rounded-2xl bg-gray-50 border border-gray-200 text-sm font-medium outline-none focus:bg-white focus:border-indigo-500 transition-all resize-none"
-                                            placeholder="Add systemic notes or terms..."
+                                            placeholder="Write remarks or terms..."
                                             value={header.notes || ""}
                                             onChange={(e) => setHeader({ ...header, notes: e.target.value })}
                                         />
@@ -318,16 +318,16 @@ export default function ERPEntryForm({
 
                                 <div className="w-full md:w-96 bg-white rounded-[1.5rem] border border-gray-200 shadow-sm p-8 space-y-4">
                                     <div className="flex justify-between items-center text-sm">
-                                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Net Identity Total</span>
+                                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Net Total</span>
                                         <span className="font-bold text-slate-900">{fmt(totals.subtotal)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
-                                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Taxation magnitude</span>
+                                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[10px]">GST Account</span>
                                         <span className="font-bold text-slate-900">{fmt(totals.tax)}</span>
                                     </div>
                                     <div className="h-px bg-slate-100" />
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Grand Matrix Total</span>
+                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Grand Total</span>
                                         <span className="text-xl font-black text-indigo-600 tracking-tighter">{fmt(totals.grandTotal)}</span>
                                     </div>
                                     <div className="pt-4">
@@ -336,7 +336,7 @@ export default function ERPEntryForm({
                                             className="w-full h-14 bg-slate-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-xl shadow-slate-900/10"
                                         >
                                             <Save className="w-4 h-4 mr-2" />
-                                            Submit Protocol
+                                            Save Entry
                                         </Button>
                                     </div>
                                 </div>

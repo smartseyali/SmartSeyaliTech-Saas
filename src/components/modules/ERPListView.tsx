@@ -143,7 +143,7 @@ export default function ERPListView({
                 </header>
 
                 {/* Filters Bar */}
-                <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center gap-3 bg-gray-50/50">
+                <div className="w-full px-4 py-1.5 flex items-center gap-3 bg-gray-50/50">
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                         <input
@@ -163,7 +163,7 @@ export default function ERPListView({
             </div>
 
             {/* List Content */}
-            <div className="max-w-7xl w-full mx-auto px-3 py-3 overflow-x-auto">
+            <div className="w-full px-3 py-3 overflow-x-auto">
                 <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                     <Table>
                         <TableHeader className="bg-gray-50/80">

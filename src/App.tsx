@@ -13,6 +13,8 @@ import { PlatformLoader } from "@/components/PlatformLoader";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import { SessionTimeoutHandler } from "@/components/auth/SessionTimeoutHandler";
+
 
 // ── E-Commerce Module (registered via modules/ecommerce/) ──
 import EcommerceDashboard from "./pages/modules/ecommerce/EcommerceDashboard";
@@ -222,12 +224,13 @@ const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const App = () => (
-    <ThemeProvider defaultTheme="system" storageKey="ecom-suite-theme">
+    <ThemeProvider attribute="class" defaultTheme="system" storageKey="ecom-suite-theme">
         <QueryClientProvider client={queryClient}>
             <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 <AuthProvider>
+                    <SessionTimeoutHandler />
                     <TenantProvider>
                         <PermissionsProvider>
                             <CartProvider>

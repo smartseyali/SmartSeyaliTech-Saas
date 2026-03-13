@@ -49,10 +49,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
         isCore: true,
         features: [
-            'Global Item Registry',
+            'Global Item Master',
             'Unified Contact Hub',
             'Organization Setup',
-            'Financial Masters (Taxes/FX)',
+            'Financial Masters (GST/HSN)',
             'User & Role Management',
         ],
         needsTemplate: false,
@@ -183,7 +183,7 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         category: 'commerce',
         status: 'live',
         includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
-        isCore: true,
+        isCore: false,
         features: [
             'Product catalog & variants',
             'Order management',
@@ -258,10 +258,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
         isCore: false,
         features: [
-            'Branded templates',
-            'Recurring invoices',
-            'Payment reminders',
-            'Online collection',
+            'GST Invoice Templates',
+            'Recurring Invoices',
+            'Payment Reminders',
+            'Online Collection',
         ],
         needsTemplate: false, // Invoice templates are internal, not website themes
     },
