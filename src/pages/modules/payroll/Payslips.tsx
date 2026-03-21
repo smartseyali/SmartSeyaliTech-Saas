@@ -20,13 +20,13 @@ export default function PayrollPayslips() {
 
     const payslipFields = [
         { 
-            key: "employee_id", label: "Resource Entity", type: "select" as const, 
+            key: "employee_id", label: "Resource", type: "select" as const, 
             required: true, options: [] // Fetch active employees
         },
         { key: "period_start", label: "Cycle Commencement", type: "date" as const, required: true },
         { key: "period_end", label: "Cycle Finalization", type: "date" as const, required: true },
         { 
-            key: "status", label: "Disbursement state", type: "select" as const,
+            key: "status", label: "Disbursement", type: "select" as const,
             options: [
                 { label: "Calculation Draft", value: "draft" },
                 { label: "Treasury Approved", value: "approved" },
@@ -37,16 +37,16 @@ export default function PayrollPayslips() {
 
     const payslipItemFields = [
         { 
-            key: "component_id", label: "Formula Node", type: "select" as const,
+            key: "component_id", label: "Formula", type: "select" as const,
             options: [
-                { label: "Basic Protocol Salary", value: "basic" },
+                { label: "Basic Salary", value: "basic" },
                 { label: "HRA Allocation", value: "hra" },
                 { label: "Performance Incentive", value: "incentive" },
                 { label: "Statutory Deduction", value: "deduction" }
             ]
         },
         { key: "amount", label: "Magnitude", type: "number" as const },
-        { key: "memo", label: "Logic Narrative", ph: "Outline formula application..." }
+        { key: "memo", label: "Narrative", ph: "Outline formula application..." }
     ];
 
     const handleSave = async (header: any, items: any[]) => {
@@ -63,7 +63,7 @@ export default function PayrollPayslips() {
     const payslipColumns = [
         { 
             key: "identity", 
-            label: "Resource Identity / Period",
+            label: "Resource / Period",
             render: (p: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg shadow-slate-900/10 group-hover:bg-indigo-600 transition-all duration-500">
@@ -94,12 +94,12 @@ export default function PayrollPayslips() {
         },
         { 
             key: "status", 
-            label: "Treasury state",
+            label: "Treasury",
             render: (p: any) => <StatusBadge status={p.status || "paid"} />
         },
         {
             key: "reference",
-            label: "Disbursement Node",
+            label: "Disbursement",
             render: (p: any) => (
                 <div className="flex items-center gap-2 text-slate-400">
                     <Landmark size={14}/>
@@ -114,7 +114,7 @@ export default function PayrollPayslips() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingPayslip ? "Refine Disbursement node" : "Initialize Payroll Cycle"}
-                    subtitle="Universal Resource Compensation Matrix"
+                    subtitle="Universal Resource Compensation"
                     headerFields={payslipFields}
                     itemFields={payslipItemFields}
                     onAbort={() => { setView("list"); setEditingPayslip(null); }}
@@ -128,7 +128,7 @@ export default function PayrollPayslips() {
 
     return (
         <ERPListView
-            title="Payroll Payslip Registry"
+            title="Payroll Payslip"
             data={payslips || []}
             columns={payslipColumns}
             onNew={() => { setEditingPayslip(null); setView("form"); }}

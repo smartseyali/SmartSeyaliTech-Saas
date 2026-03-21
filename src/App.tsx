@@ -170,6 +170,28 @@ import MarketingModuleDetail from "./pages/marketing/ModuleDetail";
 import MarketingContact from "./pages/marketing/Contact";
 import MarketingPolicy from "./pages/marketing/License";
 
+import Forecast from "./pages/modules/crm/Forecast";
+import Accounts from "./pages/modules/crm/Accounts";
+import Segments from "./pages/modules/crm/Segments";
+import POSRegister from "./pages/modules/pos/Register";
+import POSOrdersLedger from "./pages/modules/pos/POSOrders";
+import StockLevels from "./pages/modules/inventory/StockLevels";
+import StockTransfers from "./pages/modules/inventory/StockTransfers";
+import Departments from "./pages/modules/hrms/Departments";
+import GoodsReceipts from "./pages/modules/purchase/GoodsReceipts";
+import ReceiptVouchers from "./pages/modules/invoicing/ReceiptVouchers";
+import SalaryStructures from "./pages/modules/payroll/SalaryStructures";
+import RunPayroll from "./pages/modules/payroll/RunPayroll";
+
+import FinancialReports from "./pages/modules/books/FinancialReports";
+import BankReconciliation from "./pages/modules/books/BankReconciliation";
+import TaxConfigurations from "./pages/modules/books/TaxConfigurations";
+import FiscalYears from "./pages/modules/settings/FiscalYears";
+import StockAudits from "./pages/modules/inventory/StockAudits";
+import BatchTracking from "./pages/modules/inventory/BatchTracking";
+import EmployeeClaims from "./pages/modules/hrms/Claims";
+import EmployeeAppraisals from "./pages/modules/hrms/Appraisals";
+
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -330,6 +352,9 @@ const App = () => (
                                             <Route path="/apps/crm/deals" element={<ProtectedRoute><CRMDeals /></ProtectedRoute>} />
                                             <Route path="/apps/crm/contacts" element={<ProtectedRoute><CRMContacts /></ProtectedRoute>} />
                                             <Route path="/apps/crm/pipelines" element={<ProtectedRoute><CRMPipelines /></ProtectedRoute>} />
+                                            <Route path="/apps/crm/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
+                                            <Route path="/apps/crm/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
+                                            <Route path="/apps/crm/segments" element={<ProtectedRoute><Segments /></ProtectedRoute>} />
 
                                             {/* Sales */}
                                             <Route path="/apps/sales" element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
@@ -343,14 +368,21 @@ const App = () => (
                                             <Route path="/apps/books/coa" element={<ProtectedRoute><ChartOfAccounts /></ProtectedRoute>} />
                                             <Route path="/apps/books/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
                                             <Route path="/apps/books/journals" element={<ProtectedRoute><Journals /></ProtectedRoute>} />
+                                            <Route path="/apps/books/reports" element={<ProtectedRoute><FinancialReports /></ProtectedRoute>} />
+                                            <Route path="/apps/books/reconciliation" element={<ProtectedRoute><BankReconciliation /></ProtectedRoute>} />
+                                            <Route path="/apps/books/tax" element={<ProtectedRoute><TaxConfigurations /></ProtectedRoute>} />
 
                                             {/* Invoicing */}
                                             <Route path="/apps/invoicing" element={<ProtectedRoute><InvoicingDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/invoicing/list" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
+                                            <Route path="/apps/invoicing/invoices" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
+                                            <Route path="/apps/invoicing/payments" element={<ProtectedRoute><ReceiptVouchers /></ProtectedRoute>} />
 
                                              {/* Payroll */}
                                              <Route path="/apps/payroll" element={<ProtectedRoute><PayrollDashboard /></ProtectedRoute>} />
                                              <Route path="/apps/payroll/payslips" element={<ProtectedRoute><PayrollPayslips /></ProtectedRoute>} />
+                                             <Route path="/apps/payroll/structures" element={<ProtectedRoute><SalaryStructures /></ProtectedRoute>} />
+                                             <Route path="/apps/payroll/run" element={<ProtectedRoute><RunPayroll /></ProtectedRoute>} />
 
                                             {/* Helpdesk */}
                                             <Route path="/apps/helpdesk" element={<ProtectedRoute><HelpdeskDashboard /></ProtectedRoute>} />
@@ -371,10 +403,13 @@ const App = () => (
 
                                              {/* HRMS */}
                                              <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
                                              <Route path="/apps/hrms/employees" element={<ProtectedRoute><HRMSRegistry /></ProtectedRoute>} />
                                              <Route path="/apps/hrms/induction" element={<ProtectedRoute><HRMSInduction /></ProtectedRoute>} />
                                              <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
                                              <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/claims" element={<ProtectedRoute><EmployeeClaims /></ProtectedRoute>} />
+                                             <Route path="/apps/hrms/appraisals" element={<ProtectedRoute><EmployeeAppraisals /></ProtectedRoute>} />
 
                                             {/* Purchase */}
                                             <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
@@ -382,11 +417,16 @@ const App = () => (
                                             <Route path="/apps/purchase/requests" element={<ProtectedRoute><PurchaseRequests /></ProtectedRoute>} />
                                             <Route path="/apps/purchase/orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
                                             <Route path="/apps/purchase/bills" element={<ProtectedRoute><PurchaseBills /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
 
                                             {/* Inventory */}
                                             <Route path="/apps/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/inventory/items" element={<ProtectedRoute><InventoryItems /></ProtectedRoute>} />
                                             <Route path="/apps/inventory/warehouses" element={<ProtectedRoute><Warehouses /></ProtectedRoute>} />
+                                            <Route path="/apps/inventory/levels" element={<ProtectedRoute><StockLevels /></ProtectedRoute>} />
+                                            <Route path="/apps/inventory/transfers" element={<ProtectedRoute><StockTransfers /></ProtectedRoute>} />
+                                            <Route path="/apps/inventory/audits" element={<ProtectedRoute><StockAudits /></ProtectedRoute>} />
+                                            <Route path="/apps/inventory/batches" element={<ProtectedRoute><BatchTracking /></ProtectedRoute>} />
 
                                             {/* Master Registry (Foundation) */}
                                             <Route path="/apps/masters" element={<ProtectedRoute><RegistryDashboard /></ProtectedRoute>} />
@@ -398,6 +438,7 @@ const App = () => (
                                              <Route path="/apps/masters/brands" element={<ProtectedRoute><BrandMaster /></ProtectedRoute>} />
                                              <Route path="/apps/masters/variants" element={<ProtectedRoute><VariantMaster /></ProtectedRoute>} />
                                              <Route path="/apps/masters/reviews" element={<ProtectedRoute><ReviewMaster /></ProtectedRoute>} />
+                                             <Route path="/apps/settings/fiscal-years" element={<ProtectedRoute><FiscalYears /></ProtectedRoute>} />
 
                                             {/* Workflow */}
                                             <Route path="/apps/workflow" element={<ProtectedRoute><WorkflowDashboard /></ProtectedRoute>} />
@@ -416,6 +457,8 @@ const App = () => (
                                             {/* POS */}
                                             <Route path="/apps/pos" element={<ProtectedRoute><POSDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/pos/terminal" element={<ProtectedRoute><POSTerminal /></ProtectedRoute>} />
+                                            <Route path="/apps/pos/register" element={<ProtectedRoute><POSRegister /></ProtectedRoute>} />
+                                            <Route path="/apps/pos/orders" element={<ProtectedRoute><POSOrdersLedger /></ProtectedRoute>} />
                                         </Route>
 
                                         <Route path="*" element={<StoreLayout><NotFound /></StoreLayout>} />

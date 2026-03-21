@@ -76,7 +76,7 @@ export const EcomProducts = () => {
         { key: "rate", label: `Price (MRP)`, type: "number" as const },
         { key: "description", label: "Description", type: "textarea" as const },
         {
-            key: "is_featured", label: "Registry Visibility", type: "select" as const, options: [
+            key: "is_featured", label: "Visibility", type: "select" as const, options: [
                 { label: "Hide from Featured", value: "false" },
                 { label: "Show in Featured", value: "true" }
             ]
@@ -227,10 +227,10 @@ export const EcomProducts = () => {
                                         <TabsContent value="details" className="h-full mt-0 focus-visible:ring-0 overflow-y-auto pr-2 scrollbar-none">
                                             <div className="grid grid-cols-2 gap-6 pb-20">
                                                 {[
-                                                    { label: "Category Registry", value: selectedProduct.ecom_categories?.name || "Global Group", icon: Tag },
+                                                    { label: "Category", value: selectedProduct.ecom_categories?.name || "Global Group", icon: Tag },
                                                     { label: "Unit Value", value: `₹${Number(selectedProduct.rate || 0).toLocaleString()}`, icon: TrendingUp },
                                                     { label: "Ledger Status", value: selectedProduct.status || "Active", icon: CheckCircle2 },
-                                                    { label: "Registry SKU", value: selectedProduct.sku || "UNASSIGNED", icon: Box },
+                                                    { label: "SKU", value: selectedProduct.sku || "UNASSIGNED", icon: Box },
                                                 ].map(stat => (
                                                     <div key={stat.label} className="bg-white p-6 rounded-[24px] border border-white/60 shadow-sm flex flex-col gap-3 group hover:border-indigo-200 transition-all">
                                                         <div className="flex items-center gap-3">

@@ -20,22 +20,22 @@ export default function WhatsAppCampaigns() {
     const { data: campaigns, loading, fetchItems, createItem, updateItem } = useCrud("whatsapp_campaigns");
 
     const campaignFields = [
-        { key: "name", label: "Registry Campaign Identity", required: true, ph: "Summer_Sale_Broadcast..." },
+        { key: "name", label: "Campaign", required: true, ph: "Summer_Sale_Broadcast..." },
         { 
-            key: "template_id", label: "Message Protocol Node", type: "select" as const, 
+            key: "template_id", label: "Message Template", type: "select" as const, 
             required: true, options: [] // Fetch from templates in real use
         },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
-                { label: "Draft Node", value: "draft" },
-                { label: "Scheduled Protocol", value: "scheduled" },
+                { label: "Draft", value: "draft" },
+                { label: "Scheduled", value: "scheduled" },
                 { label: "Active Broadcast", value: "running" },
-                { label: "Completed Hub", value: "completed" }
+                { label: "Completed", value: "completed" }
             ]
         },
         { key: "scheduled_at", label: "Execution Mobilization Date", type: "datetime-local" as const },
-        { key: "ad_follow_up", label: "Ad-to-Chat Follow-up Logic", type: "select" as const, options: [
+        { key: "ad_follow_up", label: "Ad-to-Chat Follow-up", type: "select" as const, options: [
             { label: "Enable Automated Follow-up", value: "true" },
             { label: "Standard Broadcast", value: "false" }
         ]}
@@ -54,7 +54,7 @@ export default function WhatsAppCampaigns() {
     const campaignColumns = [
         { 
             key: "identity", 
-            label: "Campaign Entity / Logic",
+            label: "Campaign",
             render: (c: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -93,7 +93,7 @@ export default function WhatsAppCampaigns() {
         },
         { 
             key: "timeline", 
-            label: "Execution Hub",
+            label: "Execution",
             render: (c: any) => (
                 <div className="flex flex-col gap-0.5 text-right">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
@@ -107,12 +107,12 @@ export default function WhatsAppCampaigns() {
         },
         { 
             key: "status", 
-            label: "Registry state",
+            label: "Status",
             render: (c: any) => <StatusBadge status={c.status || "running"} />
         },
         {
             key: "actions",
-            label: "Node Control",
+            label: "Control",
             render: () => (
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
@@ -131,7 +131,7 @@ export default function WhatsAppCampaigns() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingCampaign ? "Refine Broadcast Strategy" : "Initialize Campaign Node"}
-                    subtitle="WhatsApp Bulk Messaging & Ad Follow-up Matrix"
+                    subtitle="WhatsApp Bulk Messaging & Ad Follow-up"
                     headerFields={campaignFields}
                     onAbort={() => { setView("list"); setEditingCampaign(null); }}
                     onSave={handleSave}
@@ -144,7 +144,7 @@ export default function WhatsAppCampaigns() {
 
     return (
         <ERPListView
-            title="Bulk messaging Hub"
+            title="Bulk messaging"
             data={campaigns || []}
             columns={campaignColumns}
             onNew={() => { setEditingCampaign(null); setView("form"); }}

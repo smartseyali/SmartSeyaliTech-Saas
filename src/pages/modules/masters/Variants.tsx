@@ -19,18 +19,18 @@ export default function VariantMaster() {
 
     const variantFields = [
         { 
-            key: "product_id", label: "Registry Parent identity", type: "select" as const, 
+            key: "product_id", label: "Parent", type: "select" as const, 
             required: true, options: [] // Fetch products
         },
-        { key: "sku", label: "Registry SKU Node", required: true, ph: "SKU-PRO-001-RED-XL..." },
-        { key: "barcode", label: "Systemic Barcode identity", ph: "1092837465..." },
+        { key: "sku", label: "SKU", required: true, ph: "SKU-PRO-001-RED-XL..." },
+        { key: "barcode", label: "Systemic Barcode", ph: "1092837465..." },
         { key: "price_extra", label: "Incremental Magnitude (Extra Price)", type: "number" as const, ph: "500.00" },
-        { key: "stock_qty", label: "Current Inventory Node", type: "number" as const, ph: "0.00" }
+        { key: "stock_qty", label: "Current Inventory", type: "number" as const, ph: "0.00" }
     ];
 
     const attributeValueFields = [
         { 
-            key: "attribute_value_id", label: "Attribute Magnitude Node", type: "select" as const,
+            key: "attribute_value_id", label: "Attribute Magnitude", type: "select" as const,
             options: [] // Fetch attribute values
         }
     ];
@@ -49,7 +49,7 @@ export default function VariantMaster() {
     const variantColumns = [
         { 
             key: "identity", 
-            label: "Variant Entity / Parent",
+            label: "Variant / Parent",
             render: (v: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -83,7 +83,7 @@ export default function VariantMaster() {
         },
         { 
             key: "inventory", 
-            label: "Systemic Stock node",
+            label: "Systemic Stock",
             render: (v: any) => (
                 <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end">
@@ -98,7 +98,7 @@ export default function VariantMaster() {
         },
         { 
             key: "state", 
-            label: "Registry state",
+            label: "Status",
             render: () => <StatusBadge status="active" />
         }
     ];
@@ -122,7 +122,7 @@ export default function VariantMaster() {
 
     return (
         <ERPListView
-            title="Item Variant Registry"
+            title="Item Variant"
             data={variants || []}
             columns={variantColumns}
             onNew={() => { setEditingVariant(null); setView("form"); }}

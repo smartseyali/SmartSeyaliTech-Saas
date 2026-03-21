@@ -7,6 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useTenant } from "@/contexts/TenantContext";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
@@ -16,16 +17,19 @@ export default function PurchaseOrders() {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingOrder, setEditingOrder] = useState<any>(null);
+    const { activeCompany } = useTenant();
 
     useEffect(() => {
-        loadOrders();
-    }, []);
+        if (activeCompany) loadOrders();
+    }, [activeCompany]);
 
     const loadOrders = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('purchase_orders')
             .select('*')
+            .eq('company_id', activeCompany.id)
             .order('created_at', { ascending: false });
 
         if (!error && data) setOrders(data);
@@ -33,7 +37,7 @@ export default function PurchaseOrders() {
     };
 
     const orderHeaderFields = [
-        { key: "vendor_name", label: "Supplier Entity", required: true },
+        { key: "vendor_name", label: "Supplier", required: true },
         { key: "reference_no", label: "Procurement Ref", required: true },
         { key: "date", label: "Procurement Date", type: "date" as const },
         { key: "expected_delivery", label: "Supply Threshold", type: "date" as const },
@@ -43,7 +47,7 @@ export default function PurchaseOrders() {
                 { label: "Draft Request", value: "draft" },
                 { label: "Confirmed Supply", value: "confirmed" },
                 { label: "Engine Received", value: "received" },
-                { label: "Closed Logic", value: "closed" }
+                { label: "Closed", value: "closed" }
             ]
         }
     ];
@@ -57,6 +61,7 @@ export default function PurchaseOrders() {
 
             const payload = {
                 ...header,
+                company_id: activeCompany?.id,
                 total_qty: totalQty,
                 subtotal: subtotal,
                 tax_amount: taxAmount,
@@ -106,7 +111,7 @@ export default function PurchaseOrders() {
         return (
             <ERPEntryForm
                 title={editingOrder ? "Modify Procurement" : "Initialize Procurement"}
-                subtitle="Enterprise Inventory Replenishment Protocol"
+                subtitle="Enterprise Inventory Replenishment"
                 headerFields={orderHeaderFields}
                 onAbort={() => { setView("list"); setEditingOrder(null); }}
                 onSave={handleSaveOrder}

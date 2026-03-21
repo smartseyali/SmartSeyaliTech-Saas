@@ -268,7 +268,7 @@ export default function Team() {
                 await supabase.from('user_permissions').insert(rows);
             }
 
-            toast({ title: "Authorization Matrix Updated", description: "Team member permissions have been re-calibrated." });
+            toast({ title: "Authorization Updated", description: "Team member permissions have been re-calibrated." });
             setPermissionOpen(false);
         } catch (err: any) {
             toast({ variant: "destructive", title: "Sync Failed", description: err.message });

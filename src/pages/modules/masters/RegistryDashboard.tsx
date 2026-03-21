@@ -26,7 +26,7 @@ const MASTER_NODES = [
         ]
     },
     {
-        title: "Entity Management",
+        title: "Management",
         items: [
             { id: 'contacts', name: 'Unified Contacts', icon: <Users />, route: '/apps/masters/contacts', desc: 'Customers, Vendors & Strategic Leads' },
             { id: 'departments', name: 'Organizational Nodes', icon: <Building2 />, route: '/apps/masters/departments', desc: 'Branch & department hierarchy' }

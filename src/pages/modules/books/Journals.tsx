@@ -19,25 +19,25 @@ export default function Journals() {
     const { data: journals, loading, fetchItems, createItem, updateItem } = useCrud("journals");
 
     const journalFields = [
-        { key: "reference_no", label: "Registry Transaction Code", required: true, ph: "JV-2026-001..." },
+        { key: "reference_no", label: "Journal Entry No.", required: true, ph: "JV-2026-001..." },
         { key: "date", label: "Posting Date", type: "date" as const, required: true },
         { 
-            key: "type", label: "Ledger Category", type: "select" as const,
+            key: "type", label: "Journal Type", type: "select" as const,
             options: [
-                { label: "General Protocol", value: "general" },
-                { label: "Sales Registry", value: "sales" },
-                { label: "Purchase Registry", value: "purchase" },
-                { label: "Cash / Bank Node", value: "cash" }
+                { label: "General", value: "general" },
+                { label: "Sales", value: "sales" },
+                { label: "Purchase", value: "purchase" },
+                { label: "Cash / Bank", value: "cash" }
             ]
         },
-        { key: "note", label: "Transaction Narrative", ph: "Outline the purpose of this entry..." }
+        { key: "note", label: "Notes / Description", ph: "Outline the purpose of this entry..." }
     ];
 
     const journalItemFields = [
-        { key: "account_id", label: "Target Ledger Hub", type: "select" as const, options: [] }, // Will need COA fetch in real usage
-        { key: "debit", label: "Debit Magnitude", type: "number" as const },
-        { key: "credit", label: "Credit Magnitude", type: "number" as const },
-        { key: "memo", label: "Line Memo", ph: "Line item specific details..." }
+        { key: "account_id", label: "Account", type: "select" as const, options: [] }, // Will need COA fetch in real usage
+        { key: "debit", label: "Debit Amount", type: "number" as const },
+        { key: "credit", label: "Credit Amount", type: "number" as const },
+        { key: "memo", label: "Line Details", ph: "Line item specific details..." }
     ];
 
     const handleSave = async (header: any, items: any[]) => {
@@ -54,7 +54,7 @@ export default function Journals() {
     const journalColumns = [
         { 
             key: "ref", 
-            label: "Transaction identity",
+            label: "Transaction",
             render: (j: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -76,7 +76,7 @@ export default function Journals() {
         },
         { 
             key: "description", 
-            label: "Narrative Hub",
+            label: "Narrative",
             render: (j: any) => (
                 <p className="text-[11px] font-medium text-slate-500 max-w-xs truncate uppercase tracking-tight">
                     {j.note || "System Generated Protocol Entry"}
@@ -97,7 +97,7 @@ export default function Journals() {
         },
         { 
             key: "status", 
-            label: "Registry State",
+            label: "Data",
             render: (j: any) => <StatusBadge status={j.status || "posted"} />
         }
     ];
@@ -106,14 +106,14 @@ export default function Journals() {
         return (
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
-                    title={editingJournal ? "Refine Protocol Entry" : "Initialize Journal identity"}
-                    subtitle="Universal Financial Ledger Orchestration"
+                    title={editingJournal ? "Edit Journal Entry" : "New Journal Entry"}
+                    subtitle="Record Accounting Transactions"
                     headerFields={journalFields}
                     itemFields={journalItemFields}
                     onAbort={() => { setView("list"); setEditingJournal(null); }}
                     onSave={handleSave}
                     initialData={editingJournal}
-                    itemTitle="Ledger Double-Entry Matrix"
+                    itemTitle="Journal Entry Lines"
                 />
             </div>
         );
@@ -121,7 +121,7 @@ export default function Journals() {
 
     return (
         <ERPListView
-            title="Journal Protocol Registry"
+            title="Journal"
             data={journals || []}
             columns={journalColumns}
             onNew={() => { setEditingJournal(null); setView("form"); }}
@@ -134,10 +134,10 @@ export default function Journals() {
             headerActions={
                 <div className="flex items-center gap-2">
                     <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
-                        <FileSpreadsheet className="w-3.5 h-3.5" /> Batch induction
+                        <FileSpreadsheet className="w-3.5 h-3.5" /> Import Entries
                     </button>
                     <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
-                        <ArrowRightLeft className="w-3.5 h-3.5" /> Reconcile Hub
+                        <ArrowRightLeft className="w-3.5 h-3.5" /> Reconciliation
                     </button>
                 </div>
             }

@@ -45,6 +45,7 @@ interface ERPEntryFormProps {
     initialItems?: any[];
     showItems?: boolean;
     itemTitle?: string;
+    customActions?: React.ReactNode;
 }
 
 export default function ERPEntryForm({
@@ -57,10 +58,12 @@ export default function ERPEntryForm({
     initialData,
     initialItems,
     showItems = true,
-    itemTitle = "Items / Services"
+    itemTitle = "Items / Services",
+    customActions
 }: ERPEntryFormProps) {
     const [header, setHeader] = useState<any>(initialData || {});
     const [items, setItems] = useState<any[]>(initialItems || [{}]);
+    const [activeTab, setActiveTab] = useState<"detail" | "audit" | "attachments" | "workflow">("detail");
 
     const [totals, setTotals] = useState({
         subtotal: 0,
@@ -164,6 +167,7 @@ export default function ERPEntryForm({
                     </div>
                     
                     <div className="flex items-center gap-3">
+                        {customActions}
                         <Button variant="outline" onClick={onAbort} className="h-9 px-4 text-xs font-bold border-gray-200 hover:bg-gray-50 rounded-xl">
                             Cancel
                         </Button>
@@ -176,10 +180,32 @@ export default function ERPEntryForm({
                         </Button>
                     </div>
                 </div>
+
+                {initialData && (
+                    <div className="w-full px-6 flex gap-6 mt-2 border-t border-gray-100">
+                        {["detail", "audit", "attachments", "workflow"].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab as any)}
+                                className={cn(
+                                    "pb-3 pt-4 text-[11px] font-black uppercase tracking-widest relative transition-all outline-none",
+                                    activeTab === tab ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
+                                )}
+                            >
+                                {tab}
+                                {activeTab === tab && (
+                                    <motion.div layoutId="activeTabBadge" className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900 rounded-t-full" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="w-full pt-4 px-6 space-y-3">
-                <div className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm overflow-hidden">
+                {activeTab === "detail" && (
+                    <>
+                        <div className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/30">
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Main Details</h3>
                     </div>
@@ -242,7 +268,7 @@ export default function ERPEntryForm({
                                                                     type={field.type === 'number' ? 'number' : 'text'}
                                                                     value={item[field.key] || ""}
                                                                     onChange={(e) => updateItem(index, field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
-                                                                    className="w-full h-9 px-3 bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
+                                                                    className="w-full h-9 px-3 bg-transparent border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
                                                                     placeholder={field.ph || ""}
                                                                 />
                                                             </TableCell>
@@ -253,8 +279,8 @@ export default function ERPEntryForm({
                                                                 <input
                                                                     value={item.description || ""}
                                                                     onChange={(e) => updateItem(index, "description", e.target.value)}
-                                                                    className="w-full h-9 px-3 bg-transparent border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
-                                                                    placeholder="Resource narrative..."
+                                                                    className="w-full h-9 px-3 bg-transparent border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
+                                                                    placeholder="Item Details..."
                                                                 />
                                                             </TableCell>
                                                             <TableCell className="w-24">
@@ -262,7 +288,7 @@ export default function ERPEntryForm({
                                                                     type="number"
                                                                     value={item.quantity || ""}
                                                                     onChange={(e) => updateItem(index, "quantity", Number(e.target.value))}
-                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
+                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
                                                                 />
                                                             </TableCell>
                                                             <TableCell className="w-32">
@@ -270,7 +296,7 @@ export default function ERPEntryForm({
                                                                     type="number"
                                                                     value={item.unitPrice || ""}
                                                                     onChange={(e) => updateItem(index, "unitPrice", Number(e.target.value))}
-                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
+                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
                                                                 />
                                                             </TableCell>
                                                             <TableCell className="w-24">
@@ -278,7 +304,7 @@ export default function ERPEntryForm({
                                                                     type="number"
                                                                     value={item.taxRate || ""}
                                                                     onChange={(e) => updateItem(index, "taxRate", Number(e.target.value))}
-                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-transparent hover:border-slate-200 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
+                                                                    className="w-full h-9 px-3 bg-transparent text-right border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-indigo-500 rounded-lg text-sm font-medium transition-all outline-none"
                                                                 />
                                                             </TableCell>
                                                             <TableCell className="text-right pr-8 text-sm font-bold text-slate-900 tracking-tight">
@@ -364,6 +390,18 @@ export default function ERPEntryForm({
                             <Save className="w-4 h-4 mr-3" />
                             Submit Verification Hub
                         </Button>
+                    </div>
+                )}
+                    </>
+                )}
+
+                {activeTab !== "detail" && initialData && (
+                    <div className="bg-white rounded-3xl p-8 border border-dashed border-gray-300 shadow-sm flex flex-col items-center justify-center min-h-[300px]">
+                        <ImageIcon className="w-12 h-12 text-slate-200 mb-4" />
+                        <h3 className="text-xl font-black text-slate-800 tracking-tight capitalize">{activeTab} Log</h3>
+                        <p className="text-sm font-medium text-slate-500 mt-2">
+                            This structural endpoint is tracking standard {activeTab} history for record ID: <span className="text-slate-900 font-bold">{initialData.id || "N/A"}</span>
+                        </p>
                     </div>
                 )}
             </div>

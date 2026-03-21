@@ -38,7 +38,7 @@ export default function Logs() {
         },
         { 
             key: "direction", 
-            label: "Logic direction",
+            label: "Direction",
             render: (log: any) => (
                 <div className="flex items-center gap-2">
                     {log.direction === 'outbound' ? (
@@ -63,7 +63,7 @@ export default function Logs() {
         },
         { 
             key: "status", 
-            label: "State",
+            label: "Status",
             render: (log: any) => <StatusBadge status={log.status} />
         }
     ];
@@ -83,7 +83,7 @@ export default function Logs() {
 
     return (
         <ERPListView
-            title="Communication Registry"
+            title="Communication"
             data={filteredLogs}
             columns={logColumns}
             onNew={() => {}} // Could be a broadast dialog

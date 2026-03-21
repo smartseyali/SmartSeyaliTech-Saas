@@ -13,12 +13,12 @@ export default function Items() {
     const { data: products, loading, fetchItems, createItem, updateItem } = useCrud("products");
 
     const itemHeaderFields = [
-        { key: "name", label: "Item Master Identity", required: true, ph: "Enterprise Logic Pro..." },
+        { key: "name", label: "Item Master", required: true, ph: "Enterprise Logic Pro..." },
         { key: "sku", label: "HSN / SKU Code", ph: "8471 / ELP-2026-00X" },
         { key: "rate", label: "Standard Cost Rate", type: "number" as const, ph: "0.00" },
         { key: "price", label: "Selling Unit Price", type: "number" as const, ph: "0.00" },
         { 
-            key: "status", label: "Ledger State", type: "select" as const, 
+            key: "status", label: "Ledger", type: "select" as const, 
             options: [
                 { label: "Active Asset", value: "active" },
                 { label: "Dormant / Archived", value: "inactive" }
@@ -64,7 +64,7 @@ export default function Items() {
         },
         { 
             key: "rate", 
-            label: "Valuation Hub / Rate",
+            label: "Valuation / Rate",
             render: (item: any) => (
                 <div className="flex flex-col">
                     <span className="font-black text-indigo-600 tracking-tight">{fmt(item.rate)}</span>
@@ -99,7 +99,7 @@ export default function Items() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingItem ? "Refine Entity Identity" : "Initialize Resource Entry"}
-                    subtitle="Global Item Registry Protocol"
+                    subtitle="Global Item"
                     headerFields={itemHeaderFields}
                     onAbort={() => { setView("list"); setEditingItem(null); }}
                     onSave={handleSave}

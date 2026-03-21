@@ -15,7 +15,7 @@ export default function Attendance() {
     const attendanceColumns = [
         { 
             key: "name", 
-            label: "Employee Identity",
+            label: "Employee",
             render: (log: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight italic uppercase leading-none">{log.name}</span>

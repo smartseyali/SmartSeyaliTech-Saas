@@ -27,30 +27,81 @@ if (provider === 'supabase') {
     internalClient = createClient(supabaseUrl, supabaseAnonKey);
 } else {
     // [ADAPTER] Custom / VPS Implementation
-    // This is where you'd write the fetch calls to your VPS API
-    internalClient = {
-        // Universal Table Accessor
-        from: (table: string) => ({
-            select: (columns: string = '*') => {
-                console.info(`[DB BRIDGE] fetching from ${table}...`);
-                // Implementation: return fetch(`${PLATFORM_CONFIG.apiUrl}/${table}?select=${columns}`);
-                return { data: [], error: null };
-            },
-            insert: (data: any) => ({ data: null, error: null }),
-            update: (data: any) => ({ data: null, error: null }),
-            delete: () => ({ error: null }),
-            upsert: () => ({ error: null }),
-            eq: () => internalClient.from(table), // Chainable mock
-            maybeSingle: () => ({ data: null, error: null }),
-            single: () => ({ data: null, error: null }),
-        }),
+    class QueryBuilder {
+        table = "";
+        action = "select";
+        queryColumns = "*";
+        filters: any[] = [];
+        orders: any[] = [];
+        payload: any = null;
 
-        // Universal Auth Accessor
+        constructor(table: string) {
+            this.table = table;
+        }
+
+        select(columns = '*') { this.action = 'select'; this.queryColumns = columns; return this; }
+        insert(data: any) { this.action = 'insert'; this.payload = data; return this; }
+        update(data: any) { this.action = 'update'; this.payload = data; return this; }
+        delete() { this.action = 'delete'; return this; }
+        upsert(data: any) { this.action = 'upsert'; this.payload = data; return this; }
+
+        eq(column: string, value: any) { this.filters.push({ type: 'eq', column, value }); return this; }
+        neq(column: string, value: any) { this.filters.push({ type: 'neq', column, value }); return this; }
+        in(column: string, values: any[]) { this.filters.push({ type: 'in', column, values }); return this; }
+        ilike(column: string, value: any) { this.filters.push({ type: 'ilike', column, value }); return this; }
+        or(query: string) { this.filters.push({ type: 'or', query }); return this; }
+        single() { this.filters.push({ type: 'single' }); return this; }
+        maybeSingle() { this.filters.push({ type: 'maybeSingle' }); return this; }
+        order(column: string, options: any) { this.orders.push({ column, ascending: options?.ascending ?? true }); return this; }
+        limit(count: number) { this.orders.push({ limit: count }); return this; } // Used generally as a modifier
+
+        // Resolves the chain into an HTTP API request automatically when awaited
+        then(onfulfilled?: (value: any) => any, onrejected?: (reason: any) => any) {
+            const execute = async () => {
+                try {
+                    const apiUrl = PLATFORM_CONFIG.apiUrl || 'http://localhost:3000/api';
+                    const res = await fetch(`${apiUrl}/database`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            table: this.table,
+                            action: this.action,
+                            columns: this.queryColumns,
+                            filters: this.filters,
+                            orders: this.orders,
+                            payload: this.payload
+                        })
+                    });
+                    return await res.json();
+                } catch (error: any) {
+                    console.error("[DB BRIDGE] Network Error:", error);
+                    return { data: null, error: { message: "Local Backend Unreachable" } };
+                }
+            };
+            return execute().then(onfulfilled, onrejected);
+        }
+    }
+
+    internalClient = {
+        // Universal Table Accessor (Returns the QueryBuilder proxy)
+        from: (table: string) => new QueryBuilder(table),
+
+        // Universal Auth Accessor (HTTP mapping layer for user sessions)
         auth: {
-            getSession: async () => ({ data: { session: null } }),
-            getUser: async () => ({ data: { user: null } }),
+            getSession: async () => {
+                const res = await fetch(`${PLATFORM_CONFIG.apiUrl || 'http://localhost:3000/api'}/auth/session`);
+                return res.json().catch(() => ({ data: { session: null }, error: null }));
+            },
+            getUser: async () => ({ data: { user: null }, error: null }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-            signInWithPassword: async () => ({ data: null, error: null }),
+            signInWithPassword: async (credentials: any) => {
+                const res = await fetch(`${PLATFORM_CONFIG.apiUrl || 'http://localhost:3000/api'}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(credentials)
+                });
+                return res.json();
+            },
             signOut: async () => ({ error: null }),
             resetPasswordForEmail: async () => ({ data: null, error: null }),
         }

@@ -13,15 +13,15 @@ export default function Vendors() {
     const { data: contacts, loading, fetchItems, createItem, updateItem } = useCrud("contacts");
 
     const vendorHeaderFields = [
-        { key: "name", label: "Corporate Identity", required: true, ph: "Global Logistics Ltd..." },
-        { key: "email", label: "Primary Communication Node", ph: "shippping@global.com" },
-        { key: "phone", label: "Voice Channel", ph: "+91 ..." },
+        { key: "name", label: "Company Name", required: true, ph: "Global Logistics Ltd..." },
+        { key: "email", label: "Email Address", ph: "shippping@global.com" },
+        { key: "phone", label: "Phone Number", ph: "+91 ..." },
         { key: "company_name", label: "Trading Name", ph: "Global Logistics" },
-        { key: "category", label: "Registry Sector", ph: "Shipping / Hardware" },
+        { key: "category", label: "Sector", ph: "Shipping / Hardware" },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
-                { label: "Verified Node", value: "Verified" },
+                { label: "Verified", value: "Verified" },
                 { label: "Preferred Partner", value: "Preferred" },
                 { label: "Active Account", value: "Active" },
                 { label: "Blocked Asset", value: "Blocked" }
@@ -43,7 +43,7 @@ export default function Vendors() {
     const vendorColumns = [
         { 
             key: "name", 
-            label: "Corporate Identity",
+            label: "Company Name",
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
@@ -53,7 +53,7 @@ export default function Vendors() {
         },
         { 
             key: "contact_info", 
-            label: "Node point / Email",
+            label: "point / Email",
             render: (row: any) => (
                 <div className="flex flex-col gap-0.5">
                     <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -98,7 +98,7 @@ export default function Vendors() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingVendor ? "Refine Supplier Node" : "Initialize Vendor Identity"}
-                    subtitle="Procurement Management Protocol"
+                    subtitle="Procurement Management"
                     headerFields={vendorHeaderFields}
                     onAbort={() => { setView("list"); setEditingVendor(null); }}
                     onSave={handleSave}
@@ -111,7 +111,7 @@ export default function Vendors() {
 
     return (
         <ERPListView
-            title="Procurement Registry"
+            title="Procurement"
             data={filteredVendors}
             columns={vendorColumns}
             onNew={() => { setEditingVendor(null); setView("form"); }}

@@ -45,7 +45,7 @@ export default function Expenses() {
     const expenseColumns = [
         { 
             key: "description", 
-            label: "Identity",
+            label: "Data",
             render: (exp: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight italic uppercase leading-none">{exp.description}</span>

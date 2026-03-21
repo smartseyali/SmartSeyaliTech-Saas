@@ -28,7 +28,7 @@ export default function Deliveries() {
     const deliveryColumns = [
         { 
             key: "order_number", 
-            label: "Node Identifier",
+            label: "Identifier",
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">#{row.order_number}</span>
@@ -38,7 +38,7 @@ export default function Deliveries() {
         },
         { 
             key: "customer_name", 
-            label: "Consignee Entity",
+            label: "Consignee",
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.customer_name}</span>
@@ -48,7 +48,7 @@ export default function Deliveries() {
         },
         { 
             key: "tracking_number", 
-            label: "Tracking Node",
+            label: "Tracking",
             render: (row: any) => row.tracking_number ? (
                 <div className="flex items-center gap-2 group">
                     <span className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">{row.tracking_number}</span>
@@ -60,7 +60,7 @@ export default function Deliveries() {
         },
         { 
             key: "status", 
-            label: "Fulfillment state",
+            label: "Fulfillment",
             render: (row: any) => <StatusBadge status={row.status} />
         }
     ];
@@ -72,7 +72,7 @@ export default function Deliveries() {
 
     return (
         <ERPListView
-            title="Logistics Registry"
+            title="Logistics"
             data={filteredDeliveries}
             columns={deliveryColumns}
             onNew={() => {}}

@@ -18,11 +18,11 @@ export default function Employees() {
     const { data: employees, loading, fetchItems, createItem, updateItem } = useCrud("hrms_employees");
 
     const employeeFields = [
-        { key: "employee_code", label: "Structural Identity (Code)", required: true, ph: "EMP-2026-001" },
-        { key: "full_name", label: "Legal Entity Name", required: true, ph: "John Doe..." },
-        { key: "email", label: "Corporate Communication Hub", ph: "john.doe@company.com" },
+        { key: "employee_code", label: "Structural (Code)", required: true, ph: "EMP-2026-001" },
+        { key: "full_name", label: "Contact Name", required: true, ph: "John Doe..." },
+        { key: "email", label: "Corporate Communication", ph: "john.doe@company.com" },
         { 
-            key: "department_id", label: "Organizational Node", type: "select" as const,
+            key: "department_id", label: "Organizational", type: "select" as const,
             options: [
                 { label: "Engineering Sector", value: "1" },
                 { label: "Financial Governance", value: "2" },
@@ -30,7 +30,7 @@ export default function Employees() {
             ]
         },
         { 
-            key: "designation_id", label: "Structural Role", type: "select" as const,
+            key: "designation_id", label: "Job Title", type: "select" as const,
             options: [
                 { label: "Lead Architect", value: "1" },
                 { label: "Senior Analyst", value: "2" },
@@ -39,7 +39,7 @@ export default function Employees() {
         },
         { key: "joining_date", label: "Mobilization Date", type: "date" as const },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Active Resource", value: "active" },
                 { label: "On Leave", value: "leave" },
@@ -61,7 +61,7 @@ export default function Employees() {
     const employeeColumns = [
         { 
             key: "name", 
-            label: "Employee Identity / Role",
+            label: "Employee / Role",
             render: (emp: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-sm relative">
@@ -98,7 +98,7 @@ export default function Employees() {
         },
         { 
             key: "contact", 
-            label: "Communication Hub",
+            label: "Communication",
             render: (emp: any) => (
                 <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
@@ -112,7 +112,7 @@ export default function Employees() {
         },
         { 
             key: "status", 
-            label: "Registry State",
+            label: "Data",
             render: (emp: any) => <StatusBadge status={emp.status || "active"} />
         }
     ];
@@ -127,7 +127,7 @@ export default function Employees() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingEmployee ? "Refine Resource Profile" : "Initialize Resource Entry"}
-                    subtitle="Human Capital Management Protocol"
+                    subtitle="Human Capital Management"
                     headerFields={employeeFields}
                     onAbort={() => { setView("list"); setEditingEmployee(null); }}
                     onSave={handleSave}
@@ -140,7 +140,7 @@ export default function Employees() {
 
     return (
         <ERPListView
-            title="Human Capital Registry"
+            title="Human Capital"
             data={filteredEmployees}
             columns={employeeColumns}
             onNew={() => { setEditingEmployee(null); setView("form"); }}

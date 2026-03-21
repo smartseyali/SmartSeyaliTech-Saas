@@ -24,7 +24,7 @@ export const Brands = () => {
         },
         { 
             key: "name", 
-            label: "Brand Identity",
+            label: "Brand",
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
@@ -34,7 +34,7 @@ export const Brands = () => {
         },
         { 
             key: "is_active", 
-            label: "Ledger State", 
+            label: "Ledger", 
             render: (row: any) => (
                 <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${
                     row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"

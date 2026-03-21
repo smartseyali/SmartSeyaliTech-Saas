@@ -19,21 +19,21 @@ export default function ReviewMaster() {
 
     const reviewFields = [
         { 
-            key: "product_id", label: "Registry Product identity", type: "select" as const, 
+            key: "product_id", label: "Product", type: "select" as const, 
             required: true, options: [] 
         },
         { 
-            key: "user_id", label: "Consumer Entity Node", type: "select" as const, 
+            key: "user_id", label: "Consumer", type: "select" as const, 
             required: true, options: [] 
         },
         { key: "rating", label: "Magnitude (1-5)", type: "number" as const, required: true },
         { key: "comment", label: "Consumer Narrative", type: "text" as const, ph: "Experience protocol..." },
         { 
-            key: "status", label: "Moderation state", type: "select" as const,
+            key: "status", label: "Moderation", type: "select" as const,
             options: [
                 { label: "Pending Authorization", value: "pending" },
-                { label: "Authorized Node (Public)", value: "approved" },
-                { label: "Hidden identity", value: "hidden" }
+                { label: "Authorized (Public)", value: "approved" },
+                { label: "Hidden", value: "hidden" }
             ]
         }
     ];
@@ -51,7 +51,7 @@ export default function ReviewMaster() {
     const reviewColumns = [
         { 
             key: "identity", 
-            label: "Review Entity / Narrative",
+            label: "Review / Narrative",
             render: (r: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -79,7 +79,7 @@ export default function ReviewMaster() {
         },
         { 
             key: "narrative", 
-            label: "Content Protocol",
+            label: "Content",
             render: (r: any) => (
                 <div className="max-w-xs overflow-hidden">
                     <p className="text-[11px] font-medium text-slate-500 line-clamp-2 italic">
@@ -90,7 +90,7 @@ export default function ReviewMaster() {
         },
         { 
             key: "verification", 
-            label: "Trust identity Hub",
+            label: "Trust",
             render: (r: any) => (
                 <div className="flex items-center gap-2">
                     {r.is_verified_purchase !== false ? (
@@ -105,7 +105,7 @@ export default function ReviewMaster() {
         },
         { 
             key: "status", 
-            label: "Moderation state",
+            label: "Moderation",
             render: (r: any) => <StatusBadge status={r.status || "approved"} />
         }
     ];
@@ -128,7 +128,7 @@ export default function ReviewMaster() {
 
     return (
         <ERPListView
-            title="Consumer Feedback Registry"
+            title="Consumer Feedback"
             data={reviews || []}
             columns={reviewColumns}
             onNew={() => { setEditingReview(null); setView("form"); }}

@@ -36,11 +36,11 @@ export default function PurchaseRequests() {
         { key: "date", label: "Request Date", type: "date" as const },
         { key: "required_by", label: "Critical Deadline", type: "date" as const },
         {
-            key: "status", label: "Logic Approval", type: "select" as const,
+            key: "status", label: "Approval", type: "select" as const,
             options: [
                 { label: "Draft Request", value: "draft" },
                 { label: "Pending Engine Approval", value: "pending-approval" },
-                { label: "Logic Approved", value: "approved" },
+                { label: "Approved", value: "approved" },
                 { label: "Ordered Payload", value: "ordered" }
             ]
         }
@@ -92,7 +92,7 @@ export default function PurchaseRequests() {
         return (
             <ERPEntryForm
                 title={editingRequest ? "Modify Request" : "Initialize Procurement Demand"}
-                subtitle="Internal Supply Chain Requirement Logic"
+                subtitle="Internal Supply Chain Requirement"
                 headerFields={requestHeaderFields}
                 onAbort={() => { setView("list"); setEditingRequest(null); }}
                 onSave={handleSaveRequest}

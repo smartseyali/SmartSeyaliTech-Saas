@@ -18,16 +18,16 @@ export default function Projects() {
     const { data: projects, loading, fetchItems, createItem, updateItem } = useCrud("projects");
 
     const projectFields = [
-        { key: "name", label: "Registry Project Identity", required: true, ph: "Enterprise Implementation..." },
-        { key: "code", label: "Structural Node Code", ph: "PRJ-2026-X" },
+        { key: "name", label: "Project", required: true, ph: "Enterprise Implementation..." },
+        { key: "code", label: "Structural Code", ph: "PRJ-2026-X" },
         { key: "start_date", label: "Mobilization Date", type: "date" as const },
         { key: "end_date", label: "Delivery Deadline", type: "date" as const },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Active Pipeline", value: "active" },
                 { label: "On Hold", value: "hold" },
-                { label: "Completed Registry", value: "completed" },
+                { label: "Completed", value: "completed" },
                 { label: "Cancelled", value: "cancelled" }
             ]
         },
@@ -47,7 +47,7 @@ export default function Projects() {
     const projectColumns = [
         { 
             key: "name", 
-            label: "Project Entity Identity",
+            label: "Project",
             render: (p: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 border border-violet-100 group-hover:bg-violet-900 group-hover:text-white transition-all duration-500 shadow-sm">
@@ -86,7 +86,7 @@ export default function Projects() {
         },
         { 
             key: "status", 
-            label: "Process State",
+            label: "Process",
             render: (p: any) => <StatusBadge status={p.status || "active"} />
         }
     ];
@@ -101,7 +101,7 @@ export default function Projects() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingProject ? "Refine Project Matrix" : "Initialize Project Entity"}
-                    subtitle="Enterprise Resource Allocation Protocol"
+                    subtitle="Enterprise Resource Allocation"
                     headerFields={projectFields}
                     onAbort={() => { setView("list"); setEditingProject(null); }}
                     onSave={handleSave}
@@ -114,7 +114,7 @@ export default function Projects() {
 
     return (
         <ERPListView
-            title="Project Portfolio Registry"
+            title="Project Portfolio"
             data={filteredProjects}
             columns={projectColumns}
             onNew={() => { setEditingProject(null); setView("form"); }}

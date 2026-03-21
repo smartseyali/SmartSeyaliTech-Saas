@@ -13,21 +13,21 @@ export default function Contacts() {
     const { data: contacts, loading, fetchItems, createItem, updateItem } = useCrud("contacts");
 
     const contactHeaderFields = [
-        { key: "name", label: "Legal Entity Name", required: true, ph: "First Last or Company..." },
-        { key: "email", label: "Primary Communication Node", ph: "email@domain.com" },
-        { key: "phone", label: "Voice Channel", ph: "+91 ..." },
-        { key: "company_name", label: "Associated Corporate Body", ph: "Acme Corp" },
-        { key: "job_title", label: "Structural Role", ph: "Manager / Director" },
+        { key: "name", label: "Contact Name", required: true, ph: "First Last or Company..." },
+        { key: "email", label: "Email Address", ph: "email@domain.com" },
+        { key: "phone", label: "Phone Number", ph: "+91 ..." },
+        { key: "company_name", label: "Company Name", ph: "Acme Corp" },
+        { key: "job_title", label: "Job Title", ph: "Manager / Director" },
         { 
-            key: "type", label: "Registry Type", type: "select" as const,
+            key: "type", label: "Type", type: "select" as const,
             options: [
                 { label: "Standard Customer", value: "customer" },
                 { label: "Strategic Vendor", value: "vendor" },
                 { label: "Prospect Lead", value: "lead" }
             ]
         },
-        { key: "city", label: "Geographic Hub", ph: "City" },
-        { key: "status", label: "Operational State", type: "select" as const,
+        { key: "city", label: "City", ph: "City" },
+        { key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Active Nodes", value: "active" },
                 { label: "Dormant / Archive", value: "inactive" },
@@ -49,7 +49,7 @@ export default function Contacts() {
     const contactColumns = [
         { 
             key: "name", 
-            label: "Entity Identity",
+            label: "Entity Name",
             render: (c: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
@@ -69,7 +69,7 @@ export default function Contacts() {
         },
         { 
             key: "email", 
-            label: "Communication Hub",
+            label: "Communication",
             render: (c: any) => (
                 <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2"><Mail size={10}/> {c.email}</span>
@@ -79,7 +79,7 @@ export default function Contacts() {
         },
         { 
             key: "status", 
-            label: "State",
+            label: "Status",
             render: (c: any) => <StatusBadge status={c.status} />
         }
     ];
@@ -94,7 +94,7 @@ export default function Contacts() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingContact ? "Refine Contact Matrix" : "Initialize Entity Entry"}
-                    subtitle="Contact Management Protocol"
+                    subtitle="Contact Management"
                     headerFields={contactHeaderFields}
                     onAbort={() => { setView("list"); setEditingContact(null); }}
                     onSave={handleSave}
@@ -107,7 +107,7 @@ export default function Contacts() {
 
     return (
         <ERPListView
-            title="Entity Directory"
+            title="Directory"
             data={filteredContacts}
             columns={contactColumns}
             onNew={() => { setEditingContact(null); setView("form"); }}

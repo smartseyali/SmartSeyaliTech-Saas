@@ -9,13 +9,13 @@ import { motion } from "framer-motion";
 
 const WORKFLOW_STATS = [
     { label: "Pending Approvals", value: "14", icon: <AlarmClock className="text-amber-500" />, trend: "+2 today" },
-    { label: "Authorized Nodes", value: "1,204", icon: <CheckCircle2 className="text-emerald-500" />, trend: "98% success" },
-    { label: "Active Protocols", value: "8", icon: <Binary className="text-indigo-500" />, trend: "Governance active" }
+    { label: "Authorized Access", value: "1,204", icon: <CheckCircle2 className="text-emerald-500" />, trend: "98% success" },
+    { label: "Active Pipelines", value: "8", icon: <Binary className="text-indigo-500" />, trend: "Governance active" }
 ];
 
 const WORKFLOW_NODES = [
     {
-        title: "Protocol Authorization",
+        title: "Authorization",
         items: [
             { id: 'approvals', name: 'Approval Matrix', icon: <ShieldCheck />, route: '/apps/workflow/approvals', desc: 'Authorize system resource requests' },
             { id: 'design', name: 'Workflow Designer', icon: <GitPullRequest />, route: '/apps/workflow/designer', desc: 'Design multi-level transition logic' }

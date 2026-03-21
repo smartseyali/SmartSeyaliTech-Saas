@@ -121,9 +121,9 @@ export default function OrderSuccess() {
                         </h3>
                         <div className="space-y-0">
                             {[
-                                { icon: ShieldCheck, title: "Authorization Node", sub: "Signature verified & confirmed" },
+                                { icon: ShieldCheck, title: "Authorization", sub: "Signature verified & confirmed" },
                                 { icon: Box, title: "Staging Array", sub: "Calibrating items for transit" },
-                                { icon: Truck, title: "In-Transit Logic", sub: "Handover to Tier-1 Logistics" },
+                                { icon: Truck, title: "In-Transit", sub: "Handover to Tier-1 Logistics" },
                                 { icon: Zap, title: "Final Sector Sync", sub: "Deployment within destination grid" },
                                 { icon: Home, title: "Deployment Finalized", sub: "Node localized successfully" },
                             ].map((step, idx) => {

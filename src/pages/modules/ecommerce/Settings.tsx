@@ -83,7 +83,7 @@ export default function Settings() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Section icon={Palette} title="Visual Identity">
+                <Section icon={Palette} title="Visual">
                     <Field label="Primary Brand Color">
                         <div className="flex gap-3">
                             <input type="color" value={formData.primary_color || "#2563eb"}

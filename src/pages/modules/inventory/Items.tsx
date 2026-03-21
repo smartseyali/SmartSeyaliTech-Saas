@@ -12,17 +12,17 @@ export default function Items() {
     const { data: products, loading, fetchItems, createItem, updateItem } = useCrud("products");
 
     const itemHeaderFields = [
-        { key: "name", label: "Legal product Identity", required: true, ph: "Enterprise Logic Pro..." },
-        { key: "sku", label: "Registry SKU node", ph: "ELP-2026-00X" },
+        { key: "name", label: "Legal product", required: true, ph: "Enterprise Logic Pro..." },
+        { key: "sku", label: "SKU", ph: "ELP-2026-00X" },
         { key: "rate", label: "Standard unit rate", type: "number" as const, ph: "0.00" },
         { key: "category", label: "ledger group", ph: "Hardware / Software" },
-        { key: "status", label: "operational state", type: "select" as const, 
+        { key: "status", label: "operational", type: "select" as const, 
             options: [
                 { label: "Active Nodes", value: "active" },
                 { label: "Archived Assets", value: "inactive" }
             ]
         },
-        { key: "description", label: "Registry Narrative", ph: "Technical specifications..." }
+        { key: "description", label: "Narrative", ph: "Technical specifications..." }
     ];
 
     const handleSave = async (header: any) => {
@@ -40,7 +40,7 @@ export default function Items() {
     const itemColumns = [
         { 
             key: "name", 
-            label: "Item Entity Identity",
+            label: "Item",
             render: (item: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
@@ -55,7 +55,7 @@ export default function Items() {
         },
         { 
             key: "sku", 
-            label: "Registry SKU",
+            label: "SKU",
             render: (item: any) => <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">{item.sku || "UNASSIGNED"}</span>
         },
         { 
@@ -82,7 +82,7 @@ export default function Items() {
         },
         { 
             key: "status", 
-            label: "Ledger state",
+            label: "Ledger",
             render: (item: any) => <StatusBadge status={ (item.current_stock || 0) > 0 ? "In Stock" : "Out of Stock"} />
         }
     ];
@@ -97,7 +97,7 @@ export default function Items() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingItem ? "Refine Entity identity" : "Initialize Resource entry"}
-                    subtitle="Inventory Management Protocol"
+                    subtitle="Inventory Management"
                     headerFields={itemHeaderFields}
                     onAbort={() => { setView("list"); setEditingItem(null); }}
                     onSave={handleSave}
@@ -110,7 +110,7 @@ export default function Items() {
 
     return (
         <ERPListView
-            title="Registry Items"
+            title="Items"
             data={filteredItems}
             columns={itemColumns}
             onNew={() => { setEditingItem(null); setView("form"); }}

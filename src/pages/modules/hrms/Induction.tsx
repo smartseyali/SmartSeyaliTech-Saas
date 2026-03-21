@@ -20,23 +20,23 @@ export default function EmployeeInduction() {
 
     const inductionFields = [
         { 
-            key: "employee_id", label: "Inductee Entity Identity", type: "select" as const, 
+            key: "employee_id", label: "Inductee", type: "select" as const, 
             required: true, options: [] // In real usage, fetch active employees
         },
         { 
-            key: "protocol_id", label: "Execution Protocol Node", type: "select" as const,
+            key: "protocol_id", label: "Execution", type: "select" as const,
             required: true, options: [
                 { label: "Executive Leadership Induction", value: "1" },
                 { label: "Engineering Sector Onboarding", value: "2" },
-                { label: "Standard Operational Protocol", value: "3" }
+                { label: "Standard Operational", value: "3" }
             ]
         },
         { 
-            key: "status", label: "Protocol State", type: "select" as const,
+            key: "status", label: "Data", type: "select" as const,
             options: [
                 { label: "Initialization", value: "pending" },
-                { label: "In-Progress Node", value: "in_progress" },
-                { label: "Protocol Finalized", value: "completed" }
+                { label: "In-Progress", value: "in_progress" },
+                { label: "Finalized", value: "completed" }
             ]
         },
         { key: "completion_date", label: "Expected Finalization", type: "date" as const }
@@ -55,7 +55,7 @@ export default function EmployeeInduction() {
     const inductionColumns = [
         { 
             key: "inductee", 
-            label: "Resource Identity / Protocol",
+            label: "Resource",
             render: (inc: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg shadow-slate-900/20 group-hover:bg-indigo-600 transition-all duration-500">
@@ -74,7 +74,7 @@ export default function EmployeeInduction() {
         },
         { 
             key: "progress", 
-            label: "Completion Matrix",
+            label: "Completion",
             render: (inc: any) => (
                 <div className="flex flex-col">
                     <div className="flex items-center justify-between mb-1.5 w-32">
@@ -89,7 +89,7 @@ export default function EmployeeInduction() {
         },
         { 
             key: "timeline", 
-            label: "Mobilization Hub",
+            label: "Mobilization",
             render: (inc: any) => (
                 <div className="flex items-center gap-2">
                     <Clock size={14} className="text-slate-300" />
@@ -101,7 +101,7 @@ export default function EmployeeInduction() {
         },
         { 
             key: "status", 
-            label: "Registry state",
+            label: "Status",
             render: (inc: any) => <StatusBadge status={inc.status || "pending"} />
         }
     ];
@@ -111,7 +111,7 @@ export default function EmployeeInduction() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingInduction ? "Refine Resource Induction" : "Initialize Mobilization protocol"}
-                    subtitle="Universal Human Capital Induction Matrix"
+                    subtitle="Universal Human Capital Induction"
                     headerFields={inductionFields}
                     onAbort={() => { setView("list"); setEditingInduction(null); }}
                     onSave={handleSave}
@@ -124,7 +124,7 @@ export default function EmployeeInduction() {
 
     return (
         <ERPListView
-            title="Induction protocol Registry"
+            title="Induction"
             data={inductions || []}
             columns={inductionColumns}
             onNew={() => { setEditingInduction(null); setView("form"); }}

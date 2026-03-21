@@ -77,7 +77,7 @@ export default function EcomOrders() {
         },
         { 
             key: "customer_name", 
-            label: "Entity Identification",
+            label: "Identification",
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.customer_name}</span>
@@ -102,7 +102,7 @@ export default function EcomOrders() {
         },
         { 
             key: "status", 
-            label: "State Vector",
+            label: "Vector",
             render: (row: any) => <StatusBadge status={row.status} />
         },
         { 

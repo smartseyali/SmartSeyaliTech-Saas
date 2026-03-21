@@ -42,7 +42,8 @@ import {
     MessageSquare,
     Smartphone,
     Binary,
-    Flame
+    Flame,
+    Clock
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -175,7 +176,6 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "crm",
             icon: Users,
             items: [
-                { title: "Contacts", url: "/apps/crm/contacts", icon: Users, resource: "customers" },
                 { title: "Accounts", url: "/apps/crm/accounts", icon: Library, resource: "customers" },
                 { title: "Segments", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
             ],
@@ -199,10 +199,11 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "inventory",
             icon: Boxes,
             items: [
-                { title: "Items", url: "/apps/inventory/items", icon: Boxes, resource: "products" },
                 { title: "Stock Levels", url: "/apps/inventory/levels", icon: BarChart3, resource: "products" },
                 { title: "Warehouses", url: "/apps/inventory/warehouses", icon: MapPin, resource: "settings" },
                 { title: "Transfers", url: "/apps/inventory/transfers", icon: Truck, resource: "products" },
+                { title: "Stock Audits", url: "/apps/inventory/audits", icon: Check, resource: "products" },
+                { title: "Batch Tracking", url: "/apps/inventory/batches", icon: Tag, resource: "products" },
             ],
         }
     ],
@@ -215,6 +216,7 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
                 { title: "Employee Directory", url: "/apps/hrms/employees", icon: Users, resource: "team" },
                 { title: "Induction Protocol", url: "/apps/hrms/induction", icon: Rocket, resource: "team" },
                 { title: "Departments Hub", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
+                { title: "Appraisals", url: "/apps/hrms/appraisals", icon: Star, resource: "team" },
             ],
         },
         {
@@ -224,6 +226,7 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             items: [
                 { title: "Attendance", url: "/apps/hrms/attendance", icon: Check, resource: "attendance" },
                 { title: "Leave Tracker", url: "/apps/hrms/leaves", icon: MapPin, resource: "attendance" },
+                { title: "Employee Claims", url: "/apps/hrms/claims", icon: CreditCard, resource: "attendance" },
                 { title: "Payroll Cycles", url: "/apps/hrms/payroll", icon: CreditCard, resource: "payroll" },
             ],
         }
@@ -234,7 +237,6 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "purchase",
             icon: ShoppingBag,
             items: [
-                { title: "Supplier Master", url: "/apps/purchase/vendors", icon: Users, resource: "customers" },
                 { title: "Indents (Internal)", url: "/apps/purchase/requests", icon: FileInput, resource: "orders" },
                 { title: "Purchase Orders", url: "/apps/purchase/orders", icon: ShoppingBag, resource: "orders" },
                 { title: "Goods Receipt (GRN)", url: "/apps/purchase/receipts", icon: Box, resource: "orders" },
@@ -252,7 +254,6 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
                 { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag, resource: "orders" },
                 { title: "Delivery Challans", url: "/apps/sales/deliveries", icon: Truck, resource: "orders" },
                 { title: "Sales Invoices", url: "/apps/invoicing/invoices", icon: CreditCard, resource: "orders" },
-                { title: "Party Records", url: "/apps/sales/customers", icon: Users, resource: "customers" },
             ]
         }
     ],
@@ -265,6 +266,17 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
                 { title: "Chart of Accounts", url: "/apps/books/accounts", icon: LayoutGrid, resource: "settings" },
                 { title: "Journals", url: "/apps/books/journals", icon: Library, resource: "orders" },
                 { title: "Expenses", url: "/apps/books/expenses", icon: CreditCard, resource: "orders" },
+            ]
+        },
+        {
+            label: "Financial Control",
+            module: "books",
+            icon: ShieldCheck,
+            items: [
+                { title: "Bank Sync", url: "/apps/books/reconciliation", icon: Zap, resource: "settings" },
+                { title: "Tax Slabs", url: "/apps/books/tax", icon: Tag, resource: "settings" },
+                { title: "Financial Reports", url: "/apps/books/reports", icon: BarChart3, resource: "settings" },
+                { title: "Fiscal Years", url: "/apps/settings/fiscal-years", icon: Clock, resource: "settings" },
             ]
         }
     ],
@@ -414,25 +426,60 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
     ]
 };
 
+const INIT_NAV_GROUPS: NavGroup[] = [
+    {
+        label: "INIT & MASTERS",
+        module: "masters",
+        icon: Settings,
+        items: [
+            { title: "Item Registry", url: "/apps/masters/items", icon: Box, resource: "products" },
+            { title: "Category Matrix", url: "/apps/masters/categories", icon: LayoutGrid, resource: "products" },
+            { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
+            { title: "UOM Protocols", url: "/apps/masters/uoms", icon: Scale, resource: "products" },
+            { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
+            { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
+        ]
+    }
+];
+
 // Help detect active module from route
 export const getCurrentModule = (pathname: string): string => {
     // Expected path structure: /apps/<module_name>/...
     const parts = pathname.split('/');
     if (parts.length >= 3 && parts[1] === 'apps') {
         const mod = parts[2];
-        // If module exists in MODULE_NAV_MAP, return it. Otherwise default to ecommerce
-        if (MODULE_NAV_MAP[mod]) return mod;
+        
+        // Seamless Universal Module Logic: Unify navigation focus
+        if (mod === 'masters') {
+            const cachedModule = localStorage.getItem('erp_active_framework') || 'ecommerce';
+            return MODULE_NAV_MAP[cachedModule] ? cachedModule : 'ecommerce';
+        }
+        
+        // Cache module state if it's a valid root
+        if (MODULE_NAV_MAP[mod]) {
+            localStorage.setItem('erp_active_framework', mod);
+            return mod;
+        }
     }
-    return 'ecommerce'; // Default
+    return localStorage.getItem('erp_active_framework') || 'ecommerce'; // Default
 };
 
 export const getRequiredResource = (pathname: string): string | undefined => {
     const activeModule = getCurrentModule(pathname);
+    
+    // Evaluate main module tree permissions
     const groups = MODULE_NAV_MAP[activeModule] || [];
     for (const group of groups) {
         const match = group.items.find(item => pathname.startsWith(item.url));
         if (match) return match.resource;
     }
+    
+    // Evaluate universal framework permissions if not found natively
+    for (const group of INIT_NAV_GROUPS) {
+        const match = group.items.find(item => pathname.startsWith(item.url));
+        if (match) return match.resource;
+    }
+    
     return undefined;
 };
 
@@ -455,22 +502,6 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "Template Management", url: "/super-admin/templates", icon: Layout },
             { title: "Headless Connectors", url: "/super-admin/connectors", icon: Zap },
         ],
-    }
-];
-
-const INIT_NAV_GROUPS: NavGroup[] = [
-    {
-        label: "INIT & MASTERS",
-        module: "masters",
-        icon: Settings,
-        items: [
-            { title: "Item Registry", url: "/apps/masters/items", icon: Box, resource: "products" },
-            { title: "Category Matrix", url: "/apps/masters/categories", icon: LayoutGrid, resource: "products" },
-            { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
-            { title: "UOM Protocols", url: "/apps/masters/uoms", icon: Scale, resource: "products" },
-            { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
-            { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
-        ]
     }
 ];
 

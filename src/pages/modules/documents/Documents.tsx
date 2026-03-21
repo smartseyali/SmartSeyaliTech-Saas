@@ -20,18 +20,18 @@ export default function Documents() {
     const { data: documents, loading, fetchItems, createItem, updateItem } = useCrud("documents");
 
     const documentFields = [
-        { key: "name", label: "Registry File Identity", required: true, ph: "Technical_Blueprint_V1.pdf" },
+        { key: "name", label: "File", required: true, ph: "Technical_Blueprint_V1.pdf" },
         { 
             key: "type", label: "Content Classification", type: "select" as const,
             options: [
                 { label: "Standard PDF Archive", value: "pdf" },
                 { label: "Spreadsheet Ledger", value: "excel" },
-                { label: "Corporate Image Node", value: "image" },
+                { label: "Corporate Image", value: "image" },
                 { label: "Internal Narrative", value: "text" }
             ]
         },
         { 
-            key: "folder_id", label: "Structural Hub / Folder", type: "select" as const,
+            key: "folder_id", label: "Structural / Folder", type: "select" as const,
             options: [
                 { label: "Financial Ledgers", value: "1" },
                 { label: "Legal Blueprints", value: "2" },
@@ -63,7 +63,7 @@ export default function Documents() {
     const docColumns = [
         { 
             key: "name", 
-            label: "File Entity Identity",
+            label: "File",
             render: (doc: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -85,7 +85,7 @@ export default function Documents() {
         },
         { 
             key: "location", 
-            label: "Structural Hub",
+            label: "Structural",
             render: (doc: any) => (
                 <div className="flex items-center gap-2">
                     <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10" />
@@ -97,7 +97,7 @@ export default function Documents() {
         },
         { 
             key: "governance", 
-            label: "Authorization state",
+            label: "Authorization",
             render: (doc: any) => (
                 <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -111,12 +111,12 @@ export default function Documents() {
         },
         { 
             key: "status", 
-            label: "Registry State",
+            label: "Data",
             render: (doc: any) => <StatusBadge status={doc.status || "final"} />
         },
         {
             key: "actions",
-            label: "Node control",
+            label: "control",
             render: () => (
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-indigo-600 transition-all"><Eye size={14}/></button>
@@ -136,7 +136,7 @@ export default function Documents() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingDoc ? "Refine Content identity" : "Initialize Document Entry"}
-                    subtitle="Enterprise Resource Governance Protocol"
+                    subtitle="Enterprise Resource Governance"
                     headerFields={documentFields}
                     onAbort={() => { setView("list"); setEditingDoc(null); }}
                     onSave={handleSave}
@@ -149,7 +149,7 @@ export default function Documents() {
 
     return (
         <ERPListView
-            title="Enterprise Document Hub"
+            title="Enterprise Document"
             data={filteredDocs}
             columns={docColumns}
             onNew={() => { setEditingDoc(null); setView("form"); }}

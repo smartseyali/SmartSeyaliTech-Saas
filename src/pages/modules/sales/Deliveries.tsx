@@ -31,7 +31,7 @@ export default function Deliveries() {
     };
 
     const deliveryHeaderFields = [
-        { key: "customer_name", label: "Recipient Entity", required: true },
+        { key: "customer_name", label: "Recipient Name", required: true },
         { key: "reference_no", label: "Delivery Note Ref", required: true },
         { key: "date", label: "Shipment Date", type: "date" as const },
         { key: "tracking_no", label: "Logistics Tracking" },
@@ -93,7 +93,7 @@ export default function Deliveries() {
         return (
             <ERPEntryForm
                 title={editingDelivery ? "Modify Delivery Note" : "Initialize Dispatch"}
-                subtitle="Enterprise Inventory Logistics Protocol"
+                subtitle="Enterprise Inventory Logistics"
                 headerFields={deliveryHeaderFields}
                 onAbort={() => { setView("list"); setEditingDelivery(null); }}
                 onSave={handleSaveDelivery}
@@ -131,7 +131,7 @@ export default function Deliveries() {
         },
         { 
             key: "status", 
-            label: "Logistics State",
+            label: "Status",
             render: (d: any) => <StatusBadge status={d.status} />
         }
     ];

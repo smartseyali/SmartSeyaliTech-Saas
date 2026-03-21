@@ -15,7 +15,8 @@
     "supabase:link": "npx supabase link --project-ref twymipaywjufnluuzpug",
     "supabase:push": "npx supabase db push",
     "supabase:types": "npx supabase gen types typescript --project-id twymipaywjufnluuzpug --schema public > src/types/supabase.ts",
-    "provision": "node provision_server.cjs"
+    "provision": "node provision_server.cjs",
+    "watch:sql": "node sql_watcher.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

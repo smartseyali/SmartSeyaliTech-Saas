@@ -222,7 +222,7 @@ export default function ProductDetail() {
                         {/* Efficiency Tags */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6">
                             {[
-                                { icon: ShieldCheck, title: "Protocol Secure", sub: "Enterprise Compliance" },
+                                { icon: ShieldCheck, title: "Secure", sub: "Enterprise Compliance" },
                                 { icon: Truck, title: "Rapid Fulfilment", sub: "Priority Logistics" }
                             ].map((g, i) => (
                                 <div key={i} className="flex gap-6 items-center bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30">

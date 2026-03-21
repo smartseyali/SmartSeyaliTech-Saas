@@ -7,6 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useTenant } from "@/contexts/TenantContext";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
@@ -16,16 +17,19 @@ export default function PurchaseBills() {
     const [bills, setBills] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingBill, setEditingBill] = useState<any>(null);
+    const { activeCompany } = useTenant();
 
     useEffect(() => {
-        loadBills();
-    }, []);
+        if (activeCompany) loadBills();
+    }, [activeCompany]);
 
     const loadBills = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('purchase_bills')
             .select('*')
+            .eq('company_id', activeCompany.id)
             .order('created_at', { ascending: false });
 
         if (!error && data) setBills(data);
@@ -33,7 +37,7 @@ export default function PurchaseBills() {
     };
 
     const billHeaderFields = [
-        { key: "vendor_name", label: "Supplier Entity", required: true },
+        { key: "vendor_name", label: "Supplier", required: true },
         { key: "bill_no", label: "Vendor Invoice No", required: true },
         { key: "reference_no", label: "Internal Settlement ID", required: true },
         { key: "date", label: "Recording Date", type: "date" as const },
@@ -57,6 +61,7 @@ export default function PurchaseBills() {
 
             const payload = {
                 ...header,
+                company_id: activeCompany?.id,
                 subtotal: subtotal,
                 tax_amount: taxAmount,
                 grand_total: grandTotal
@@ -105,7 +110,7 @@ export default function PurchaseBills() {
         return (
             <ERPEntryForm
                 title={editingBill ? "Modify Liability Record" : "Generate Vendor Settlement"}
-                subtitle="Accounts Payable Optimization Protocol"
+                subtitle="Accounts Payable Optimization"
                 headerFields={billHeaderFields}
                 onAbort={() => { setView("list"); setEditingBill(null); }}
                 onSave={handleSaveBill}

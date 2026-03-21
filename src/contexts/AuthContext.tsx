@@ -23,9 +23,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
+        supabase.auth.getSession().then(({ data, error }) => {
+            if (error) {
+                console.error("Error fetching session:", error.message);
+            }
+            setSession(data?.session ?? null);
+            setUser(data?.session?.user ?? null);
+        })
+        .catch((err) => {
+            console.error("Auth configuration or network error:", err);
+            // In case of a hard crash (like a DNS failure for Supabase), clear state safely.
+            setSession(null);
+            setUser(null);
+        })
+        .finally(() => {
             setLoading(false);
         });
 

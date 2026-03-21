@@ -18,20 +18,20 @@ export default function BrandMaster() {
     const { data: brands, loading, fetchItems, createItem, updateItem } = useCrud("product_brands");
 
     const brandFields = [
-        { key: "name", label: "Registry Brand identity", required: true, ph: "Nike, Apple, Samsung..." },
-        { key: "logo_url", label: "Identity visual Node (URL)", ph: "https://cdn.brand.com/logo.png" },
-        { key: "website", label: "Discovery Hub (URL)", ph: "https://www.brand.com" },
+        { key: "name", label: "Brand", required: true, ph: "Nike, Apple, Samsung..." },
+        { key: "logo_url", label: "visual (URL)", ph: "https://cdn.brand.com/logo.png" },
+        { key: "website", label: "Discovery (URL)", ph: "https://www.brand.com" },
         { 
-            key: "is_active", label: "Registry status", type: "select" as const,
+            key: "is_active", label: "status", type: "select" as const,
             options: [
-                { label: "Active Authorized Entity", value: "true" },
-                { label: "Archived Identity Node", value: "false" }
+                { label: "Active Authorized", value: "true" },
+                { label: "Archived", value: "false" }
             ]
         }
     ];
 
     const subBrandFields = [
-        { key: "name", label: "Sub-Brand Registry identity", ph: "Air Max, iPhone, Galaxy..." }
+        { key: "name", label: "Sub-Brand", ph: "Air Max, iPhone, Galaxy..." }
     ];
 
     const handleSave = async (header: any, items: any[]) => {
@@ -48,7 +48,7 @@ export default function BrandMaster() {
     const brandColumns = [
         { 
             key: "identity", 
-            label: "Brand Entity / Logic",
+            label: "Brand",
             render: (b: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:border-slate-800 transition-all duration-500 overflow-hidden">
@@ -74,7 +74,7 @@ export default function BrandMaster() {
         },
         { 
             key: "discovery", 
-            label: "Global discovery Hub",
+            label: "Global discovery",
             render: (b: any) => (
                 <div className="flex items-center gap-2">
                     {b.website && (
@@ -87,7 +87,7 @@ export default function BrandMaster() {
         },
         { 
             key: "state", 
-            label: "Registry state",
+            label: "Status",
             render: (b: any) => <StatusBadge status={b.is_active !== false ? "active" : "disabled"} />
         }
     ];
@@ -97,7 +97,7 @@ export default function BrandMaster() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingBrand ? "Refine Brand Identity" : "Initialize Brand Entity"}
-                    subtitle="Universal Label & Sub-Identity Registry"
+                    subtitle="Universal Label & Sub"
                     headerFields={brandFields}
                     itemFields={subBrandFields}
                     onAbort={() => { setView("list"); setEditingBrand(null); }}
@@ -111,7 +111,7 @@ export default function BrandMaster() {
 
     return (
         <ERPListView
-            title="Global Brand Registry"
+            title="Global Brand"
             data={brands || []}
             columns={brandColumns}
             onNew={() => { setEditingBrand(null); setView("form"); }}

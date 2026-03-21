@@ -20,24 +20,24 @@ export default function CRMLeads() {
     const { data: leads, loading, fetchItems, createItem, updateItem } = useCrud("crm_leads");
 
     const leadFields = [
-        { key: "full_name", label: "Registry Lead Name", required: true, ph: "Prospective Client..." },
+        { key: "full_name", label: "Lead Name", required: true, ph: "Prospective Client..." },
         { 
             key: "status", label: "Pipeline Stage", type: "select" as const,
             options: [
                 { label: "New Inquiry", value: "new" },
-                { label: "Contacted Protocol", value: "contacted" },
+                { label: "Contacted", value: "contacted" },
                 { label: "Qualified Opportunity", value: "qualified" },
                 { label: "Closed / Won", value: "won" },
-                { label: "Lost Node", value: "lost" }
+                { label: "Lost", value: "lost" }
             ]
         },
-        { key: "email", label: "Communication Hub (Email)", ph: "lead@example.com" },
-        { key: "phone", label: "Contact Channel (Phone)", ph: "+91..." },
-        { key: "company_name", label: "Corporate Entity Identity", ph: "Lead Organization..." },
+        { key: "email", label: "Email Address", ph: "lead@example.com" },
+        { key: "phone", label: "Phone Number", ph: "+91..." },
+        { key: "company_name", label: "Corporate", ph: "Lead Organization..." },
         { 
-            key: "priority", label: "Lead Temperature", type: "select" as const,
+            key: "priority", label: "Lead", type: "select" as const,
             options: [
-                { label: "High Velocity (Hot)", value: "3" },
+                { label: "High (Hot)", value: "3" },
                 { label: "Medium Priority (Warm)", value: "2" },
                 { label: "Low Priority (Cold)", value: "1" }
             ]
@@ -57,7 +57,7 @@ export default function CRMLeads() {
     const leadColumns = [
         { 
             key: "name", 
-            label: "Lead Identity / Entity",
+            label: "Lead",
             render: (lead: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-sm relative">
@@ -75,7 +75,7 @@ export default function CRMLeads() {
         },
         { 
             key: "contact", 
-            label: "Communication Hub",
+            label: "Communication",
             render: (lead: any) => (
                 <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
@@ -89,7 +89,7 @@ export default function CRMLeads() {
         },
         { 
             key: "pipeline", 
-            label: "Pipeline Velocity",
+            label: "Pipeline",
             render: (lead: any) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-1.5">
@@ -109,7 +109,7 @@ export default function CRMLeads() {
         },
         { 
             key: "status", 
-            label: "Registry State",
+            label: "Data",
             render: (lead: any) => <StatusBadge status={lead.status || "new"} />
         }
     ];
@@ -123,7 +123,7 @@ export default function CRMLeads() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingLead ? "Refine Lead Strategy" : "Initialize Lead Protocol"}
-                    subtitle="Universal Customer acquisition Matrix"
+                    subtitle="Universal Customer acquisition"
                     headerFields={leadFields}
                     onAbort={() => { setView("list"); setEditingLead(null); }}
                     onSave={handleSave}
@@ -136,7 +136,7 @@ export default function CRMLeads() {
 
     return (
         <ERPListView
-            title="Revenue pipeline Registry"
+            title="Revenue pipeline"
             data={filteredLeads}
             columns={leadColumns}
             onNew={() => { setEditingLead(null); setView("form"); }}

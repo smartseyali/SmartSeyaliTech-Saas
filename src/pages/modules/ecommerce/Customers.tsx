@@ -61,7 +61,7 @@ export default function Customers() {
     const customerColumns = [
         { 
             key: "full_name", 
-            label: "Resource Identity",
+            label: "Resource",
             render: (row: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
@@ -76,7 +76,7 @@ export default function Customers() {
         },
         { 
             key: "email", 
-            label: "Digital contact Node",
+            label: "Digital contact",
             render: (row: any) => (
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -92,7 +92,7 @@ export default function Customers() {
         },
         { 
             key: "created_at", 
-            label: "Registry Date",
+            label: "Date",
             render: (row: any) => (
                 <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">
                     <Calendar className="w-3 h-3" />
@@ -102,7 +102,7 @@ export default function Customers() {
         },
         { 
             key: "status", 
-            label: "Validation state",
+            label: "Validation",
             render: (row: any) => <StatusBadge status={row.status} />
         }
     ];

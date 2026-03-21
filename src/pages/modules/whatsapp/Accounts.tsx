@@ -18,14 +18,14 @@ export default function WhatsAppAccounts() {
     const { data: accounts, loading, fetchItems, createItem, updateItem } = useCrud("whatsapp_accounts");
 
     const accountFields = [
-        { key: "display_name", label: "Registry Account identity", required: true, ph: "Primary Business API..." },
+        { key: "display_name", label: "Account Name", required: true, ph: "Primary Business API..." },
         { key: "phone_number_id", label: "Meta Phone Number ID", required: true, ph: "1092837465..." },
         { key: "waba_id", label: "WhatsApp Business Account ID", required: true, ph: "987654321..." },
         { key: "access_token", label: "Permanent access Token", ph: "EAAG...", type: "text" as const },
         { 
-            key: "status", label: "Verification state", type: "select" as const,
+            key: "status", label: "Verification", type: "select" as const,
             options: [
-                { label: "Protocol Initialize", value: "pending" },
+                { label: "Pending", value: "pending" },
                 { label: "Infrastructure Verified", value: "verified" },
                 { label: "Connection Interrupted", value: "disconnected" }
             ]
@@ -45,7 +45,7 @@ export default function WhatsAppAccounts() {
     const accountColumns = [
         { 
             key: "identity", 
-            label: "Business Account / identity",
+            label: "Business Account",
             render: (a: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-900 border border-emerald-800 flex items-center justify-center text-emerald-400 shadow-xl shadow-emerald-900/10 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
@@ -64,7 +64,7 @@ export default function WhatsAppAccounts() {
         },
         { 
             key: "infrastructure", 
-            label: "Meta Connectivity Node",
+            label: "Connection",
             render: (a: any) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2 text-slate-400">
@@ -80,7 +80,7 @@ export default function WhatsAppAccounts() {
         },
         { 
             key: "security", 
-            label: "Authorization Hub",
+            label: "Authorization",
             render: (a: any) => (
                 <div className="flex items-center gap-2">
                     <Key size={14} className="text-amber-500" />
@@ -90,7 +90,7 @@ export default function WhatsAppAccounts() {
         },
         { 
             key: "status", 
-            label: "Registry state",
+            label: "Status",
             render: (a: any) => <StatusBadge status={a.status || "verified"} />
         }
     ];
@@ -113,7 +113,7 @@ export default function WhatsAppAccounts() {
 
     return (
         <ERPListView
-            title="Meta Account Registry"
+            title="Meta Account"
             data={accounts || []}
             columns={accountColumns}
             onNew={() => { setEditingAccount(null); setView("form"); }}

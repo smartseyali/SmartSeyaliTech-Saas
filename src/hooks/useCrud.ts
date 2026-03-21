@@ -14,7 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
  * - onCreate: automatically injects company_id from activeCompany.
  * - onUpdate/Delete: also enforces company_id to prevent cross-tenant mutations.
  */
-export function useCrud(tableName: string, selectQuery: string = "*") {
+export function useCrud(tableName: string, selectQuery: string = "*", options: { isGlobal?: boolean } = {}) {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
@@ -30,7 +30,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
             .from(tableName)
             .select(selectQuery);
 
-        if (activeCompany) {
+        if (activeCompany && !options.isGlobal) {
             query = query.eq("company_id", activeCompany.id);
         }
 
@@ -56,7 +56,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
     }, [tableName, activeCompany]);
 
     const createItem = async (payload: any) => {
-        if (!activeCompany) throw new Error("No active workspace selected.");
+        if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
         // Clean payload to prevent joined relations from breaking the insert
         const cleanPayload = (data: any) => {
@@ -87,7 +87,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
         // Always stamp company_id and created_by on creation — the SaaS foundation
         const payloadWithCompany = cleanPayload({
             ...payload,
-            company_id: activeCompany.id,
+            ...(options.isGlobal ? {} : { company_id: activeCompany?.id }),
             user_id: authUser?.id // Optional: attribute to specific user
         });
 
@@ -107,7 +107,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
     };
 
     const updateItem = async (id: number | string, payload: any) => {
-        if (!activeCompany) throw new Error("No active workspace selected.");
+        if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
         // Clean payload to prevent joined relations from breaking the update
         const cleanPayload = (data: any) => {
@@ -141,7 +141,7 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
             .update(cleanedPayload)
             .eq("id", id);
 
-        if (activeCompany) {
+        if (activeCompany && !options.isGlobal) {
             query.eq("company_id", activeCompany.id);
         }
 
@@ -158,14 +158,14 @@ export function useCrud(tableName: string, selectQuery: string = "*") {
     };
 
     const deleteItem = async (id: number | string) => {
-        if (!activeCompany) throw new Error("No active workspace selected.");
+        if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
         const query = supabase
             .from(tableName)
             .delete()
             .eq("id", id);
 
-        if (activeCompany) {
+        if (activeCompany && !options.isGlobal) {
             query.eq("company_id", activeCompany.id);
         }
 

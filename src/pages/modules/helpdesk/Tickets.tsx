@@ -12,25 +12,25 @@ export default function Tickets() {
     const { data: tickets, loading, fetchItems, createItem, updateItem } = useCrud("helpdesk_tickets");
 
     const ticketHeaderFields = [
-        { key: "subject", label: "Registry Subject Identity", required: true, ph: "Payment Gateway Integration Error..." },
+        { key: "subject", label: "Subject", required: true, ph: "Payment Gateway Integration Error..." },
         { 
             key: "priority", label: "Operational Priority", type: "select" as const,
             options: [
                 { label: "Low Impact", value: "low" },
                 { label: "Medium Flow", value: "medium" },
                 { label: "High Criticality", value: "high" },
-                { label: "Critical Logic", value: "critical" }
+                { label: "Critical", value: "critical" }
             ]
         },
         { 
-            key: "status", label: "Support Node State", type: "select" as const,
+            key: "status", label: "Support", type: "select" as const,
             options: [
                 { label: "Open Discovery", value: "open" },
-                { label: "In-Progress Node", value: "in-progress" },
-                { label: "Closed Logic", value: "closed" }
+                { label: "In-Progress", value: "in-progress" },
+                { label: "Closed", value: "closed" }
             ]
         },
-        { key: "message", label: "Registry Narrative", ph: "Detailed inquiry description..." }
+        { key: "message", label: "Narrative", ph: "Detailed inquiry description..." }
     ];
 
     const handleSave = async (header: any) => {
@@ -46,7 +46,7 @@ export default function Tickets() {
     const ticketColumns = [
         { 
             key: "subject", 
-            label: "Ticket Entity identity",
+            label: "Ticket",
             render: (t: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center text-cyan-600 border border-cyan-100">
@@ -68,7 +68,7 @@ export default function Tickets() {
         },
         { 
             key: "priority", 
-            label: "Priority State",
+            label: "Priority",
             render: (t: any) => (
                 <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${
                     t.priority === 'critical' ? 'bg-rose-50 text-rose-600 border-rose-100' :
@@ -81,7 +81,7 @@ export default function Tickets() {
         },
         { 
             key: "status", 
-            label: "Ledger State",
+            label: "Ledger",
             render: (t: any) => <StatusBadge status={t.status || "Open"} />
         }
     ];
@@ -96,7 +96,7 @@ export default function Tickets() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingTicket ? "Refine Support Data" : "Initialize Ticket Matrix"}
-                    subtitle="Customer Service Protocol"
+                    subtitle="Customer Service"
                     headerFields={ticketHeaderFields}
                     onAbort={() => { setView("list"); setEditingTicket(null); }}
                     onSave={handleSave}
@@ -109,7 +109,7 @@ export default function Tickets() {
 
     return (
         <ERPListView
-            title="Support Registry"
+            title="Support"
             data={filteredTickets}
             columns={ticketColumns}
             onNew={() => { setEditingTicket(null); setView("form"); }}

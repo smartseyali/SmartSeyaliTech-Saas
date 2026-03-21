@@ -19,14 +19,14 @@ export default function Approvals() {
     const { data: approvals, loading, fetchItems, updateItem } = useCrud("approval_requests");
 
     const approvalFields = [
-        { key: "resource_type", label: "Registry Protocol Type", required: true, ph: "sales_orders, purchase_orders...", disabled: true },
-        { key: "resource_id", label: "Target Entity ID", required: true, ph: "UUID...", disabled: true },
+        { key: "resource_type", label: "Type", required: true, ph: "sales_orders, purchase_orders...", disabled: true },
+        { key: "resource_id", label: "Target ID", required: true, ph: "UUID...", disabled: true },
         { 
             key: "status", label: "Operational Decision", type: "select" as const,
             options: [
                 { label: "Pending Review", value: "pending" },
                 { label: "Authorized", value: "approved" },
-                { label: "Rejected Node", value: "rejected" }
+                { label: "Rejected", value: "rejected" }
             ]
         },
         { key: "remarks", label: "Decision Rationale", ph: "Outline why this was approved/rejected..." }
@@ -43,7 +43,7 @@ export default function Approvals() {
     const approvalColumns = [
         { 
             key: "resource", 
-            label: "Authorization Node / Protocol",
+            label: "Authorization",
             render: (app: any) => (
                 <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
@@ -67,7 +67,7 @@ export default function Approvals() {
         },
         { 
             key: "requester", 
-            label: "Induction Contact / Node",
+            label: "Contact",
             render: (app: any) => (
                 <div className="flex items-center gap-2">
                     <UserCheck className="w-4 h-4 text-slate-400" />
@@ -93,7 +93,7 @@ export default function Approvals() {
         },
         { 
             key: "status", 
-            label: "Decision State",
+            label: "Decision",
             render: (app: any) => <StatusBadge status={app.status || "pending"} />
         }
     ];
@@ -107,8 +107,8 @@ export default function Approvals() {
         return (
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
-                    title="Protocol Governance Decision"
-                    subtitle="Universal Workflow Approval Matrix"
+                    title="Governance Decision"
+                    subtitle="Universal Workflow Approval"
                     headerFields={approvalFields}
                     onAbort={() => { setView("list"); setEditingApproval(null); }}
                     onSave={handleSave}
@@ -121,7 +121,7 @@ export default function Approvals() {
 
     return (
         <ERPListView
-            title="Approval Matrix Registry"
+            title="Approval"
             data={filteredApprovals}
             columns={approvalColumns}
             onNew={null} // Usually created by system

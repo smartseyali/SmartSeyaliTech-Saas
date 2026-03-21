@@ -208,7 +208,7 @@ export default function Onboarding() {
         {
             image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80",
             title: "Scalable Infrastructure for Growth.",
-            subtitle: "Built on high-performance architecture that scales with your business.",
+            subtitle: "Built on high-performance that scales with your business.",
             stats: [
                 { val: "99.9%", label: "Uptime" },
                 { val: "Global", label: "Edge Network" }

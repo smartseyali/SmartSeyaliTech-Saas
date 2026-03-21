@@ -20,23 +20,23 @@ export default function WhatsAppTemplates() {
     const { data: templates, loading, fetchItems, createItem, updateItem } = useCrud("whatsapp_templates");
 
     const templateFields = [
-        { key: "name", label: "Registry Template identity", required: true, ph: "Summer_Promo_2026..." },
+        { key: "name", label: "Template Name", required: true, ph: "Summer_Promo_2026..." },
         { 
-            key: "category", label: "Protocol Category", type: "select" as const,
+            key: "category", label: "Category", type: "select" as const,
             options: [
-                { label: "Marketing Campaign Node", value: "MARKETING" },
-                { label: "Utility Transactional hub", value: "UTILITY" },
-                { label: "Authentication Protocol", value: "AUTHENTICATION" }
+                { label: "Marketing Campaign", value: "MARKETING" },
+                { label: "Utility Transactional", value: "UTILITY" },
+                { label: "Authentication", value: "AUTHENTICATION" }
             ]
         },
-        { key: "language", label: "Localization Protocol", ph: "en_US..." },
-        { key: "meta_template_id", label: "Meta Infrastructure Identity", ph: "h_1029348123..." },
+        { key: "language", label: "Language", ph: "en_US..." },
+        { key: "meta_template_id", label: "Meta Infrastructure", ph: "h_1029348123..." },
         { 
-            key: "status", label: "Authorization State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Pending Meta Approval", value: "pending" },
-                { label: "Protocol Authorized", value: "approved" },
-                { label: "Rejected Node", value: "rejected" }
+                { label: "Authorized", value: "approved" },
+                { label: "Rejected", value: "rejected" }
             ]
         }
     ];
@@ -54,7 +54,7 @@ export default function WhatsAppTemplates() {
     const templateColumns = [
         { 
             key: "identity", 
-            label: "Template Node / Logic",
+            label: "Template Name",
             render: (t: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 relative">
@@ -90,7 +90,7 @@ export default function WhatsAppTemplates() {
         },
         { 
             key: "meta_id", 
-            label: "Meta Entity ID",
+            label: "Meta ID",
             render: (t: any) => (
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono">
                     {t.meta_template_id || 'PENDING_IND...'}
@@ -99,7 +99,7 @@ export default function WhatsAppTemplates() {
         },
         { 
             key: "status", 
-            label: "Registry Status",
+            label: "Status",
             render: (t: any) => <StatusBadge status={t.status || "approved"} />
         }
     ];
@@ -109,7 +109,7 @@ export default function WhatsAppTemplates() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingTemplate ? "Refine Meta Protocol" : "Initialize Meta Template"}
-                    subtitle="WhatsApp Business Infrastructure Protocol"
+                    subtitle="WhatsApp Business Infrastructure"
                     headerFields={templateFields}
                     onAbort={() => { setView("list"); setEditingTemplate(null); }}
                     onSave={handleSave}
@@ -122,7 +122,7 @@ export default function WhatsAppTemplates() {
 
     return (
         <ERPListView
-            title="WhatsApp Protocol Registry"
+            title="WhatsApp"
             data={templates || []}
             columns={templateColumns}
             onNew={() => { setEditingTemplate(null); setView("form"); }}

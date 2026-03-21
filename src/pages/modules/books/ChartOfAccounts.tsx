@@ -19,7 +19,7 @@ export default function ChartOfAccounts() {
 
     const accountFields = [
         { key: "code", label: "Ledger Code (Identifier)", required: true, ph: "1000-001" },
-        { key: "name", label: "Registry Account Name", required: true, ph: "Retained Earnings..." },
+        { key: "name", label: "Account Name", required: true, ph: "Retained Earnings..." },
         { 
             key: "type", label: "Account Classification", type: "select" as const,
             options: [
@@ -27,17 +27,17 @@ export default function ChartOfAccounts() {
                 { label: "Liability Structure", value: "liability" },
                 { label: "Equity Base", value: "equity" },
                 { label: "Income Stream", value: "income" },
-                { label: "Expense Node", value: "expense" }
+                { label: "Expense", value: "expense" }
             ]
         },
         { 
-            key: "is_group", label: "Operational State", type: "select" as const,
+            key: "is_group", label: "Status", type: "select" as const,
             options: [
                 { label: "Group Ledger", value: "true" },
-                { label: "Transactable Node", value: "false" }
+                { label: "Transactable", value: "false" }
             ]
         },
-        { key: "description", label: "Registry Narrative", ph: "Detailed ledger description..." }
+        { key: "description", label: "Narrative", ph: "Detailed ledger description..." }
     ];
 
     const handleSave = async (header: any) => {
@@ -56,7 +56,7 @@ export default function ChartOfAccounts() {
     const accountColumns = [
         { 
             key: "code", 
-            label: "Ledger Identity",
+            label: "Ledger",
             render: (acc: any) => (
                 <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
@@ -75,7 +75,7 @@ export default function ChartOfAccounts() {
         },
         { 
             key: "type", 
-            label: "Node Classification",
+            label: "Classification",
             render: (acc: any) => (
                 <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${
@@ -90,7 +90,7 @@ export default function ChartOfAccounts() {
         },
         { 
             key: "balance", 
-            label: "Current Registry Balance",
+            label: "Current Balance",
             render: (acc: any) => (
                 <span className={`font-black tracking-tighter ${
                     (acc.balance || 0) < 0 ? "text-rose-600" : "text-emerald-600"
@@ -101,7 +101,7 @@ export default function ChartOfAccounts() {
         },
         { 
             key: "status", 
-            label: "Registry Status",
+            label: "Status",
             render: (acc: any) => <StatusBadge status={acc.is_group ? "Group" : "Active Ledger"} />
         }
     ];
@@ -116,7 +116,7 @@ export default function ChartOfAccounts() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingAccount ? "Refine Ledger Node" : "Initialize Account Identity"}
-                    subtitle="Universal Chart of Accounts Protocol"
+                    subtitle="Universal Chart of Accounts"
                     headerFields={accountFields}
                     onAbort={() => { setView("list"); setEditingAccount(null); }}
                     onSave={handleSave}
@@ -129,7 +129,7 @@ export default function ChartOfAccounts() {
 
     return (
         <ERPListView
-            title="Chart of Accounts Registry"
+            title="Chart of Accounts"
             data={filteredAccounts}
             columns={accountColumns}
             onNew={() => { setEditingAccount(null); setView("form"); }}

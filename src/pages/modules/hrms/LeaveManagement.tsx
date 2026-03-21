@@ -46,7 +46,7 @@ export default function LeaveManagement() {
     const leaveColumns = [
         { 
             key: "name", 
-            label: "Requestor Identity",
+            label: "Requestor",
             render: (lv: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight italic uppercase leading-none">{lv.name}</span>
@@ -56,7 +56,7 @@ export default function LeaveManagement() {
         },
         { 
             key: "type", 
-            label: "Time-Off Logic",
+            label: "Time-Off",
             render: (lv: any) => (
                 <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${lv.type.includes('Sick') ? "bg-rose-500" : "bg-emerald-500"}`} />

@@ -36,7 +36,7 @@ export const Categories = () => {
         },
         { 
             key: "is_active", 
-            label: "Ledger State", 
+            label: "Ledger", 
             render: (row: any) => (
                 <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${
                     row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
@@ -52,7 +52,7 @@ export const Categories = () => {
         { key: "name", label: `${t("Category")} Name`, required: true },
         { key: "description", label: "Description", type: "textarea" as const },
         {
-            key: "is_active", label: "Registry Status", type: "select" as const, 
+            key: "is_active", label: "Status", type: "select" as const, 
             options: [
                 { label: "Public Discovery", value: "true" },
                 { label: "Internal Draft", value: "false" }

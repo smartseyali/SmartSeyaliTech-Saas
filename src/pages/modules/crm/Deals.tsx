@@ -11,15 +11,15 @@ export default function Deals() {
     const { data: deals, loading, fetchItems, createItem, updateItem } = useCrud("crm_deals");
 
     const dealHeaderFields = [
-        { key: "title", label: "Deal Matrix Identity", required: true, ph: "Enterprise Plan Upgrade..." },
-        { key: "amount", label: "Projected Yield", type: "number" as const, ph: "0.00" },
+        { key: "title", label: "Deal Title", required: true, ph: "Enterprise Plan Upgrade..." },
+        { key: "amount", label: "Amount", type: "number" as const, ph: "0.00" },
         { 
             key: "stage", label: "Operational Stage", type: "select" as const,
             options: [
                 { label: "Discovery Phase", value: "discovery" },
-                { label: "Proposal Node", value: "proposal" },
+                { label: "Proposal", value: "proposal" },
                 { label: "Negotiation Link", value: "negotiation" },
-                { label: "Closing Logic", value: "closing" },
+                { label: "Closing", value: "closing" },
                 { label: "Won Asset", value: "won" },
                 { label: "Lost Link", value: "lost" }
             ]
@@ -51,7 +51,7 @@ export default function Deals() {
     const dealColumns = [
         { 
             key: "title", 
-            label: "Deal Entity",
+            label: "Deal",
             render: (deal: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight italic uppercase">{deal.title}</span>
@@ -67,7 +67,7 @@ export default function Deals() {
         },
         { 
             key: "stage", 
-            label: "Matrix Stage",
+            label: "Stage",
             render: (deal: any) => <StatusBadge status={deal.stage} />
         },
         { 
@@ -86,7 +86,7 @@ export default function Deals() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingDeal ? "Refine Negotiation Data" : "Initialize Deal Matrix"}
-                    subtitle="Revenue Forecasting Protocol"
+                    subtitle="Revenue Forecasting"
                     headerFields={dealHeaderFields}
                     onAbort={() => { setView("list"); setEditingDeal(null); }}
                     onSave={handleSave}

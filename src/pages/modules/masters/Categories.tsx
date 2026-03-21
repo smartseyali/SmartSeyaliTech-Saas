@@ -13,15 +13,15 @@ export default function Categories() {
     const { data: categories, loading, fetchItems, createItem, updateItem } = useCrud("ecom_categories");
 
     const categoryFields = [
-        { key: "name", label: "Registry Category identity", required: true, ph: "Electronics / Services..." },
+        { key: "name", label: "Category", required: true, ph: "Electronics / Services..." },
         { 
-            key: "is_active", label: "Operational State", type: "select" as const,
+            key: "is_active", label: "Status", type: "select" as const,
             options: [
-                { label: "Active Classification Node", value: "true" },
-                { label: "Archived Asset Node", value: "false" }
+                { label: "Active Classification", value: "true" },
+                { label: "Archived Asset", value: "false" }
             ]
         },
-        { key: "description", label: "Registry Narrative", ph: "Classification details..." }
+        { key: "description", label: "Narrative", ph: "Classification details..." }
     ];
 
     const handleSave = async (header: any) => {
@@ -38,7 +38,7 @@ export default function Categories() {
     const categoryColumns = [
         { 
             key: "name", 
-            label: "Node Entity Identity",
+            label: "Data",
             render: (c: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-900 group-hover:text-white transition-all duration-500">
@@ -53,7 +53,7 @@ export default function Categories() {
         },
         { 
             key: "is_active", 
-            label: "Operational State",
+            label: "Status",
             render: (c: any) => <StatusBadge status={c.is_active ? "Active" : "Archived"} />
         }
     ];
@@ -67,7 +67,7 @@ export default function Categories() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingCategory ? "Refine Classification node" : "Initialize Category Matrix"}
-                    subtitle="Global Registry Protocol"
+                    subtitle="Global"
                     headerFields={categoryFields}
                     onAbort={() => { setView("list"); setEditingCategory(null); }}
                     onSave={handleSave}
@@ -80,7 +80,7 @@ export default function Categories() {
 
     return (
         <ERPListView
-            title="Category Matrix Registry"
+            title="Category"
             data={filteredCategories}
             columns={categoryColumns}
             onNew={() => { setEditingCategory(null); setView("form"); }}

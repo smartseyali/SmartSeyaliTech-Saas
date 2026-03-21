@@ -20,22 +20,22 @@ export default function Jobs() {
     const { data: jobs, loading, fetchItems, createItem, updateItem } = useCrud("jobs");
 
     const jobFields = [
-        { key: "name", label: "Protocol Job Identity", required: true, ph: "Sync_Odoo_Partners_Cron" },
+        { key: "name", label: "Job", required: true, ph: "Sync_Odoo_Partners_Cron" },
         { 
-            key: "type", label: "Execution Logic Category", type: "select" as const,
+            key: "type", label: "Execution Category", type: "select" as const,
             options: [
-                { label: "Data Synchronous Node", value: "sync" },
+                { label: "Data Synchronous", value: "sync" },
                 { label: "Report Generation Cycle", value: "report" },
-                { label: "Internal Cleanup Protocol", value: "cleanup" },
+                { label: "Internal Cleanup", value: "cleanup" },
                 { label: "Email / SMS Broadcast", value: "broadcast" }
             ]
         },
         { key: "schedule", label: "Cron Frequency Pattern", ph: "0 0 * * * (Daily Midnight)" },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Active Scheduler", value: "active" },
-                { label: "Paused Node", value: "paused" },
+                { label: "Paused", value: "paused" },
                 { label: "Failed Execution", value: "failed" }
             ]
         },
@@ -55,7 +55,7 @@ export default function Jobs() {
     const jobColumns = [
         { 
             key: "name", 
-            label: "Automation Entity / Execution Node",
+            label: "Automation / Execution",
             render: (job: any) => (
                 <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:bg-slate-900 transition-all duration-500 ${
@@ -98,7 +98,7 @@ export default function Jobs() {
         },
         { 
             key: "governance", 
-            label: "Last Execution state",
+            label: "Last Execution",
             render: (job: any) => (
                 <div className="flex flex-col gap-0.5">
                     <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${
@@ -115,12 +115,12 @@ export default function Jobs() {
         },
         { 
             key: "status", 
-            label: "Registry Status",
+            label: "Status",
             render: (job: any) => <StatusBadge status={job.status || "active"} />
         },
         {
             key: "actions",
-            label: "Node Control",
+            label: "Control",
             render: () => (
                 <div className="flex items-center gap-2">
                     <button className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
@@ -143,7 +143,7 @@ export default function Jobs() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingJob ? "Refine Automation Identity" : "Initialize Job Protocol"}
-                    subtitle="Background Cycle Orchestration Protocol"
+                    subtitle="Background Cycle Orchestration"
                     headerFields={jobFields}
                     onAbort={() => { setView("list"); setEditingJob(null); }}
                     onSave={handleSave}
@@ -156,7 +156,7 @@ export default function Jobs() {
 
     return (
         <ERPListView
-            title="Automation Cycle Registry"
+            title="Automation Cycle"
             data={filteredJobs}
             columns={jobColumns}
             onNew={() => { setEditingJob(null); setView("form"); }}

@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import {
     Plus,
-    Edit
+    Edit,
+    ArrowRight
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useTenant } from "@/contexts/TenantContext";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
@@ -14,16 +17,20 @@ export default function Quotations() {
     const [quotes, setQuotes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingQuote, setEditingQuote] = useState<any>(null);
+    const { activeCompany } = useTenant();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        loadQuotations();
-    }, []);
+        if (activeCompany) loadQuotations();
+    }, [activeCompany]);
 
     const loadQuotations = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('sales_quotations')
             .select('*')
+            .eq('company_id', activeCompany.id)
             .order('created_at', { ascending: false });
 
         if (!error && data) setQuotes(data);
@@ -54,6 +61,7 @@ export default function Quotations() {
 
             const payload = {
                 ...header,
+                company_id: activeCompany?.id,
                 total_qty: totalQty,
                 subtotal: subtotal,
                 tax_amount: taxAmount,
@@ -99,6 +107,15 @@ export default function Quotations() {
 
     const fmt = (n: number) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
+    const handleConvertToSO = () => {
+        navigate("/apps/sales/orders", { 
+            state: { 
+                sourceRecord: editingQuote, 
+                conversionType: 'quotation_to_so' 
+            } 
+        });
+    };
+
     if (view === "form") {
         return (
             <ERPEntryForm
@@ -109,6 +126,17 @@ export default function Quotations() {
                 onSave={handleSaveQuote}
                 initialData={editingQuote}
                 initialItems={editingQuote ? [] : undefined}
+                customActions={
+                    editingQuote && (
+                        <button
+                            onClick={handleConvertToSO}
+                            className="flex items-center h-9 px-4 text-xs font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl transition-all shadow-sm border border-indigo-100"
+                        >
+                            <ArrowRight className="w-3.5 h-3.5 mr-2" />
+                            Create Sales Order
+                        </button>
+                    )
+                }
             />
         );
     }
@@ -148,7 +176,7 @@ export default function Quotations() {
 
     return (
         <ERPListView
-            title="Quotation Registry"
+            title="Quotation"
             data={filteredQuotes}
             columns={quoteColumns}
             onNew={() => { setEditingQuote(null); setView("form"); }}

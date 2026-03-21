@@ -15,7 +15,7 @@ export default function Customers() {
     const customerColumns = [
         { 
             key: "name", 
-            label: "Entity Identity",
+            label: "Entity Name",
             render: (c: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
@@ -25,7 +25,7 @@ export default function Customers() {
         },
         { 
             key: "location", 
-            label: "Geographic Node",
+            label: "Location",
             render: (c: any) => (
                 <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
@@ -41,7 +41,7 @@ export default function Customers() {
         },
         { 
             key: "status", 
-            label: "Relationship state",
+            label: "Relationship",
             render: (c: any) => <StatusBadge status={c.status} />
         }
     ];

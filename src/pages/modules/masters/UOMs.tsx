@@ -14,10 +14,10 @@ export default function UOMMaster() {
     const [searchTerm, setSearchTerm] = useState("");
     const [editingUOM, setEditingUOM] = useState<any>(null);
     
-    const { data: uoms, loading, fetchItems, createItem, updateItem } = useCrud("uoms");
+    const { data: uoms, loading, fetchItems, createItem, updateItem } = useCrud("uoms", "*", { isGlobal: true });
 
     const uomFields = [
-        { key: "name", label: "Protocol identity", required: true, ph: "Killogram (Kg), Liters (L)..." },
+        { key: "name", label: "Data", required: true, ph: "Killogram (Kg), Liters (L)..." },
         { 
             key: "category_id", label: "Universal Dimension category", type: "select" as const, 
             options: [
@@ -28,14 +28,14 @@ export default function UOMMaster() {
             ]
         },
         { 
-            key: "type", label: "Scale identity", type: "select" as const,
+            key: "type", label: "Scale", type: "select" as const,
             options: [
-                { label: "Reference Entity (Standard)", value: "reference" },
+                { label: "Reference (Standard)", value: "reference" },
                 { label: "Bigger Magnitude", value: "bigger" },
                 { label: "Smaller Magnitude", value: "smaller" }
             ]
         },
-        { key: "ratio", label: "Conversion Ratio Node", type: "number" as const, ph: "1.0000" }
+        { key: "ratio", label: "Conversion Ratio", type: "number" as const, ph: "1.0000" }
     ];
 
     const handleSave = async (header: any) => {
@@ -51,7 +51,7 @@ export default function UOMMaster() {
     const uomColumns = [
         { 
             key: "identity", 
-            label: "UOM Entity / Logic",
+            label: "UOM",
             render: (u: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -73,7 +73,7 @@ export default function UOMMaster() {
         },
         { 
             key: "conversion", 
-            label: "Equivalence Matrix",
+            label: "Equivalence",
             render: (u: any) => (
                 <div className="flex flex-col">
                     <span className="text-[13px] font-black text-slate-900 tracking-tighter">
@@ -85,7 +85,7 @@ export default function UOMMaster() {
         },
         { 
             key: "state", 
-            label: "Registry state",
+            label: "Status",
             render: (u: any) => <StatusBadge status={u.is_active !== false ? "active" : "disabled"} />
         }
     ];
@@ -95,7 +95,7 @@ export default function UOMMaster() {
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
                     title={editingUOM ? "Refine UOM Identity" : "Initialize Dimension protocol"}
-                    subtitle="Universal Measurement Infrastructure Registry"
+                    subtitle="Universal Measurement Infrastructure"
                     headerFields={uomFields}
                     onAbort={() => { setView("list"); setEditingUOM(null); }}
                     onSave={handleSave}
@@ -108,7 +108,7 @@ export default function UOMMaster() {
 
     return (
         <ERPListView
-            title="UOM Protocol Registry"
+            title="UOM"
             data={uoms || []}
             columns={uomColumns}
             onNew={() => { setEditingUOM(null); setView("form"); }}

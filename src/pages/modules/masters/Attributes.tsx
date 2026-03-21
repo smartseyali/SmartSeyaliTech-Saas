@@ -18,19 +18,19 @@ export default function AttributeMaster() {
     const { data: attributes, loading, fetchItems, createItem, updateItem } = useCrud("product_attributes");
 
     const attrFields = [
-        { key: "name", label: "Registry Attribute identity", required: true, ph: "Color, Size, Material..." },
+        { key: "name", label: "Attribute", required: true, ph: "Color, Size, Material..." },
         { 
-            key: "display_type", label: "Visualization Protocol", type: "select" as const,
+            key: "display_type", label: "Visualization", type: "select" as const,
             options: [
-                { label: "Standard textual Hub", value: "text" },
+                { label: "Standard textual", value: "text" },
                 { label: "High-Fidelity Swatches", value: "swatches" },
-                { label: "Selection Dropdown node", value: "dropdown" }
+                { label: "Selection Dropdown", value: "dropdown" }
             ]
         }
     ];
 
     const attrValueFields = [
-        { key: "value", label: "Node Value Identity", ph: "Red / XL / Silk..." },
+        { key: "value", label: "Value", ph: "Red / XL / Silk..." },
         { key: "meta_data", label: "Logical Meta (JSON)", ph: '{"hex": "#FF0000"}' }
     ];
 
@@ -48,7 +48,7 @@ export default function AttributeMaster() {
     const attrColumns = [
         { 
             key: "identity", 
-            label: "Attribute Entity / Logic",
+            label: "Attribute",
             render: (a: any) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
@@ -84,7 +84,7 @@ export default function AttributeMaster() {
         },
         { 
             key: "state", 
-            label: "Registry state",
+            label: "Status",
             render: () => <StatusBadge status="active" />
         }
     ];
@@ -108,7 +108,7 @@ export default function AttributeMaster() {
 
     return (
         <ERPListView
-            title="Product Attribute Registry"
+            title="Product Attribute"
             data={attributes || []}
             columns={attrColumns}
             onNew={() => { setEditingAttr(null); setView("form"); }}

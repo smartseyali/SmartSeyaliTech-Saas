@@ -275,7 +275,7 @@ export default function Checkout() {
 
                     <div className="flex items-center gap-6">
                         {[{ id: "address", label: "Allocation Signal", icon: MapPin },
-                        { id: "payment", label: "Financial Node", icon: CreditCard }].map((s, i) => (
+                        { id: "payment", label: "Financial", icon: CreditCard }].map((s, i) => (
                             <div key={s.id} className="flex items-center gap-6">
                                 {i > 0 && <div className={cn("h-px w-8 md:w-16", step === "payment" ? "bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" : "bg-slate-100")} />}
                                 <button

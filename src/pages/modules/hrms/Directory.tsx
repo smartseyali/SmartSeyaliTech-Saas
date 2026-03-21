@@ -11,12 +11,12 @@ export default function Directory() {
     const { data: employees, loading, fetchItems, createItem, updateItem } = useCrud("hrms_employees");
 
     const employeeHeaderFields = [
-        { key: "employee_code", label: "Registry Code", required: true, ph: "EMP-001" },
+        { key: "employee_code", label: "Code", required: true, ph: "EMP-001" },
         { key: "full_name", label: "Legal Resource Name", required: true, ph: "John Doe" },
-        { key: "email", label: "Corporate Email Hub", required: true, ph: "john@company.com" },
+        { key: "email", label: "Corporate Email", required: true, ph: "john@company.com" },
         { key: "designation", label: "Structural Designation", ph: "Senior Engineer" },
         { 
-            key: "status", label: "Operational State", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
                 { label: "Active Operational", value: "active" },
                 { label: "On Temporary Leave", value: "on-leave" },
@@ -39,7 +39,7 @@ export default function Directory() {
     const employeeColumns = [
         { 
             key: "full_name", 
-            label: "Employee Matrix",
+            label: "Employee",
             render: (emp: any) => (
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded bg-slate-900 flex items-center justify-center text-white font-bold text-xs">
