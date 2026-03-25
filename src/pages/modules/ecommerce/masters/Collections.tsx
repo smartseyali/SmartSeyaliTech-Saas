@@ -28,7 +28,7 @@ export const Collections = () => {
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1 truncate max-w-[200px]">{row.slug || "NO_SLUG"}</span>
+                    <span className="text-xs text-gray-400 font-bold tracking-widest mt-1 truncate max-w-[200px]">{row.slug || "NO_SLUG"}</span>
                 </div>
             )
         },
@@ -36,8 +36,8 @@ export const Collections = () => {
             key: "is_active", 
             label: "Status", 
             render: (row: any) => (
-                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-widest border ${
-                    row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
+                <div className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold tracking-widest border ${
+                    row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-500 border-slate-100"
                 }`}>
                     {row.is_active ? 'Published' : 'Draft'}
                 </div>

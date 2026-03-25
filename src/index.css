@@ -22,7 +22,7 @@ body {
 }
 
 .content-zoom {
-  zoom: 0.8;
+  zoom: 1.0;
   display: block;
   height: auto;
   min-height: min-content;

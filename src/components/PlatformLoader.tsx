@@ -57,7 +57,7 @@ export const PlatformLoader = ({
                 </div>
 
                 <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ">
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 ">
                         {message}
                     </p>
                     {subtext && (
@@ -72,17 +72,17 @@ export const PlatformLoader = ({
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-8 opacity-20 grayscale hover:opacity-100 transition-all duration-700">
                 <div className="flex flex-col items-center gap-1">
                     <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Tier</span>
-                    <span className="text-[10px] font-bold uppercase text-slate-900 ">L1-Security</span>
+                    <span className="text-xs font-bold uppercase text-slate-900 ">L1-Security</span>
                 </div>
                 <div className="w-px h-6 bg-slate-200" />
                 <div className="flex flex-col items-center gap-1">
                     <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Node</span>
-                    <span className="text-[10px] font-bold uppercase text-slate-900 ">Universal-Core</span>
+                    <span className="text-xs font-bold uppercase text-slate-900 ">Universal-Core</span>
                 </div>
                 <div className="w-px h-6 bg-slate-200" />
                 <div className="flex flex-col items-center gap-1">
                     <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Async</span>
-                    <span className="text-[10px] font-bold uppercase text-slate-900 ">Enabled</span>
+                    <span className="text-xs font-bold uppercase text-slate-900 ">Enabled</span>
                 </div>
             </div>
         </div>

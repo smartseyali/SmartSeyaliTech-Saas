@@ -31,140 +31,124 @@ export default function POSDashboard() {
 
     const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
+    if (!activeCompany) return null;
+
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100 relative">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <Monitor className="w-6 h-6 text-indigo-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-400">Retail Operations Control</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase tracking-wider">POS Terminal Hub</h1>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase leading-none">Retail Operations Control • {activeCompany?.name}</p>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 ">POS Terminal Hub</h1>
-                    <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                        Online Status: <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-bold border border-emerald-100"><span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> SYNCED</span> • <span className="text-indigo-600 font-bold">{activeCompany?.name}</span>
-                    </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
-                        <Printer className="w-5 h-5" />
+                    <button className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-all shadow-sm">
+                        <Printer className="w-4 h-4" />
                     </button>
                     <Button
                         onClick={() => navigate('/apps/pos/terminal')}
-                        className="h-12 px-8 rounded-2xl bg-indigo-600 hover:bg-black text-white font-bold shadow-xl shadow-indigo-600/20 transition-all gap-3 border-0"
+                        className="h-11 px-8 rounded-2xl bg-indigo-600 hover:bg-slate-900 text-white font-bold text-xs tracking-widest uppercase transition-all shadow-xl shadow-indigo-600/20 gap-3 border-0"
                     >
-                        <Zap className="w-5 h-5" /> Start New Session
+                        <Zap className="w-4 h-4" /> Start Session
                     </Button>
                 </div>
             </div>
 
-            {/* Premium KPI Cards */}
+            {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
                     { label: "Today's Revenue", value: fmt(stats.todaySales), sub: "Gross sales (24h)", icon: TrendingUp, color: "bg-indigo-600" },
-                    { label: "Transaction Count", value: stats.transactions, sub: "Unique bills generated", icon: ShoppingBag, color: "bg-slate-900" },
-                    { label: "Active Terminals", value: stats.activeTerminals, sub: "Connected devices", icon: Monitor, color: "bg-indigo-600" },
-                    { label: "Average Ticket", value: fmt(stats.avgTicket), sub: "Per customer spend", icon: BarChart3, color: "bg-slate-900" },
+                    { label: "Transactions", value: stats.transactions, sub: "Unique bills generated", icon: ShoppingBag, color: "bg-slate-900" },
+                    { label: "Active Nodes", value: stats.activeTerminals, sub: "Connected devices", icon: Monitor, color: "bg-indigo-600" },
+                    { label: "Average Ticket", value: fmt(stats.avgTicket), sub: "Basket yield", icon: BarChart3, color: "bg-slate-900" },
                 ].map(k => (
-                    <div key={k.label} className="group bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-2xl hover:border-indigo-200 transition-all duration-500 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-                            <k.icon className="w-24 h-24 -rotate-12 translate-x-8 translate-y-4" />
-                        </div>
-                        <div className="flex items-center justify-between mb-10 relative z-10">
-                            <div className={cn("p-4 rounded-2xl shadow-lg shadow-indigo-600/5 text-white transition-transform group-hover:scale-110", k.color)}>
-                                <k.icon className="w-6 h-6" />
+                    <div key={k.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all h-64">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white", k.color)}>
+                                <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold  tracking-widest text-slate-300">{k.label}</span>
+                            <span className="text-xs font-bold tracking-[0.1em] text-slate-500 uppercase leading-none">{k.label}</span>
                         </div>
-                        <div className="relative z-10">
-                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2 truncate">{k.value}</p>
-                            <p className="text-[10px] font-bold text-slate-400  tracking-widest">{k.sub}</p>
+                        <div>
+                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2 truncate leading-none">{k.value}</p>
+                            <p className="text-xs font-bold text-slate-500 tracking-widest uppercase mt-4 leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Transaction Ledger */}
-                <div className="lg:col-span-8 bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-500">
-                    <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="p-4 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-                                <Receipt className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold tracking-tight text-slate-900 leading-none">Live Terminal Feed</h2>
-                                <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-2">Real-time checkout stream</p>
-                            </div>
-                        </div>
-                        <Button variant="ghost" className="h-11 px-6 rounded-xl text-[10px] font-bold  tracking-widest text-indigo-600 hover:bg-indigo-50 transition-all">Audit History <ArrowRight className="w-4 h-4 ml-2" /></Button>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                    <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-white relative">
+                         <h2 className="text-xl font-bold tracking-tight text-slate-900 uppercase tracking-wider leading-none">Terminal Feed</h2>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-xs font-bold tracking-widest text-indigo-600 uppercase hover:bg-indigo-50 transition-all">Audit History</Button>
                     </div>
 
-                    <div className="p-10">
-                        <div className="space-y-6">
-                            {recentSells.map(sell => (
-                                <div key={sell.id} className="flex items-center justify-between p-6 rounded-3xl border border-slate-50 hover:border-indigo-100 hover:bg-slate-50/50 transition-all group">
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                                            {sell.type.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{sell.id}</p>
-                                            <div className="flex items-center gap-3 mt-1 text-[10px] font-bold text-slate-400  tracking-widest">
-                                                <span>{sell.items} items</span>
-                                                <span>•</span>
-                                                <span className="text-emerald-600">{sell.type} payment</span>
-                                            </div>
-                                        </div>
+                    <div className="p-10 space-y-6">
+                        {recentSells.map(sell => (
+                            <div key={sell.id} className="flex items-center justify-between p-7 rounded-[2.5rem] border border-slate-50 hover:border-indigo-100 hover:bg-slate-50/50 transition-all group">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest shadow-lg">
+                                        {sell.type.charAt(0)}
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-xl font-bold text-slate-900 tracking-tight">{fmt(sell.amount)}</p>
-                                        <p className="text-[10px] font-bold text-slate-400  tracking-widest">{sell.time}</p>
+                                    <div>
+                                        <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors uppercase text-[12px] tracking-tight leading-none">{sell.id}</p>
+                                        <div className="flex items-center gap-3 mt-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                            <span>{sell.items} Items</span>
+                                            <span className="text-slate-200">•</span>
+                                            <span className="text-emerald-600">{sell.type}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="text-right">
+                                    <p className="text-2xl font-bold text-slate-900 tracking-tighter leading-none mb-1">{fmt(sell.amount)}</p>
+                                    <p className="text-xs font-bold text-slate-300 uppercase tracking-widest leading-none">{sell.time}</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Counter Stats & Quick Actions */}
                 <div className="lg:col-span-4 space-y-8">
-                    <div className="bg-slate-900 rounded-[40px] p-10 shadow-2xl relative overflow-hidden group">
+                    <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-8 opacity-10">
-                            <Zap className="w-24 h-24 text-indigo-500" />
+                            <Zap className="w-32 h-32 text-indigo-500 -rotate-12 translate-x-12" />
                         </div>
-                        <h2 className="text-xl font-bold text-white  tracking-tighter mb-8 ">Terminal Summary</h2>
-                        <div className="space-y-6">
+                        <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-6">Settlements</h2>
+                        <div className="space-y-6 relative z-10 p-2">
                             {[
-                                { label: "Cash on Hand", value: "₹12,450", color: "text-emerald-400" },
-                                { label: "Card Settlements", value: "₹28,600", color: "text-indigo-400" },
+                                { label: "Cash Control", value: "₹12,450", color: "text-emerald-400" },
+                                { label: "Card Matrix", value: "₹28,600", color: "text-indigo-400" },
                                 { label: "Digital UPI", value: "₹4,230", color: "text-amber-400" },
                             ].map(item => (
-                                <div key={item.label} className="flex justify-between items-center py-4 border-b border-white/5 last:border-0">
-                                    <span className="text-[10px] font-bold text-slate-500  tracking-widest">{item.label}</span>
-                                    <span className={cn("text-lg font-bold tracking-tight", item.color)}>{item.value}</span>
+                                <div key={item.label} className="flex justify-between items-center py-5 border-b border-white/5 last:border-0">
+                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">{item.label}</span>
+                                    <span className={cn("text-xl font-bold tracking-tighter leading-none", item.color)}>{item.value}</span>
                                 </div>
                             ))}
                         </div>
-                        <Button className="w-full mt-10 h-14 rounded-2xl bg-white text-slate-900 hover:bg-slate-200 font-bold text-[10px]  tracking-widest transition-all shadow-xl shadow-white/5 border-0">
-                            Generate Day-End Report
+                        <Button className="w-full mt-10 h-12 rounded-2xl bg-white text-slate-900 hover:bg-slate-200 font-bold text-xs tracking-widest uppercase transition-all shadow-xl shadow-white/5 border-0">
+                            Day-End Report
                         </Button>
                     </div>
 
-                    <div className="bg-white rounded-[40px] border border-slate-100 p-10 shadow-sm hover:shadow-2xl transition-all duration-500">
-                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 underline decoration-amber-500 decoration-2 underline-offset-4  ">Staff Vitals</h2>
-                        <div className="space-y-6">
+                    <div className="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm flex flex-col">
+                        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 tracking-wider uppercase w-full text-center underline decoration-indigo-600 decoration-2 underline-offset-8 leading-none">Efficiency</h2>
+                        <div className="space-y-6 w-full">
                             {[
                                 { name: "John Doe", sales: "₹15,400", level: 85 },
                                 { name: "Sarah Smith", sales: "₹12,200", level: 64 },
                             ].map(staff => (
                                 <div key={staff.name} className="space-y-3">
-                                    <div className="flex justify-between text-[11px] font-bold">
-                                        <span className="text-slate-900  tracking-widest">{staff.name}</span>
+                                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                                        <span className="text-slate-900">{staff.name}</span>
                                         <span className="text-indigo-600 font-mono tracking-tighter">{staff.sales}</span>
                                     </div>
-                                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${staff.level}%` }} />
+                                    <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
+                                        <div className="h-full bg-indigo-600 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(79,70,229,0.3)]" style={{ width: `${staff.level}%` }} />
                                     </div>
                                 </div>
                             ))}

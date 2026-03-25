@@ -19,7 +19,7 @@ export default function Customers() {
             render: (c: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">POC: {c.contact}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">POC: {c.contact}</span>
                 </div>
             )
         },
@@ -29,7 +29,7 @@ export default function Customers() {
             render: (c: any) => (
                 <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-[11px] font-bold text-gray-600  tracking-widest">{c.location}</span>
+                    <span className="text-[13px] font-bold text-gray-600  tracking-widest">{c.location}</span>
                 </div>
             )
         },
@@ -47,9 +47,9 @@ export default function Customers() {
     ];
 
     const filteredCustomers = customers.filter(c => 
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.location.toLowerCase().includes(searchTerm.toLowerCase())
+        (c.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.contact || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.location || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (

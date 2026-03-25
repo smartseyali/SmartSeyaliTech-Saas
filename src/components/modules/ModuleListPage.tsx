@@ -74,7 +74,7 @@ export function ModuleListPage({
       {!hideHeader && (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Management</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Management</p>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
             <p className="text-sm text-slate-500 mt-1">{subtitle}</p>
           </div>
@@ -100,7 +100,7 @@ export function ModuleListPage({
       {/* Search Bar */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
             placeholder={`Search ${title.toLowerCase()}...`}
@@ -125,7 +125,7 @@ export function ModuleListPage({
                   <th
                     key={col.key}
                     className={cn(
-                      "px-5 py-3.5 text-[10px] font-bold uppercase tracking-widest text-slate-400",
+                      "px-5 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-500",
                       col.align === "right" ? "text-right" : "text-left"
                     )}
                   >
@@ -141,7 +141,7 @@ export function ModuleListPage({
                   <td colSpan={columns.length + 1} className="px-5 py-16">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <RefreshCw className="w-6 h-6 text-blue-500 animate-spin opacity-30" />
-                      <p className="text-xs font-medium text-slate-400">Loading...</p>
+                      <p className="text-xs font-medium text-slate-500">Loading...</p>
                     </div>
                   </td>
                 </tr>
@@ -153,7 +153,7 @@ export function ModuleListPage({
                         <Search className="w-6 h-6 text-slate-300" />
                       </div>
                       <p className="text-sm font-semibold text-slate-700">No {title.toLowerCase()} found</p>
-                      <p className="text-xs font-medium text-slate-400">Try adjusting your search or add a new entry.</p>
+                      <p className="text-xs font-medium text-slate-500">Try adjusting your search or add a new entry.</p>
                     </div>
                   </td>
                 </tr>
@@ -175,8 +175,8 @@ export function ModuleListPage({
                         {col.key === statusKey ? (
                           <span
                             className={cn(
-                              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border",
-                              statusColors[String(row[col.key]).toLowerCase()] || "bg-slate-50 text-slate-400 border-slate-100"
+                              "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest border",
+                              statusColors[String(row[col.key]).toLowerCase()] || "bg-slate-50 text-slate-500 border-slate-100"
                             )}
                           >
                             <div className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
@@ -199,7 +199,7 @@ export function ModuleListPage({
                             </Button>
                           )}
                           {onDelete && (
-                            <Button variant="ghost" size="sm" onClick={() => onDelete(row)} className="h-8 px-3 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-all">
+                            <Button variant="ghost" size="sm" onClick={() => onDelete(row)} className="h-8 px-3 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-all">
                               Delete
                             </Button>
                           )}
@@ -222,13 +222,13 @@ export function ModuleListPage({
             Showing <span className="font-bold text-slate-800">{filtered.length}</span> of {data.length} {title.toLowerCase()}
           </p>
           <div className="flex items-center gap-1.5">
-            <button className="h-9 w-9 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 transition-all">
+            <button className="h-9 w-9 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-all">
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button className="h-9 w-9 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-blue-600/20">
               1
             </button>
-            <button className="h-9 w-9 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 transition-all">
+            <button className="h-9 w-9 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-all">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

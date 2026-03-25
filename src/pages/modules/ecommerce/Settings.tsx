@@ -63,7 +63,7 @@ export default function Settings() {
     if (loading) return (
         <div className="p-8 flex items-center justify-center h-[400px] gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-blue-600 opacity-40" />
-            <span className="text-sm text-slate-400">Loading settings...</span>
+            <span className="text-sm text-slate-500">Loading settings...</span>
         </div>
     );
 
@@ -72,7 +72,7 @@ export default function Settings() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold  tracking-widest text-slate-400 mb-1">System Configuration</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-500 mb-1">System Configuration</p>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Store Settings</h1>
                     <p className="text-sm text-slate-500 mt-1">Manage your storefront configuration and preferences.</p>
                 </div>

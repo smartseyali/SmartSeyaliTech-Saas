@@ -46,8 +46,8 @@ export default function LeaveManagement() {
     };
 
     const filteredLeaves = leaves.filter(l =>
-        l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.type.toLowerCase().includes(searchTerm.toLowerCase())
+        (l.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (l.type || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const leaveColumns = [
@@ -57,7 +57,7 @@ export default function LeaveManagement() {
             render: (lv: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight leading-none">{lv.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1">{lv.reason}</span>
+                    <span className="text-xs text-gray-400 font-bold tracking-widest mt-1">{lv.reason}</span>
                 </div>
             )
         },
@@ -77,7 +77,7 @@ export default function LeaveManagement() {
             render: (lv: any) => (
                 <div className="flex flex-col">
                     <span className="text-sm font-bold text-gray-900 leading-none">{lv.duration}</span>
-                    <span className="text-[10px] text-gray-400 font-bold tracking-widest leading-none mt-1">Starts {lv.start}</span>
+                    <span className="text-xs text-gray-400 font-bold tracking-widest leading-none mt-1">Starts {lv.start}</span>
                 </div>
             )
         },

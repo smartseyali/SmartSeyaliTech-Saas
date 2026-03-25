@@ -95,7 +95,7 @@ export default function EcomOrderDetail() {
     if (loading) return (
         <div className="flex flex-col items-center justify-center p-20 gap-4">
             <RefreshCw className="w-10 h-10 text-blue-600 animate-spin opacity-40" />
-            <p className="text-xs font-bold  tracking-widest text-slate-400">Loading order details...</p>
+            <p className="text-xs font-bold  tracking-widest text-slate-500">Loading order details...</p>
         </div>
     );
     if (!order) return (
@@ -133,7 +133,7 @@ export default function EcomOrderDetail() {
                         <div className="flex items-center gap-6 flex-wrap">
                             <h1 className="text-4xl font-bold tracking-tighter text-slate-950   leading-none">{order.order_number}</h1>
                             <div className={cn(
-                                "px-5 py-2 rounded-full text-[10px] font-bold  tracking-widest border shadow-sm",
+                                "px-5 py-2 rounded-full text-xs font-bold  tracking-widest border shadow-sm",
                                 isCancelled ? "bg-rose-50 text-rose-600 border-rose-100" :
                                     order.status === "delivered" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                         "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-600/20"
@@ -141,7 +141,7 @@ export default function EcomOrderDetail() {
                                 {STAGE_LABELS[order.status] || order.status}
                             </div>
                             <div className={cn(
-                                "px-5 py-2 rounded-full text-[10px] font-bold  tracking-widest border shadow-sm",
+                                "px-5 py-2 rounded-full text-xs font-bold  tracking-widest border shadow-sm",
                                 order.payment_status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                     "bg-amber-50 text-amber-600 border-amber-100"
                             )}>
@@ -156,7 +156,7 @@ export default function EcomOrderDetail() {
                         <Printer className="w-5 h-5" /> Print Invoice
                     </Button>
                     {nextStatus && !isCancelled && (
-                        <Button className="h-14 px-10 rounded-2xl bg-blue-600 hover:bg-black text-white font-bold  tracking-widest text-[10px] shadow-2xl shadow-blue-600/20 transition-all active:scale-95" onClick={advanceStatus} disabled={updating}>
+                        <Button className="h-14 px-10 rounded-2xl bg-blue-600 hover:bg-black text-white font-bold  tracking-widest text-xs shadow-2xl shadow-blue-600/20 transition-all active:scale-95" onClick={advanceStatus} disabled={updating}>
                             {updating ? "Updating..." : `Mark as ${STAGE_LABELS[nextStatus]}`}
                         </Button>
                     )}
@@ -196,7 +196,7 @@ export default function EcomOrderDetail() {
 
                                     <div className="flex flex-col items-center gap-1">
                                         <span className={cn(
-                                            "text-[9px] font-bold  tracking-widest text-center transition-colors px-4",
+                                            "text-[13px] font-bold  tracking-widest text-center transition-colors px-4",
                                             done ? "text-slate-900" : "text-slate-200"
                                         )}>
                                             {STAGE_LABELS[stage]}
@@ -221,13 +221,13 @@ export default function EcomOrderDetail() {
                                 <ShoppingBag className="w-6 h-6 text-blue-600" />
                                 Order Items
                             </h2>
-                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-5 py-2 rounded-2xl  tracking-widest border border-blue-100">{items.length} Items</span>
+                            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-5 py-2 rounded-2xl  tracking-widest border border-blue-100">{items.length} Items</span>
                         </div>
 
                         <div className="p-0">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-slate-50/50 text-[9px] font-bold  tracking-widest text-slate-400 border-b border-slate-50">
+                                    <tr className="bg-slate-50/50 text-[13px] font-bold  tracking-widest text-slate-500 border-b border-slate-50">
                                         <th className="px-10 py-6 text-left">Product Details</th>
                                         <th className="px-8 py-6 text-center">Qty</th>
                                         <th className="px-8 py-6 text-right">Unit Price</th>
@@ -246,7 +246,7 @@ export default function EcomOrderDetail() {
                                                         <p className="font-bold text-slate-950 text-lg tracking-tight leading-none group-hover:text-blue-600 transition-colors  ">{item.product_name}</p>
                                                         <div className="flex items-center gap-3">
                                                             {item.variant_label && <span className="px-3 py-1 bg-slate-900 rounded-lg text-[8px] font-bold text-white  tracking-widest">{item.variant_label}</span>}
-                                                            <span className="text-[10px] text-slate-500 font-bold  tracking-widest font-mono">#{item.sku}</span>
+                                                            <span className="text-xs text-slate-500 font-bold  tracking-widest font-mono">#{item.sku}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -269,30 +269,30 @@ export default function EcomOrderDetail() {
                         {/* Totals Section */}
                         <div className="p-12 space-y-6 bg-slate-900 border-t border-slate-100 text-white relative overflow-hidden group">
                             <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] group-hover:bg-blue-600/20 transition-all duration-1000" />
-                            <div className="flex justify-between items-center text-[10px] font-bold  tracking-widest text-slate-500 relative z-10">
+                            <div className="flex justify-between items-center text-xs font-bold  tracking-widest text-slate-500 relative z-10">
                                 <span>Subtotal</span>
                                 <span className="font-mono text-white/60">{fmt(order.subtotal || 0)}</span>
                             </div>
                             {Number(order.coupon_discount) > 0 && (
-                                <div className="flex justify-between items-center text-[10px] font-bold text-emerald-400  tracking-widest relative z-10">
+                                <div className="flex justify-between items-center text-xs font-bold text-emerald-400  tracking-widest relative z-10">
                                     <div className="flex items-center gap-3">
                                         <Tag className="w-5 h-5" /> Promo Discount [{order.coupon_code}]
                                     </div>
                                     <span className="bg-emerald-500/20 px-4 py-2 rounded-xl border border-emerald-500/30">−{fmt(order.coupon_discount)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between items-center text-[10px] font-bold  tracking-widest text-slate-500 relative z-10">
+                            <div className="flex justify-between items-center text-xs font-bold  tracking-widest text-slate-500 relative z-10">
                                 <span>GST (Flat)</span>
                                 <span className="font-mono text-white/60">{fmt(order.tax_amount || 0)}</span>
                             </div>
-                            <div className="flex justify-between items-center text-[10px] font-bold  tracking-widest text-slate-500 border-b border-white/5 pb-10 relative z-10">
+                            <div className="flex justify-between items-center text-xs font-bold  tracking-widest text-slate-500 border-b border-white/5 pb-10 relative z-10">
                                 <span>Shipping Charges</span>
                                 <span className="text-blue-400">{Number(order.shipping_amount) === 0 ? "FREE" : fmt(order.shipping_amount)}</span>
                             </div>
                             <div className="flex justify-between items-end pt-10 relative z-10">
                                 <div className="space-y-3">
-                                    <span className="text-[11px] font-bold  tracking-[0.5em] text-blue-500 animate-pulse">Grand Total</span>
-                                    <p className="text-[10px] text-slate-500 font-bold  tracking-widest  opacity-50">Inclusive of all taxes</p>
+                                    <span className="text-[13px] font-bold  tracking-[0.5em] text-blue-500 animate-pulse">Grand Total</span>
+                                    <p className="text-xs text-slate-500 font-bold  tracking-widest  opacity-50">Inclusive of all taxes</p>
                                 </div>
                                 <span className="text-7xl font-bold text-white tracking-tighter ">{fmt(order.grand_total || 0).replace('₹', '')}<span className="text-2xl ml-2 not- text-slate-600 font-light">INR</span></span>
                             </div>
@@ -309,13 +309,13 @@ export default function EcomOrderDetail() {
                                 </h2>
                                 <div className="space-y-8">
                                     <div className="space-y-4 group/field">
-                                        <label className="text-[9px] font-bold  tracking-widest text-slate-400 ml-1 group-focus-within/field:text-blue-600 transition-colors">Courier Partner</label>
+                                        <label className="text-[13px] font-bold  tracking-widest text-slate-500 ml-1 group-focus-within/field:text-blue-600 transition-colors">Courier Partner</label>
                                         <input value={courierInput} onChange={e => setCourierInput(e.target.value)}
                                             placeholder="e.g. Delhivery, Bluedart"
                                             className="w-full h-14 px-6 rounded-2xl border border-slate-100 bg-slate-50/50 text-sm font-bold  tracking-tight focus:outline-none focus:ring-8 focus:ring-blue-500/5 focus:bg-white focus:border-blue-500 transition-all shadow-inner" />
                                     </div>
                                     <div className="space-y-4 group/field">
-                                        <label className="text-[9px] font-bold  tracking-widest text-slate-400 ml-1 group-focus-within/field:text-blue-600 transition-colors">Tracking Number (AWB)</label>
+                                        <label className="text-[13px] font-bold  tracking-widest text-slate-500 ml-1 group-focus-within/field:text-blue-600 transition-colors">Tracking Number (AWB)</label>
                                         <div className="relative">
                                             <input value={trackingInput} onChange={e => setTrackingInput(e.target.value)}
                                                 placeholder="Enter tracking number"
@@ -331,7 +331,7 @@ export default function EcomOrderDetail() {
                                     </div>
                                 </div>
                             </div>
-                            <Button className="w-full h-16 rounded-2xl bg-blue-600 hover:bg-black text-white font-bold text-[10px]  tracking-widest shadow-2xl shadow-blue-600/20 transition-all mt-10 active:scale-95" onClick={saveTracking}>
+                            <Button className="w-full h-16 rounded-2xl bg-blue-600 hover:bg-black text-white font-bold text-xs  tracking-widest shadow-2xl shadow-blue-600/20 transition-all mt-10 active:scale-95" onClick={saveTracking}>
                                 Update Shipping Info
                             </Button>
                         </div>
@@ -347,7 +347,7 @@ export default function EcomOrderDetail() {
                                     <div className="w-20 h-20 rounded-full bg-white mx-auto mb-6 flex items-center justify-center text-slate-100 shadow-sm">
                                         <Clock className="w-10 h-10" />
                                     </div>
-                                    <p className="text-[10px] font-bold  tracking-widest text-slate-300 ">No events found</p>
+                                    <p className="text-xs font-bold  tracking-widest text-slate-300 ">No events found</p>
                                 </div>
                             ) : (
                                 <div className="relative pl-10 space-y-12">
@@ -365,12 +365,12 @@ export default function EcomOrderDetail() {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <p className="text-sm font-bold text-slate-950   tracking-tight leading-none">{STAGE_LABELS[t.status] || t.status}</p>
-                                                    <p className="text-[9px] font-bold text-slate-500  tracking-widest  font-mono">
+                                                    <p className="text-[13px] font-bold text-slate-500  tracking-widest  font-mono">
                                                         {new Date(t.created_at).toLocaleString("en-IN", { timeStyle: 'short', dateStyle: 'medium' })}
                                                     </p>
                                                     {t.note && (
                                                         <div className="mt-4 p-5 rounded-[24px] bg-slate-50 group-hover/ev:bg-blue-50/50 transition-colors border border-slate-100 border-l-4 border-l-blue-600 shadow-sm">
-                                                            <p className="text-[11px] font-bold text-slate-500 leading-relaxed  tracking-tight">{t.note}</p>
+                                                            <p className="text-[13px] font-bold text-slate-500 leading-relaxed  tracking-tight">{t.note}</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -388,14 +388,14 @@ export default function EcomOrderDetail() {
                     {/* Customer Profile */}
                     <div className="bg-slate-950 rounded-[48px] p-12 text-white shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/10 rounded-full blur-[80px] -z-0 group-hover:bg-blue-600/20 transition-all duration-1000" />
-                        <h2 className="text-[10px] font-bold  tracking-widest text-blue-500 mb-12 relative z-10 ">Customer Details</h2>
+                        <h2 className="text-xs font-bold  tracking-widest text-blue-500 mb-12 relative z-10 ">Customer Details</h2>
 
                         <div className="flex flex-col items-center text-center mb-12 relative z-10">
                             <div className="w-32 h-32 rounded-[40px] bg-white/5 flex items-center justify-center text-white font-bold text-5xl shadow-inner border border-white/10 mb-8 transform group-hover:-translate-y-2 transition-transform duration-700 ">
                                 {order.customer_name?.charAt(0)}
                             </div>
                             <h3 className="font-bold text-3xl tracking-tighter leading-none mb-3  ">{order.customer_name}</h3>
-                            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-600/20 text-blue-400 text-[9px] font-bold  tracking-widest border border-blue-500/30">Verified Customer</div>
+                            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-600/20 text-blue-400 text-[13px] font-bold  tracking-widest border border-blue-500/30">Verified Customer</div>
                         </div>
 
                         <div className="space-y-6 relative z-10">
@@ -417,7 +417,7 @@ export default function EcomOrderDetail() {
                             <div className="mt-12 pt-12 border-t border-white/10 relative z-10">
                                 <div className="flex items-center gap-4 mb-8">
                                     <MapPin className="w-5 h-5 text-blue-500" />
-                                    <h3 className="text-[10px] font-bold  tracking-widest text-white/30 ">Delivery Address</h3>
+                                    <h3 className="text-xs font-bold  tracking-widest text-white/30 ">Delivery Address</h3>
                                 </div>
                                 <div className="p-8 rounded-[32px] bg-white/5 border border-white/5 text-sm font-bold leading-relaxed text-white/50 group-hover:bg-white/[0.07] transition-all">
                                     <p className="text-white font-bold text-lg mb-2  ">{addr.line1}</p>
@@ -439,28 +439,28 @@ export default function EcomOrderDetail() {
                             <div className="p-10 rounded-[40px] bg-slate-50 border border-slate-100 shadow-inner group/bill">
                                 <div className="flex justify-between items-center mb-10">
                                     <div className="space-y-1">
-                                        <span className="text-[9px] font-bold  tracking-widest text-slate-400 block">Payment Method</span>
-                                        <span className="text-[10px] font-bold  tracking-widest px-5 py-2 bg-white rounded-xl border border-slate-200 text-slate-950 shadow-sm">{order.payment_method || "COD"}</span>
+                                        <span className="text-[13px] font-bold  tracking-widest text-slate-500 block">Payment Method</span>
+                                        <span className="text-xs font-bold  tracking-widest px-5 py-2 bg-white rounded-xl border border-slate-200 text-slate-950 shadow-sm">{order.payment_method || "COD"}</span>
                                     </div>
                                     <div className="space-y-1 text-right">
-                                        <span className="text-[9px] font-bold  tracking-widest text-slate-400 block">Status</span>
+                                        <span className="text-[13px] font-bold  tracking-widest text-slate-500 block">Status</span>
                                         <span className={cn(
-                                            "text-[10px] font-bold  tracking-widest px-5 py-2 rounded-xl border-2",
+                                            "text-xs font-bold  tracking-widest px-5 py-2 rounded-xl border-2",
                                             order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-500/10 shadow-lg' : 'bg-amber-50 text-amber-600 border-amber-100 shadow-inner'
                                         )}>{order.payment_status}</span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-center pt-10 border-t border-slate-200/60">
-                                    <span className="text-[11px] font-bold text-slate-400  tracking-[0.5em] mb-4">Total Amount</span>
+                                    <span className="text-[13px] font-bold text-slate-500  tracking-[0.5em] mb-4">Total Amount</span>
                                     <span className="text-6xl font-bold text-slate-950 tracking-tighter  group-hover/bill:scale-110 transition-transform duration-500">{fmt(order.grand_total || 0).replace('₹', '')}<span className="text-xs ml-2 not- text-slate-300 font-light">INR</span></span>
                                 </div>
                             </div>
 
                             {order.payment_gateway_ref && (
                                 <div className="space-y-4">
-                                    <label className="text-[9px] font-bold  tracking-widest text-slate-400 ml-1">Payment Reference ID</label>
+                                    <label className="text-[13px] font-bold  tracking-widest text-slate-500 ml-1">Payment Reference ID</label>
                                     <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-[28px] border border-slate-100 shadow-inner group/sig">
-                                        <span className="font-mono text-[10px] font-bold truncate flex-1 text-slate-400 group-hover/sig:text-blue-600 transition-colors  ">{order.payment_gateway_ref}</span>
+                                        <span className="font-mono text-xs font-bold truncate flex-1 text-slate-500 group-hover/sig:text-blue-600 transition-colors  ">{order.payment_gateway_ref}</span>
                                         <button onClick={() => {
                                             navigator.clipboard.writeText(order.payment_gateway_ref);
                                             toast({ title: "Ref ID copied" });
@@ -473,14 +473,14 @@ export default function EcomOrderDetail() {
 
                             <div className="space-y-4">
                                 {order.payment_status === "pending" && (
-                                    <Button className="w-full h-16 rounded-[24px] bg-amber-500 hover:bg-black text-white font-bold text-[10px]  tracking-widest shadow-2xl shadow-amber-500/20 flex items-center justify-center gap-4 border-none transition-all active:scale-95" onClick={markPaymentPaid}>
+                                    <Button className="w-full h-16 rounded-[24px] bg-amber-500 hover:bg-black text-white font-bold text-xs  tracking-widest shadow-2xl shadow-amber-500/20 flex items-center justify-center gap-4 border-none transition-all active:scale-95" onClick={markPaymentPaid}>
                                         <CreditCard className="w-6 h-6" /> Mark as Paid
                                     </Button>
                                 )}
 
                                 {order.payment_status === "paid" && !["cancelled", "returned", "delivered"].includes(order.status) && (
                                     <Link to={`/apps/ecommerce/refunds/new?order=${order.id}`} className="block">
-                                        <Button variant="outline" className="w-full h-16 rounded-[24px] font-bold text-[10px]  tracking-widest text-rose-500 border-rose-50 hover:bg-rose-500 hover:text-white gap-4 border-2 transition-all active:scale-95 shadow-lg shadow-rose-500/5">
+                                        <Button variant="outline" className="w-full h-16 rounded-[24px] font-bold text-xs  tracking-widest text-rose-500 border-rose-50 hover:bg-rose-500 hover:text-white gap-4 border-2 transition-all active:scale-95 shadow-lg shadow-rose-500/5">
                                             <RotateCcw className="w-6 h-6" /> Process Refund
                                         </Button>
                                     </Link>

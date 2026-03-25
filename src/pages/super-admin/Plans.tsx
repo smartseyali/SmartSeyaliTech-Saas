@@ -117,7 +117,7 @@ export default function PlatformPlans() {
     };
 
     const getPlanIcon = (slug: string) => {
-        if (slug.includes('standard')) return <Shield className="w-8 h-8 text-slate-400" />;
+        if (slug.includes('standard')) return <Shield className="w-8 h-8 text-slate-500" />;
         if (slug.includes('pro')) return <Zap className="w-8 h-8 text-blue-500" />;
         if (slug.includes('enterprise')) return <Crown className="w-8 h-8 text-amber-500" />;
         return <Star className="w-8 h-8 text-indigo-500" />;
@@ -161,11 +161,11 @@ export default function PlatformPlans() {
                             <h3 className="text-xl font-bold text-slate-900 tracking-tight  mb-1">{plan.name}</h3>
                             <div className="flex items-baseline gap-1 mb-6">
                                 <span className="text-3xl font-bold text-blue-600">${plan.price_monthly}</span>
-                                <span className="text-xs font-bold text-slate-400  tracking-widest">/ month</span>
+                                <span className="text-xs font-bold text-slate-500  tracking-widest">/ month</span>
                             </div>
 
                             <div className="space-y-3 mb-8">
-                                <p className="text-[10px] font-bold  text-slate-400 tracking-widest border-b border-slate-50 pb-2">Enabled Engines</p>
+                                <p className="text-xs font-bold  text-slate-500 tracking-widest border-b border-slate-50 pb-2">Enabled Engines</p>
                                 {(Array.isArray(plan.features) ? plan.features : []).slice(0, 5).map((f: string, i: number) => (
                                     <div key={i} className="flex items-center gap-3 text-xs font-bold text-slate-600">
                                         <Check className="w-4 h-4 text-green-500 shrink-0" /> {f}
@@ -174,8 +174,8 @@ export default function PlatformPlans() {
                             </div>
 
                             <div className={`mt-auto pt-6 border-t border-slate-50 flex items-center justify-between`}>
-                                <span className="text-[9px] font-bold  text-slate-400 tracking-widest">Slug: {plan.slug}</span>
-                                <div className={`px-3 py-1 rounded-full text-[9px] font-bold  tracking-widest ${plan.is_active ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                                <span className="text-[13px] font-bold  text-slate-500 tracking-widest">Slug: {plan.slug}</span>
+                                <div className={`px-3 py-1 rounded-full text-[13px] font-bold  tracking-widest ${plan.is_active ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
                                     {plan.is_active ? 'Active' : 'Disabled'}
                                 </div>
                             </div>
@@ -196,28 +196,28 @@ export default function PlatformPlans() {
                     <div className="grid gap-6 py-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Pack Name</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Pack Name</Label>
                                 <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Professional" className="font-bold h-12" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">System Slug</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">System Slug</Label>
                                 <Input value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="e.g. enterprise-tier" className="font-mono text-sm h-12" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Monthly Yield ($)</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Monthly Yield ($)</Label>
                                 <Input type="number" value={formData.price_monthly} onChange={(e) => setFormData({ ...formData, price_monthly: parseFloat(e.target.value) || 0 })} className="font-bold h-12" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Sort Priority</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Sort Priority</Label>
                                 <Input type="number" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} className="font-bold h-12" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Engine Features (One per line)</Label>
+                            <Label className="text-xs font-bold  tracking-widest text-slate-500">Engine Features (One per line)</Label>
                             <Textarea
                                 value={formData.features}
                                 onChange={(e) => setFormData({ ...formData, features: e.target.value })}
@@ -238,8 +238,8 @@ export default function PlatformPlans() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="font-bold  text-[10px] tracking-widest">Abort</Button>
-                        <Button onClick={handleSave} disabled={isSubmitting} className="bg-black text-white hover:bg-slate-900 h-12 px-8 rounded-xl font-bold  text-[10px] tracking-widest">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="font-bold  text-xs tracking-widest">Abort</Button>
+                        <Button onClick={handleSave} disabled={isSubmitting} className="bg-black text-white hover:bg-slate-900 h-12 px-8 rounded-xl font-bold  text-xs tracking-widest">
                             {isSubmitting ? "Processing..." : "Commit Package"}
                         </Button>
                     </DialogFooter>

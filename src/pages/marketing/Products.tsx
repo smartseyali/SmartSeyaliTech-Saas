@@ -144,7 +144,7 @@ const Products = () => {
                             </div>
                           </div>
                           <div className="absolute top-4 left-4">
-                            <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-white/50 shadow-sm text-[9px] font-bold text-primary-600 uppercase tracking-wider">
+                            <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-white/50 shadow-sm text-[13px] font-bold text-primary-600 uppercase tracking-wider">
                               {mod.status || "Operational"}
                             </div>
                           </div>
@@ -154,7 +154,7 @@ const Products = () => {
                           <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
                             {mod.name}
                           </h3>
-                          <p className="text-[9px] font-semibold text-primary-600/60 uppercase tracking-widest">
+                          <p className="text-[13px] font-semibold text-primary-600/60 uppercase tracking-widest">
                             {mod.tagline || (category + " Engine")}
                           </p>
                         </div>
@@ -163,7 +163,7 @@ const Products = () => {
                       <div className="p-4 pt-0 mt-auto">
                         <Button
                           onClick={() => navigate(`/login?module=${mod.slug}`)}
-                          className="w-full h-9 rounded-lg bg-gray-50 text-gray-900 border border-gray-100 font-bold text-[10px] hover:bg-primary-600 hover:text-white transition-all group/btn"
+                          className="w-full h-9 rounded-lg bg-gray-50 text-gray-900 border border-gray-100 font-bold text-xs hover:bg-primary-600 hover:text-white transition-all group/btn"
                         >
                           Initialize <ArrowRight className="ml-1.5 w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>

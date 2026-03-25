@@ -55,7 +55,7 @@ export default function Deals() {
             render: (deal: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight  ">{deal.title}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{deal.priority || "Standard"} Priority</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">{deal.priority || "Standard"} Priority</span>
                 </div>
             )
         },

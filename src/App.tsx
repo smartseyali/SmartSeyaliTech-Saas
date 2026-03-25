@@ -15,8 +15,7 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import { SessionTimeoutHandler } from "@/components/auth/SessionTimeoutHandler";
 
-
-// ── E-Commerce Module (registered via modules/ecommerce/) ──
+// ── E-Commerce Module ──
 import EcommerceDashboard from "./pages/modules/ecommerce/EcommerceDashboard";
 import EcomOrders from "./pages/modules/ecommerce/EcomOrders";
 import EcomOrderDetail from "./pages/modules/ecommerce/EcomOrderDetail";
@@ -73,44 +72,33 @@ import CRMLeads from "./pages/modules/crm/Leads";
 import CRMDeals from "./pages/modules/crm/Deals";
 import CRMContacts from "./pages/modules/crm/Contacts";
 import CRMPipelines from "./pages/modules/crm/Pipelines";
+import Forecast from "./pages/modules/crm/Forecast";
+import Accounts from "./pages/modules/crm/Accounts";
+import Segments from "./pages/modules/crm/Segments";
 
-// ── SALES Module ──
+// ── SALES Module (with Integrated Invoicing) ──
 import SalesDashboard from "./pages/modules/sales/SalesDashboard";
 import SalesQuotations from "./pages/modules/sales/Quotations";
 import SalesOrders from "./pages/modules/sales/Orders";
 import SalesDeliveries from "./pages/modules/sales/Deliveries";
 import SalesCustomers from "./pages/modules/sales/Customers";
+import InvoiceList from "./pages/modules/sales/Invoices";
+import ReceiptVouchers from "./pages/modules/sales/ReceiptVouchers";
 
-// ── BOOKS Module ──
-import BooksDashboard from "./pages/modules/books/BooksDashboard";
-import ChartOfAccounts from "./pages/modules/books/ChartOfAccounts";
-import Expenses from "./pages/modules/books/Expenses";
-import Journals from "./pages/modules/books/Journals";
+// ── POS Module ──
+import POSDashboard from "./pages/modules/pos/POSDashboard";
+import POSTerminal from "./pages/modules/pos/Terminal";
+import POSRegister from "./pages/modules/pos/Register";
+import POSOrdersLedger from "./pages/modules/pos/POSOrders";
 
-// ── INVOICING Module ──
-import InvoicingDashboard from "./pages/modules/invoicing/InvoicingDashboard";
-import InvoiceList from "./pages/modules/invoicing/Invoices";
-
-// ── PAYROLL Module ──
-import PayrollDashboard from "./pages/modules/payroll/PayrollDashboard";
-import PayrollPayslips from "./pages/modules/payroll/Payslips";
-
-// ── HELPDESK Module ──
-import HelpdeskDashboard from "./pages/modules/helpdesk/HelpdeskDashboard";
-import SupportTickets from "./pages/modules/helpdesk/Tickets";
-
-// ── HOSPITAL Module ──
-import HospitalDashboard from "./pages/modules/hospital/HospitalDashboard";
-import PatientRecords from "./pages/modules/hospital/Patients";
-
-// ── WHATSAPP Module ──
-import WhatsAppDashboard from "./pages/modules/whatsapp/WhatsAppDashboard";
-import WhatsAppAccounts from "./pages/modules/whatsapp/Accounts";
-import WhatsAppTemplates from "./pages/modules/whatsapp/Templates";
-import WhatsAppCampaigns from "./pages/modules/whatsapp/Campaigns";
-
-// ── LANDING PAGE Module ──
-import LandingPageDashboard from "./pages/modules/landing-page/LandingPageDashboard";
+// ── INVENTORY Module ──
+import InventoryDashboard from "./pages/modules/inventory/InventoryDashboard";
+import InventoryItems from "./pages/modules/inventory/Items";
+import Warehouses from "./pages/modules/inventory/Warehouses";
+import StockLevels from "./pages/modules/inventory/StockLevels";
+import StockTransfers from "./pages/modules/inventory/StockTransfers";
+import StockAudits from "./pages/modules/inventory/StockAudits";
+import BatchTracking from "./pages/modules/inventory/BatchTracking";
 
 // ── HRMS Module ──
 import HRMSDashboard from "./pages/modules/hrms/HRMSDashboard";
@@ -118,6 +106,9 @@ import HRMSRegistry from "./pages/modules/hrms/Employees";
 import HRMSInduction from "./pages/modules/hrms/Induction";
 import Attendance from "./pages/modules/hrms/Attendance";
 import LeaveManagement from "./pages/modules/hrms/LeaveManagement";
+import Departments from "./pages/modules/hrms/Departments";
+import EmployeeClaims from "./pages/modules/hrms/Claims";
+import EmployeeAppraisals from "./pages/modules/hrms/Appraisals";
 
 // ── PURCHASE Module ──
 import PurchaseDashboard from "./pages/modules/purchase/PurchaseDashboard";
@@ -125,11 +116,13 @@ import PurchaseVendors from "./pages/modules/purchase/Vendors";
 import PurchaseOrders from "./pages/modules/purchase/PurchaseOrders";
 import PurchaseRequests from "./pages/modules/purchase/PurchaseRequests";
 import PurchaseBills from "./pages/modules/purchase/PurchaseBills";
+import GoodsReceipts from "./pages/modules/purchase/GoodsReceipts";
 
-// ── INVENTORY Module ──
-import InventoryDashboard from "./pages/modules/inventory/InventoryDashboard";
-import InventoryItems from "./pages/modules/inventory/Items";
-import Warehouses from "./pages/modules/inventory/Warehouses";
+// ── WHATSAPP Module ──
+import WhatsAppDashboard from "./pages/modules/whatsapp/WhatsAppDashboard";
+import WhatsAppAccounts from "./pages/modules/whatsapp/Accounts";
+import WhatsAppTemplates from "./pages/modules/whatsapp/Templates";
+import WhatsAppCampaigns from "./pages/modules/whatsapp/Campaigns";
 
 // ── MASTER REGISTRY (Common Foundation) ──
 import MasterDashboard from "./pages/modules/masters/MasterDashboard";
@@ -140,25 +133,9 @@ import UOMMaster from "./pages/modules/masters/UOMs";
 import AttributeMaster from "./pages/modules/masters/Attributes";
 import BrandMaster from "./pages/modules/masters/Brands";
 import VariantMaster from "./pages/modules/masters/Variants";
+import ChartOfAccounts from "./pages/modules/masters/ChartOfAccounts";
+import FiscalYears from "./pages/modules/masters/FiscalYears";
 import ReviewMaster from "./pages/modules/masters/Reviews";
-
-// ── WORKFLOW Module ──
-import WorkflowDashboard from "./pages/modules/workflow/WorkflowDashboard";
-import ApprovalMatrix from "./pages/modules/workflow/Approvals";
-
-// ── AUTOMATION Module ──
-import AutomationDashboard from "./pages/modules/automation/AutomationDashboard";
-import AutomationJobs from "./pages/modules/automation/Jobs";
-
-// ── DOCUMENTS Module ──
-import DocumentsHub from "./pages/modules/documents/Documents";
-
-// ── PROJECTS Module ──
-import ProjectPortfolio from "./pages/modules/projects/Projects";
-
-// ── POS Module ──
-import POSDashboard from "./pages/modules/pos/POSDashboard";
-import POSTerminal from "./pages/modules/pos/Terminal";
 
 // ── MARKETING (Smartseyali) ──
 import { MarketingLayout } from "./components/marketing/MarketingLayout";
@@ -170,27 +147,6 @@ import MarketingModuleDetail from "./pages/marketing/ModuleDetail";
 import MarketingContact from "./pages/marketing/Contact";
 import MarketingPolicy from "./pages/marketing/License";
 
-import Forecast from "./pages/modules/crm/Forecast";
-import Accounts from "./pages/modules/crm/Accounts";
-import Segments from "./pages/modules/crm/Segments";
-import POSRegister from "./pages/modules/pos/Register";
-import POSOrdersLedger from "./pages/modules/pos/POSOrders";
-import StockLevels from "./pages/modules/inventory/StockLevels";
-import StockTransfers from "./pages/modules/inventory/StockTransfers";
-import Departments from "./pages/modules/hrms/Departments";
-import GoodsReceipts from "./pages/modules/purchase/GoodsReceipts";
-import ReceiptVouchers from "./pages/modules/invoicing/ReceiptVouchers";
-import SalaryStructures from "./pages/modules/payroll/SalaryStructures";
-import RunPayroll from "./pages/modules/payroll/RunPayroll";
-
-import FinancialReports from "./pages/modules/books/FinancialReports";
-import BankReconciliation from "./pages/modules/books/BankReconciliation";
-import TaxConfigurations from "./pages/modules/books/TaxConfigurations";
-import FiscalYears from "./pages/modules/settings/FiscalYears";
-import StockAudits from "./pages/modules/inventory/StockAudits";
-import BatchTracking from "./pages/modules/inventory/BatchTracking";
-import EmployeeClaims from "./pages/modules/hrms/Claims";
-import EmployeeAppraisals from "./pages/modules/hrms/Appraisals";
 
 const queryClient = new QueryClient();
 
@@ -356,68 +312,20 @@ const App = () => (
                                             <Route path="/apps/crm/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
                                             <Route path="/apps/crm/segments" element={<ProtectedRoute><Segments /></ProtectedRoute>} />
 
+                                            {/* POS */}
+                                            <Route path="/apps/pos" element={<ProtectedRoute><POSDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/pos/terminal" element={<ProtectedRoute><POSTerminal /></ProtectedRoute>} />
+                                            <Route path="/apps/pos/register" element={<ProtectedRoute><POSRegister /></ProtectedRoute>} />
+                                            <Route path="/apps/pos/orders" element={<ProtectedRoute><POSOrdersLedger /></ProtectedRoute>} />
+
                                             {/* Sales */}
                                             <Route path="/apps/sales" element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/sales/quotations" element={<ProtectedRoute><SalesQuotations /></ProtectedRoute>} />
                                             <Route path="/apps/sales/orders" element={<ProtectedRoute><SalesOrders /></ProtectedRoute>} />
                                             <Route path="/apps/sales/deliveries" element={<ProtectedRoute><SalesDeliveries /></ProtectedRoute>} />
                                             <Route path="/apps/sales/customers" element={<ProtectedRoute><SalesCustomers /></ProtectedRoute>} />
-
-                                            {/* Books */}
-                                            <Route path="/apps/books" element={<ProtectedRoute><BooksDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/books/coa" element={<ProtectedRoute><ChartOfAccounts /></ProtectedRoute>} />
-                                            <Route path="/apps/books/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-                                            <Route path="/apps/books/journals" element={<ProtectedRoute><Journals /></ProtectedRoute>} />
-                                            <Route path="/apps/books/reports" element={<ProtectedRoute><FinancialReports /></ProtectedRoute>} />
-                                            <Route path="/apps/books/reconciliation" element={<ProtectedRoute><BankReconciliation /></ProtectedRoute>} />
-                                            <Route path="/apps/books/tax" element={<ProtectedRoute><TaxConfigurations /></ProtectedRoute>} />
-
-                                            {/* Invoicing */}
-                                            <Route path="/apps/invoicing" element={<ProtectedRoute><InvoicingDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/invoicing/list" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
-                                            <Route path="/apps/invoicing/invoices" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
-                                            <Route path="/apps/invoicing/payments" element={<ProtectedRoute><ReceiptVouchers /></ProtectedRoute>} />
-
-                                             {/* Payroll */}
-                                             <Route path="/apps/payroll" element={<ProtectedRoute><PayrollDashboard /></ProtectedRoute>} />
-                                             <Route path="/apps/payroll/payslips" element={<ProtectedRoute><PayrollPayslips /></ProtectedRoute>} />
-                                             <Route path="/apps/payroll/structures" element={<ProtectedRoute><SalaryStructures /></ProtectedRoute>} />
-                                             <Route path="/apps/payroll/run" element={<ProtectedRoute><RunPayroll /></ProtectedRoute>} />
-
-                                            {/* Helpdesk */}
-                                            <Route path="/apps/helpdesk" element={<ProtectedRoute><HelpdeskDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/helpdesk/tickets" element={<ProtectedRoute><SupportTickets /></ProtectedRoute>} />
-
-                                            {/* Landing Page */}
-                                            <Route path="/apps/landing-page" element={<ProtectedRoute><LandingPageDashboard /></ProtectedRoute>} />
-
-                                            {/* Hospital */}
-                                            <Route path="/apps/hospital" element={<ProtectedRoute><HospitalDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/hospital/patients" element={<ProtectedRoute><PatientRecords /></ProtectedRoute>} />
-
-                                             {/* WhatsApp */}
-                                             <Route path="/apps/whatsapp" element={<ProtectedRoute><WhatsAppDashboard /></ProtectedRoute>} />
-                                             <Route path="/apps/whatsapp/accounts" element={<ProtectedRoute><WhatsAppAccounts /></ProtectedRoute>} />
-                                             <Route path="/apps/whatsapp/templates" element={<ProtectedRoute><WhatsAppTemplates /></ProtectedRoute>} />
-                                             <Route path="/apps/whatsapp/campaigns" element={<ProtectedRoute><WhatsAppCampaigns /></ProtectedRoute>} />
-
-                                             {/* HRMS */}
-                                             <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/employees" element={<ProtectedRoute><HRMSRegistry /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/induction" element={<ProtectedRoute><HRMSInduction /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/claims" element={<ProtectedRoute><EmployeeClaims /></ProtectedRoute>} />
-                                             <Route path="/apps/hrms/appraisals" element={<ProtectedRoute><EmployeeAppraisals /></ProtectedRoute>} />
-
-                                            {/* Purchase */}
-                                            <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/vendors" element={<ProtectedRoute><PurchaseVendors /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/requests" element={<ProtectedRoute><PurchaseRequests /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/bills" element={<ProtectedRoute><PurchaseBills /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
+                                            <Route path="/apps/sales/invoices" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
+                                            <Route path="/apps/sales/payments" element={<ProtectedRoute><ReceiptVouchers /></ProtectedRoute>} />
 
                                             {/* Inventory */}
                                             <Route path="/apps/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
@@ -428,38 +336,35 @@ const App = () => (
                                             <Route path="/apps/inventory/audits" element={<ProtectedRoute><StockAudits /></ProtectedRoute>} />
                                             <Route path="/apps/inventory/batches" element={<ProtectedRoute><BatchTracking /></ProtectedRoute>} />
 
+                                            {/* HRMS */}
+                                            <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/employees" element={<ProtectedRoute><HRMSRegistry /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/induction" element={<ProtectedRoute><HRMSInduction /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/claims" element={<ProtectedRoute><EmployeeClaims /></ProtectedRoute>} />
+                                            <Route path="/apps/hrms/appraisals" element={<ProtectedRoute><EmployeeAppraisals /></ProtectedRoute>} />
+
+                                            {/* Purchase */}
+                                            <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/vendors" element={<ProtectedRoute><PurchaseVendors /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/requests" element={<ProtectedRoute><PurchaseRequests /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/bills" element={<ProtectedRoute><PurchaseBills /></ProtectedRoute>} />
+                                            <Route path="/apps/purchase/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
+
+                                            {/* WhatsApp */}
+                                            <Route path="/apps/whatsapp" element={<ProtectedRoute><WhatsAppDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/whatsapp/accounts" element={<ProtectedRoute><WhatsAppAccounts /></ProtectedRoute>} />
+                                            <Route path="/apps/whatsapp/templates" element={<ProtectedRoute><WhatsAppTemplates /></ProtectedRoute>} />
+                                            <Route path="/apps/whatsapp/campaigns" element={<ProtectedRoute><WhatsAppCampaigns /></ProtectedRoute>} />
+
                                             {/* Master Registry (Foundation) */}
-                                            <Route path="/apps/masters" element={<ProtectedRoute><MasterDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/masters/items" element={<ProtectedRoute><MastersItems /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/contacts" element={<ProtectedRoute><MastersContacts /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/categories" element={<ProtectedRoute><MastersCategories /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/uoms" element={<ProtectedRoute><UOMMaster /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/attributes" element={<ProtectedRoute><AttributeMaster /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/brands" element={<ProtectedRoute><BrandMaster /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/variants" element={<ProtectedRoute><VariantMaster /></ProtectedRoute>} />
-                                             <Route path="/apps/masters/reviews" element={<ProtectedRoute><ReviewMaster /></ProtectedRoute>} />
-                                             <Route path="/apps/settings/fiscal-years" element={<ProtectedRoute><FiscalYears /></ProtectedRoute>} />
-
-                                            {/* Workflow */}
-                                            <Route path="/apps/workflow" element={<ProtectedRoute><WorkflowDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/workflow/approvals" element={<ProtectedRoute><ApprovalMatrix /></ProtectedRoute>} />
-
-                                            {/* Automation */}
-                                            <Route path="/apps/automation" element={<ProtectedRoute><AutomationDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/automation/jobs" element={<ProtectedRoute><AutomationJobs /></ProtectedRoute>} />
-
-                                            {/* Documents */}
-                                            <Route path="/apps/documents" element={<ProtectedRoute><DocumentsHub /></ProtectedRoute>} />
-
-                                            {/* Projects */}
-                                            <Route path="/apps/projects" element={<ProtectedRoute><ProjectPortfolio /></ProtectedRoute>} />
-
-                                            {/* POS */}
-                                            <Route path="/apps/pos" element={<ProtectedRoute><POSDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/terminal" element={<ProtectedRoute><POSTerminal /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/register" element={<ProtectedRoute><POSRegister /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/orders" element={<ProtectedRoute><POSOrdersLedger /></ProtectedRoute>} />
+                                            <Route path="/apps/masters/*" element={<ProtectedRoute><MasterDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/masters/fiscal-years" element={<ProtectedRoute><FiscalYears /></ProtectedRoute>} />
                                         </Route>
+
 
                                         <Route path="*" element={<StoreLayout><NotFound /></StoreLayout>} />
                                     </Routes>

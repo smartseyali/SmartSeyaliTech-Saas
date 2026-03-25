@@ -20,14 +20,14 @@ export default function Terminal() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <Zap className="w-6 h-6 text-violet-600" />
-                            <span className="text-xs font-bold  tracking-widest text-slate-400">Terminal Node Alpha</span>
+                            <span className="text-xs font-bold  tracking-widest text-slate-500">Terminal Node Alpha</span>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight text-slate-900   leading-none">POS Terminal</h1>
                         <p className="text-sm font-medium text-slate-500">Retail transaction engine and billing matrix.</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="hidden lg:flex items-center bg-slate-100 rounded-3xl px-6 h-14 border border-slate-200 shadow-inner group">
-                            <Search className="w-5 h-5 text-slate-400 mr-3 group-focus-within:text-violet-600 transition-colors" />
+                            <Search className="w-5 h-5 text-slate-500 mr-3 group-focus-within:text-violet-600 transition-colors" />
                             <input type="text" placeholder="Barcode or Resource SKU..." className="bg-transparent border-0 focus:ring-0 text-sm w-64 font-medium" />
                         </div>
                     </div>
@@ -41,7 +41,7 @@ export default function Terminal() {
                             </div>
                             <div className="space-y-1">
                                 <h3 className="text-sm font-bold text-slate-900   truncate max-w-full leading-tight">Product Node {i}</h3>
-                                <p className="text-[10px] font-bold text-blue-600 tracking-tighter  leading-none">{fmt(999 + i)}</p>
+                                <p className="text-xs font-bold text-blue-600 tracking-tighter  leading-none">{fmt(999 + i)}</p>
                             </div>
                         </div>
                     ))}
@@ -55,7 +55,7 @@ export default function Terminal() {
                 <div className="relative z-10 flex flex-col h-full space-y-10">
                     <div className="flex items-center justify-between border-b border-white/5 pb-8">
                         <h2 className="text-2xl font-bold tracking-tight text-white   leading-none">Order Stack</h2>
-                        <span className="text-[10px] font-bold text-slate-500  tracking-widest">Matrix Billing</span>
+                        <span className="text-xs font-bold text-slate-500  tracking-widest">Matrix Billing</span>
                     </div>
 
                     <div className="flex-1 space-y-6 overflow-y-auto pr-2 scrollbar-hide">
@@ -63,7 +63,7 @@ export default function Terminal() {
                             <div key={item.id} className="flex items-center justify-between p-6 rounded-[28px] bg-white/5 border border-white/5 group/item hover:bg-white/10 transition-all">
                                 <div className="space-y-1">
                                     <p className="font-bold text-white text-sm   leading-tight">{item.name}</p>
-                                    <p className="text-[10px] font-bold text-slate-500  tracking-widest">{item.qty} UNIT(S) • {fmt(item.price)}</p>
+                                    <p className="text-xs font-bold text-slate-500  tracking-widest">{item.qty} UNIT(S) • {fmt(item.price)}</p>
                                 </div>
                                 <span className="text-lg font-bold text-white tracking-tighter ">{fmt(item.price * item.qty)}</span>
                             </div>
@@ -72,16 +72,16 @@ export default function Terminal() {
 
                     <div className="space-y-6 border-t border-white/10 pt-10">
                         <div className="flex justify-between items-end">
-                            <span className="text-[10px] font-bold text-slate-500  tracking-widest leading-none">Matrix Total Yield</span>
+                            <span className="text-xs font-bold text-slate-500  tracking-widest leading-none">Matrix Total Yield</span>
                             <span className="text-4xl font-bold text-white tracking-tighter  leading-none">{fmt(total)}</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <Button className="h-16 rounded-[24px] bg-white text-slate-900 hover:bg-blue-500 hover:text-white font-bold  text-[10px] tracking-widest transition-all gap-3 border-0 transition-all flex flex-col items-center justify-center py-0">
+                            <Button className="h-16 rounded-[24px] bg-white text-slate-900 hover:bg-blue-500 hover:text-white font-bold  text-xs tracking-widest transition-all gap-3 border-0 transition-all flex flex-col items-center justify-center py-0">
                                 <CreditCard className="w-5 h-5" />
                                 <span>Digital Link</span>
                             </Button>
-                            <Button className="h-16 rounded-[24px] bg-white/5 border border-white/10 text-white hover:bg-emerald-600 font-bold  text-[10px] tracking-widest transition-all gap-3 flex flex-col items-center justify-center py-0">
+                            <Button className="h-16 rounded-[24px] bg-white/5 border border-white/10 text-white hover:bg-emerald-600 font-bold  text-xs tracking-widest transition-all gap-3 flex flex-col items-center justify-center py-0">
                                 <Banknote className="w-5 h-5" />
                                 <span>Physical Asset</span>
                             </Button>

@@ -17,13 +17,13 @@ export const Footer = () => {
               </div>
               <span className="text-2xl font-bold tracking-tight">{PLATFORM_CONFIG.name} <span className="text-primary-500">Tech</span></span>
             </Link>
-            <p className="text-slate-400 font-medium  max-w-sm leading-relaxed">
+            <p className="text-slate-500 font-medium  max-w-sm leading-relaxed">
               We engineer robust enterprise software solutions designed for global scalability and high-performance operational efficiency.
             </p>
             <div className="flex space-x-6 pt-4">
               {[Facebook, Instagram, Github].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-all hover:-translate-y-1">
-                  <Icon className="h-5 w-5 text-slate-400 hover:text-white transition-colors" />
+                  <Icon className="h-5 w-5 text-slate-500 hover:text-white transition-colors" />
                 </a>
               ))}
             </div>
@@ -41,7 +41,7 @@ export const Footer = () => {
                 { label: "Contact", path: "/contact" }
               ].map((link, i) => (
                 <li key={i}>
-                  <Link to={link.path} className="text-md font-semibold text-slate-400 hover:text-white transition-all inline-flex items-center group">
+                  <Link to={link.path} className="text-md font-semibold text-slate-500 hover:text-white transition-all inline-flex items-center group">
                     {link.label} <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </Link>
                 </li>
@@ -56,21 +56,21 @@ export const Footer = () => {
               <div className="flex items-start gap-4">
                 <Mail className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 shrink-0">Inquiries</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500 shrink-0">Inquiries</p>
                   <p className="text-sm font-semibold text-slate-300">support@{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Phone className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Call Us</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Call Us</p>
                   <p className="text-sm font-semibold text-slate-300">+91 90477 36612</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <MapPin className="h-5 w-5 text-primary-500 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Location</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Location</p>
                   <p className="text-sm font-semibold text-slate-300">SR Nagar, Tiruppur, IN</p>
                 </div>
               </div>
@@ -84,7 +84,7 @@ export const Footer = () => {
           </p>
           <div className="flex items-center gap-3 bg-slate-800/50 px-5 py-2 rounded-full border border-slate-700">
             <ShieldCheck className="w-4 h-4 text-primary-500" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Enterprise Grade Security</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Enterprise Grade Security</span>
           </div>
         </div>
       </div>

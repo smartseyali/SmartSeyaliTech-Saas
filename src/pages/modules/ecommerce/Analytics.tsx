@@ -13,7 +13,7 @@ export default function Analytics() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold  tracking-widest text-slate-400 mb-1">Performance</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-500 mb-1">Performance</p>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Analytics</h1>
                     <p className="text-sm text-slate-500 mt-1">Deep-dive performance metrics and behavioral analytics.</p>
                 </div>
@@ -32,7 +32,7 @@ export default function Analytics() {
                                 {s.trend}
                             </div>
                         </div>
-                        <p className="text-[10px] font-bold  tracking-widest text-slate-400 mb-1">{s.label}</p>
+                        <p className="text-xs font-bold  tracking-widest text-slate-500 mb-1">{s.label}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{s.value}</h3>
                     </div>
                 ))}

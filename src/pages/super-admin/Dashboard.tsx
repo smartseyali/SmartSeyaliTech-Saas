@@ -113,12 +113,12 @@ export default function SuperAdminDashboard() {
                             <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", s.bg)}>
                                 <s.Icon className={cn("w-7 h-7", s.color)} />
                             </div>
-                            <div className="px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-[10px] font-bold flex items-center gap-1">
+                            <div className="px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-xs font-bold flex items-center gap-1">
                                 <ArrowUpRight className="w-3 h-3" /> 100%
                             </div>
                         </div>
                         <div>
-                            <p className="text-[10px] font-bold text-muted-foreground mb-1">{s.label}</p>
+                            <p className="text-xs font-bold text-muted-foreground mb-1">{s.label}</p>
                             <p className="text-3xl font-bold tracking-tight">{s.value}</p>
                         </div>
                     </div>
@@ -162,7 +162,7 @@ export default function SuperAdminDashboard() {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-sm tracking-tight">{company.name}</p>
-                                                    <p className="text-[10px] text-muted-foreground font-medium  opacity-60">REF: {company.id}</p>
+                                                    <p className="text-xs text-muted-foreground font-medium  opacity-60">REF: {company.id}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -176,7 +176,7 @@ export default function SuperAdminDashboard() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className={cn(
-                                                "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-bold border",
+                                                "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[13px] font-bold border",
                                                 company.plan === 'enterprise' || company.plan === 'Enterprise' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
                                                     company.plan === 'professional' || company.plan === 'Professional' ? "bg-blue-500/10 text-blue-600 border-blue-500/20" : "bg-muted text-muted-foreground border-border"
                                             )}>

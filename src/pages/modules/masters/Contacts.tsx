@@ -1,155 +1,118 @@
 import { useState } from "react";
-import { 
-    Building2, Mail, Phone, MapPin, 
-    Search, Plus, Filter, RefreshCw, 
-    X, Save, Users, UserCheck, 
-    TrendingUp, Briefcase 
-} from "lucide-react";
 import { useCrud } from "@/hooks/useCrud";
+import { User, Plus, Search, Filter, RefreshCw, Save, X, Phone, Mail, MapPin } from "lucide-react";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
-export default function Contacts({ defaultType }: { defaultType?: "customer" | "vendor" | "lead" }) {
+export default function Contacts() {
     const [view, setView] = useState<"list" | "form">("list");
     const [searchTerm, setSearchTerm] = useState("");
     const [editingContact, setEditingContact] = useState<any>(null);
     
-    // Fetch all contacts from unified table
-    const { data: contacts, loading, fetchItems, createItem, updateItem } = useCrud("contacts");
-
-    const contactHeaderFields = [
-        { key: "name", label: "Data", required: true, ph: "First Last or Company Node..." },
-        { key: "email", label: "Email Address", ph: "email@domain.com" },
-        { key: "phone", label: "Phone Number", ph: "+91 ..." },
-        { key: "company_name", label: "Company Name", ph: "Acme Corp Matrix" },
-        { key: "job_title", label: "Job Title", ph: "Manager / Director" },
-        { 
-            key: "type", label: "Type Classification", type: "select" as const,
-            options: [
-                { label: "Standard Customer", value: "customer" },
-                { label: "Strategic Vendor", value: "vendor" },
-                { label: "Prospect Lead Stream", value: "lead" }
-            ]
-        },
-        { key: "city", label: "Geographic", ph: "City" },
-        { key: "status", label: "Status", type: "select" as const,
-            options: [
-                { label: "Active Operational", value: "active" },
-                { label: "Dormant / Archive", value: "inactive" },
-                { label: "Blacklisted Sector", value: "blocked" }
-            ]
-        }
-    ];
-
-    const handleSave = async (header: any) => {
-        if (editingContact) {
-            await updateItem(editingContact.id, header);
-        } else {
-            await createItem({ ...header, type: header.type || defaultType || "customer" });
-        }
-        setView("list");
-        setEditingContact(null);
-    };
+    const { data: contacts, loading, fetchItems, createItem, updateItem } = useCrud("ecom_customers");
 
     const contactColumns = [
+        { key: "full_name", label: "Contact Name", className: "font-bold text-slate-900" },
         { 
-            key: "name", 
-            label: "Type",
-            render: (c: any) => (
-                <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 ${
-                        c.type === 'vendor' ? 'bg-amber-50 text-amber-600 border-amber-100 group-hover:bg-amber-900 group-hover:text-white' :
-                        c.type === 'lead' ? 'bg-cyan-50 text-cyan-600 border-cyan-100 group-hover:bg-cyan-900 group-hover:text-white' :
-                        'bg-blue-50 text-blue-600 border-blue-100 group-hover:bg-blue-900 group-hover:text-white'
-                    }`}>
-                        {c.type === 'vendor' ? <Briefcase className="w-5 h-5" /> : 
-                         c.type === 'lead' ? <TrendingUp className="w-5 h-5" /> : 
-                         <Users className="w-5 h-5" />}
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
-                                {c.type?.toUpperCase() || "CUSTOMER"}
-                            </span>
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
-                                {c.job_title || "Unclassified Role"}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            key: "type", 
+            label: "Category",
+            render: (item: any) => (
+                <span className="text-[12px] font-medium text-slate-500 uppercase tracking-tighter">
+                    {item.type || "Customer"}
+                </span>
             )
         },
-        { 
-            key: "company_name", 
-            label: "Corporate Unit",
-            render: (c: any) => (
-                <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-gray-400 group-hover:text-slate-900 transition-colors" />
-                    <span className="text-[11px] font-bold text-gray-600  tracking-widest group-hover:text-slate-900 transition-colors">{c.company_name || 'Individual / Personal Node'}</span>
-                </div>
-            )
-        },
-        { 
-            key: "email", 
-            label: "Operational Communication",
-            render: (c: any) => (
-                <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2 group-hover:text-indigo-600 transition-colors"><Mail size={12}/> {c.email}</span>
-                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2 group-hover:text-amber-600 transition-colors"><Phone size={12}/> {c.phone}</span>
-                </div>
-            )
-        },
+        { key: "email", label: "Email Address" },
+        { key: "phone", label: "Phone Number" },
         { 
             key: "status", 
-            label: "Operational status",
-            render: (c: any) => <StatusBadge status={c.status || "Active"} />
-        }
+            label: "Status",
+            render: (item: any) => <StatusBadge status={item.status || "Active"} />
+        },
+        { key: "updated_at", label: "Updated Date" }
     ];
 
-    const filteredContacts = (contacts || []).filter(c => {
-        const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.email?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesType = defaultType ? c.type === defaultType : true;
-        return matchesSearch && matchesType;
-    });
+    const contactTabFields = {
+        basic: [
+            { key: "full_name", label: "Legal Name *", type: "text" as const, required: true, ph: "Company or Individual Name" },
+            { 
+                key: "type", label: "Type", type: "select" as const,
+                options: [
+                    { label: "Customer", value: "Customer" },
+                    { label: "Vendor", value: "Vendor" },
+                    { label: "Employee", value: "Employee" }
+                ]
+            },
+            { key: "phone", label: "Phone Number", type: "text" as const, ph: "+91..." },
+            { key: "email", label: "Email Address", type: "text" as const, ph: "contact@example.com" },
+            { key: "gst_number", label: "GST Number", type: "text" as const, ph: "27AAAAA0000A1Z5" },
+            { key: "pan", label: "PAN", type: "text" as const, ph: "ABCDE1234F" }
+        ],
+        config: [
+            { key: "billing_address", label: "Billing Address", type: "textarea" as any, ph: "Full billing address..." },
+            { key: "shipping_address", label: "Shipping Address", type: "textarea" as any, ph: "Full shipping address..." }
+        ],
+        mapping: [
+            { key: "erp_id", label: "ERP ID", type: "text" as const },
+            { key: "status", label: "Status", type: "select" as const, options: [{ value: 'Active', label: 'Active' }, { value: 'Blocked', label: 'Blocked' }] }
+        ]
+    };
+
+    const personFields = [
+        { key: "contact_person", label: "Contact Person", type: "text" as const, ph: "Name" },
+        { key: "phone", label: "Phone", type: "text" as const, ph: "Phone" },
+        { key: "email", label: "Email", type: "text" as const, ph: "Email" },
+        { key: "role", label: "Role", type: "text" as const, ph: "e.g. Manager" }
+    ];
+
+    const handleSave = async (header: any, items: any[]) => {
+        try {
+            console.log("Saving contact with people:", { header, items });
+            if (editingContact) {
+                await updateItem(editingContact.id, header);
+            } else {
+                await createItem(header);
+            }
+            setView("list");
+            setEditingContact(null);
+            fetchItems();
+        } catch (err) {
+            console.error("Save failed:", err);
+        }
+    };
 
     if (view === "form") {
         return (
-            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <div className="p-4 bg-slate-50 min-h-screen">
                 <ERPEntryForm
-                    title={editingContact ? "Refine Contact Matrix" : "Initialize Entity Identity Entry"}
-                    subtitle="Universal Contact Management"
-                    headerFields={contactHeaderFields}
+                    title={editingContact ? "Edit Contact" : "Add New Contact"}
+                    subtitle="Manage customer, vendor and employee details"
+                    tabFields={contactTabFields}
+                    itemFields={personFields}
+                    itemTitle="Contact Persons"
                     onAbort={() => { setView("list"); setEditingContact(null); }}
                     onSave={handleSave}
                     initialData={editingContact}
-                    showItems={false}
+                    showItems={true}
                 />
             </div>
         );
     }
 
     return (
-        <ERPListView
-            title="Unified Contact"
-            data={filteredContacts}
-            columns={contactColumns}
-            onNew={() => { setEditingContact(null); setView("form"); }}
-            onRefresh={fetchItems}
-            onRowClick={(c) => { setEditingContact(c); setView("form"); }}
-            isLoading={loading}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            primaryKey="id"
-            headerActions={
-                <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
-                        Matrix Bulk Import
-                    </button>
-                </div>
-            }
-        />
+        <div className="flex flex-col h-full bg-white">
+            <ERPListView
+                title="Unified Contact Master"
+                data={contacts || []}
+                columns={contactColumns}
+                onNew={() => { setEditingContact(null); setView("form"); }}
+                onRefresh={fetchItems}
+                onRowClick={(item) => { setEditingContact(item); setView("form"); }}
+                isLoading={loading}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                primaryKey="id"
+            />
+        </div>
     );
 }

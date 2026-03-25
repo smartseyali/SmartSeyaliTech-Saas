@@ -37,16 +37,16 @@ export default function PurchaseOrders() {
     };
 
     const orderHeaderFields = [
-        { key: "vendor_name", label: "Supplier", required: true },
-        { key: "reference_no", label: "Procurement Ref", required: true },
-        { key: "date", label: "Procurement Date", type: "date" as const },
-        { key: "expected_delivery", label: "Supply Threshold", type: "date" as const },
+        { key: "vendor_name", label: "Vendor", required: true },
+        { key: "reference_no", label: "Order Reference", required: true },
+        { key: "date", label: "Order Date", type: "date" as const },
+        { key: "expected_delivery", label: "Expected Delivery", type: "date" as const },
         {
-            key: "status", label: "Procurement Status", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
-                { label: "Draft Request", value: "draft" },
-                { label: "Confirmed Supply", value: "confirmed" },
-                { label: "Engine Received", value: "received" },
+                { label: "Draft", value: "draft" },
+                { label: "Confirmed", value: "confirmed" },
+                { label: "Received", value: "received" },
                 { label: "Closed", value: "closed" }
             ]
         }
@@ -92,11 +92,11 @@ export default function PurchaseOrders() {
             const { error: iError } = await supabase.from('purchase_order_items').insert(lineItems);
             if (iError) throw iError;
 
-            toast.success("Procurement Blueprint Committed");
+            toast.success("Purchase Order Saved");
             setView("list");
             loadOrders();
         } catch (err: any) {
-            toast.error(`Supply Sync Failure: ${err.message}`);
+            toast.error(`Save Failed: ${err.message}`);
         }
     };
 
@@ -110,8 +110,8 @@ export default function PurchaseOrders() {
     if (view === "form") {
         return (
             <ERPEntryForm
-                title={editingOrder ? "Modify Procurement" : "Initialize Procurement"}
-                subtitle="Enterprise Inventory Replenishment"
+                title={editingOrder ? "Edit Purchase Order" : "New Purchase Order"}
+                subtitle="Manage supplier orders and stock procurement"
                 headerFields={orderHeaderFields}
                 onAbort={() => { setView("list"); setEditingOrder(null); }}
                 onSave={handleSaveOrder}
@@ -133,7 +133,7 @@ export default function PurchaseOrders() {
             render: (o: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{o.vendor_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Expected: {o.expected_delivery || 'N/A'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">Expected: {o.expected_delivery || 'N/A'}</span>
                 </div>
             )
         },

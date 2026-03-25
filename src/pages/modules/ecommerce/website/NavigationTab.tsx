@@ -95,7 +95,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-[#14532d]">Menu Sets</h2>
-                            <p className="text-[10px] font-bold text-slate-400 tracking-widest mt-0.5">Define Your Links</p>
+                            <p className="text-xs font-bold text-slate-500 tracking-widest mt-0.5">Define Your Links</p>
                         </div>
                     </div>
 
@@ -119,11 +119,11 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                                 <div className="space-y-1 text-left">
                                     <span className={cn(
                                         "text-sm font-bold transition-all",
-                                        activeMenuSet === m ? "text-[#14532d]" : "text-slate-400 group-hover/btn:text-[#14532d]"
+                                        activeMenuSet === m ? "text-[#14532d]" : "text-slate-500 group-hover/btn:text-[#14532d]"
                                     )}>
                                         {m}
                                     </span>
-                                    <p className="text-[9px] font-bold text-slate-300 tracking-widest leading-none">Global Scope</p>
+                                    <p className="text-[13px] font-bold text-slate-300 tracking-widest leading-none">Global Scope</p>
                                 </div>
                                 <ChevronRight className={cn("w-4 h-4 transition-all", activeMenuSet === m ? "translate-x-0 opacity-100 text-[#f97316]" : "-translate-x-2 opacity-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100")} />
                             </button>
@@ -133,7 +133,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
 
                 <div className="p-6 bg-[#14532d] rounded-[24px] text-white flex items-center gap-4 shadow-xl">
                     <ShieldCheck className="w-6 h-6 text-[#f97316]" />
-                    <p className="text-[10px] font-bold tracking-widest text-white/60">Hierarchy Guard Active</p>
+                    <p className="text-xs font-bold tracking-widest text-white/60">Hierarchy Guard Active</p>
                 </div>
             </div>
 
@@ -143,7 +143,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Leaf className="w-4 h-4 text-[#f97316]" />
-                                <span className="text-[#14532d]/40 font-bold tracking-widest text-[10px]">Active Node Registry</span>
+                                <span className="text-[#14532d]/40 font-bold tracking-widest text-xs">Active Node Registry</span>
                             </div>
                             <h2 className="text-3xl md:text-5xl font-bold text-[#14532d] leading-none">{activeMenuSet}</h2>
                         </div>
@@ -183,9 +183,9 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                                     <div className="space-y-0.5">
                                         <p className="font-bold text-lg text-[#14532d] leading-none mb-1">{li.label}</p>
                                         <div className="flex items-center gap-3">
-                                            <code className="text-[10px] font-bold text-[#14532d]/40 tracking-tight">{li.link_url}</code>
+                                            <code className="text-xs font-bold text-[#14532d]/40 tracking-tight">{li.link_url}</code>
                                             <span className="w-1 h-1 rounded-full bg-[#f97316]" />
-                                            <span className="text-[9px] font-bold text-slate-400 tracking-widest">Sort: {li.display_order}</span>
+                                            <span className="text-[13px] font-bold text-slate-500 tracking-widest">Sort: {li.display_order}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -210,7 +210,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                     <div className="mt-12 pt-8 border-t border-slate-50 flex items-center justify-between opacity-30 group-hover:opacity-100 transition-opacity">
                         <div className="flex items-center gap-4">
                             <Lock className="w-5 h-5 text-[#14532d]" />
-                            <p className="text-[10px] font-bold tracking-widest text-[#14532d]">Link Masking Active</p>
+                            <p className="text-xs font-bold tracking-widest text-[#14532d]">Link Masking Active</p>
                         </div>
                         <Zap className="w-5 h-5 text-[#f97316] animate-pulse" />
                     </div>

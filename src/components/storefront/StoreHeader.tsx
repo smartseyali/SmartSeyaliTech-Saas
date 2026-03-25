@@ -53,7 +53,7 @@ export function StoreHeader() {
             {/* Top Strip */}
             <div className="bg-slate-900 overflow-hidden">
                 <div className="max-w-screen-xl mx-auto px-4 py-2 text-center">
-                    <p className="text-white/80 text-[10px] md:text-[11px] font-bold tracking-widest uppercase  flex items-center justify-center gap-6">
+                    <p className="text-white/80 text-xs md:text-[13px] font-bold tracking-widest uppercase  flex items-center justify-center gap-6">
                         <span className="flex items-center gap-2"><Activity className="w-3 h-3 text-blue-500" /> GLOBAL_STANDARDS</span>
                         <span className="hidden md:inline text-white/20">|</span>
                         <span className="hidden md:inline">ENTERPRISE_SOLUTIONS</span>
@@ -90,10 +90,10 @@ export function StoreHeader() {
                                 key={link.label}
                                 to={storeLink(link.path)}
                                 className={cn(
-                                    "text-[11px] font-bold uppercase tracking-widest transition-all  hover:text-blue-600",
+                                    "text-[13px] font-bold uppercase tracking-widest transition-all  hover:text-blue-600",
                                     location.pathname === storeLink(link.path) || (link.path === "/" && location.pathname === storeLink("/"))
                                         ? "text-blue-600"
-                                        : "text-slate-400"
+                                        : "text-slate-500"
                                 )}
                             >
                                 {link.label}
@@ -139,7 +139,7 @@ export function StoreHeader() {
                                         className="absolute right-0 mt-4 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-50 z-50 overflow-hidden"
                                     >
                                         <div className="px-8 py-6 bg-slate-50 border-b border-slate-100">
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ">User Identity</p>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-500 ">User Identity</p>
                                             <p className="font-bold text-slate-900 text-sm truncate mt-1  uppercase">{user.email}</p>
                                         </div>
                                         <div className="p-4 space-y-2">
@@ -159,7 +159,7 @@ export function StoreHeader() {
                         <Link to={storeLink("/cart")} className="p-3 bg-slate-900 text-white hover:bg-blue-600 rounded-2xl transition-all relative flex items-center shadow-xl shadow-slate-900/10">
                             <ShoppingCart className="w-5 h-5" />
                             {itemCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[13px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
                                     {itemCount > 9 ? "9+" : itemCount}
                                 </span>
                             )}
@@ -182,12 +182,12 @@ export function StoreHeader() {
                                 <Link
                                     key={link.label}
                                     to={storeLink(link.path)}
-                                    className="block px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all "
+                                    className="block px-6 py-4 text-[13px] font-bold uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all "
                                 >
                                     {link.label}
                                 </Link>
                             ))}
-                            {!user && <Link to="/login" className="block px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-blue-600 border-t border-slate-50 mt-4 ">Login Access</Link>}
+                            {!user && <Link to="/login" className="block px-6 py-4 text-[13px] font-bold uppercase tracking-widest text-blue-600 border-t border-slate-50 mt-4 ">Login Access</Link>}
                         </div>
                     </motion.div>
                 )}

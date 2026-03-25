@@ -47,7 +47,7 @@ export default function Vendors() {
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900   tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{row.category || "General"} / REGISTERED</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">{row.category || "General"} / REGISTERED</span>
                 </div>
             )
         },
@@ -56,10 +56,10 @@ export default function Vendors() {
             label: "point / Email",
             render: (row: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500  tracking-widest">
+                    <div className="flex items-center gap-2 text-xs font-bold text-gray-500  tracking-widest">
                         <Mail className="w-3 h-3 text-slate-300" /> {row.email}
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500  tracking-widest">
+                    <div className="flex items-center gap-2 text-xs font-bold text-gray-500  tracking-widest">
                         <Phone className="w-3 h-3 text-slate-300" /> {row.phone}
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export default function Vendors() {
                             <Star key={s} className={`w-2.5 h-2.5 ${s <= Math.floor(row.rating || 0) ? 'fill-rose-500 text-rose-500' : 'text-slate-200'}`} />
                         ))}
                     </div>
-                    <span className="text-[11px] font-bold text-slate-900 tracking-tight">{row.rating || "0.0"}</span>
+                    <span className="text-[13px] font-bold text-slate-900 tracking-tight">{row.rating || "0.0"}</span>
                 </div>
             )
         },
@@ -123,10 +123,10 @@ export default function Vendors() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button onClick={() => { setEditingVendor(null); setView("form"); }} className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button onClick={() => { setEditingVendor(null); setView("form"); }} className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
                         <Building2 className="w-3.5 h-3.5" /> Enlist Supplier
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all shadow-sm">
                         Matrix Export
                     </button>
                 </div>

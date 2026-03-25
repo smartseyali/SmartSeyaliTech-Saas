@@ -84,10 +84,10 @@ export function BlogTab({ companyId }: { companyId: any }) {
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
                         <Leaf className="w-4 h-4 text-[#f97316]" />
-                        <span className="text-[#14532d]/40 font-bold tracking-widest text-[10px]">Merchant Journal</span>
+                        <span className="text-[#14532d]/40 font-bold tracking-widest text-xs">Merchant Journal</span>
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#14532d] leading-none">The <span className="text-[#14532d]/20 ">Blog</span></h2>
-                    <p className="text-sm text-slate-400 font-medium max-w-xl">
+                    <p className="text-sm text-slate-500 font-medium max-w-xl">
                         Share stories, recipes, and organic farming tips with your community. Your blog is a powerful tool for customer engagement.
                     </p>
                 </div>
@@ -113,8 +113,8 @@ export function BlogTab({ companyId }: { companyId: any }) {
                     <div className="col-span-full py-32 text-center bg-[#f8fafc] rounded-[48px] border-2 border-dashed border-slate-100">
                         <MessageCircle className="w-16 h-16 mx-auto mb-6 text-slate-200" />
                         <p className="text-xl font-bold text-[#14532d] tracking-tight">The Archive is Silent</p>
-                        <p className="text-slate-400 font-medium mt-2">Begin your brand's narrative by publishing your first article.</p>
-                        <Button onClick={handleNew} variant="outline" className="mt-10 rounded-2xl h-14 px-8 font-bold tracking-widest text-[10px]">Start Writing</Button>
+                        <p className="text-slate-500 font-medium mt-2">Begin your brand's narrative by publishing your first article.</p>
+                        <Button onClick={handleNew} variant="outline" className="mt-10 rounded-2xl h-14 px-8 font-bold tracking-widest text-xs">Start Writing</Button>
                     </div>
                 )}
 
@@ -133,13 +133,13 @@ export function BlogTab({ companyId }: { companyId: any }) {
                                 alt={b.title}
                                 className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-[2000ms]"
                             />
-                            <span className="absolute top-4 left-4 px-3 py-1 bg-[#14532d] rounded-full text-[9px] font-bold text-white tracking-widest z-10 shadow-lg shadow-[#14532d]/20">
+                            <span className="absolute top-4 left-4 px-3 py-1 bg-[#14532d] rounded-full text-[13px] font-bold text-white tracking-widest z-10 shadow-lg shadow-[#14532d]/20">
                                 {b.category || "General"}
                             </span>
                         </div>
 
                         <div className="p-8 flex flex-col flex-1">
-                            <div className="flex items-center gap-2 mb-4 text-[10px] font-bold tracking-widest text-slate-400">
+                            <div className="flex items-center gap-2 mb-4 text-xs font-bold tracking-widest text-slate-500">
                                 <Sparkles className="w-3.5 h-3.5 text-[#f97316]" /> {b.is_published ? "Published" : "Draft"}
                             </div>
                             <h3 className="font-bold text-xl text-[#14532d] mb-6 line-clamp-2">
@@ -163,7 +163,7 @@ export function BlogTab({ companyId }: { companyId: any }) {
                                 </div>
                                 <Button
                                     onClick={(e) => { e.stopPropagation(); handleEdit(b); }}
-                                    variant="link" className="p-0 h-auto text-[10px] font-bold tracking-widest text-[#14532d]/60 hover:text-[#14532d] flex items-center gap-2 group/link transition-all"
+                                    variant="link" className="p-0 h-auto text-xs font-bold tracking-widest text-[#14532d]/60 hover:text-[#14532d] flex items-center gap-2 group/link transition-all"
                                 >
                                     Edit Post <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                                 </Button>

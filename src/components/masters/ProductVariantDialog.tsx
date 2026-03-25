@@ -17,7 +17,7 @@ interface Variant {
     image_url: string;
 }
 
-const inputStyle = "w-full h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all shadow-sm";
+const inputStyle = "w-full h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all shadow-sm";
 const labelStyle = "text-sm font-semibold text-slate-700 mb-1.5 block";
 
 export function ProductVariantDialog({
@@ -194,7 +194,7 @@ export function ProductVariantDialog({
                                                 <input type="number" value={v.price} onChange={e => {
                                                     const next = [...variants]; next[i].price = Number(e.target.value); setVariants(next);
                                                 }} className={cn(inputStyle, "pl-8 text-blue-600 font-bold")} />
-                                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">₹</span>
+                                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">₹</span>
                                             </div>
                                         </div>
                                         <div>
@@ -206,7 +206,7 @@ export function ProductVariantDialog({
 
                                         {/* Status + Delete row */}
                                         <div className="flex items-end justify-between col-span-2 lg:col-span-3 pt-4 mt-2 border-t border-slate-100">
-                                            <span className="text-xs font-medium text-slate-400">
+                                            <span className="text-xs font-medium text-slate-500">
                                                 {v.id ? `ID: ${v.id}` : <span className="text-blue-500 ">Unsaved variant</span>}
                                             </span>
                                             <button

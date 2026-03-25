@@ -65,7 +65,7 @@ export function SectionEditor({ companyId }: { companyId: any }) {
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-[#14532d]">Banner Management</h2>
-                        <p className="text-xs font-semibold text-slate-400 mt-0.5">Edit and arrange hero images for your storefront home page.</p>
+                        <p className="text-xs font-semibold text-slate-500 mt-0.5">Edit and arrange hero images for your storefront home page.</p>
                     </div>
                 </div>
                 <Button
@@ -98,7 +98,7 @@ export function SectionEditor({ companyId }: { companyId: any }) {
 
                         <Button
                             onClick={handleAddBanner}
-                            className="w-full h-24 border-2 border-dashed border-[#14532d]/20 bg-[#14532d]/5 hover:bg-white hover:border-[#14532d] rounded-[32px] font-bold  tracking-widest text-[11px] text-[#14532d] transition-all duration-300 group/add"
+                            className="w-full h-24 border-2 border-dashed border-[#14532d]/20 bg-[#14532d]/5 hover:bg-white hover:border-[#14532d] rounded-[32px] font-bold  tracking-widest text-[13px] text-[#14532d] transition-all duration-300 group/add"
                         >
                             <Plus className="w-6 h-6 mr-2 group-hover/add:rotate-90 transition-transform" /> Add New Banner Slide
                         </Button>
@@ -120,7 +120,7 @@ export function SectionEditor({ companyId }: { companyId: any }) {
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/10 relative z-10">
                     <Leaf className="w-3.5 h-3.5 text-[#f97316]" />
-                    <span className="text-[10px] font-bold  tracking-widest">Node: {activeCompany?.subdomain}</span>
+                    <span className="text-xs font-bold  tracking-widest">Node: {activeCompany?.subdomain}</span>
                 </div>
             </div>
         </div>

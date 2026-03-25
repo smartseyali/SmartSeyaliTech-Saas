@@ -53,10 +53,10 @@ export default function Tenants() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Company</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Plan / Type</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Primary Admins</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-right">Actions</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left">Company</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left">Plan / Type</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left">Primary Admins</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -72,17 +72,17 @@ export default function Tenants() {
                                             </div>
                                             <div>
                                                 <p className="font-bold text-slate-900">{c.name}</p>
-                                                <p className="text-xs font-semibold text-slate-400">{c.subdomain}.domain.com</p>
+                                                <p className="text-xs font-semibold text-slate-500">{c.subdomain}.domain.com</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="p-4">
                                         <div className="flex flex-col gap-1 inline-flex">
-                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px]  tracking-wider w-fit">
+                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-bold text-xs  tracking-wider w-fit">
                                                 {c.plan || 'Starter'}
                                             </span>
                                             {c.industry_type && (
-                                                <span className="text-[10px] font-bold text-slate-400 ">{c.industry_type}</span>
+                                                <span className="text-xs font-bold text-slate-500 ">{c.industry_type}</span>
                                             )}
                                         </div>
                                     </td>
@@ -92,15 +92,15 @@ export default function Tenants() {
                                                 {admins.slice(0, 2).map((adm: any, i: number) => (
                                                     <div key={i} className="flex flex-col">
                                                         <span className="text-xs font-bold text-slate-900">{adm.users?.full_name || 'Admin'}</span>
-                                                        <span className="text-[10px] font-semibold text-slate-500">{adm.users?.username}</span>
+                                                        <span className="text-xs font-semibold text-slate-500">{adm.users?.username}</span>
                                                     </div>
                                                 ))}
                                                 {admins.length > 2 && (
-                                                    <span className="text-[10px] font-bold text-slate-400">+{admins.length - 2} more</span>
+                                                    <span className="text-xs font-bold text-slate-500">+{admins.length - 2} more</span>
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-slate-400 font-semibold ">No admins linked</span>
+                                            <span className="text-xs text-slate-500 font-semibold ">No admins linked</span>
                                         )}
                                     </td>
                                     <td className="p-4 text-right">
@@ -113,7 +113,7 @@ export default function Tenants() {
                         })}
                         {companies.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-sm font-semibold text-slate-400">
+                                <td colSpan={4} className="p-8 text-center text-sm font-semibold text-slate-500">
                                     No tenant companies found.
                                 </td>
                             </tr>

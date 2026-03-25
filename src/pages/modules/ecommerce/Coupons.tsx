@@ -70,7 +70,7 @@ export default function Coupons() {
         try {
             const payload = {
                 company_id: activeCompany.id,
-                code: formData.code.toUpperCase().trim(),
+                code: (formData.code || "").toUpperCase().trim(),
                 description: formData.description,
                 type: formData.type,
                 value: Number(formData.value) || 0,
@@ -145,7 +145,7 @@ export default function Coupons() {
         <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold tracking-widest text-slate-400 mb-1">Marketing</p>
+                    <p className="text-xs font-bold tracking-widest text-slate-500 mb-1">Marketing</p>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">Coupons & Discounts</h1>
                     <p className="text-sm text-slate-500 mt-1">Manage promotional codes and discount rules for your store.</p>
                 </div>
@@ -158,13 +158,13 @@ export default function Coupons() {
                 {Object.entries(TYPE_CONFIG).map(([type, conf]) => (
                     <div key={type} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-bold tracking-widest text-slate-400">{conf.label}</span>
+                            <span className="text-xs font-bold tracking-widest text-slate-500">{conf.label}</span>
                             <div className={cn("p-2 rounded-lg border", conf.color)}>
                                 <conf.icon className="w-4 h-4" />
                             </div>
                         </div>
                         <p className="text-2xl font-bold tracking-tight text-slate-900 mb-0.5">{coupons.filter(c => c.type === type).length}</p>
-                        <p className="text-xs font-medium text-slate-400 capitalize">{type.replace(/_/g, ' ')}</p>
+                        <p className="text-xs font-medium text-slate-500 capitalize">{type.replace(/_/g, ' ')}</p>
                     </div>
                 ))}
             </div>
@@ -177,7 +177,7 @@ export default function Coupons() {
                             <Tag className="w-4 h-4 text-indigo-600 animate-pulse" />
                         </div>
                     </div>
-                    <p className="text-[10px] font-bold tracking-widest text-slate-400">Syncing Coupon Registry...</p>
+                    <p className="text-xs font-bold tracking-widest text-slate-500">Syncing Coupon Registry...</p>
                 </div>
             ) : coupons.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-dashed border-slate-200 text-center py-20">
@@ -185,7 +185,7 @@ export default function Coupons() {
                         <Tag className="w-8 h-8 text-indigo-500" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 mb-1">No coupons yet</h3>
-                    <p className="text-sm text-slate-400 mb-6 max-w-xs mx-auto">Create discount codes to reward customers and boost conversions.</p>
+                    <p className="text-sm text-slate-500 mb-6 max-w-xs mx-auto">Create discount codes to reward customers and boost conversions.</p>
                     <Button className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold gap-2" onClick={handleNew}>
                         <Plus className="w-4 h-4" /> Create First Coupon
                     </Button>
@@ -208,7 +208,7 @@ export default function Coupons() {
                                             </div>
                                             <div>
                                                 <code className="text-lg font-bold tracking-widest text-slate-900 block">{c.code}</code>
-                                                <span className={cn("inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold border mt-0.5", conf.color)}>{conf.label}</span>
+                                                <span className={cn("inline-flex items-center px-2 py-0.5 rounded-md text-[13px] font-bold border mt-0.5", conf.color)}>{conf.label}</span>
                                             </div>
                                         </div>
                                         <button onClick={() => toggleActive(c)}
@@ -217,12 +217,12 @@ export default function Coupons() {
                                         </button>
                                     </div>
 
-                                    {c.description && <p className="text-sm text-slate-400 leading-relaxed font-medium">{c.description}</p>}
+                                    {c.description && <p className="text-sm text-slate-500 leading-relaxed font-medium">{c.description}</p>}
 
                                     <div className="space-y-2.5 py-4 border-y border-slate-100 text-xs">
                                         {c.type !== "free_shipping" && (
                                             <div className="flex justify-between items-center">
-                                                <span className="font-bold text-slate-400 tracking-widest text-[9px]">BENEFIT</span>
+                                                <span className="font-bold text-slate-500 tracking-widest text-[13px]">BENEFIT</span>
                                                 <span className="font-bold text-indigo-600 px-2.5 py-1 bg-slate-50 rounded-lg">
                                                     {c.type === "percentage" ? `${c.value}%` : `₹${c.value}`}{c.max_discount ? ` (max ₹${c.max_discount})` : ""}
                                                 </span>
@@ -230,17 +230,17 @@ export default function Coupons() {
                                         )}
                                         {Number(c.min_order_amount) > 0 && (
                                             <div className="flex justify-between items-center">
-                                                <span className="font-bold text-slate-400 tracking-widest text-[9px]">MIN ORDER</span>
+                                                <span className="font-bold text-slate-500 tracking-widest text-[13px]">MIN ORDER</span>
                                                 <span className="font-bold text-slate-800">₹{c.min_order_amount}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between items-center">
-                                            <span className="font-bold text-slate-400 tracking-widest text-[9px]">USAGE</span>
+                                            <span className="font-bold text-slate-500 tracking-widest text-[13px]">USAGE</span>
                                             <span className="font-bold text-slate-800">{c.used_count || 0} / {c.usage_limit || "∞"}</span>
                                         </div>
                                         {c.valid_until && (
                                             <div className="flex justify-between items-center">
-                                                <span className="font-bold text-slate-400 tracking-widest text-[9px]">EXPIRY</span>
+                                                <span className="font-bold text-slate-500 tracking-widest text-[13px]">EXPIRY</span>
                                                 <span className={cn("font-bold", isExpired ? "text-rose-500" : "text-slate-500")}>{new Date(c.valid_until).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</span>
                                             </div>
                                         )}
@@ -252,11 +252,11 @@ export default function Coupons() {
                                         <Pencil className="w-3.5 h-3.5" /> Edit
                                     </Button>
                                     <button onClick={() => { navigator.clipboard.writeText(c.code); toast({ title: "Copied!" }); }}
-                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 transition-all">
+                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 transition-all">
                                         <Copy className="w-4 h-4" />
                                     </button>
                                     <button onClick={() => deleteCoupon(c)}
-                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-slate-100">
+                                        className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-all border border-slate-100">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>

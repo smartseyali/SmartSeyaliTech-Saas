@@ -115,7 +115,7 @@ export default function Deliveries() {
             render: (d: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800   leading-none">{d.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Tracking: {d.tracking_no || 'Pending'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">Tracking: {d.tracking_no || 'Pending'}</span>
                 </div>
             )
         },
@@ -125,7 +125,7 @@ export default function Deliveries() {
             render: (d: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-slate-600 tracking-tight">{d.total_qty || 0} Units</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Ship Date: {d.date}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">Ship Date: {d.date}</span>
                 </div>
             )
         },

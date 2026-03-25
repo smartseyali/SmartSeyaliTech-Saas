@@ -7,7 +7,7 @@ import {
     ShoppingBag, TrendingUp, Package, RefreshCw, AlertCircle,
     ArrowUpRight, Clock, CheckCircle2, XCircle, Truck, RotateCcw,
     CreditCard, Tag, Star, Users, BarChart3, MapPin, Image as ImageIcon, Plus,
-    ExternalLink
+    ExternalLink, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,14 +39,14 @@ interface RecentOrder {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
-    pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400", icon: Clock },
-    confirmed: { label: "Confirmed", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", icon: CheckCircle2 },
-    packed: { label: "Packed", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400", icon: Package },
-    shipped: { label: "Shipped", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", icon: Truck },
-    out_for_delivery: { label: "Out for Delivery", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400", icon: Truck },
-    delivered: { label: "Delivered", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400", icon: CheckCircle2 },
-    cancelled: { label: "Cancelled", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400", icon: XCircle },
-    returned: { label: "Returned", color: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400", icon: RotateCcw },
+    pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700", icon: Clock },
+    confirmed: { label: "Confirmed", color: "bg-blue-100 text-blue-700", icon: CheckCircle2 },
+    packed: { label: "Packed", color: "bg-indigo-100 text-indigo-700", icon: Package },
+    shipped: { label: "Shipped", color: "bg-purple-100 text-purple-700", icon: Truck },
+    out_for_delivery: { label: "Out for Delivery", color: "bg-orange-100 text-orange-700", icon: Truck },
+    delivered: { label: "Delivered", color: "bg-green-100 text-green-700", icon: CheckCircle2 },
+    cancelled: { label: "Cancelled", color: "bg-red-100 text-red-700", icon: XCircle },
+    returned: { label: "Returned", color: "bg-slate-100 text-slate-700", icon: RotateCcw },
 };
 
 export default function EcomDashboard() {
@@ -64,7 +64,6 @@ export default function EcomDashboard() {
         setLoading(true);
         try {
             const today = new Date().toISOString().split("T")[0];
-
             const [{ data: orders }, { data: refunds }, { data: coupons }, { data: reviews }, { data: customers }] = await Promise.all([
                 supabase.from("ecom_orders").select("*").eq("company_id", activeCompany.id),
                 supabase.from("refunds").select("id, status").eq("company_id", activeCompany.id).eq("status", "pending"),
@@ -100,232 +99,162 @@ export default function EcomDashboard() {
 
     const fmt = (n: number) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
-    if (!activeCompany) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[70vh] space-y-6 text-center animate-in fade-in zoom-in duration-500">
-                <div className="w-24 h-24 rounded-[2.5rem] bg-amber-100 flex items-center justify-center text-amber-600 shadow-2xl shadow-amber-200/50">
-                    <AlertCircle className="w-12 h-12" />
-                </div>
-                <div className="space-y-4 max-w-md">
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">No Active Workspace</h2>
-                    <p className="text-slate-500 font-medium text-sm">We couldn't find an active company linked to your account. Please create or select a workspace to manage your store.</p>
-                </div>
-                <div className="flex gap-4">
-                    <Button onClick={() => navigate("/settings")} className="px-8 font-bold">Setup Workspace</Button>
-                </div>
-            </div>
-        );
-    }
-
-    if (loading) return (
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-            <RefreshCw className="w-6 h-6 text-blue-600 animate-spin opacity-40" />
-            <p className="text-xs font-bold  tracking-widest text-slate-400">Synchronizing Data...</p>
-        </div>
-    );
+    if (!activeCompany) return null;
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100 relative">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <TrendingUp className="w-5 h-5 text-blue-600" />
-                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Store Performance</span>
-                    </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">E-commerce Dashboard</h1>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase tracking-wider">Store Analytics</h1>
                     <div className="flex items-center gap-2">
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md text-[9px] font-bold border border-emerald-100">
-                            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                            ACTIVE
-                        </div>
-                        <span className="text-slate-300 text-xs">•</span>
-                        <span className="text-slate-500 font-medium text-xs">{activeCompany?.name}</span>
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase leading-none">Global Revenue Hub • {activeCompany?.name}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={load} className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+                    <button onClick={load} className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 transition-all">
                         <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
                     </button>
                     <Link to="/apps/ecommerce/orders/new">
-                        <Button className="h-10 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 transition-all gap-2 border-0">
+                        <Button className="h-10 px-6 rounded-xl bg-blue-600 hover:bg-slate-900 text-white font-bold text-xs tracking-widest uppercase transition-all gap-2 border-0">
                             <Plus className="w-4 h-4" /> New Order
                         </Button>
                     </Link>
                 </div>
             </div>
 
-            {/* Premium KPI Cards */}
+            {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
                     { label: "Total Revenue", value: fmt(stats?.totalRevenue || 0), sub: `${fmt(stats?.todayRevenue || 0)} last 24h`, icon: TrendingUp, color: "bg-blue-600" },
                     { label: "Total Orders", value: stats?.totalOrders || 0, sub: `${stats?.todayOrders || 0} today`, icon: ShoppingBag, color: "bg-slate-900" },
-                    { label: "Avg. Order Value", value: fmt(stats?.avgOrderValue || 0), sub: "platform average", icon: BarChart3, color: "bg-blue-600" },
-                    { label: "Total Customers", value: stats?.totalCustomers || 0, sub: "registered users", icon: Users, color: "bg-slate-900" },
+                    { label: "Avg. Ticket", value: fmt(stats?.avgOrderValue || 0), sub: "Basket efficiency", icon: BarChart3, color: "bg-blue-600" },
+                    { label: "Total Customers", value: stats?.totalCustomers || 0, sub: "Loyal base", icon: Users, color: "bg-slate-900" },
                 ].map(k => (
-                    <div key={k.label} className="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-xl hover:border-blue-100 transition-all duration-300 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
-                            <k.icon className="w-20 h-20 -rotate-12 translate-x-4 translate-y-2" />
-                        </div>
-                        <div className="flex items-center justify-between mb-8 relative z-10">
-                            <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
+                    <div key={k.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all h-64">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-500">{k.label}</span>
+                            <span className="text-xs font-bold tracking-[0.1em] text-slate-500 uppercase leading-none">{k.label}</span>
                         </div>
-                        <div className="relative z-10">
-                            <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
-                            <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-semibold text-slate-500  tracking-wide leading-none">{k.sub}</p>
-                            </div>
+                        <div>
+                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2">{k.value}</p>
+                            <p className="text-xs font-bold text-slate-500 tracking-widest uppercase leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300">
-                    <div className="px-8 py-6 border-b border-slate-50 bg-white flex items-center justify-between relative">
-                        <div className="absolute top-0 left-0 w-16 h-1 bg-blue-600 rounded-full ml-8" />
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-                                <Clock className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Order Fulfillment</h2>
-                                <p className="text-[10px] font-bold text-slate-500  tracking-[0.1em] mt-1.5">Recent updates</p>
-                            </div>
-                        </div>
+                <div className="lg:col-span-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                    <div className="px-10 py-8 border-b border-slate-50 bg-white flex items-center justify-between">
+                        <h2 className="text-xl font-bold tracking-tight text-slate-900 uppercase tracking-wider leading-none">Fulfillment Stream</h2>
                         <Link to="/apps/ecommerce/orders">
-                            <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-blue-600 hover:bg-blue-50">View All Orders <ExternalLink className="w-3 h-3 ml-2" /></Button>
+                            <Button variant="ghost" className="h-9 px-4 rounded-lg text-xs font-bold tracking-widest text-blue-600 uppercase hover:bg-blue-50 transition-all">Entire Ledger</Button>
                         </Link>
                     </div>
 
-                    <div className="p-8 space-y-10 flex-1">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-10 space-y-10">
+                        <div className="grid grid-cols-4 gap-4">
                             {[
-                                { label: "Incoming", value: stats?.pendingOrders, color: "bg-blue-50 text-blue-600", border: "border-blue-100", icon: Clock },
-                                { label: "In Transit", value: stats?.shippedOrders, color: "bg-amber-50 text-amber-600", border: "border-amber-100", icon: Truck },
-                                { label: "Fulfilled", value: stats?.deliveredOrders, color: "bg-emerald-50 text-emerald-600", border: "border-emerald-100", icon: CheckCircle2 },
-                                { label: "Exceptions", value: stats?.cancelledOrders, color: "bg-rose-50 text-rose-600", border: "border-rose-100", icon: XCircle },
+                                { label: "Pending", value: stats?.pendingOrders, color: "bg-amber-50 text-amber-600", border: "border-amber-100", icon: Clock },
+                                { label: "Shipped", value: stats?.shippedOrders, color: "bg-blue-50 text-blue-600", border: "border-blue-100", icon: Truck },
+                                { label: "Delivered", value: stats?.deliveredOrders, color: "bg-emerald-50 text-emerald-600", border: "border-emerald-100", icon: CheckCircle2 },
+                                { label: "Cancelled", value: stats?.cancelledOrders, color: "bg-rose-50 text-rose-600", border: "border-rose-100", icon: XCircle },
                             ].map(s => (
-                                <div key={s.label} className={cn("flex flex-col gap-2 p-5 rounded-xl border bg-white shadow-sm transition-all hover:shadow-md group relative overflow-hidden", s.border)}>
-                                    <div className="flex items-center justify-between relative z-10">
-                                        <div className={cn("p-2 rounded-lg border", s.color)}>
-                                            <s.icon className="w-3.5 h-3.5" />
+                                <div key={s.label} className={cn("flex flex-col gap-2 p-6 rounded-3xl border bg-white shadow-sm flex-1", s.border)}>
+                                    <div className="flex items-center justify-between">
+                                        <div className={cn("p-2.5 rounded-xl border fill-current", s.color)}>
+                                            <s.icon className="w-4 h-4" />
                                         </div>
                                         <span className="text-2xl font-bold tracking-tight text-slate-900">{s.value || 0}</span>
                                     </div>
-                                    <p className="text-[10px] font-bold  tracking-[0.1em] text-slate-600 relative z-10 mt-1">{s.label}</p>
+                                    <p className="text-xs font-bold tracking-widest text-slate-500 uppercase mt-2">{s.label}</p>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Recent Orders Table */}
-                        <div className="space-y-5">
-                            <h3 className="text-[10px] font-bold  tracking-widest text-slate-500 ml-1">Recent Orders</h3>
-                            <div className="rounded-xl border border-slate-50 overflow-hidden bg-white shadow-inner">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="bg-slate-50 text-[10px] font-bold  tracking-widest text-slate-500 border-b border-slate-100">
-                                            <th className="px-8 py-5 text-left">Order ID</th>
-                                            <th className="px-8 py-5 text-left">Customer</th>
-                                            <th className="px-8 py-5 text-right">Amount</th>
-                                            <th className="px-8 py-5 text-center">Status</th>
-                                            <th className="px-8 py-5 text-left">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {recentOrders.map(o => {
-                                            const s = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
-                                            return (
-                                                <tr key={o.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => navigate(`/apps/ecommerce/orders/${o.id}`)}>
-                                                    <td className="px-8 py-4">
-                                                        <span className="font-bold text-blue-600 group-hover:underline  tracking-widest text-xs font-mono">{o.order_number}</span>
-                                                    </td>
-                                                    <td className="px-8 py-4">
-                                                        <p className="font-bold text-slate-700 truncate max-w-[150px]">{o.customer_name}</p>
-                                                    </td>
-                                                    <td className="px-8 py-4 text-right text-slate-900 font-bold font-mono">
-                                                        {fmt(Number(o.grand_total))}
-                                                    </td>
-                                                    <td className="px-8 py-4 text-center">
-                                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold  border shadow-sm", s.color.replace('dark:', ''))}>
-                                                            <s.icon className="w-3 h-3" /> {s.label}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-8 py-4">
-                                                        <p className="text-[10px] font-bold text-slate-500 ">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div className="rounded-[2rem] border border-slate-50 overflow-hidden bg-white">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="bg-slate-50 text-xs font-bold tracking-widest text-slate-500 uppercase border-b border-slate-100">
+                                        <th className="px-8 py-5 text-left">Document ID</th>
+                                        <th className="px-8 py-5 text-left">Entity</th>
+                                        <th className="px-8 py-5 text-right">Valuation</th>
+                                        <th className="px-8 py-5 text-center">Status</th>
+                                        <th className="px-8 py-5 text-left">Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {recentOrders.map(o => {
+                                        const s = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
+                                        return (
+                                            <tr key={o.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => navigate(`/apps/ecommerce/orders/${o.id}`)}>
+                                                <td className="px-8 py-5">
+                                                    <span className="font-bold text-blue-600 tracking-widest text-xs font-mono">{o.order_number}</span>
+                                                </td>
+                                                <td className="px-8 py-5">
+                                                    <p className="font-bold text-slate-700 truncate max-w-[150px] uppercase text-[13px] tracking-tight">{o.customer_name}</p>
+                                                </td>
+                                                <td className="px-8 py-5 text-right text-slate-900 font-bold font-mono text-[13px]">
+                                                    {fmt(Number(o.grand_total))}
+                                                </td>
+                                                <td className="px-8 py-5 text-center">
+                                                    <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-bold tracking-widest uppercase border", s.color)}>
+                                                        {s.label}
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-5 text-left">
+                                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
-                    {/* Operational Alerts */}
-                    <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-5 relative">
-                            <div className="absolute top-0 left-0 w-10 h-1 bg-blue-600 rounded-full" />
-                            <h2 className="text-lg font-bold tracking-tight text-slate-900">Alerts</h2>
-                            <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md border border-blue-100 ">Updates</span>
+                    <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10">
+                            <Zap className="w-32 h-32 text-blue-500 -rotate-12 translate-x-12" />
                         </div>
-                        <div className="space-y-4">
+                        <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-6">Shortcuts</h2>
+                        <div className="grid grid-cols-2 gap-4 relative z-10">
                             {[
-                                { label: "Refund Requests", value: stats?.pendingRefunds || 0, icon: RotateCcw, color: "text-rose-600 bg-rose-50", border: "border-rose-100", link: "/apps/ecommerce/refunds", urgent: (stats?.pendingRefunds || 0) > 0 },
-                                { label: "Reviews", value: stats?.pendingReviews || 0, icon: Star, color: "text-amber-600 bg-amber-50", border: "border-amber-100", link: "/apps/ecommerce/reviews", urgent: (stats?.pendingReviews || 0) > 0 },
-                                { label: "Abandoned Carts", value: "8 Carts", icon: Users, color: "text-blue-600 bg-blue-50", border: "border-blue-100", link: "/apps/ecommerce/abandoned-carts", urgent: true },
-                            ].map(a => (
-                                <Link key={a.label} to={a.link}
-                                    className={cn(
-                                        "relative group flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:shadow-md bg-white",
-                                        a.urgent ? `${a.border} border-l-2` : "border-slate-50 opacity-60"
-                                    )}>
-                                    <div className="flex items-center gap-4">
-                                        <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 border", a.color)}>
-                                            <a.icon className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <p className="text-[9px] font-bold  tracking-[0.1em] text-slate-500 mb-0.5">{a.label}</p>
-                                            <p className="text-xl font-bold tracking-tight text-slate-900">{a.value}</p>
-                                        </div>
+                                { label: "Catalog Hub", icon: Package, link: "/apps/ecommerce/masters/products", color: "bg-blue-600" },
+                                { label: "Asset Vault", icon: ImageIcon, link: "/apps/ecommerce/gallery", color: "bg-white/10" },
+                                { label: "Growth Engine", icon: TrendingUp, link: "/apps/ecommerce/offers", color: "bg-blue-600" },
+                                { label: "Fiscal Logs", icon: CreditCard, link: "/apps/ecommerce/payment-gateways", color: "bg-white/10" },
+                            ].map(q => (
+                                <Link key={q.label} to={q.link}
+                                    className="flex flex-col items-center justify-center gap-4 p-6 rounded-3xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 group/item">
+                                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl transition-transform group-hover/item:-translate-y-1 text-white", q.color)}>
+                                        <q.icon className="w-5 h-5" />
                                     </div>
+                                    <span className="text-xs font-bold tracking-widest text-slate-500 group-hover/item:text-white transition-colors text-center uppercase">{q.label}</span>
                                 </Link>
                             ))}
                         </div>
                     </div>
 
-                    {/* Fast Navigation */}
-                    <div className="bg-slate-900 rounded-2xl p-8 shadow-xl relative overflow-hidden group">
-                        <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-all" />
-                        <h2 className="text-lg font-bold tracking-tight text-white mb-8 border-b border-white/5 pb-5  tracking-wide">Shortcuts</h2>
-                        <div className="grid grid-cols-2 gap-4 relative z-10">
-                            {[
-                                { label: "Zones", icon: MapPin, link: "/apps/ecommerce/shipping-zones", color: "bg-blue-600" },
-                                { label: "Assets", icon: ImageIcon, link: "/apps/ecommerce/gallery", color: "bg-white/10 border border-white/10" },
-                                { label: "Growth", icon: TrendingUp, link: "/apps/ecommerce/offers", color: "bg-blue-600" },
-                                { label: "Finance", icon: CreditCard, link: "/apps/ecommerce/payment-gateways", color: "bg-white/10 border border-white/10" },
-                                { label: "Fleet", icon: Truck, link: "/apps/ecommerce/deliveries", color: "bg-blue-600" },
-                                { label: "Vitals", icon: BarChart3, link: "/apps/ecommerce/reports", color: "bg-white/10 border border-white/10" },
-                            ].map(q => (
-                                <Link key={q.label} to={q.link}
-                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all group border border-white/5">
-                                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:-translate-y-1 text-white", q.color)}>
-                                        <q.icon className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[9px] font-bold  tracking-[0.1em] text-slate-300 group-hover:text-white transition-colors text-center">{q.label}</span>
-                                </Link>
-                            ))}
+                    <div className="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm flex flex-col items-center text-center">
+                        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6">
+                            <RotateCcw className="w-8 h-8" />
                         </div>
+                        <h2 className="text-xl font-bold text-slate-900 mb-2 uppercase tracking-tight">Refund Queue</h2>
+                        <p className="text-xs font-bold text-slate-500 tracking-widest uppercase mb-8">Pending Customer Reclamations</p>
+                        <span className="text-5xl font-bold text-slate-900 tracking-tighter mb-8">{stats?.pendingRefunds || 0}</span>
+                        <Link to="/apps/ecommerce/refunds" className="w-full">
+                            <Button className="w-full h-12 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-widest uppercase">Process Matrix</Button>
+                        </Link>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
-

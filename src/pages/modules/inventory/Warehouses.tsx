@@ -21,7 +21,7 @@ export default function Warehouses() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Home className="w-6 h-6 text-amber-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-400">Inventory Distribution</span>
+                        <span className="text-xs font-bold  tracking-widest text-slate-500">Inventory Distribution</span>
                     </div>
                     <h1 className="text-4xl font-bold tracking-tight text-slate-900  ">Warehouse Registry</h1>
                     <p className="text-sm font-medium text-slate-500">Manage multi-location stock storage and distribution points.</p>
@@ -44,18 +44,18 @@ export default function Warehouses() {
                                 <div className="w-16 h-16 rounded-[24px] bg-slate-900 text-amber-500 flex items-center justify-center transition-transform group-hover:scale-110">
                                     <Box className="w-8 h-8" />
                                 </div>
-                                <span className="px-4 py-1.5 bg-slate-100 text-[10px] font-bold  tracking-widest text-slate-500 rounded-full border border-slate-200">{wh.type}</span>
+                                <span className="px-4 py-1.5 bg-slate-100 text-xs font-bold  tracking-widest text-slate-500 rounded-full border border-slate-200">{wh.type}</span>
                             </div>
 
                             <h3 className="text-2xl font-bold text-slate-900 mb-2   leading-tight">{wh.name}</h3>
-                            <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px]  tracking-widest mb-8">
+                            <div className="flex items-center gap-2 text-slate-500 font-bold text-xs  tracking-widest mb-8">
                                 <MapPin className="w-4 h-4" /> {wh.location}
                             </div>
 
                             <div className="space-y-6">
                                 <div>
                                     <div className="flex justify-between items-end mb-2">
-                                        <p className="text-[10px] font-bold  tracking-widest text-slate-400">Utilization</p>
+                                        <p className="text-xs font-bold  tracking-widest text-slate-500">Utilization</p>
                                         <p className="text-sm font-bold text-slate-900 ">{wh.capacity}%</p>
                                     </div>
                                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -68,7 +68,7 @@ export default function Warehouses() {
 
                                 <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
                                     <div>
-                                        <p className="text-[10px] font-bold  tracking-widest text-slate-400 mb-1 leading-none">Total Stock Units</p>
+                                        <p className="text-xs font-bold  tracking-widest text-slate-500 mb-1 leading-none">Total Stock Units</p>
                                         <p className="text-xl font-bold text-slate-900 leading-none ">{wh.items.toLocaleString()}</p>
                                     </div>
                                     <Button size="icon" variant="ghost" className="h-10 w-10 text-slate-300 hover:text-slate-900 rounded-xl">

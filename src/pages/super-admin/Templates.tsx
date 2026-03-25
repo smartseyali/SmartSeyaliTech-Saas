@@ -214,7 +214,7 @@ export default function PlatformTemplates() {
                                     </button>
                                 </div>
                                 <div className="absolute top-4 left-4 flex gap-2">
-                                    <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-bold  tracking-widest text-slate-900 shadow-sm transition-transform group-hover:scale-110">
+                                    <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[13px] font-bold  tracking-widest text-slate-900 shadow-sm transition-transform group-hover:scale-110">
                                         {tpl.industry}
                                     </span>
                                     <div className="w-4 h-4 rounded-full border border-white shadow-sm" style={{ backgroundColor: tpl.color }} />
@@ -226,15 +226,15 @@ export default function PlatformTemplates() {
                                         <h3 className="font-bold text-xl text-slate-900 tracking-tight  leading-tight ">
                                             {tpl.name}
                                         </h3>
-                                        <p className="text-[10px] font-bold  tracking-widest text-blue-600 mt-2">Architecture v{tpl.version || '1.0.0'}</p>
+                                        <p className="text-xs font-bold  tracking-widest text-blue-600 mt-2">Architecture v{tpl.version || '1.0.0'}</p>
                                     </div>
                                     <div className="px-4 py-2 rounded-2xl bg-slate-50 border border-slate-100 shrink-0">
-                                        <span className="text-[10px] font-bold  tracking-widest text-slate-500 ">{tpl.folder}</span>
+                                        <span className="text-xs font-bold  tracking-widest text-slate-500 ">{tpl.folder}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-4">
                                     <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-2  mb-4">"{tpl.description}"</p>
-                                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-400  tracking-widest border-t border-slate-50 pt-4">
+                                    <div className="flex items-center justify-between text-[13px] font-bold text-slate-500  tracking-widest border-t border-slate-50 pt-4">
                                         <span>Status</span>
                                         <button
                                             onClick={() => handleToggleActive(tpl.id, tpl.is_active)}
@@ -276,7 +276,7 @@ export default function PlatformTemplates() {
                     <div className="grid gap-6 py-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Public Name</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Public Name</Label>
                                 <Input
                                     className="font-bold h-12 rounded-xl"
                                     value={formData.name}
@@ -285,7 +285,7 @@ export default function PlatformTemplates() {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">System Folder Name</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">System Folder Name</Label>
                                 <Input
                                     className="font-mono text-sm h-12 rounded-xl bg-slate-50 border-none"
                                     value={formData.folder}
@@ -296,7 +296,7 @@ export default function PlatformTemplates() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Marketing Pitch / Description</Label>
+                            <Label className="text-xs font-bold  tracking-widest text-slate-500">Marketing Pitch / Description</Label>
                             <Input
                                 className="font-semibold h-12 rounded-xl"
                                 value={formData.description}
@@ -307,7 +307,7 @@ export default function PlatformTemplates() {
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Core Industry</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Core Industry</Label>
                                 <select
                                     className="h-12 rounded-xl bg-white border-2 font-bold px-3 text-sm focus:border-black outline-none transition-colors"
                                     value={formData.industry}
@@ -319,7 +319,7 @@ export default function PlatformTemplates() {
                                 </select>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Version Sync</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Version Sync</Label>
                                 <Input
                                     className="font-bold h-12 rounded-xl"
                                     value={formData.version}
@@ -328,7 +328,7 @@ export default function PlatformTemplates() {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Comp. Count</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Comp. Count</Label>
                                 <Input
                                     type="number"
                                     className="font-bold h-12 rounded-xl"
@@ -340,7 +340,7 @@ export default function PlatformTemplates() {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Primary Branding Color</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Primary Branding Color</Label>
                                 <div className="flex items-center gap-3">
                                     <Input
                                         type="color"
@@ -356,7 +356,7 @@ export default function PlatformTemplates() {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Global Categories (Comma separated)</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Global Categories (Comma separated)</Label>
                                 <Input
                                     className="font-bold text-sm h-12 rounded-xl"
                                     value={formData.tags}
@@ -368,7 +368,7 @@ export default function PlatformTemplates() {
 
                         <div className="space-y-4 bg-slate-50 p-6 rounded-[32px] border border-slate-100">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Primary Feature Image (URL)</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-blue-600">Primary Feature Image (URL)</Label>
                                 <Input
                                     className="font-medium text-xs h-12 rounded-xl bg-white border-none shadow-sm"
                                     value={formData.preview_image}
@@ -378,14 +378,14 @@ export default function PlatformTemplates() {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Gallery Preview Nodes (One URL per line)</Label>
+                                <Label className="text-xs font-bold  tracking-widest text-slate-500">Gallery Preview Nodes (One URL per line)</Label>
                                 <Textarea
-                                    className="min-h-[140px] font-medium text-[10px] leading-relaxed rounded-2xl bg-white border-none shadow-sm p-4"
+                                    className="min-h-[140px] font-medium text-xs leading-relaxed rounded-2xl bg-white border-none shadow-sm p-4"
                                     value={formData.gallery_images}
                                     onChange={(e) => setFormData({ ...formData, gallery_images: e.target.value })}
                                     placeholder="https://images.unsplash.com/photo-1... &#10;https://images.unsplash.com/photo-2..."
                                 />
-                                <span className="text-[9px] font-bold text-slate-400 ">This powers the multi-image swiper in the onboarding preview.</span>
+                                <span className="text-[13px] font-bold text-slate-500 ">This powers the multi-image swiper in the onboarding preview.</span>
                             </div>
                         </div>
 
@@ -403,8 +403,8 @@ export default function PlatformTemplates() {
                         </div>
                     </div>
                     <DialogFooter className="gap-2">
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="font-bold  text-[10px] tracking-widest px-8">Abort</Button>
-                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 px-10 bg-black text-white hover:bg-slate-900 rounded-2xl font-bold  text-[10px] tracking-widest shadow-xl">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="font-bold  text-xs tracking-widest px-8">Abort</Button>
+                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 px-10 bg-black text-white hover:bg-slate-900 rounded-2xl font-bold  text-xs tracking-widest shadow-xl">
                             {isSubmitting ? "Processing..." : "Commit Infrastructure"}
                         </Button>
                     </DialogFooter>

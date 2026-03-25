@@ -66,10 +66,10 @@ export default function WhatsAppTemplates() {
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900   tracking-tight">{t.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-xs text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {t.category || "GENERAL"}
                             </span>
-                            <span className="text-[10px] text-indigo-400 font-bold  tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-xs text-indigo-400 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Globe size={10}/> {t.language || 'en_US'}
                             </span>
                         </div>
@@ -82,9 +82,9 @@ export default function WhatsAppTemplates() {
             label: "Message Components",
             render: () => (
                 <div className="flex gap-1.5">
-                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><ImageIcon size={12}/></div>
-                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><Type size={12}/></div>
-                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><MousePointer2 size={12}/></div>
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500"><ImageIcon size={12}/></div>
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500"><Type size={12}/></div>
+                    <div className="w-6 h-6 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500"><MousePointer2 size={12}/></div>
                 </div>
             )
         },
@@ -92,7 +92,7 @@ export default function WhatsAppTemplates() {
             key: "meta_id", 
             label: "Meta ID",
             render: (t: any) => (
-                <span className="text-[10px] font-bold text-slate-400  tracking-widest font-mono">
+                <span className="text-xs font-bold text-slate-500  tracking-widest font-mono">
                     {t.meta_template_id || 'PENDING_IND...'}
                 </span>
             )
@@ -134,7 +134,7 @@ export default function WhatsAppTemplates() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <RefreshCw className="w-3.5 h-3.5" /> Sync with Meta Hub
                     </button>
                 </div>

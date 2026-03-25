@@ -64,7 +64,7 @@ fetch('https://api.belibeli.com/v1/content', {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold tracking-tighter ">Headless <span className="text-indigo-600 ">API</span> Console</h1>
-                            <p className="text-[10px] font-bold  tracking-widest text-muted-foreground opacity-60">Connector Path Management • Super Admin Only</p>
+                            <p className="text-xs font-bold  tracking-widest text-muted-foreground opacity-60">Connector Path Management • Super Admin Only</p>
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                         </div>
                                         <div className="text-left">
                                             <p className="font-bold text-xs tracking-tight">{c.name}</p>
-                                            <p className="text-[9px] font-medium opacity-50  tracking-widest">{c.subdomain}</p>
+                                            <p className="text-[13px] font-medium opacity-50  tracking-widest">{c.subdomain}</p>
                                         </div>
                                     </div>
                                     <div className={cn(
@@ -132,14 +132,14 @@ fetch('https://api.belibeli.com/v1/content', {
                             <h4 className="text-xs font-bold  tracking-widest">Master API Status</h4>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-[10px] font-bold opacity-50  tracking-widest">Global Endpoint</p>
-                            <code className="text-[10px] font-mono text-indigo-300 break-all">https://api.belibeli.com/v1/headless</code>
+                            <p className="text-xs font-bold opacity-50  tracking-widest">Global Endpoint</p>
+                            <code className="text-xs font-mono text-indigo-300 break-all">https://api.belibeli.com/v1/headless</code>
                         </div>
                         <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                            <span className="text-[9px] font-bold  tracking-widest text-emerald-400 flex items-center gap-1.5">
+                            <span className="text-[13px] font-bold  tracking-widest text-emerald-400 flex items-center gap-1.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Systems Nominal
                             </span>
-                            <span className="text-[9px] font-bold  tracking-widest opacity-40">v2.4.0-stable</span>
+                            <span className="text-[13px] font-bold  tracking-widest opacity-40">v2.4.0-stable</span>
                         </div>
                     </div>
                 </div>
@@ -155,7 +155,7 @@ fetch('https://api.belibeli.com/v1/content', {
                             <div className="space-y-8 animate-in slide-in-from-bottom-5 duration-500">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-xl font-bold tracking-tighter ">API Configurations</h3>
-                                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[9px] font-bold  tracking-widest">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[13px] font-bold  tracking-widest">
                                         <ShieldCheck className="w-3 h-3" /> Secure Endpoint
                                     </div>
                                 </div>
@@ -175,7 +175,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-sm  tracking-tight">{config.section_id}</p>
-                                                            <p className="text-[10px] text-muted-foreground font-bold ">Mapping: {config.screen_id} → {config.mapping_config?.table || 'N/A'}</p>
+                                                            <p className="text-xs text-muted-foreground font-bold ">Mapping: {config.screen_id} → {config.mapping_config?.table || 'N/A'}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2">
@@ -185,9 +185,9 @@ fetch('https://api.belibeli.com/v1/content', {
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <p className="text-[10px] font-bold  tracking-widest text-indigo-600 ml-1">Frontend Implementation Path</p>
+                                                    <p className="text-xs font-bold  tracking-widest text-indigo-600 ml-1">Frontend Implementation Path</p>
                                                     <div className="relative group">
-                                                        <pre className="p-6 rounded-2xl bg-black text-indigo-400 text-[11px] font-mono overflow-x-auto border-2 border-indigo-600/20">
+                                                        <pre className="p-6 rounded-2xl bg-black text-indigo-400 text-[13px] font-mono overflow-x-auto border-2 border-indigo-600/20">
                                                             {generateSnippet(config)}
                                                         </pre>
                                                         <button
@@ -199,7 +199,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-4 text-[10px] font-bold  tracking-widest opacity-50">
+                                                <div className="flex items-center gap-4 text-xs font-bold  tracking-widest opacity-50">
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> CORS Enabled</span>
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> SSL Active</span>
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Rate Limited</span>

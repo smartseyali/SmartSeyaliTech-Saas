@@ -84,10 +84,10 @@ export function PagesTab({ companyId }: { companyId: any }) {
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
                         <Leaf className="w-4 h-4 text-[#f97316]" />
-                        <span className="text-[#14532d]/40 font-bold tracking-widest text-[10px]">Content Management</span>
+                        <span className="text-[#14532d]/40 font-bold tracking-widest text-xs">Content Management</span>
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#14532d] leading-none">Storefront <span className="text-slate-100">Pages</span></h2>
-                    <p className="text-sm text-slate-400 font-medium max-w-xl">
+                    <p className="text-sm text-slate-500 font-medium max-w-xl">
                         Manage your custom informational pages, terms of service, and about us content from one central dashboard.
                     </p>
                 </div>
@@ -100,7 +100,7 @@ export function PagesTab({ companyId }: { companyId: any }) {
                     </Button>
                     <div className="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] rounded-full border border-border shadow-inner">
                         <Globe className="w-4 h-4 text-[#14532d]/40" />
-                        <span className="text-[10px] font-bold text-[#14532d]/60 tracking-widest">Global CDN Active</span>
+                        <span className="text-xs font-bold text-[#14532d]/60 tracking-widest">Global CDN Active</span>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@ export function PagesTab({ companyId }: { companyId: any }) {
             <div className="overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left border-separate border-spacing-y-3">
                     <thead>
-                        <tr className="text-[10px] font-bold tracking-widest text-slate-300">
+                        <tr className="text-xs font-bold tracking-widest text-slate-300">
                             <th className="px-6 py-4">Page Title</th>
                             <th className="px-6 py-4">URL Slug</th>
                             <th className="px-6 py-4 text-center">Status</th>
@@ -147,17 +147,17 @@ export function PagesTab({ companyId }: { companyId: any }) {
                                         </div>
                                         <div className="space-y-0.5">
                                             <span className="font-bold text-base text-[#14532d]">{p.title}</span>
-                                            <p className="text-[10px] font-bold text-slate-400 tracking-widest">INDEX: {i + 1}</p>
+                                            <p className="text-xs font-bold text-slate-500 tracking-widest">INDEX: {i + 1}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-5 border-y border-transparent group-hover/tr:border-slate-100">
-                                    <code className="px-3 py-1 bg-white rounded-lg border border-slate-100 text-[11px] font-bold text-[#14532d]/60 tracking-tight">/{p.slug}</code>
+                                    <code className="px-3 py-1 bg-white rounded-lg border border-slate-100 text-[13px] font-bold text-[#14532d]/60 tracking-tight">/{p.slug}</code>
                                 </td>
                                 <td className="px-6 py-5 text-center border-y border-transparent group-hover/tr:border-slate-100">
                                     <span className={cn(
-                                        "px-4 py-1.5 rounded-full font-bold text-[9px] tracking-widest shadow-sm border",
-                                        p.is_published ? "bg-[#14532d]/10 text-[#14532d] border-[#14532d]/20" : "bg-slate-100 text-slate-400 border-slate-200"
+                                        "px-4 py-1.5 rounded-full font-bold text-[13px] tracking-widest shadow-sm border",
+                                        p.is_published ? "bg-[#14532d]/10 text-[#14532d] border-[#14532d]/20" : "bg-slate-100 text-slate-500 border-slate-200"
                                     )}>
                                         {p.is_published ? "Published" : "Draft"}
                                     </span>
@@ -166,13 +166,13 @@ export function PagesTab({ companyId }: { companyId: any }) {
                                     <div className="flex items-center justify-end gap-3 px-2">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleEdit(p); }}
-                                            className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-400 hover:text-[#14532d] transition-all flex items-center justify-center shadow-sm"
+                                            className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-500 hover:text-[#14532d] transition-all flex items-center justify-center shadow-sm"
                                         >
                                             <Pencil className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }}
-                                            className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
+                                            className="w-8 h-8 rounded-lg bg-white border border-slate-100 text-slate-500 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -187,11 +187,11 @@ export function PagesTab({ companyId }: { companyId: any }) {
             <div className="mt-12 flex items-center justify-between opacity-40 group-hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-4">
                     <ShieldCheck className="w-5 h-5 text-[#14532d]" />
-                    <p className="text-[10px] font-bold tracking-widest text-[#14532d]">Content Integrity Active</p>
+                    <p className="text-xs font-bold tracking-widest text-[#14532d]">Content Integrity Active</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-[#f97316] animate-pulse" />
-                    <span className="text-[10px] font-bold tracking-widest text-slate-400">Synced to cloud storage</span>
+                    <span className="text-xs font-bold tracking-widest text-slate-500">Synced to cloud storage</span>
                 </div>
             </div>
         </div>

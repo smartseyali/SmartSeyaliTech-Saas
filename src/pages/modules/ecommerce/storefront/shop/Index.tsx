@@ -72,7 +72,7 @@ export default function Shop() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <Activity className="w-5 h-5 text-blue-600" />
-                            <span className="text-[10px] font-bold  tracking-widest text-slate-400 ">Store Inventory</span>
+                            <span className="text-xs font-bold  tracking-widest text-slate-500 ">Store Inventory</span>
                         </div>
                         <h1 className="text-5xl lg:text-7xl font-bold text-slate-900  tracking-tighter  leading-[0.8] mb-2">Our <span className="text-blue-600">Store</span></h1>
                         <p className="text-sm font-medium text-slate-500 ">Premium assets curated for professional-scale operations.</p>
@@ -95,14 +95,14 @@ export default function Shop() {
                     {/* Sidebar */}
                     <aside className="w-full lg:w-72 shrink-0 space-y-10">
                         <div className="space-y-8 bg-white p-10 rounded-[2.5rem] border border-slate-50 shadow-xl shadow-slate-200/40">
-                            <h3 className="text-[11px] font-bold text-slate-900  tracking-widest border-b border-slate-50 pb-6 ">Categories</h3>
+                            <h3 className="text-[13px] font-bold text-slate-900  tracking-widest border-b border-slate-50 pb-6 ">Categories</h3>
                             <div className="space-y-4">
                                 {categories.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={cn(
-                                            "w-full text-left text-[11px] font-bold  tracking-widest transition-all flex items-center justify-between group py-2 ",
+                                            "w-full text-left text-[13px] font-bold  tracking-widest transition-all flex items-center justify-between group py-2 ",
                                             selectedCategory === cat ? "text-blue-600" : "text-slate-300 hover:text-slate-900"
                                         )}
                                     >
@@ -114,14 +114,14 @@ export default function Shop() {
                         </div>
 
                         <div className="space-y-8 bg-white p-10 rounded-[2.5rem] border border-slate-50 shadow-xl shadow-slate-200/40">
-                            <h3 className="text-[11px] font-bold text-slate-900  tracking-widest border-b border-slate-50 pb-6 ">Sort By</h3>
+                            <h3 className="text-[13px] font-bold text-slate-900  tracking-widest border-b border-slate-50 pb-6 ">Sort By</h3>
                             <div className="space-y-5">
                                 {SORT_OPTIONS.map(opt => (
                                     <button
                                         key={opt.value}
                                         onClick={() => setSort(opt.value)}
                                         className={cn(
-                                            "w-full text-left text-[10px] font-bold  tracking-widest transition-all ",
+                                            "w-full text-left text-xs font-bold  tracking-widest transition-all ",
                                             sort === opt.value ? "text-slate-900" : "text-slate-300 hover:text-slate-900"
                                         )}
                                     >
@@ -146,7 +146,7 @@ export default function Shop() {
                             <div className="flex flex-col items-center justify-center py-48 bg-white rounded-[4rem] border border-dashed border-slate-100">
                                 <Search className="w-16 h-16 text-slate-100 mb-8" />
                                 <h3 className="text-2xl font-bold text-slate-900  tracking-tighter ">No Products Found</h3>
-                                <p className="text-[10px] text-slate-400 font-bold  tracking-widest mt-4 ">Adjust your search parameters.</p>
+                                <p className="text-xs text-slate-500 font-bold  tracking-widest mt-4 ">Adjust your search parameters.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-20 gap-x-10">
@@ -176,7 +176,7 @@ export default function Shop() {
                                                                 e.preventDefault();
                                                                 addToCart({ id: p.id, product_id: p.id, name: p.name, price, image_url: p.image_url || "" }, 1);
                                                             }}
-                                                            className="w-full h-16 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white font-bold  text-[11px] tracking-widest shadow-2xl border-none transition-all "
+                                                            className="w-full h-16 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white font-bold  text-[13px] tracking-widest shadow-2xl border-none transition-all "
                                                         >
                                                             <ShoppingCart className="w-4 h-4 mr-3" /> Add to Cart
                                                         </Button>
@@ -194,12 +194,12 @@ export default function Shop() {
 
                                                 <div className="space-y-4 px-2">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold  tracking-widest text-blue-600 ">{p.category || "General Asset"}</span>
+                                                        <span className="text-xs font-bold  tracking-widest text-blue-600 ">{p.category || "General Asset"}</span>
                                                         <div className="h-px grow bg-slate-100" />
                                                     </div>
                                                     <h3 className="font-bold text-2xl text-slate-900 leading-none line-clamp-2  tracking-tighter  group-hover:text-blue-600 transition-colors">{p.name}</h3>
                                                     <p className="text-3xl font-bold text-slate-900 tracking-tighter flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold  tracking-widest text-slate-400 mt-2 ">Price</span>
+                                                        <span className="text-xs font-bold  tracking-widest text-slate-500 mt-2 ">Price</span>
                                                         ₹ {price.toLocaleString()}
                                                     </p>
                                                 </div>

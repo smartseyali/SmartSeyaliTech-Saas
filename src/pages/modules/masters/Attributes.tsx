@@ -1,130 +1,120 @@
 import { useState } from "react";
-import { 
-    Tag, Palette, Maximize, 
-    Plus, Search, Filter, RefreshCw, 
-    CheckCircle2, AlertCircle, Clock,
-    LayoutGrid, ChevronRight, Binary,
-    ListFilter
-} from "lucide-react";
+import { Layers, Plus, Search, Filter, RefreshCw, Save, X, Binary, ListFilter } from "lucide-react";
 import { useCrud } from "@/hooks/useCrud";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
-export default function AttributeMaster() {
+export default function Attributes() {
     const [view, setView] = useState<"list" | "form">("list");
     const [searchTerm, setSearchTerm] = useState("");
-    const [editingAttr, setEditingAttr] = useState<any>(null);
+    const [editingAttribute, setEditingAttribute] = useState<any>(null);
     
-    const { data: attributes, loading, fetchItems, createItem, updateItem } = useCrud("product_attributes");
+    // Using ecom_product_attributes for data persistence
+    const { data: attributes, loading, fetchItems, createItem, updateItem } = useCrud("ecom_product_attributes");
 
-    const attrFields = [
-        { key: "name", label: "Attribute", required: true, ph: "Color, Size, Material..." },
+    const attributeColumns = [
+        { key: "name", label: "Attribute Name", className: "font-bold text-slate-900" },
         { 
-            key: "display_type", label: "Visualization", type: "select" as const,
-            options: [
-                { label: "Standard textual", value: "text" },
-                { label: "High-Fidelity Swatches", value: "swatches" },
-                { label: "Selection Dropdown", value: "dropdown" }
-            ]
-        }
+            key: "type", 
+            label: "Input Type",
+            render: (a: any) => (
+                <span className="text-[12px] font-medium text-slate-500 uppercase tracking-tighter">
+                    {a.type || "Select"}
+                </span>
+            )
+        },
+        { 
+            key: "is_filterable", 
+            label: "Filterable",
+            render: (a: any) => (
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${a.is_filterable ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}>
+                    {a.is_filterable ? 'YES' : 'NO'}
+                </span>
+            )
+        },
+        { 
+            key: "is_active", 
+            label: "Status",
+            render: (a: any) => <StatusBadge status={a.is_active !== false ? "Active" : "Disabled"} />
+        },
+        { key: "updated_at", label: "Last Updated" }
     ];
 
-    const attrValueFields = [
-        { key: "value", label: "Value", ph: "Red / XL / Silk..." },
-        { key: "meta_data", label: "Logical Meta (JSON)", ph: '{"hex": "#FF0000"}' }
-    ];
+    const attributeTabFields = {
+        basic: [
+            { key: "name", label: "Attribute Name *", type: "text" as const, required: true, ph: "e.g. Color / Size" },
+            { 
+                key: "type", label: "Input Type", type: "select" as const,
+                options: [
+                    { label: "Dropdown", value: "Select" },
+                    { label: "Multi-select", value: "Multi-select" },
+                    { label: "Text", value: "Text" },
+                    { label: "Color Swatch", value: "Swatch" }
+                ]
+            },
+            { key: "unit", label: "Unit", type: "text" as const, ph: "e.g. cm, kg" },
+            { key: "description", label: "Description", type: "text" as any, ph: "Enter details..." }
+        ],
+        config: [
+            { key: "is_filterable", label: "Show in Filters", type: "select" as const, options: [{ value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }] },
+            { key: "is_required", label: "Required?", type: "select" as const, options: [{ value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }] },
+            { 
+                key: "display_type", label: "Display Style", type: "select" as const,
+                options: [
+                    { label: "Dropdown Menu", value: "Dropdown" },
+                    { label: "Checkbox Grid", value: "Checkbox" },
+                    { label: "Radio Buttons", value: "Radio" }
+                ]
+            }
+        ],
+        mapping: [
+            { key: "erp_mapping_id", label: "ERP ID", type: "text" as const },
+            { key: "visibility", label: "Visibility", type: "select" as const, options: [{ value: 'Public', label: 'Public' }, { value: 'Private', label: 'Hidden' }] }
+        ]
+    };
 
-    const handleSave = async (header: any, items: any[]) => {
-        const payload = { ...header, values: items };
-        if (editingAttr) {
-            await updateItem(editingAttr.id, payload);
+    const handleSave = async (header: any) => {
+        const payload = { ...header, is_active: header.is_active === "true", is_filterable: header.is_filterable === "true", is_required: header.is_required === "true" };
+        if (editingAttribute) {
+            await updateItem(editingAttribute.id, payload);
         } else {
             await createItem(payload);
         }
         setView("list");
-        setEditingAttr(null);
+        setEditingAttribute(null);
+        fetchItems();
     };
-
-    const attrColumns = [
-        { 
-            key: "identity", 
-            label: "Attribute",
-            render: (a: any) => (
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
-                        <Tag className="w-6 h-6" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-gray-900   tracking-tight">{a.name}</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
-                                {a.display_type?.toUpperCase() || "TEXT"} INTERFACE
-                            </span>
-                            <span className="text-[10px] text-amber-500 font-bold  tracking-widest leading-none flex items-center gap-1">
-                                <Binary size={10}/> {a.value_count || 0} NODES
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            )
-        },
-        { 
-            key: "structure", 
-            label: "Magnitude Cluster",
-            render: (a: any) => (
-                <div className="flex gap-1.5 flex-wrap max-w-xs">
-                    {(a.sample_values || ['Red', 'Blue', 'Green']).map((v: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-bold text-slate-500  tracking-widest">
-                            {v}
-                        </span>
-                    ))}
-                    {a.value_count > 3 && <span className="text-[9px] font-bold text-slate-300">+{a.value_count - 3} MORE</span>}
-                </div>
-            )
-        },
-        { 
-            key: "state", 
-            label: "Status",
-            render: () => <StatusBadge status="active" />
-        }
-    ];
 
     if (view === "form") {
         return (
-            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <div className="p-4 bg-slate-50 min-h-screen">
                 <ERPEntryForm
-                    title={editingAttr ? "Refine Attribute Protocol" : "Initialize Identity Node"}
-                    subtitle="Universal Catalog Variation Infrastructure"
-                    headerFields={attrFields}
-                    itemFields={attrValueFields}
-                    onAbort={() => { setView("list"); setEditingAttr(null); }}
+                    title={editingAttribute ? "Edit Attribute" : "Add New Attribute"}
+                    subtitle="Manage product attributes and variations"
+                    tabFields={attributeTabFields}
+                    onAbort={() => { setView("list"); setEditingAttribute(null); }}
                     onSave={handleSave}
-                    initialData={editingAttr}
-                    itemTitle="Attribute Magnitude Registry"
+                    initialData={editingAttribute}
+                    showItems={false}
                 />
             </div>
         );
     }
 
     return (
-        <ERPListView
-            title="Product Attribute"
-            data={attributes || []}
-            columns={attrColumns}
-            onNew={() => { setEditingAttr(null); setView("form"); }}
-            onRefresh={fetchItems}
-            onRowClick={(a) => { setEditingAttr(a); setView("form"); }}
-            isLoading={loading}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            primaryKey="id"
-            headerActions={
-                <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
-                        <Palette className="w-3.5 h-3.5" /> Visualize Hub
-                    </button>
-                </div>
-            }
-        />
+        <div className="flex flex-col h-full bg-white">
+            <ERPListView
+                title="Attributes"
+                data={attributes || []}
+                columns={attributeColumns}
+                onNew={() => { setEditingAttribute(null); setView("form"); }}
+                onRefresh={fetchItems}
+                onRowClick={(a) => { setEditingAttribute(a); setView("form"); }}
+                isLoading={loading}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                primaryKey="id"
+            />
+        </div>
     );
 }

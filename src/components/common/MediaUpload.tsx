@@ -76,7 +76,7 @@ export function MediaUpload({
         onChange("");
     };
 
-    const isVideo = type === "video" || value.toLowerCase().match(/\.(mp4|webm|ogg)$/);
+    const isVideo = type === "video" || (value && value.toLowerCase().match(/\.(mp4|webm|ogg)$/));
 
     if (compact) {
         return (
@@ -157,9 +157,9 @@ export function MediaUpload({
                             {uploading ? (
                                 <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
                             ) : type === "video" ? (
-                                <Film className="w-5 h-5 text-slate-400 group-hover/upload:text-blue-500 transition-colors" />
+                                <Film className="w-5 h-5 text-slate-500 group-hover/upload:text-blue-500 transition-colors" />
                             ) : (
-                                <Upload className="w-5 h-5 text-slate-400 group-hover/upload:text-blue-500 transition-colors" />
+                                <Upload className="w-5 h-5 text-slate-500 group-hover/upload:text-blue-500 transition-colors" />
                             )}
                         </div>
                         <div className="text-center overflow-hidden w-full">

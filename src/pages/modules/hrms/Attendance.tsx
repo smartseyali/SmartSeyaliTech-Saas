@@ -19,7 +19,7 @@ export default function Attendance() {
             render: (log: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight   leading-none">{log.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{log.location}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">{log.location}</span>
                 </div>
             )
         },
@@ -41,9 +41,9 @@ export default function Attendance() {
     ];
 
     const filteredAttendance = attendance.filter(log => 
-        log.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.location.toLowerCase().includes(searchTerm.toLowerCase())
+        (log.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (log.status || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (log.location || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (

@@ -153,7 +153,7 @@ export default function Quotations() {
             render: (q: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800   leading-none">{q.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Issued: {q.date}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">Issued: {q.date}</span>
                 </div>
             )
         },
@@ -163,7 +163,7 @@ export default function Quotations() {
             render: (q: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-indigo-600 tracking-tight">{fmt(q.grand_total)}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Qty: {q.total_qty}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">Qty: {q.total_qty}</span>
                 </div>
             )
         },

@@ -58,7 +58,7 @@ export default function Reviews() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <MessageSquare className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-400">Customer Feedback</span>
+                        <span className="text-xs font-bold  tracking-widest text-slate-500">Customer Feedback</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Product Reviews</h1>
                     <p className="text-sm font-medium text-slate-500">
@@ -79,7 +79,7 @@ export default function Reviews() {
                             <div className="flex justify-center mb-3">
                                 <StarRating rating={Math.round(avgRating)} />
                             </div>
-                            <p className="text-[10px] font-bold  tracking-widest text-slate-400">{reviews.filter(r => r.status === "approved").length} verified reviews</p>
+                            <p className="text-xs font-bold  tracking-widest text-slate-500">{reviews.filter(r => r.status === "approved").length} verified reviews</p>
                         </div>
                         <div className="flex-1 w-full space-y-3">
                             {[5, 4, 3, 2, 1].map(star => {
@@ -95,7 +95,7 @@ export default function Reviews() {
                                         <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-50">
                                             <div className="bg-amber-400 h-2.5 rounded-full transition-all shadow-sm" style={{ width: `${pct}%` }} />
                                         </div>
-                                        <span className="w-10 text-right font-bold text-slate-400">{count}</span>
+                                        <span className="w-10 text-right font-bold text-slate-500">{count}</span>
                                     </div>
                                 );
                             })}
@@ -111,14 +111,14 @@ export default function Reviews() {
                         <button key={f} onClick={() => setFilter(f)}
                             className={cn(
                                 "px-5 py-2 rounded-lg text-xs font-bold  tracking-widest transition-all",
-                                filter === f ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                                filter === f ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-slate-500 hover:text-slate-600 hover:bg-slate-50"
                             )}>
                             {f} ({f === "all" ? reviews.length : reviews.filter(r => r.status === f).length})
                         </button>
                     ))}
                 </div>
                 <div className="relative flex-1">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="Search by customer name, review title or content..."
                         className="w-full h-12 pl-12 pr-6 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all shadow-sm" />
@@ -129,7 +129,7 @@ export default function Reviews() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-                    <p className="text-xs font-bold  tracking-widest text-slate-400">Moderating reviews...</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-500">Moderating reviews...</p>
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-200 border-dashed text-center py-20 max-w-2xl mx-auto shadow-sm">
@@ -159,7 +159,7 @@ export default function Reviews() {
                                             <div className="flex items-center gap-3">
                                                 <StarRating rating={r.rating} />
                                                 {r.is_verified_purchase && (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold  tracking-tight gap-1">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold  tracking-tight gap-1">
                                                         <Check className="w-3 h-3" /> Verified Buyer
                                                     </span>
                                                 )}
@@ -167,7 +167,7 @@ export default function Reviews() {
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <span className={cn(
-                                                "px-3 py-1 rounded-full text-[10px] font-bold  tracking-widest border shadow-sm",
+                                                "px-3 py-1 rounded-full text-xs font-bold  tracking-widest border shadow-sm",
                                                 r.status === "pending" ? "bg-amber-100 text-amber-700 border-amber-200"
                                                     : r.status === "approved" ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                                         : "bg-slate-100 text-slate-500 border-slate-200"
@@ -194,7 +194,7 @@ export default function Reviews() {
                                         {r.product_id && (
                                             <Link to={`/masters/products`} className="text-xs font-bold text-blue-600 hover:text-blue-700 underline underline-offset-4 decoration-2">View Associated Product</Link>
                                         )}
-                                        <div className="flex items-center gap-2 text-[10px] font-bold  tracking-widest text-slate-400">
+                                        <div className="flex items-center gap-2 text-xs font-bold  tracking-widest text-slate-500">
                                             <Clock className="w-3.5 h-3.5" />
                                             {new Date(r.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </div>

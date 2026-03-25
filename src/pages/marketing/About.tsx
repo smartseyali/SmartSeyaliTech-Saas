@@ -43,7 +43,7 @@ const About = () => {
           >
             <div className="flex items-center justify-center gap-3">
               <Activity className="w-5 h-5 text-primary-600" />
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ">Our Identity</span>
+              <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest ">Our Identity</span>
             </div>
 
             <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
@@ -94,7 +94,7 @@ const About = () => {
               <div className="absolute -bottom-8 -left-8 bg-white p-8 rounded-3xl shadow-xl z-20 border border-gray-50 flex items-center gap-6">
                 <ShieldCheck className="w-10 h-10 text-primary-600" />
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300  mb-1">Status</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-300  mb-1">Status</p>
                   <p className="text-xl font-bold text-gray-900 tracking-tight">Enterprise Verified</p>
                 </div>
               </div>
@@ -172,7 +172,7 @@ const About = () => {
                   <div className={cn("w-12 h-12 rounded-xl mx-auto flex items-center justify-center", item.bg, item.color)}>
                     <item.icon className="w-6 h-6" />
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 ">{item.label}</p>
+                  <p className="text-[13px] font-bold uppercase tracking-widest text-gray-400 ">{item.label}</p>
                 </div>
               ))}
             </div>

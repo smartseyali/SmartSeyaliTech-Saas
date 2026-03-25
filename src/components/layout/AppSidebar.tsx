@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     LayoutDashboard,
     BarChart3,
@@ -22,12 +22,14 @@ import {
     Settings,
     ShieldCheck,
     Users,
+    UserPlus,
     ExternalLink,
     Crown,
     Award,
     Layout,
     Rocket,
     Box,
+    Binary,
     FileInput,
     Building2,
     Database,
@@ -40,14 +42,14 @@ import {
     Activity,
     MessageSquare,
     Smartphone,
-    Binary,
     Flame,
     Clock,
     Layers,
     ListTree,
     Ruler,
     DollarSign,
-    Percent
+    Percent,
+    Share2
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -62,6 +64,9 @@ interface NavItem {
     url: string;
     icon: React.ElementType;
     resource?: string;
+    requiredModule?: string;
+    requiredPermissions?: { action: string; resource: string }[];
+    subItems?: NavItem[];
 }
 
 interface NavGroup {
@@ -147,10 +152,10 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             module: "ecommerce",
             icon: Settings,
             items: [
-                { title: "Storefront Ops", url: "/apps/ecommerce/website", icon: Globe2, resource: "settings" },
+                { title: "Website Settings", url: "/apps/ecommerce/website", icon: Globe2, resource: "settings" },
                 { title: "Billing & GST", url: "/apps/ecommerce/billing", icon: CreditCard, resource: "settings" },
-                { title: "User Controls", url: "/apps/ecommerce/team", icon: Users, resource: "team" },
-                { title: "POS Gateways", url: "/apps/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },
+                { title: "Team", url: "/apps/ecommerce/team", icon: Users, resource: "team" },
+                { title: "Payments", url: "/apps/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },
                 { title: "Shipping Zones", url: "/apps/ecommerce/shipping-zones", icon: MapPin, resource: "settings" },
                 { title: "API & Integrations", url: "/apps/ecommerce/api-integrations", icon: Zap, resource: "settings" },
                 { title: "General Settings", url: "/apps/ecommerce/settings", icon: Settings, resource: "settings" },
@@ -160,13 +165,13 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
     ],
     crm: [
         {
-            label: "Pipeline Matrix",
+            label: "Sales Pipeline",
             module: "crm",
             icon: Zap,
             items: [
-                { title: "Inquiry Nodes", url: "/apps/crm/leads", icon: Users, resource: "leads" },
+                { title: "Leads", url: "/apps/crm/leads", icon: Users, resource: "leads" },
                 { title: "Deal Pipeline", url: "/apps/crm/deals", icon: ShoppingBag, resource: "deals" },
-                { title: "Segments Hub", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
+                { title: "Segments", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
                 { title: "Sales Forecast", url: "/apps/crm/forecast", icon: BarChart3, resource: "analytics" },
             ],
         }
@@ -204,8 +209,8 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             icon: Users,
             items: [
                 { title: "Employee Directory", url: "/apps/hrms/employees", icon: Users, resource: "team" },
-                { title: "Induction Protocol", url: "/apps/hrms/induction", icon: Rocket, resource: "team" },
-                { title: "Departments Hub", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
+                { title: "Onboarding", url: "/apps/hrms/induction", icon: Rocket, resource: "team" },
+                { title: "Departments", url: "/apps/hrms/departments", icon: LayoutGrid, resource: "team" },
                 { title: "Appraisals", url: "/apps/hrms/appraisals", icon: Star, resource: "team" },
             ],
         },
@@ -234,87 +239,6 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             ],
         }
     ],
-    sales: [
-        {
-            label: "Sales Management",
-            module: "sales",
-            icon: ShoppingBag,
-            items: [
-                { title: "Quotations", url: "/apps/sales/quotations", icon: Library, resource: "orders" },
-                { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag, resource: "orders" },
-                { title: "Delivery Challans", url: "/apps/sales/deliveries", icon: Truck, resource: "orders" },
-                { title: "Sales Invoices", url: "/apps/invoicing/invoices", icon: CreditCard, resource: "orders" },
-            ]
-        }
-    ],
-    books: [
-        {
-            label: "Accounting",
-            module: "books",
-            icon: BarChart3,
-            items: [
-                { title: "Chart of Accounts", url: "/apps/books/accounts", icon: LayoutGrid, resource: "settings" },
-                { title: "Journals", url: "/apps/books/journals", icon: Library, resource: "orders" },
-                { title: "Expenses", url: "/apps/books/expenses", icon: CreditCard, resource: "orders" },
-            ]
-        },
-        {
-            label: "Financial Control",
-            module: "books",
-            icon: ShieldCheck,
-            items: [
-                { title: "Bank Sync", url: "/apps/books/reconciliation", icon: Zap, resource: "settings" },
-                { title: "Tax Slabs", url: "/apps/books/tax", icon: Tag, resource: "settings" },
-                { title: "Financial Reports", url: "/apps/books/reports", icon: BarChart3, resource: "settings" },
-                { title: "Fiscal Years", url: "/apps/settings/fiscal-years", icon: Clock, resource: "settings" },
-            ]
-        }
-    ],
-    invoicing: [
-        {
-            label: "Billing",
-            module: "invoicing",
-            icon: CreditCard,
-            items: [
-                { title: "Sales Invoices", url: "/apps/invoicing/invoices", icon: CreditCard, resource: "orders" },
-                { title: "Receipt Vouchers", url: "/apps/invoicing/payments", icon: Zap, resource: "orders" },
-            ]
-        }
-    ],
-    payroll: [
-        {
-            label: "Payroll Setup",
-            module: "payroll",
-            icon: CreditCard,
-            items: [
-                { title: "Payslip Registry", url: "/apps/payroll/payslips", icon: FileInput, resource: "payroll" },
-                { title: "Salary Structures", url: "/apps/payroll/structures", icon: LayoutGrid, resource: "payroll" },
-                { title: "Run Payroll Batch", url: "/apps/payroll/run", icon: Zap, resource: "payroll" },
-            ]
-        }
-    ],
-    helpdesk: [
-        {
-            label: "Support Ops",
-            module: "helpdesk",
-            icon: ShieldCheck,
-            items: [
-                { title: "Tickets", url: "/apps/helpdesk/tickets", icon: Tag, resource: "orders" },
-                { title: "SLA Policies", url: "/apps/helpdesk/sla", icon: ShieldCheck, resource: "settings" },
-            ]
-        }
-    ],
-    hospital: [
-        {
-            label: "Clinical Records",
-            module: "hospital",
-            icon: Zap,
-            items: [
-                { title: "Patients", url: "/apps/hospital/patients", icon: Users, resource: "customers" },
-                { title: "Appointments", url: "/apps/hospital/appointments", icon: MapPin, resource: "orders" },
-            ]
-        }
-    ],
     whatsapp: [
         {
             label: "Messaging",
@@ -327,97 +251,17 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             ]
         }
     ],
-    "landing-page": [
+    sales: [
         {
-            label: "Web Builder",
-            module: "landing-page",
-            icon: Globe2,
+            label: "Sales Management",
+            module: "sales",
+            icon: ShoppingBag,
             items: [
-                { title: "Pages", url: "/apps/landing-page/pages", icon: LayoutGrid, resource: "settings" },
-                { title: "Themes", url: "/apps/landing-page/themes", icon: ImageIcon, resource: "settings" },
-            ]
-        }
-    ],
-    masters: [
-        {
-            label: "Product Master",
-            module: "masters",
-            icon: Boxes,
-            items: [
-                { title: "Product Catalogue", url: "/apps/masters/items", icon: Box, resource: "products" },
-                { title: "Variant Registry", url: "/apps/masters/variants", icon: Binary, resource: "products" },
-                { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
-            ]
-        },
-        {
-            label: "Category & Brand",
-            module: "masters",
-            icon: LayoutGrid,
-            items: [
-                { title: "Category Tree", url: "/apps/masters/categories", icon: ListTree, resource: "products" },
-                { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
-            ]
-        },
-        {
-            label: "UOM & Fiscal",
-            module: "masters",
-            icon: Scale,
-            items: [
-                { title: "UOM Register", url: "/apps/masters/uoms", icon: Ruler, resource: "products" },
-                { title: "Tax Mapping", url: "/apps/masters/tax", icon: Percent, resource: "products" },
-                { title: "Price Lists", url: "/apps/masters/pricing", icon: DollarSign, resource: "products" },
-            ]
-        },
-        {
-            label: "Entity Control",
-            module: "masters",
-            icon: Users,
-            items: [
-                { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
-            ]
-        }
-    ],
-    workflow: [
-        {
-            label: "Governance Hub",
-            module: "workflow",
-            icon: GitPullRequest,
-            items: [
-                { title: "Approval Matrix", url: "/apps/workflow/approvals", icon: ShieldCheck, resource: "settings" },
-                { title: "Transition Logs", url: "/apps/workflow/logs", icon: Activity, resource: "settings" },
-            ]
-        }
-    ],
-    automation: [
-        {
-            label: "Orchestration Layer",
-            module: "automation",
-            icon: Zap,
-            items: [
-                { title: "Jobs Registry", url: "/apps/automation/jobs", icon: Flame, resource: "settings" },
-                { title: "Execution Matrix", url: "/apps/automation/history", icon: Activity, resource: "settings" },
-            ]
-        }
-    ],
-    documents: [
-        {
-            label: "Content Repository",
-            module: "documents",
-            icon: Box,
-            items: [
-                { title: "Enterprise Hub", url: "/apps/documents", icon: Box, resource: "documents" },
-                { title: "Shared Protocols", url: "/apps/documents/shared", icon: Users, resource: "documents" },
-            ]
-        }
-    ],
-    projects: [
-        {
-            label: "Delivery Portfolio",
-            module: "projects",
-            icon: Rocket,
-            items: [
-                { title: "Active Projects", url: "/apps/projects", icon: Rocket, resource: "projects" },
-                { title: "Task Boards", url: "/apps/projects/tasks", icon: LayoutGrid, resource: "projects" },
+                { title: "Quotations", url: "/apps/sales/quotations", icon: Library, resource: "orders" },
+                { title: "Sales Orders", url: "/apps/sales/orders", icon: ShoppingBag, resource: "orders" },
+                { title: "Delivery Challans", url: "/apps/sales/deliveries", icon: Truck, resource: "orders" },
+                { title: "Sales Invoices", url: "/apps/sales/invoices", icon: CreditCard, resource: "orders" },
+                { title: "Payment Receipts", url: "/apps/sales/payments", icon: Zap, resource: "orders" },
             ]
         }
     ]
@@ -425,14 +269,42 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
 
 const INIT_NAV_GROUPS: NavGroup[] = [
     {
-        label: "FOUNDATION",
+        label: "GOVERNANCE",
         module: "masters",
         icon: Database,
         items: [
-            { title: "Master Hub", url: "/apps/masters", icon: Layers, resource: "products" },
+            { 
+                title: "Master Hub", 
+                url: "/apps/masters", 
+                icon: Database, 
+                resource: "products",
+                subItems: [
+                    { title: "Item Registry", url: "/apps/masters/items", icon: Box, resource: "products" },
+                    { title: "Category Matrix", url: "/apps/masters/categories", icon: ListTree, resource: "products" },
+                    { title: "Brand Catalog", url: "/apps/masters/brands", icon: Flag, resource: "products" },
+                    { title: "UOM Matrix", url: "/apps/masters/uoms", icon: Hash, resource: "products" },
+                    { title: "Tax Slabs", url: "/apps/masters/tax", icon: Percent, resource: "settings" },
+                    { title: "Price Matrix", url: "/apps/masters/pricing", icon: DollarSign, resource: "settings" },
+                    { title: "Contact Hub", url: "/apps/masters/contacts", icon: Users, resource: "leads" },
+                ]
+            },
+            { title: "User Directory", url: "/apps/masters/users", icon: Users, resource: "users" },
+            { title: "Role Matrix", url: "/apps/masters/roles", icon: ShieldCheck, resource: "users" },
+        ]
+    },
+    {
+        label: "FINANCIALS",
+        module: "masters",
+        icon: DollarSign,
+        items: [
+            { title: "Chart of Accounts", url: "/apps/masters/coa", icon: LayoutGrid, resource: "settings" },
+            { title: "Fiscal Cycle", url: "/apps/masters/fiscal-years", icon: Clock, resource: "settings" },
         ]
     }
 ];
+
+// Peripheral modules that shouldn't switch the main navigation context
+const PERIPHERAL_MODULES = ['masters', 'settings', 'documents', 'projects'];
 
 // Help detect active module from route
 export const getCurrentModule = (pathname: string): string => {
@@ -441,11 +313,11 @@ export const getCurrentModule = (pathname: string): string => {
     if (parts.length >= 3 && parts[1] === 'apps') {
         const mod = parts[2];
         
-        // Seamless Universal Module Logic: Unify navigation focus
-        if (mod === 'masters') {
-            return 'masters';
+        // If it's a peripheral module, don't update the framework state
+        if (PERIPHERAL_MODULES.includes(mod)) {
+            return localStorage.getItem('erp_active_framework') || 'ecommerce';
         }
-        
+
         // Cache module state if it's a valid root
         if (MODULE_NAV_MAP[mod]) {
             localStorage.setItem('erp_active_framework', mod);
@@ -502,14 +374,31 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const { activeCompany, companies, setCompany } = useTenant();
     const { settings } = useStoreSettings();
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
-
+    const [expandedItems, setExpandedItems] = useState<string[]>([]);
+    
     const isSuperAdminView = location.pathname.startsWith('/super-admin');
+    const activeModule = getCurrentModule(location.pathname);
+
+    // Auto-expand current active module's sub-items
+    useEffect(() => {
+        const path = location.pathname;
+        const allGroups = isSuperAdminView ? superAdminNavGroups : [...(MODULE_NAV_MAP[activeModule] || []), ...INIT_NAV_GROUPS];
+        
+        allGroups.forEach(group => {
+            group.items.forEach(item => {
+                if (item.subItems && (path === item.url || path.startsWith(item.url + '/'))) {
+                    if (!expandedItems.includes(item.url)) {
+                        setExpandedItems(prev => [...prev, item.url]);
+                    }
+                }
+            });
+        });
+    }, [location.pathname, activeModule]);
 
     const logoUrl = settings?.logo_url;
     const storeName = isSuperAdminView ? "Platform Admin" : (settings?.store_name || activeCompany?.name || PLATFORM_CONFIG.name);
 
     // Dynamic Navigation Generation based on Active Module & Industry
-    const activeModule = getCurrentModule(location.pathname);
     const moduleNavGroups = MODULE_NAV_MAP[activeModule] || MODULE_NAV_MAP.ecommerce;
     const industry = activeCompany?.industry_type || 'retail';
     const overrides = INDUSTRY_MAP[industry] || { labels: {}, items: {} };
@@ -523,17 +412,17 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         }))
     }));
 
-    // Combine current module groups with INIT groups for integrated experience
-    // BUT: Skip INIT groups if we are already in the Masters module to avoid duplication
+    // Always include INIT_NAV_GROUPS to ensure Master Data & User Directory are visible
+    // within the context of the active module.
     const activeGroupsToRender = isSuperAdminView 
         ? superAdminNavGroups 
-        : (activeModule === 'masters' ? navGroups : [...navGroups, ...INIT_NAV_GROUPS]);
+        : [...navGroups, ...INIT_NAV_GROUPS];
 
     return (
         <aside
             className={cn(
-                "fixed left-0 top-0 min-h-screen h-full flex flex-col z-50 transition-all duration-300 ease-in-out border-r border-slate-200 shadow-sm overflow-y-auto overflow-x-hidden select-none bg-white",
-                collapsed ? "w-[48px]" : "w-[180px]"
+                "h-full flex flex-col shrink-0 border-r border-slate-200 shadow-sm overflow-y-auto overflow-x-hidden select-none bg-white transition-all duration-300 ease-in-out",
+                collapsed ? "w-[60px]" : "w-[240px]"
             )}
         >
             {/* Header / Logo + Collapse Toggle */}
@@ -572,7 +461,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                             </div>
                         )}
                         <div className="flex flex-col min-w-0">
-                            <span className="font-bold text-slate-900 tracking-tight text-[12px] truncate">
+                            <span className="font-bold text-slate-900 tracking-tight text-[13px] truncate">
                                 {storeName}
                             </span>
                         </div>
@@ -581,7 +470,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     {/* Collapse chevron */}
                     <button
                         onClick={onToggle}
-                        className="w-5 h-5 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all shrink-0"
+                        className="w-5 h-5 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all shrink-0"
                         title="Collapse sidebar"
                     >
                         <ChevronLeft className="w-2.5 h-2.5" />
@@ -600,9 +489,9 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                         <div className="w-4 h-4 rounded-md bg-blue-600/10 flex items-center justify-center shrink-0">
                             <Crown className="w-2.5 h-2.5 text-blue-600" />
                         </div>
-                        <span className="flex-1 font-medium truncate text-[11px] text-slate-900">{activeCompany.name}</span>
+                        <span className="flex-1 font-medium truncate text-[13px] text-slate-900">{activeCompany.name}</span>
                         {(companies.length > 1) && (
-                            <ChevronDown className={cn("w-3 h-3 text-slate-400 transition-transform", showCompanySwitcher && "rotate-180")} />
+                            <ChevronDown className={cn("w-3 h-3 text-slate-500 transition-transform", showCompanySwitcher && "rotate-180")} />
                         )}
                     </button>
 
@@ -613,12 +502,12 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                                     key={c.id}
                                     onClick={() => { setCompany(c.id); setShowCompanySwitcher(false); }}
                                     className={cn(
-                                        "w-full flex items-center gap-2 px-3 py-2 text-[11px] text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0",
+                                        "w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0",
                                         activeCompany.id === c.id && "bg-blue-50 text-blue-600"
                                     )}
                                 >
                                     <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                                        <span className="text-[9px] font-bold text-slate-600">{c.name.charAt(0).toUpperCase()}</span>
+                                        <span className="text-[13px] font-bold text-slate-600">{c.name.charAt(0).toUpperCase()}</span>
                                     </div>
                                     <span className="flex-1 truncate font-medium">{c.name}</span>
                                     {activeCompany.id === c.id && <Check className="w-3 h-3 text-blue-600" />}
@@ -630,105 +519,123 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
 
             {/* Navigation Sections */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden pt-2 px-2 space-y-3 pb-4">
+            <div className="flex-1 flex flex-col gap-1 p-2 custom-scrollbar overflow-y-auto">
+                {/* ── Dashboard Hub ── */}
                 <div className="space-y-0.5">
-                    {!isSuperAdminView && (
-                        <NavLink
-                            to="/apps"
-                            className={cn(
-                                "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] relative text-slate-500 hover:text-slate-900",
-                                collapsed ? "justify-center" : ""
-                            )}
-                            activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
-                        >
-                            <LayoutGrid className="w-4 h-4 shrink-0" />
-                            {!collapsed && <span className="flex-1 truncate font-bold text-[10px]">App Launcher</span>}
-                        </NavLink>
-                    )}
                     <NavLink
                         to={isSuperAdminView ? "/super-admin" : `/apps/${activeModule}`}
                         className={cn(
-                            "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] relative",
-                            collapsed ? "justify-center" : "",
-                            "text-slate-500 hover:text-slate-900"
+                            "group flex items-center justify-start gap-2 px-3 py-1.5 rounded-md transition-all font-bold text-[13px] text-slate-700 hover:text-slate-900 relative uppercase tracking-tight",
+                            collapsed ? "justify-center" : "justify-start"
                         )}
                         activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
                     >
-                        <LayoutDashboard className="w-4 h-4 shrink-0" />
-                        {!collapsed && <span className="flex-1 truncate">Dashboard Hub</span>}
+                        <LayoutDashboard className="w-5 h-5 shrink-0" />
+                        {!collapsed && <span className="flex-1 text-left">Dashboard Hub</span>}
                     </NavLink>
                 </div>
 
-                {activeGroupsToRender
-                    .map((group) => {
-                        const visibleItems = group.items.filter(item => !item.resource || can('manage', item.resource) || isSuperAdminView);
-                        if (visibleItems.length === 0) return null;
+                {activeGroupsToRender.map((group) => {
+                    const visibleItems = group.items.filter(item => {
+                        if (item.requiredModule && !hasModule(item.requiredModule)) return false;
+                        return true;
+                    });
 
-                        return (
-                            <div key={group.label} className="space-y-0.5">
-                                {group.label === "FOUNDATION" ? (
-                                    <div className="px-2 py-4">
-                                        {visibleItems.map((item) => (
-                                            <NavLink
-                                                key={item.url}
-                                                to={item.url}
-                                                className={cn(
-                                                    "group flex flex-col items-center justify-center p-4 rounded-2xl transition-all font-bold text-[13px] relative bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95",
-                                                    collapsed ? "p-2" : ""
-                                                )}
-                                                activeClassName="ring-2 ring-indigo-300 ring-offset-2"
-                                            >
-                                                <item.icon className={cn("w-6 h-6 mb-2 transition-transform group-hover:rotate-12", collapsed ? "mb-0" : "")} />
-                                                {!collapsed && <span className="text-[11px] uppercase tracking-widest">{item.title}</span>}
-                                            </NavLink>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <>
-                                        {!collapsed && (
-                                            <div className="px-3 py-1 mt-2">
-                                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{group.label}</p>
+                    if (visibleItems.length === 0) return null;
+
+                    return (
+                        <div key={group.label} className="space-y-0.5">
+                            {!collapsed && (
+                                <div className="px-3 py-1 mt-4">
+                                    <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">{group.label}</p>
+                                </div>
+                            )}
+                            {visibleItems.map((item) => {
+                                const hasSubItems = item.subItems && item.subItems.length > 0;
+                                const isExpanded = expandedItems.includes(item.url);
+                                const toggleExpand = (e: React.MouseEvent) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setExpandedItems(prev =>
+                                        prev.includes(item.url)
+                                            ? prev.filter(u => u !== item.url)
+                                            : [...prev, item.url]
+                                    );
+                                };
+
+                                const isExternal = item.url === "STOREFRONT";
+
+                                if (isExternal) {
+                                    return (
+                                        <a
+                                            key={item.url}
+                                            href={`/${activeCompany?.subdomain || ''}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={cn(
+                                                "group flex items-center justify-start gap-2 px-3 py-1.5 rounded-md transition-all font-bold text-[13px] text-slate-700 hover:text-slate-900 relative uppercase tracking-tight",
+                                                collapsed ? "justify-center" : "justify-start"
+                                            )}
+                                        >
+                                            <item.icon className="w-5 h-5 shrink-0 opacity-70 group-hover:opacity-100" />
+                                            {!collapsed && <span className="flex-1 text-left">{item.title}</span>}
+                                        </a>
+                                    );
+                                }
+
+                                return (
+                                    <div key={item.url} className="space-y-0.5">
+                                        <NavLink
+                                            to={item.url}
+                                            className={cn(
+                                                "group flex items-center justify-start gap-2 px-3 py-1.5 rounded-md transition-all font-bold text-[13px] text-slate-700 hover:text-slate-900 relative uppercase tracking-tight",
+                                                collapsed ? "justify-center" : "justify-start"
+                                            )}
+                                            activeClassName="text-blue-600 bg-blue-50/50 before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:bg-blue-600 before:rounded-r-full"
+                                        >
+                                            <item.icon className={cn(
+                                                "w-5 h-5 shrink-0 transition-transform group-hover:scale-110 opacity-70 group-hover:opacity-100",
+                                                (isExpanded || location.pathname.startsWith(item.url)) && "opacity-100"
+                                            )} />
+                                            {!collapsed && (
+                                                <>
+                                                    <span className="flex-1 text-left">{item.title}</span>
+                                                    {hasSubItems && (
+                                                        <button 
+                                                            onClick={toggleExpand}
+                                                            className="p-1 hover:bg-slate-200/50 rounded transition-all"
+                                                        >
+                                                            <ChevronDown className={cn(
+                                                                "w-4 h-4 text-slate-400 transition-transform",
+                                                                isExpanded && "rotate-180"
+                                                            )} />
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
+                                        </NavLink>
+
+                                        {hasSubItems && isExpanded && !collapsed && (
+                                            <div className="ml-5 mt-1 border-l border-slate-200 pl-1 space-y-0.5">
+                                                {item.subItems?.map((sub) => (
+                                                    <NavLink
+                                                        key={sub.url}
+                                                        to={sub.url}
+                                                        className="group flex items-center justify-start gap-2 px-3 py-1.5 rounded-md border-0 transition-all font-bold text-[13px] text-slate-600 hover:text-blue-600 hover:bg-blue-50/20 uppercase tracking-tight"
+                                                        activeClassName="text-blue-600 bg-blue-50/50 font-bold"
+                                                    >
+                                                        <sub.icon className="w-4 h-4 opacity-60 group-hover:opacity-100" />
+                                                        <span className="text-left">{sub.title}</span>
+                                                    </NavLink>
+                                                ))}
                                             </div>
                                         )}
-                                        {visibleItems.map((item) => {
-                                            const isExternal = item.url === "STOREFRONT";
-                                            if (isExternal) {
-                                                return (
-                                                    <a
-                                                        key={item.url}
-                                                        href={`/${activeCompany?.subdomain || ''}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className={cn(
-                                                            "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-600 hover:text-slate-900 hover:bg-slate-50",
-                                                            collapsed ? "justify-center" : ""
-                                                        )}
-                                                    >
-                                                        <item.icon className="w-3.5 h-3.5 shrink-0" />
-                                                        {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
-                                                    </a>
-                                                );
-                                            }
-                                            return (
-                                                <NavLink
-                                                    key={item.url}
-                                                    to={item.url}
-                                                    className={cn(
-                                                        "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-500 hover:text-slate-900 relative",
-                                                        collapsed ? "justify-center" : ""
-                                                    )}
-                                                    activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
-                                                >
-                                                    <item.icon className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110" />
-                                                    {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
-                                                </NavLink>
-                                            );
-                                        })}
-                                    </>
-                                )}
-                            </div>
-                        );
-                    })}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Bottom Utilities */}
@@ -737,14 +644,14 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     <NavLink
                         to={isSuperAdminView ? "/ecommerce" : "/super-admin"}
                         className={cn(
-                            "group flex items-center gap-2 px-2 py-1.5 rounded-md transition-all text-[11px] font-semibold hover:bg-slate-200/50",
+                            "group flex items-center justify-start gap-2 px-2 py-1.5 rounded-md transition-all text-[13px] font-semibold hover:bg-slate-200/50",
                             isSuperAdminView ? "text-slate-600" : "text-blue-600 hover:bg-blue-100/50",
-                            collapsed ? "justify-center" : ""
+                            collapsed ? "justify-center" : "justify-start"
                         )}
                         activeClassName={isSuperAdminView ? "bg-slate-200" : "bg-blue-100"}
                     >
                         {isSuperAdminView ? <LayoutDashboard className="w-4 h-4 shrink-0" /> : <ShieldCheck className="w-4 h-4 shrink-0" />}
-                        {!collapsed && <span className="flex-1 truncate">{isSuperAdminView ? "Merchant mode" : "Platform Admin"}</span>}
+                        {!collapsed && <span className="flex-1">{isSuperAdminView ? "Merchant mode" : "Platform Admin"}</span>}
                     </NavLink>
                 )}
             </div>

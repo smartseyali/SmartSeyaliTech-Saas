@@ -97,7 +97,7 @@ export default function Website() {
             </div>
             <div className="text-left">
                 <p className="text-sm font-bold tracking-tight">{label}</p>
-                <p className={cn("text-[10px] font-medium opacity-60", activeTab === id ? "text-white/80" : "text-slate-400")}>{sub}</p>
+                <p className={cn("text-xs font-medium opacity-60", activeTab === id ? "text-white/80" : "text-slate-500")}>{sub}</p>
             </div>
         </button>
     );
@@ -111,7 +111,7 @@ export default function Website() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Globe className="w-4 h-4 text-blue-600" />
-                            <span className="text-slate-400 font-bold  tracking-widest text-[10px]">Website Management</span>
+                            <span className="text-slate-500 font-bold  tracking-widest text-xs">Website Management</span>
                         </div>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Storefront Builder</h1>
                         <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-200 w-fit shadow-sm">

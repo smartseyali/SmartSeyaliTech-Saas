@@ -16,7 +16,7 @@ export default function Logs() {
                     <span className="font-bold text-gray-900 tracking-tight  ">
                         {new Date(log.created_at).toLocaleTimeString()}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest leading-none">
                         {new Date(log.created_at).toLocaleDateString()}
                     </span>
                 </div>
@@ -30,7 +30,7 @@ export default function Logs() {
                     <span className="font-bold text-gray-800   tracking-tight">
                         {log.contacts?.name || "Anonymous Node"}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">
                         Channel Integrated
                     </span>
                 </div>
@@ -46,7 +46,7 @@ export default function Logs() {
                     ) : (
                         <Inbox className="w-3 h-3 text-emerald-500" />
                     )}
-                    <span className="text-[10px] font-bold  tracking-widest text-gray-600">
+                    <span className="text-xs font-bold  tracking-widest text-gray-600">
                         {log.direction}
                     </span>
                 </div>
@@ -56,7 +56,7 @@ export default function Logs() {
             key: "message", 
             label: "Data Payload",
             render: (log: any) => (
-                <div className="max-w-sm truncate text-slate-500 font-medium  text-[11px] leading-relaxed">
+                <div className="max-w-sm truncate text-slate-500 font-medium  text-[13px] leading-relaxed">
                     "{log.message}"
                 </div>
             )
@@ -75,7 +75,7 @@ export default function Logs() {
 
     const headerActions = (
         <div className="flex items-center gap-2">
-            <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-slate-200">
+            <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-slate-900 text-white hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-slate-200">
                 <MessageSquare className="w-3.5 h-3.5" /> Direct Broadcast
             </button>
         </div>

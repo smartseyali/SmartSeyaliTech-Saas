@@ -60,7 +60,7 @@ export default function ReviewMaster() {
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900   tracking-tight">{r.product_name || 'PRODUCT ENTITY NODE'}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-xs text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {r.user_name || 'ANONYMOUS CONSUMER'}
                             </span>
                             <div className="flex items-center gap-0.5">
@@ -82,7 +82,7 @@ export default function ReviewMaster() {
             label: "Content",
             render: (r: any) => (
                 <div className="max-w-xs overflow-hidden">
-                    <p className="text-[11px] font-medium text-slate-500 line-clamp-2 ">
+                    <p className="text-[13px] font-medium text-slate-500 line-clamp-2 ">
                         "{r.comment || 'Performance protocol authorized successfully.'}"
                     </p>
                 </div>
@@ -94,11 +94,11 @@ export default function ReviewMaster() {
             render: (r: any) => (
                 <div className="flex items-center gap-2">
                     {r.is_verified_purchase !== false ? (
-                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-bold  tracking-widest">
+                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[13px] font-bold  tracking-widest">
                             <ShieldCheck size={10} /> Verified Protocol
                         </span>
                     ) : (
-                        <span className="text-[9px] font-bold text-slate-300  tracking-widest">Standard Entry</span>
+                        <span className="text-[13px] font-bold text-slate-300  tracking-widest">Standard Entry</span>
                     )}
                 </div>
             )
@@ -140,10 +140,10 @@ export default function ReviewMaster() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Batch Authorization
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2">
                         <Eye className="w-3.5 h-3.5" /> Hidden Nodes
                     </button>
                 </div>

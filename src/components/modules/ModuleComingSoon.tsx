@@ -34,7 +34,7 @@ export default function ModuleComingSoon({ moduleId }: Props) {
                 {/* Back button */}
                 <button
                     onClick={() => navigate('/apps')}
-                    className="flex items-center gap-2 text-white/30 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest mx-auto"
+                    className="flex items-center gap-2 text-white/30 hover:text-white transition-colors text-[13px] font-bold uppercase tracking-widest mx-auto"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back to App Launcher
                 </button>
@@ -51,7 +51,7 @@ export default function ModuleComingSoon({ moduleId }: Props) {
 
                 {/* Title */}
                 <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.5em] mb-3"
+                    <p className="text-[13px] font-bold uppercase tracking-[0.5em] mb-3"
                         style={{ color: mod.color }}>
                         {isBeta ? 'Coming in Beta' : 'In Development'}
                     </p>
@@ -77,13 +77,13 @@ export default function ModuleComingSoon({ moduleId }: Props) {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Button
                         onClick={() => navigate('/apps')}
-                        className="h-14 px-8 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white font-bold uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all"
+                        className="h-14 px-8 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white font-bold uppercase tracking-widest text-xs flex items-center gap-3 transition-all"
                         variant="ghost"
                     >
                         <ArrowLeft className="w-4 h-4" /> Back to Launcher
                     </Button>
                     <Button
-                        className="h-14 px-8 rounded-2xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all text-white shadow-2xl"
+                        className="h-14 px-8 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center gap-3 transition-all text-white shadow-2xl"
                         style={{ backgroundColor: mod.color }}
                     >
                         <Bell className="w-4 h-4" />
@@ -95,7 +95,7 @@ export default function ModuleComingSoon({ moduleId }: Props) {
                 {/* Estimated */}
                 <div className="flex items-center justify-center gap-2 text-white/15">
                     <Zap className="w-4 h-4 text-white/10" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">
+                    <span className="text-xs font-bold uppercase tracking-widest">
                         {PLATFORM_CONFIG.name} Platform · {mod.category.replace('-', ' ')} module
                     </span>
                 </div>

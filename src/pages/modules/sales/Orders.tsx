@@ -82,16 +82,16 @@ export default function Orders() {
     };
 
     const orderHeaderFields = [
-        { key: "customer_name", label: "Client Name", required: true, ph: "Customer name..." },
+        { key: "customer_name", label: "Customer", required: true, ph: "Customer name..." },
         { key: "reference_no", label: "Order Reference", required: true, ph: "ORD-2026-001" },
         { key: "date", label: "Order Date", type: "date" as const },
-        { key: "delivery_date", label: "Expected Date", type: "date" as const },
+        { key: "delivery_date", label: "Delivery Date", type: "date" as const },
         {
-            key: "status", label: "Engine Status", type: "select" as const,
+            key: "status", label: "Status", type: "select" as const,
             options: [
-                { label: "Draft Confirmation", value: "draft" },
-                { label: "On-Hold Delay", value: "on-hold" },
-                { label: "Confirmed Deployment", value: "confirmed" },
+                { label: "Draft", value: "draft" },
+                { label: "On-Hold", value: "on-hold" },
+                { label: "Confirmed", value: "confirmed" },
                 { label: "Closed", value: "closed" }
             ]
         }
@@ -137,11 +137,11 @@ export default function Orders() {
             const { error: iError } = await supabase.from('sales_order_items').insert(lineItems);
             if (iError) throw iError;
 
-            toast.success("Sales Order Blueprint Committed");
+            toast.success("Sales Order Saved");
             setView("list");
             loadOrders();
         } catch (err: any) {
-            toast.error(`Sync Failure: ${err.message}`);
+            toast.error(`Save Failed: ${err.message}`);
         }
     };
 
@@ -153,7 +153,7 @@ export default function Orders() {
     const fmt = (n: number) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
     const handleConvertToInvoice = () => {
-        navigate("/apps/invoicing/invoices", { 
+        navigate("/apps/sales/invoices", { 
             state: { 
                 sourceRecord: editingOrder, 
                 conversionType: 'so_to_invoice' 
@@ -165,8 +165,8 @@ export default function Orders() {
         return (
             <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
                 <ERPEntryForm
-                    title={editingOrder ? "Modify Sales Order" : "Initialize Sales Order"}
-                    subtitle="Confirmed Enterprise Deployment"
+                    title={editingOrder ? "Edit Sales Order" : "New Sales Order"}
+                    subtitle="Manage customer orders and shipments"
                     headerFields={orderHeaderFields}
                     onAbort={() => { setView("list"); setEditingOrder(null); setEditingItems(undefined); }}
                     onSave={handleSaveOrder}
@@ -200,7 +200,7 @@ export default function Orders() {
             render: (o: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{o.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{o.date || 'No Date'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">{o.date || 'No Date'}</span>
                 </div>
             )
         },

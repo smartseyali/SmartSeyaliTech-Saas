@@ -29,8 +29,8 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                             <k.icon className="w-5 h-5" />
                         </div>
                         <p className="text-4xl font-bold tracking-tight text-[#14532d] mb-1 ">{k.value}</p>
-                        <p className="text-[11px] font-bold  tracking-widest text-[#f97316]">{k.label}</p>
-                        <p className="text-[10px] font-medium text-slate-400 mt-3">{k.sub}</p>
+                        <p className="text-[13px] font-bold  tracking-widest text-[#f97316]">{k.label}</p>
+                        <p className="text-xs font-medium text-slate-500 mt-3">{k.sub}</p>
                     </motion.div>
                 ))}
             </div>
@@ -41,13 +41,13 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                     <div className="flex items-center justify-between mb-10 border-b border-border pb-8">
                         <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                                <span className="text-[#14532d] font-bold  tracking-widest text-[10px]">Merchant Intelligence</span>
+                                <span className="text-[#14532d] font-bold  tracking-widest text-xs">Merchant Intelligence</span>
                             </div>
                             <h2 className="text-2xl font-bold text-[#14532d]">Latest <span className="text-slate-200 ">Pages</span></h2>
                         </div>
                         <Button
                             onClick={() => onTabChange("pages")}
-                            variant="ghost" className="text-[10px] font-bold  tracking-widest text-[#14532d]/60 hover:text-[#14532d] hover:bg-[#14532d]/5"
+                            variant="ghost" className="text-xs font-bold  tracking-widest text-[#14532d]/60 hover:text-[#14532d] hover:bg-[#14532d]/5"
                         >
                             Manage All Pages
                         </Button>
@@ -62,7 +62,7 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                                     <span className="text-3xl font-bold text-[#14532d]/10 group-hover/item:text-[#f97316] transition-colors">{idx + 1}</span>
                                     <div>
                                         <p className="font-bold text-base text-[#14532d] group-hover/item:translate-x-1 transition-transform">{p}</p>
-                                        <p className="text-[10px] font-medium text-slate-400  tracking-widest mt-0.5">Updated 2 days ago</p>
+                                        <p className="text-xs font-medium text-slate-500  tracking-widest mt-0.5">Updated 2 days ago</p>
                                     </div>
                                 </div>
                                 <ArrowRight className="w-5 h-5 text-[#14532d]/20 group-hover/item:text-[#14532d] group-hover/item:translate-x-1 transition-all" />
@@ -76,7 +76,7 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                     <div className="bg-[#14532d] p-8 rounded-[32px] text-white shadow-xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl rounded-full" />
                         <h2 className="text-xl font-bold  mb-1">Quick Actions</h2>
-                        <p className="text-[10px] font-bold text-white/40  tracking-widest mb-8 border-b border-white/5 pb-4">Manage your storefront</p>
+                        <p className="text-xs font-bold text-white/40  tracking-widest mb-8 border-b border-white/5 pb-4">Manage your storefront</p>
 
                         <div className="grid grid-cols-2 gap-4">
                             {[
@@ -89,7 +89,7 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                                     onClick={() => onTabChange(a.tab)}
                                     className="flex flex-col items-center justify-center p-6 bg-white/10 rounded-2xl border border-white/10 hover:bg-white hover:text-[#14532d] transition-all duration-300 group/btn">
                                     <a.icon className="w-5 h-5 mb-3 group-hover/btn:scale-110 transition-transform" />
-                                    <span className="text-[10px] font-bold  tracking-widest whitespace-nowrap">{a.label}</span>
+                                    <span className="text-xs font-bold  tracking-widest whitespace-nowrap">{a.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -101,7 +101,7 @@ export function OverviewTab({ stats, onTabChange }: { stats: any, onTabChange: (
                         </div>
                         <div className="space-y-0.5">
                             <p className="font-bold text-[#14532d]">Platform Active</p>
-                            <p className="text-[10px] font-bold text-slate-400  tracking-widest">Storefront optimized</p>
+                            <p className="text-xs font-bold text-slate-500  tracking-widest">Storefront optimized</p>
                         </div>
                     </div>
                 </div>

@@ -113,7 +113,7 @@ const Services = () => {
           >
             <div className="flex items-center justify-center gap-3">
               <Settings className="w-5 h-5 text-primary-600 animate-spin-slow" />
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Our Capabilities</span>
+              <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">Our Capabilities</span>
             </div>
             <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
               Comprehensive <span className="text-primary-600">Services</span>

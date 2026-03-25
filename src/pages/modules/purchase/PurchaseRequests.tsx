@@ -114,7 +114,7 @@ export default function PurchaseRequests() {
             render: (r: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{r.date || 'No Date'}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Required by: {r.required_by || 'ASAP'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">Required by: {r.required_by || 'ASAP'}</span>
                 </div>
             )
         },

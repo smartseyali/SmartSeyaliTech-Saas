@@ -7,7 +7,9 @@ import {
     ChevronDown,
     Filter,
     FileText,
-    ArrowUpDown
+    ArrowUpDown,
+    FileDown,
+    FileUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,7 +76,7 @@ export function StatusBadge({ status }: { status: string }) {
 
     return (
         <span className={cn(
-            "px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border",
+            "px-2 py-0.5 rounded text-[13px] font-bold uppercase tracking-wider border",
             colorClass
         )}>
             {status}
@@ -104,29 +106,48 @@ export default function ERPListView({
                 <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-100 flex flex-col">
                     <div className="flex items-center justify-between h-14 px-4">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-[12px] font-bold tracking-tight text-gray-950 uppercase  leading-none">{title}</h1>
+                            <h1 className="text-[13px] font-bold tracking-tight text-gray-950 uppercase  leading-none">{title}</h1>
                             <div className="h-4 w-px bg-gray-200" />
-                            <span className="text-[11px] font-bold text-gray-400">{data.length} Total</span>
+                            <span className="text-[13px] font-bold text-gray-400">{data.length} Total</span>
                         </div>
 
                         <div className="flex items-center gap-1.5 font-sans">
                             {headerActions && (
-                                <div className="flex items-center gap-1.5 mr-1.5">
+                                <div className="flex items-center gap-1.5 mr-1.5 font-sans border-r border-gray-200 pr-1.5">
                                     {headerActions}
-                                    <div className="h-4 w-px bg-gray-200" />
                                 </div>
                             )}
+                            <div className="flex items-center gap-1 mr-1.5 font-sans">
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 px-2.5 text-slate-600 hover:bg-slate-100 font-bold text-xs tracking-widest uppercase gap-2 border border-slate-100"
+                                >
+                                    <FileDown className="w-3.5 h-3.5" />
+                                    Export
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-8 px-2.5 text-slate-600 hover:bg-slate-100 font-bold text-xs tracking-widest uppercase gap-2 border border-slate-100"
+                                >
+                                    <FileUp className="w-3.5 h-3.5" />
+                                    Bulk Import
+                                </Button>
+                                <div className="h-4 w-px bg-gray-200 mx-1" />
+                            </div>
                             <Button 
                                 variant="ghost" 
                                 size="sm" 
                                 onClick={onRefresh}
-                                className="h-8 px-2.5 text-gray-500 hover:bg-gray-100"
+                                title="Refresh"
+                                className="h-8 px-2.5 text-gray-500 hover:bg-gray-100 border border-slate-100"
                             >
                                 <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
                             </Button>
                             <Button 
                                 onClick={onNew}
-                                className="h-8 px-4 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-sm"
+                                className="h-8 px-4 bg-slate-900 hover:bg-black text-white text-[12px] font-bold shadow-sm uppercase tracking-widest"
                             >
                                 <Plus className="w-3.5 h-3.5 mr-1" />
                                 New
@@ -151,11 +172,11 @@ export default function ERPListView({
                             value={searchTerm}
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder={`Search for ${title.toLowerCase()}...`}
-                            className="w-full h-8 pl-9 pr-4 bg-white border border-gray-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full h-8 pl-9 pr-4 bg-white border border-gray-200 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                         />
                     </div>
                     
-                    <Button variant="outline" size="sm" className="h-9 text-gray-600 border-gray-200 text-xs font-medium bg-white">
+                    <Button variant="outline" size="sm" className="h-9 text-gray-600 border-gray-200 text-[13px] font-medium bg-white">
                         <Filter className="w-3.5 h-3.5 mr-2" />
                         Add Filter
                     </Button>
@@ -172,7 +193,7 @@ export default function ERPListView({
                                     <TableHead 
                                         key={col.key} 
                                         className={cn(
-                                            "text-[11px] font-bold text-gray-500 uppercase tracking-wider",
+                                            "text-[13px] font-bold text-gray-500 uppercase tracking-wider",
                                             col.className
                                         )}
                                     >
@@ -237,11 +258,11 @@ export default function ERPListView({
                 </div>
                 
                 {/* Pagination Placeholder */}
-                <div className="mt-4 flex items-center justify-between text-xs text-gray-500 font-medium">
+                <div className="mt-4 flex items-center justify-between text-[13px] text-gray-500 font-medium">
                     <div>Showing {data.length} of {data.length} items</div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="h-8 px-4 text-xs bg-white border-gray-200" disabled>Previous</Button>
-                        <Button variant="outline" size="sm" className="h-8 px-4 text-xs bg-white border-gray-200" disabled>Next</Button>
+                        <Button variant="outline" size="sm" className="h-8 px-4 text-[13px] bg-white border-gray-200" disabled>Previous</Button>
+                        <Button variant="outline" size="sm" className="h-8 px-4 text-[13px] bg-white border-gray-200" disabled>Next</Button>
                     </div>
                 </div>
             </div>

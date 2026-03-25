@@ -51,7 +51,7 @@ export default function AbandonedCarts() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <ShoppingCart className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-400">Checkout Recovery</span>
+                        <span className="text-xs font-bold  tracking-widest text-slate-500">Checkout Recovery</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Abandoned Carts</h1>
                     <p className="text-sm font-medium text-slate-500">
@@ -73,7 +73,7 @@ export default function AbandonedCarts() {
                 ].map(s => (
                     <div key={s.label} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{s.label}</span>
+                            <span className="text-xs font-bold  tracking-widest text-slate-500">{s.label}</span>
                             <div className={cn("p-2 rounded-lg border", s.color)}>
                                 <s.icon className="w-4 h-4" />
                             </div>
@@ -88,7 +88,7 @@ export default function AbandonedCarts() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-                        <p className="text-xs font-bold  tracking-widest text-slate-400">Analyzing carts...</p>
+                        <p className="text-xs font-bold  tracking-widest text-slate-500">Analyzing carts...</p>
                     </div>
                 ) : carts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
@@ -103,7 +103,7 @@ export default function AbandonedCarts() {
                 ) : (
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50 text-[10px] font-bold  tracking-widest text-slate-500 border-b border-slate-100">
+                            <tr className="bg-slate-50 text-xs font-bold  tracking-widest text-slate-500 border-b border-slate-100">
                                 <th className="px-6 py-4 text-left">Customer</th>
                                 <th className="px-6 py-4 text-left">Items</th>
                                 <th className="px-6 py-4 text-left">Value</th>
@@ -129,18 +129,18 @@ export default function AbandonedCarts() {
                                     </td>
                                     <td className="px-6 py-4 font-bold text-slate-900">{fmt(cart.cart_total)}</td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 text-[10px] font-bold  tracking-tight text-slate-400">
+                                        <div className="flex items-center gap-2 text-xs font-bold  tracking-tight text-slate-500">
                                             <Clock className="w-3.5 h-3.5 text-slate-300" />
                                             {getTimeSince(cart.updated_at)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         {cart.recovered ? (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold  border bg-emerald-50 text-emerald-700 border-emerald-100">Recovered</span>
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  border bg-emerald-50 text-emerald-700 border-emerald-100">Recovered</span>
                                         ) : cart.recovery_email_sent ? (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold  border bg-blue-50 text-blue-700 border-blue-100">Email Sent</span>
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  border bg-blue-50 text-blue-700 border-blue-100">Email Sent</span>
                                         ) : (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold  border bg-rose-50 text-rose-700 border-rose-100">Abandoned</span>
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  border bg-rose-50 text-rose-700 border-rose-100">Abandoned</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-right">

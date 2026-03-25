@@ -132,7 +132,7 @@ export default function PurchaseBills() {
             render: (o: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{o.vendor_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Due: {o.due_date || 'N/A'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">Due: {o.due_date || 'N/A'}</span>
                 </div>
             )
         },

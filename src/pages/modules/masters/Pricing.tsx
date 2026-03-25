@@ -58,7 +58,7 @@ export function PriceLists() {
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900 tracking-tight">{l.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">CURRENCY: {l.currency || 'INR'}</span>
+                        <span className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">CURRENCY: {l.currency || 'INR'}</span>
                     </div>
                 </div>
             )
@@ -143,7 +143,7 @@ export function TaxMapping() {
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900 tracking-tight">{t.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">RATE: {t.rate || 0}%</span>
+                        <span className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">RATE: {t.rate || 0}%</span>
                     </div>
                 </div>
             )

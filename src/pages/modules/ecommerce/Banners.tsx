@@ -136,7 +136,7 @@ export default function Banners() {
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 mb-2">
                         <div className="w-2 h-8 bg-indigo-600 rounded-full" />
-                        <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Visual Identity</span>
+                        <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">Visual Identity</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Banners & Promotions</h1>
                     <p className="text-sm font-medium text-slate-500">Manage storefront visual fragments and hero assets</p>
@@ -149,7 +149,7 @@ export default function Banners() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[40px] border border-slate-50 shadow-inner">
                     <RefreshCw className="w-12 h-12 text-indigo-600 animate-spin opacity-20" />
-                    <p className="text-[10px] font-bold tracking-widest text-slate-400 animate-pulse">Synchronizing Visual Hub...</p>
+                    <p className="text-xs font-bold tracking-widest text-slate-500 animate-pulse">Synchronizing Visual Hub...</p>
                 </div>
             ) : banners.length === 0 ? (
                 <div className="bg-white rounded-3xl border border-slate-100 border-dashed text-center py-32 max-w-3xl mx-auto shadow-sm">
@@ -170,7 +170,7 @@ export default function Banners() {
                         return (
                             <div key={p.key} className="space-y-6">
                                 <div className="flex items-center gap-4">
-                                    <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-100 px-4 py-1.5 rounded-full border border-slate-200">
+                                    <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 bg-slate-100 px-4 py-1.5 rounded-full border border-slate-200">
                                         {p.label} Cluster
                                     </h2>
                                     <div className="h-px flex-1 bg-slate-100" />
@@ -196,7 +196,7 @@ export default function Banners() {
                                                     {b.is_active ? <ToggleRight className="w-10 h-10 text-emerald-500 drop-shadow-md" /> : <ToggleLeft className="w-10 h-10 text-white/50 drop-shadow-md" />}
                                                 </button>
                                                 <div className="absolute bottom-4 left-6">
-                                                   <span className="px-3 py-1 bg-white/90 text-[9px] font-bold uppercase tracking-widest rounded-full shadow-lg text-slate-900">
+                                                   <span className="px-3 py-1 bg-white/90 text-[13px] font-bold uppercase tracking-widest rounded-full shadow-lg text-slate-900">
                                                        Priority {b.display_order}
                                                    </span>
                                                 </div>
@@ -205,12 +205,12 @@ export default function Banners() {
                                             <div className="p-8 flex-1 flex flex-col">
                                                 <div className="mb-8 space-y-2">
                                                     <h3 className="text-xl font-bold text-slate-950 group-hover:text-indigo-600 transition-colors line-clamp-1">{b.title}</h3>
-                                                    {b.subtitle && <p className="text-sm font-medium text-slate-400 line-clamp-2 leading-relaxed">{b.subtitle}</p>}
+                                                    {b.subtitle && <p className="text-sm font-medium text-slate-500 line-clamp-2 leading-relaxed">{b.subtitle}</p>}
                                                 </div>
 
                                                 <div className="space-y-3 mb-8">
                                                     {b.button_link && (
-                                                        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 p-3 rounded-2xl border border-slate-100 overflow-hidden">
+                                                        <div className="flex items-center gap-2 text-[13px] font-bold text-slate-500 uppercase tracking-widest bg-slate-50 p-3 rounded-2xl border border-slate-100 overflow-hidden">
                                                             <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                                                             <span className="truncate">{b.button_link}</span>
                                                         </div>

@@ -53,7 +53,7 @@ export function PageBanner({ position, height = "h-48", className, autoPlay = tr
                         <div className="absolute inset-0 flex items-center px-10">
                             <div className="text-white space-y-3 max-w-lg">
                                 {banners[current].badge_text && (
-                                    <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                    <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-widest">
                                         {banners[current].badge_text}
                                     </span>
                                 )}

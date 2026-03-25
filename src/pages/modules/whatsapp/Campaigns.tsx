@@ -63,10 +63,10 @@ export default function WhatsAppCampaigns() {
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-xs text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {c.template_name || "MARKETING NODE"}
                             </span>
-                            <span className="text-[10px] text-amber-500 font-bold  tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-xs text-amber-500 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Target size={10}/> {c.ad_follow_up ? 'Ad Follow-up' : 'Bulk Broadcast'}
                             </span>
                         </div>
@@ -81,7 +81,7 @@ export default function WhatsAppCampaigns() {
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-1.5">
                         <TrendingUp size={12} className="text-emerald-500" />
-                        <span className="text-[11px] font-bold text-slate-700  tracking-widest leading-none">
+                        <span className="text-[13px] font-bold text-slate-700  tracking-widest leading-none">
                             {c.stats?.read || 452} / {c.stats?.sent || 1250} READ
                         </span>
                     </div>
@@ -96,10 +96,10 @@ export default function WhatsAppCampaigns() {
             label: "Execution",
             render: (c: any) => (
                 <div className="flex flex-col gap-0.5 text-right">
-                    <span className="text-[10px] font-bold text-slate-400  tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
+                    <span className="text-xs font-bold text-slate-500  tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
                         <Clock size={10} /> {c.scheduled_at || 'IMMEDIATE'}
                     </span>
-                    <span className="text-[11px] font-bold text-slate-700 tracking-tighter">
+                    <span className="text-[13px] font-bold text-slate-700 tracking-tighter">
                         Protocol Alpha Node
                     </span>
                 </div>
@@ -118,7 +118,7 @@ export default function WhatsAppCampaigns() {
                     <button className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
                         <Send size={14} />
                     </button>
-                    <button className="h-8 w-8 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                    <button className="h-8 w-8 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all shadow-sm">
                         <BarChart3 size={14} />
                     </button>
                 </div>
@@ -156,7 +156,7 @@ export default function WhatsAppCampaigns() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-rose-600 text-white hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg shadow-rose-600/20">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-rose-600 text-white hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg shadow-rose-600/20">
                         <Flame className="w-3.5 h-3.5" /> High-Velocity Burst
                     </button>
                 </div>

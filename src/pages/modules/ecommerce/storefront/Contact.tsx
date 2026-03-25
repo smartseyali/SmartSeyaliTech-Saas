@@ -27,12 +27,12 @@ export default function Contact() {
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-8">
                         <div className="flex items-center justify-center gap-3">
                             <Activity className="w-5 h-5 text-blue-600 animate-pulse" />
-                            <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">Operational Status: Online</span>
+                            <span className="text-slate-500 font-bold  tracking-widest text-xs ">Operational Status: Online</span>
                         </div>
                         <h1 className="text-6xl md:text-[8rem] font-bold text-slate-900 tracking-tighter leading-[0.8] mb-12  ">
                             Contact <br /><span className="text-blue-600">Center</span>
                         </h1>
-                        <p className="text-xl md:text-2xl font-medium  text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl font-medium  text-slate-500 max-w-3xl mx-auto leading-relaxed">
                             Professional support channels initialized. Our team is standing by for corporate inquiries, product support, and partnership verification.
                         </p>
                     </motion.div>
@@ -81,9 +81,9 @@ export default function Contact() {
                                     <info.icon className="w-7 h-7 text-blue-600 group-hover:text-white" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[10px] font-bold  tracking-widest text-slate-300 mb-1  leading-none">{info.title}</p>
+                                    <p className="text-xs font-bold  tracking-widest text-slate-300 mb-1  leading-none">{info.title}</p>
                                     <p className="font-bold text-xl text-slate-900 tracking-tight  ">{info.value}</p>
-                                    <div className="text-[10px] font-bold text-slate-400   tracking-widest leading-none pt-2">{info.sub}</div>
+                                    <div className="text-xs font-bold text-slate-500   tracking-widest leading-none pt-2">{info.sub}</div>
                                 </div>
                             </motion.div>
                         ))}
@@ -101,10 +101,10 @@ export default function Contact() {
                                     <ShieldCheck className="w-16 h-16 text-blue-400 animate-pulse" />
                                 </div>
                                 <h2 className="text-5xl font-bold text-slate-900 mb-6  tracking-tighter ">Message Received</h2>
-                                <p className="text-slate-400 text-xl font-medium  max-w-sm">Submission accepted. Our handlers are analyzing your query for immediate response.</p>
+                                <p className="text-slate-500 text-xl font-medium  max-w-sm">Submission accepted. Our handlers are analyzing your query for immediate response.</p>
                                 <Button
                                     onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", subject: "", message: "" }); }}
-                                    className="mt-12 h-20 px-16 rounded-3xl bg-slate-900 text-white font-bold  tracking-widest text-[11px]  transition-all hover:bg-blue-600 shadow-2xl shadow-slate-900/10 border-none"
+                                    className="mt-12 h-20 px-16 rounded-3xl bg-slate-900 text-white font-bold  tracking-widest text-[13px]  transition-all hover:bg-blue-600 shadow-2xl shadow-slate-900/10 border-none"
                                 >
                                     New Message
                                 </Button>
@@ -119,7 +119,7 @@ export default function Contact() {
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-1 bg-blue-600" />
-                                        <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">Inquiry Registry</span>
+                                        <span className="text-slate-500 font-bold  tracking-widest text-xs ">Inquiry Registry</span>
                                     </div>
                                     <h2 className="text-5xl font-bold text-slate-900  tracking-tighter  leading-none">Send <span className="text-blue-600">Message</span></h2>
                                 </div>
@@ -133,7 +133,7 @@ export default function Contact() {
                                     ].map(field => (
                                         <div key={field.key} className="space-y-4 group">
                                             <div className="flex items-center justify-between px-2">
-                                                <label className="text-[10px] font-bold  tracking-widest text-slate-300 group-focus-within:text-blue-600 transition-colors  leading-none">{field.label}</label>
+                                                <label className="text-xs font-bold  tracking-widest text-slate-300 group-focus-within:text-blue-600 transition-colors  leading-none">{field.label}</label>
                                                 <field.icon className="w-3.5 h-3.5 text-slate-100 group-focus-within:text-blue-200 transition-all" />
                                             </div>
                                             <input
@@ -142,7 +142,7 @@ export default function Contact() {
                                                 placeholder={field.placeholder}
                                                 value={(form as any)[field.key]}
                                                 onChange={e => set(field.key, e.target.value)}
-                                                className="w-full h-16 px-8 rounded-2xl border border-slate-50 bg-slate-50 text-[11px] font-bold  tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200"
+                                                className="w-full h-16 px-8 rounded-2xl border border-slate-50 bg-slate-50 text-[13px] font-bold  tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200"
                                             />
                                         </div>
                                     ))}
@@ -150,7 +150,7 @@ export default function Contact() {
 
                                 <div className="space-y-4 group">
                                     <div className="flex items-center justify-between px-2">
-                                        <label className="text-[10px] font-bold  tracking-widest text-slate-300 group-focus-within:text-blue-600 transition-colors  leading-none">MESSAGE_BODY</label>
+                                        <label className="text-xs font-bold  tracking-widest text-slate-300 group-focus-within:text-blue-600 transition-colors  leading-none">MESSAGE_BODY</label>
                                         <MessageSquare className="w-3.5 h-3.5 text-slate-100 group-focus-within:text-blue-200 transition-all" />
                                     </div>
                                     <textarea
@@ -159,7 +159,7 @@ export default function Contact() {
                                         value={form.message}
                                         onChange={e => set("message", e.target.value)}
                                         rows={6}
-                                        className="w-full px-8 py-8 rounded-[2rem] border border-slate-50 bg-slate-50 text-[11px] font-bold  tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200 resize-none"
+                                        className="w-full px-8 py-8 rounded-[2rem] border border-slate-50 bg-slate-50 text-[13px] font-bold  tracking-widest text-slate-900 outline-none focus:border-blue-600/20 focus:bg-white transition-all shadow-inner focus:shadow-2xl focus:shadow-blue-600/5 placeholder:text-slate-200 resize-none"
                                     />
                                 </div>
 

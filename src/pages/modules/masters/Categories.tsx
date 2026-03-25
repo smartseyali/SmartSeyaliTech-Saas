@@ -9,20 +9,52 @@ export default function Categories() {
     const [searchTerm, setSearchTerm] = useState("");
     const [editingCategory, setEditingCategory] = useState<any>(null);
     
-    // Fetch from ecom_categories (renamed or shared)
+    // Using ecom_categories for data persistence
     const { data: categories, loading, fetchItems, createItem, updateItem } = useCrud("ecom_categories");
 
-    const categoryFields = [
-        { key: "name", label: "Category", required: true, ph: "Electronics / Services..." },
+    const categoryColumns = [
+        { key: "name", label: "Category Name", className: "font-bold text-slate-900" },
         { 
-            key: "is_active", label: "Status", type: "select" as const,
-            options: [
-                { label: "Active Classification", value: "true" },
-                { label: "Archived Asset", value: "false" }
-            ]
+            key: "parent_id", 
+            label: "Parent Category",
+            render: (c: any) => (
+                <span className="text-[12px] font-medium text-slate-500 uppercase tracking-tighter">
+                    {c.parent_id || "None"}
+                </span>
+            )
         },
-        { key: "description", label: "Narrative", ph: "Classification details..." }
+        { 
+            key: "is_active", 
+            label: "Status",
+            render: (c: any) => <StatusBadge status={c.is_active ? "Active" : "Disabled"} />
+        },
+        { key: "created_at", label: "Created Date" },
+        { key: "updated_at", label: "Updated Date" }
     ];
+
+    const categoryTabFields = {
+        basic: [
+            { key: "name", label: "Category Name *", type: "text" as const, required: true, ph: "e.g. Electronics" },
+            { 
+                key: "type", label: "Type", type: "select" as const,
+                options: [
+                    { label: "Product", value: "Product" },
+                    { label: "Service", value: "Service" }
+                ]
+            },
+            { key: "parent_id", label: "Parent Category", type: "select" as const, options: [{ value: 'none', label: 'None' }] },
+            { key: "description", label: "Description", type: "text" as any, ph: "Enter description..." }
+        ],
+        config: [
+            { key: "is_active", label: "Status", type: "select" as const, options: [{ value: 'true', label: 'Active' }, { value: 'false', label: 'Disabled' }] },
+            { key: "sort_order", label: "Sort Order", type: "number" as const },
+            { key: "url_key", label: "URL Key", type: "text" as const }
+        ],
+        mapping: [
+            { key: "visibility", label: "Visibility", type: "select" as const, options: [{ value: 'Public', label: 'Public' }, { value: 'Private', label: 'Hidden' }] },
+            { key: "ecom_mapping", label: "Store Mapping", type: "text" as const }
+        ]
+    };
 
     const handleSave = async (header: any) => {
         const payload = { ...header, is_active: header.is_active === "true" };
@@ -33,30 +65,8 @@ export default function Categories() {
         }
         setView("list");
         setEditingCategory(null);
+        fetchItems();
     };
-
-    const categoryColumns = [
-        { 
-            key: "name", 
-            label: "Data",
-            render: (c: any) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-900 group-hover:text-white transition-all duration-500">
-                        <LayoutGrid className="w-5 h-5" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none mt-1">Registry Classification Node</span>
-                    </div>
-                </div>
-            )
-        },
-        { 
-            key: "is_active", 
-            label: "Status",
-            render: (c: any) => <StatusBadge status={c.is_active ? "Active" : "Archived"} />
-        }
-    ];
 
     const filteredCategories = (categories || []).filter(c =>
         c.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -64,11 +74,11 @@ export default function Categories() {
 
     if (view === "form") {
         return (
-            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <div className="p-4 bg-slate-50 min-h-screen">
                 <ERPEntryForm
-                    title={editingCategory ? "Refine Classification node" : "Initialize Category Matrix"}
-                    subtitle="Global"
-                    headerFields={categoryFields}
+                    title={editingCategory ? "Edit Category" : "Add Category"}
+                    subtitle="Manage category hierarchy and settings"
+                    tabFields={categoryTabFields}
                     onAbort={() => { setView("list"); setEditingCategory(null); }}
                     onSave={handleSave}
                     initialData={editingCategory}
@@ -79,17 +89,19 @@ export default function Categories() {
     }
 
     return (
-        <ERPListView
-            title="Category"
-            data={filteredCategories}
-            columns={categoryColumns}
-            onNew={() => { setEditingCategory(null); setView("form"); }}
-            onRefresh={fetchItems}
-            onRowClick={(c) => { setEditingCategory(c); setView("form"); }}
-            isLoading={loading}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            primaryKey="id"
-        />
+        <div className="flex flex-col h-full bg-white">
+            <ERPListView
+                title="Category Master"
+                data={filteredCategories}
+                columns={categoryColumns}
+                onNew={() => { setEditingCategory(null); setView("form"); }}
+                onRefresh={fetchItems}
+                onRowClick={(c) => { setEditingCategory(c); setView("form"); }}
+                isLoading={loading}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                primaryKey="id"
+            />
+        </div>
     );
 }

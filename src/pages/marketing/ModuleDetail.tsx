@@ -89,7 +89,7 @@ const ModuleDetail = () => {
                                     <div className="bg-primary-100 p-1.5 rounded-lg">
                                         <Cpu className="w-3.5 h-3.5 text-primary-600" />
                                     </div>
-                                    <span className="text-[10px] font-bold text-primary-600 uppercase tracking-widest">{module.category || 'Platform'} Category</span>
+                                    <span className="text-xs font-bold text-primary-600 uppercase tracking-widest">{module.category || 'Platform'} Category</span>
                                 </div>
                                 <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
                                     {module.name} <br />
@@ -167,7 +167,7 @@ const ModuleDetail = () => {
                                         <h3 className="text-lg font-bold text-gray-900">Technical Stack</h3>
                                         <div className="flex flex-wrap gap-2">
                                             {(module.technologies || ["React", "PostgreSQL", "Node.js", "Redis"]).map((tech: string) => (
-                                                <span key={tech} className="px-3 py-1 bg-gray-50 rounded-lg text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-widest">{tech}</span>
+                                                <span key={tech} className="px-3 py-1 bg-gray-50 rounded-lg text-xs font-bold text-gray-500 border border-gray-100 uppercase tracking-widest">{tech}</span>
                                             ))}
                                         </div>
                                     </div>
@@ -178,21 +178,21 @@ const ModuleDetail = () => {
                                                 <Shield className="w-4 h-4 text-primary-600" />
                                                 <span className="font-bold text-gray-900 text-sm">Security Grade</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md">Tier-1</span>
+                                            <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md">Tier-1</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <Globe className="w-4 h-4 text-primary-600" />
                                                 <span className="font-bold text-gray-900 text-sm">Network Type</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md">Global</span>
+                                            <span className="text-xs font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md">Global</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <Zap className="w-4 h-4 text-primary-600" />
                                                 <span className="font-bold text-gray-900 text-sm">Architecture</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md">Modular</span>
+                                            <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md">Modular</span>
                                         </div>
                                     </div>
 

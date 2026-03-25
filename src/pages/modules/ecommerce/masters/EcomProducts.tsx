@@ -50,7 +50,7 @@ export const EcomProducts = () => {
             render: (row: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-900 tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1">SKU: {row.sku || 'UNASSIGNED'}</span>
+                    <span className="text-xs text-gray-400 font-bold tracking-widest mt-1">SKU: {row.sku || 'UNASSIGNED'}</span>
                 </div>
             )
         },
@@ -156,7 +156,7 @@ export const EcomProducts = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => navigate("/apps/ecommerce/masters/products/import")}
-                                className="h-8 px-4 rounded-xl gap-2 font-bold text-[10px] tracking-widest border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+                                className="h-8 px-4 rounded-xl gap-2 font-bold text-xs tracking-widest border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
                             >
                                 <Upload className="w-3.5 h-3.5 text-indigo-600" />
                                 Bulk Import
@@ -183,7 +183,7 @@ export const EcomProducts = () => {
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-                                                <p className="text-[10px] font-bold tracking-widest text-indigo-600/80">Registry Profile</p>
+                                                <p className="text-xs font-bold tracking-widest text-indigo-600/80">Registry Profile</p>
                                             </div>
                                             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{selectedProduct.name}</h2>
                                         </div>
@@ -201,7 +201,7 @@ export const EcomProducts = () => {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => setSearchParams({})}
-                                            className="h-10 w-10 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
+                                            className="h-10 w-10 rounded-2xl text-slate-500 hover:text-slate-900 transition-all"
                                         >
                                             <X className="w-5 h-5" />
                                         </Button>
@@ -210,13 +210,13 @@ export const EcomProducts = () => {
 
                                 <Tabs defaultValue="inventory" className="flex-1 flex flex-col min-h-0">
                                     <TabsList className="bg-white/60 p-1.5 rounded-2xl border border-white/60 shadow-sm mb-6 w-fit h-auto flex gap-1">
-                                        <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-bold text-xs tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Database className="w-3.5 h-3.5" /> Variants
                                         </TabsTrigger>
-                                        <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-bold text-xs tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Info className="w-3.5 h-3.5" /> Specifications
                                         </TabsTrigger>
-                                        <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-bold text-xs tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Layers className="w-3.5 h-3.5" /> Asset Ledger
                                         </TabsTrigger>
                                     </TabsList>
@@ -245,16 +245,16 @@ export const EcomProducts = () => {
                                                 ].map(stat => (
                                                     <div key={stat.label} className="bg-white p-6 rounded-[24px] border border-white/60 shadow-sm flex flex-col gap-3 group hover:border-indigo-200 transition-all">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                                                 <stat.icon className="w-4 h-4" />
                                                             </div>
-                                                            <span className="text-[10px] font-bold tracking-widest text-slate-400">{stat.label}</span>
+                                                            <span className="text-xs font-bold tracking-widest text-slate-500">{stat.label}</span>
                                                         </div>
                                                         <p className="text-xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
                                                     </div>
                                                 ))}
                                                 <div className="col-span-2 bg-white p-8 rounded-[32px] border border-white/60 shadow-sm">
-                                                    <h4 className="text-[10px] font-bold tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                                                    <h4 className="text-xs font-bold tracking-widest text-slate-500 mb-4 flex items-center gap-2">
                                                         <Info className="w-4 h-4 text-indigo-600" /> Registry Bio
                                                     </h4>
                                                     <p className="text-sm leading-relaxed text-slate-600 font-medium whitespace-pre-wrap">
@@ -271,7 +271,7 @@ export const EcomProducts = () => {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <h3 className="text-lg font-bold text-slate-900">Media Asset Vault</h3>
-                                                    <p className="text-xs font-bold text-slate-400 tracking-widest max-w-[240px]">Expanded gallery indexing sequence engaged.</p>
+                                                    <p className="text-xs font-bold text-slate-500 tracking-widest max-w-[240px]">Expanded gallery indexing sequence engaged.</p>
                                                 </div>
                                             </div>
                                         </TabsContent>

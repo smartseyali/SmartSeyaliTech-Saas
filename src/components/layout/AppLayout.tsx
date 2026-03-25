@@ -40,7 +40,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[50px]" : "w-[180px]")} />
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
         </div>
@@ -52,7 +51,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className={cn("shrink-0 h-full transition-all duration-300", collapsed ? "w-[50px]" : "w-[180px]")} />
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
           <div className="max-w-md w-full p-12 bg-white rounded-[40px] shadow-3xl text-center space-y-8 animate-in zoom-in-95 duration-500 border border-slate-100 relative overflow-hidden">
             {/* Background design element */}
@@ -81,7 +79,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {!hasModuleAccess ? (
                 <Button
                   onClick={() => navigate(`/apps/ecommerce/billing?module=${activeModule}`)}
-                  className="h-14 px-8 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-[11px] gap-3 active:scale-95 transition-all shadow-xl shadow-blue-100"
+                  className="h-14 px-8 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-[13px] gap-3 active:scale-95 transition-all shadow-xl shadow-blue-100"
                 >
                   <Sparkles className="w-4 h-4" /> Activate {activeModule}
                 </Button>
@@ -89,7 +87,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <Button
                 onClick={() => navigate('/apps')}
                 variant="outline"
-                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-900 font-bold text-[11px] gap-3 active:scale-95 transition-all"
+                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-900 font-bold text-[13px] gap-3 active:scale-95 transition-all"
               >
                 <Home className="w-4 h-4" /> Go to App Launcher
               </Button>
@@ -103,13 +101,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
       <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-      <div
-        className={cn(
-          "shrink-0 h-full transition-all duration-300",
-          collapsed ? "w-[50px]" : "w-[180px]"
-        )}
-      />
-
+      
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <AppHeader />
         <main className="flex-1 overflow-y-auto scrollbar-hide bg-[#f8fafc]/50">

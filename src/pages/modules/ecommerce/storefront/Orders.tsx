@@ -50,7 +50,7 @@ export default function Orders() {
         switch (status.toLowerCase()) {
             case 'completed':
             case 'delivered': return 'bg-slate-900 text-blue-400 border-slate-800';
-            case 'pending': return 'bg-slate-50 text-slate-400 border-slate-100';
+            case 'pending': return 'bg-slate-50 text-slate-500 border-slate-100';
             case 'shipped':
             case 'processing': return 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20';
             case 'cancelled': return 'bg-rose-50 text-rose-400 border-rose-100';
@@ -66,17 +66,17 @@ export default function Orders() {
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
                             <Package className="w-5 h-5 text-blue-600" />
-                            <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">Order Management</span>
+                            <span className="text-slate-500 font-bold  tracking-widest text-xs ">Order Management</span>
                         </div>
                         <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-slate-900  leading-[0.8]  mb-2">My <span className="text-blue-600">Orders</span></h1>
                     </div>
                     <div className="flex flex-col md:items-end gap-6 text-right">
-                        <p className="text-lg text-slate-400 font-medium  md:text-right max-w-sm leading-relaxed">
+                        <p className="text-lg text-slate-500 font-medium  md:text-right max-w-sm leading-relaxed">
                             Complete history of your professional acquisitions and service deployments.
                         </p>
                         <Link
                             to={storeLink("/shop")}
-                            className="text-[10px] font-bold  tracking-widest text-blue-600 hover:text-slate-900 transition-all border-b-2 border-slate-100 hover:border-blue-600 pb-2 "
+                            className="text-xs font-bold  tracking-widest text-blue-600 hover:text-slate-900 transition-all border-b-2 border-slate-100 hover:border-blue-600 pb-2 "
                         >
                             Back to Store
                         </Link>
@@ -96,11 +96,11 @@ export default function Orders() {
                         </div>
                         <div className="space-y-4">
                             <h3 className="text-3xl font-bold  tracking-tighter text-slate-900 ">No Orders Yet</h3>
-                            <p className="text-slate-400 font-medium  px-24 text-lg">Your account history contains no recorded purchases at this time.</p>
+                            <p className="text-slate-500 font-medium  px-24 text-lg">Your account history contains no recorded purchases at this time.</p>
                         </div>
                         <Button
                             onClick={() => navigate(storeLink("/shop"))}
-                            className="h-20 px-16 rounded-3xl bg-blue-600 text-white font-bold  tracking-widest text-[11px] shadow-2xl shadow-blue-600/30 transition-all border-none  hover:bg-slate-900"
+                            className="h-20 px-16 rounded-3xl bg-blue-600 text-white font-bold  tracking-widest text-[13px] shadow-2xl shadow-blue-600/30 transition-all border-none  hover:bg-slate-900"
                         >
                             Start Shopping
                         </Button>
@@ -121,10 +121,10 @@ export default function Orders() {
                                     <div className="space-y-12 relative z-10">
                                         <div className="flex justify-between items-start gap-4">
                                             <div className="space-y-2">
-                                                <p className="text-[10px] font-bold  tracking-widest text-slate-300  leading-none">ORDER_ID</p>
+                                                <p className="text-xs font-bold  tracking-widest text-slate-300  leading-none">ORDER_ID</p>
                                                 <h4 className="font-bold text-3xl text-slate-900 tracking-tighter  whitespace-nowrap  group-hover:text-blue-600 transition-colors">#{order.order_number || order.id.slice(0, 8).toUpperCase()}</h4>
                                             </div>
-                                            <div className={cn("px-6 py-2.5 rounded-2xl border font-bold  text-[9px] tracking-widest shadow-2xl ", getStatusStyles(order.status))}>
+                                            <div className={cn("px-6 py-2.5 rounded-2xl border font-bold  text-[13px] tracking-widest shadow-2xl ", getStatusStyles(order.status))}>
                                                 {order.status}
                                             </div>
                                         </div>
@@ -135,8 +135,8 @@ export default function Orders() {
                                                     <Calendar className="w-5 h-5" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <span className="text-[11px] font-bold  tracking-widest text-slate-900 ">{new Date(order.created_at).toLocaleDateString()}</span>
-                                                    <p className="text-[10px] font-bold text-slate-300  tracking-widest  leading-none opacity-60">Confirmed Date</p>
+                                                    <span className="text-[13px] font-bold  tracking-widest text-slate-900 ">{new Date(order.created_at).toLocaleDateString()}</span>
+                                                    <p className="text-xs font-bold text-slate-300  tracking-widest  leading-none opacity-60">Confirmed Date</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-6">
@@ -144,15 +144,15 @@ export default function Orders() {
                                                     <BarChart3 className="w-5 h-5" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <span className="text-[11px] font-bold  tracking-widest text-slate-900 ">{order.items?.length || 1} Products</span>
-                                                    <p className="text-[10px] font-bold text-slate-300  tracking-widest  leading-none opacity-60">Verified Assets</p>
+                                                    <span className="text-[13px] font-bold  tracking-widest text-slate-900 ">{order.items?.length || 1} Products</span>
+                                                    <p className="text-xs font-bold text-slate-300  tracking-widest  leading-none opacity-60">Verified Assets</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="flex justify-between items-end">
                                             <div className="space-y-3">
-                                                <p className="text-[10px] font-bold  tracking-widest text-blue-500  leading-none">Total Amount</p>
+                                                <p className="text-xs font-bold  tracking-widest text-blue-500  leading-none">Total Amount</p>
                                                 <p className="text-4xl font-bold text-slate-900 tracking-tighter  leading-none tabular-nums group-hover:scale-105 transition-transform origin-left">₹ {Number(order.grand_total || order.total_amount).toLocaleString()}</p>
                                             </div>
                                             <Link
@@ -179,12 +179,12 @@ export default function Orders() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-[13px] font-bold text-slate-900  tracking-widest ">Secure History</p>
-                            <p className="text-[10px] font-bold text-slate-300  tracking-widest  leading-none opacity-60">Verified Operational Protocol</p>
+                            <p className="text-xs font-bold text-slate-300  tracking-widest  leading-none opacity-60">Verified Operational Protocol</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4 text-slate-200 px-12 py-6 bg-slate-50 rounded-full border border-slate-100 shadow-inner">
                         <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                        <span className="text-[10px] font-bold  tracking-[1em] ">System Verified</span>
+                        <span className="text-xs font-bold  tracking-[1em] ">System Verified</span>
                     </div>
                 </div>
             </div>

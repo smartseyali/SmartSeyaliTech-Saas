@@ -72,7 +72,7 @@ export default function Refunds() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Undo2 className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-400">Post-Purchase Operations</span>
+                        <span className="text-xs font-bold  tracking-widest text-slate-500">Post-Purchase Operations</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Refund Requests</h1>
                     <p className="text-sm font-medium text-slate-500">
@@ -94,7 +94,7 @@ export default function Refunds() {
                 ].map(s => (
                     <div key={s.label} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{s.label}</span>
+                            <span className="text-xs font-bold  tracking-widest text-slate-500">{s.label}</span>
                             <div className={cn("p-2 rounded-lg border", s.color)}>
                                 <s.icon className="w-4 h-4" />
                             </div>
@@ -122,14 +122,14 @@ export default function Refunds() {
                         <button key={f} onClick={() => setFilter(f)}
                             className={cn(
                                 "px-5 py-2 rounded-lg text-xs font-bold  tracking-widest whitespace-nowrap transition-all",
-                                filter === f ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                                filter === f ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-slate-500 hover:text-slate-600 hover:bg-slate-50"
                             )}>
                             {f === "all" ? `All (${refunds.length})` : `${STATUS_CONFIG[f]?.label} (${refunds.filter(r => r.status === f).length})`}
                         </button>
                     ))}
                 </div>
                 <div className="relative flex-1">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="Search by order #, customer name..."
                         className="w-full h-12 pl-12 pr-6 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 outline-none transition-all shadow-sm" />
@@ -141,7 +141,7 @@ export default function Refunds() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-                        <p className="text-xs font-bold  tracking-widest text-slate-400">Verifying requests...</p>
+                        <p className="text-xs font-bold  tracking-widest text-slate-500">Verifying requests...</p>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
@@ -156,7 +156,7 @@ export default function Refunds() {
                 ) : (
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50 text-[10px] font-bold  tracking-widest text-slate-500 border-b border-slate-100">
+                            <tr className="bg-slate-50 text-xs font-bold  tracking-widest text-slate-500 border-b border-slate-100">
                                 <th className="px-6 py-4 text-left">Order Details</th>
                                 <th className="px-6 py-4 text-left">Customer</th>
                                 <th className="px-6 py-4 text-left">Refund Amount</th>
@@ -177,7 +177,7 @@ export default function Refunds() {
                                                     className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
                                                     {r.order_number} <LinkIcon className="w-3.5 h-3.5" />
                                                 </Link>
-                                            ) : <span className="text-slate-400">—</span>}
+                                            ) : <span className="text-slate-500">—</span>}
                                         </td>
                                         <td className="px-6 py-4">
                                             <p className="text-sm font-bold text-slate-900">{r.customer_name}</p>
@@ -192,14 +192,14 @@ export default function Refunds() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={cn(
-                                                "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold  tracking-tight border",
+                                                "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  tracking-tight border",
                                                 sc.color
                                             )}>
                                                 {sc.label}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-[10px] font-bold  tracking-widest text-slate-400">
+                                            <div className="flex items-center gap-2 text-xs font-bold  tracking-widest text-slate-500">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 {new Date(r.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}
                                             </div>
@@ -208,11 +208,11 @@ export default function Refunds() {
                                             <div className="flex justify-end gap-2">
                                                 {r.status === "pending" && (
                                                     <>
-                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]  gap-1 shadow-md shadow-emerald-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs  gap-1 shadow-md shadow-emerald-600/10 transition-all opacity-0 group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "approved")}>
                                                             <CheckCircle2 className="w-3 h-3" /> Approve
                                                         </Button>
-                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px]  gap-1 shadow-md shadow-rose-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs  gap-1 shadow-md shadow-rose-600/10 transition-all opacity-0 group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "rejected")}>
                                                             <XCircle className="w-3 h-3" /> Reject
                                                         </Button>

@@ -49,12 +49,12 @@ export default function About() {
                 >
                     <div className="flex items-center justify-center gap-3">
                         <Activity className="w-5 h-5 text-blue-600" />
-                        <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">Our Vision</span>
+                        <span className="text-slate-500 font-bold  tracking-widest text-xs ">Our Vision</span>
                     </div>
                     <h1 className="text-6xl md:text-[9rem] font-bold tracking-tighter text-slate-900  leading-[0.8] ">
                         Our <span className="text-blue-600">Mission</span>
                     </h1>
-                    <p className="text-xl md:text-2xl font-medium  text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-xl md:text-2xl font-medium  text-slate-500 max-w-3xl mx-auto leading-relaxed">
                         Engineering reliable infrastructure for the next generation of commerce and enterprise management. High-yield results through technical excellence.
                     </p>
                 </motion.div>
@@ -67,7 +67,7 @@ export default function About() {
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="w-16 h-1 bg-blue-600" />
-                                <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">The Genesis</span>
+                                <span className="text-slate-500 font-bold  tracking-widest text-xs ">The Genesis</span>
                             </div>
                             <h2 className="text-5xl md:text-8xl font-bold tracking-tighter text-slate-900  leading-[0.8] ">Quality <br /><span className="text-blue-600">Engineering</span></h2>
                         </div>
@@ -76,16 +76,16 @@ export default function About() {
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 pt-12 border-t border-slate-100">
                             <div className="space-y-6">
-                                <h4 className="font-bold text-slate-900  tracking-widest text-[11px] flex items-center gap-3  font-bold">
+                                <h4 className="font-bold text-slate-900  tracking-widest text-[13px] flex items-center gap-3  font-bold">
                                     <CheckCircle2 className="w-5 h-5 text-blue-600" /> Built for Integrity
                                 </h4>
-                                <p className="text-slate-400 text-sm leading-relaxed  font-medium">Direct-to-market protocols ensuring zero-compromise product verification and localized auditing.</p>
+                                <p className="text-slate-500 text-sm leading-relaxed  font-medium">Direct-to-market protocols ensuring zero-compromise product verification and localized auditing.</p>
                             </div>
                             <div className="space-y-6">
-                                <h4 className="font-bold text-slate-900  tracking-widest text-[11px] flex items-center gap-3  font-bold">
+                                <h4 className="font-bold text-slate-900  tracking-widest text-[13px] flex items-center gap-3  font-bold">
                                     <Target className="w-5 h-5 text-blue-600" /> Scalable Growth
                                 </h4>
-                                <p className="text-slate-400 text-sm leading-relaxed  font-medium">Advanced resource optimization across our global distribution network, built on sustainable architecture.</p>
+                                <p className="text-slate-500 text-sm leading-relaxed  font-medium">Advanced resource optimization across our global distribution network, built on sustainable architecture.</p>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ export default function About() {
                         </div>
                         <div className="absolute top-16 left-16 flex items-center gap-4 px-6 py-3 bg-slate-900/90 backdrop-blur-md rounded-full shadow-2xl">
                             <CheckCircle2 className="w-5 h-5 text-blue-400" />
-                            <span className="text-[10px] font-bold  tracking-widest text-white ">Operational Status: Verified</span>
+                            <span className="text-xs font-bold  tracking-widest text-white ">Operational Status: Verified</span>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ export default function About() {
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-5xl font-bold text-slate-900 tracking-tighter  group-hover:text-white transition-colors tabular-nums">{stat.value}</h3>
-                                <p className="text-[10px] font-bold text-slate-400  tracking-widest  group-hover:text-blue-400">{stat.label}</p>
+                                <p className="text-xs font-bold text-slate-500  tracking-widest  group-hover:text-blue-400">{stat.label}</p>
                             </div>
                         </div>
                     ))}
@@ -130,7 +130,7 @@ export default function About() {
                                 <Mail className="w-10 h-10" />
                             </div>
                             <h2 className="text-6xl md:text-8xl font-bold tracking-tighter  leading-none  text-slate-900">Get in <br /><span className="text-blue-600">Touch</span></h2>
-                            <p className="text-slate-400 text-xl md:text-2xl font-medium  max-w-2xl mx-auto leading-relaxed">
+                            <p className="text-slate-500 text-xl md:text-2xl font-medium  max-w-2xl mx-auto leading-relaxed">
                                 Connect with our corporate headquarters for partnership inquiries and technical support. Secure channels initialized.
                             </p>
                         </div>
@@ -138,15 +138,15 @@ export default function About() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 pt-16 border-t border-slate-50 mt-16">
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <Phone className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-bold  tracking-widest text-slate-900 ">{settings?.contact_phone || "+1 (555) 000-0000"}</p>
+                                <p className="text-[13px] font-bold  tracking-widest text-slate-900 ">{settings?.contact_phone || "+1 (555) 000-0000"}</p>
                             </div>
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <Mail className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.contact_email || "office@ecosystem.io"}</p>
+                                <p className="text-[13px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.contact_email || "office@ecosystem.io"}</p>
                             </div>
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <MapPin className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.address || "Silicon Valley, Global HQ"}</p>
+                                <p className="text-[13px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.address || "Silicon Valley, Global HQ"}</p>
                             </div>
                         </div>
 

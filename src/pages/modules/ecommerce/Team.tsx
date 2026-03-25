@@ -52,7 +52,7 @@ const teamColumns = [
                 <div>
                     <p className="font-bold text-sm text-slate-900">{row.users?.full_name || row.users?.username?.split('@')[0] || 'System User'}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                        <Mail className="w-3 h-3 text-slate-400" />
+                        <Mail className="w-3 h-3 text-slate-500" />
                         <p className="text-xs font-medium text-slate-500">{row.users?.username}</p>
                     </div>
                 </div>
@@ -67,7 +67,7 @@ const teamColumns = [
             const isAdmin = val === 'admin';
             return (
                 <div className={cn(
-                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold tracking-wider",
+                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold tracking-wider",
                     isOwner ? "bg-purple-50 text-purple-700 border-purple-200" :
                         isAdmin ? "bg-blue-50 text-blue-700 border-blue-200" :
                             "bg-slate-50 text-slate-700 border-slate-200"
@@ -274,7 +274,7 @@ export default function Team() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Shield className="w-5 h-5 text-blue-600" />
-                        <span className="text-xs font-bold tracking-widest text-slate-400">Team Management</span>
+                        <span className="text-xs font-bold tracking-widest text-slate-500">Team Management</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Personnel & Staff</h1>
                     <p className="text-sm font-medium text-slate-500">Manage your team members and their access levels</p>
@@ -282,7 +282,7 @@ export default function Team() {
 
                 <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-bold text-slate-400 tracking-wider">Total Members</span>
+                        <span className="text-xs font-bold text-slate-500 tracking-wider">Total Members</span>
                         <span className="text-2xl font-bold text-slate-900">{team?.length || 0}</span>
                     </div>
                     <Button
@@ -334,7 +334,7 @@ export default function Team() {
                                 <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
                                     <Shield className="w-5 h-5 text-blue-600" />
                                 </div>
-                                <span className="text-[10px] font-bold tracking-widest text-slate-400">Permission Access</span>
+                                <span className="text-xs font-bold tracking-widest text-slate-500">Permission Access</span>
                             </div>
                             <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">Access Control</DialogTitle>
                             <DialogDescription className="text-sm font-medium text-slate-500 mt-1">
@@ -359,13 +359,13 @@ export default function Team() {
                                     <div className="flex items-center gap-3">
                                         <div className={cn(
                                             "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                                            memberPermissions.includes(res.id) ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400"
+                                            memberPermissions.includes(res.id) ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"
                                         )}>
                                             <CheckCircle2 className={cn("w-4 h-4", !memberPermissions.includes(res.id) && "opacity-20")} />
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-xs font-bold text-slate-900">{res.label}</span>
-                                            <span className="text-[10px] font-medium text-slate-500">Access Granted</span>
+                                            <span className="text-xs font-medium text-slate-500">Access Granted</span>
                                         </div>
                                     </div>
                                     <ArrowRight className={cn(

@@ -131,12 +131,12 @@ export default function Login() {
                     <div className="flex items-center gap-12 text-white">
                         <div className="space-y-1">
                             <p className="text-3xl font-bold">99.9%</p>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Global Uptime</p>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Global Uptime</p>
                         </div>
                         <div className="w-px h-10 bg-slate-700" />
                         <div className="space-y-1">
                             <p className="text-3xl font-bold">Secure</p>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tier-1 Encryption</p>
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tier-1 Encryption</p>
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@ export default function Login() {
 
                             <div className="relative flex items-center py-2">
                                 <div className="flex-1 h-px bg-gray-100" />
-                                <span className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Secure Enterprise Access</span>
+                                <span className="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Secure Enterprise Access</span>
                                 <div className="flex-1 h-px bg-gray-100" />
                             </div>
 
@@ -267,11 +267,11 @@ export default function Login() {
                     <div className="pt-20 border-t border-gray-100 flex justify-center gap-8 opacity-40 grayscale">
                         <div className="flex flex-col items-center">
                             <ShieldCheck className="w-6 h-6 mb-1" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">Encrypted</span>
                         </div>
                         <div className="flex flex-col items-center">
                             <Globe className="w-6 h-6 mb-1" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Global</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">Global</span>
                         </div>
                     </div>
                 </div>

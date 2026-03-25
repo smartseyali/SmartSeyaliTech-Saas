@@ -47,7 +47,7 @@ export default function Directory() {
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900 tracking-tight  ">{emp.full_name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{emp.employee_code}</span>
+                        <span className="text-xs text-gray-400 font-bold  tracking-widest">{emp.employee_code}</span>
                     </div>
                 </div>
             )
@@ -58,7 +58,7 @@ export default function Directory() {
             render: (emp: any) => (
                 <div className="flex flex-col">
                     <span className="text-sm font-bold text-gray-700">{emp.designation || "Not Assigned"}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{emp.email}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">{emp.email}</span>
                 </div>
             )
         },

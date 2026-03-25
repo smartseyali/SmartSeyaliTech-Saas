@@ -77,7 +77,7 @@ export default function Home() {
                                         {banners[currentBanner]?.badge_text && (
                                             <div className="flex items-center gap-4">
                                                 <div className="h-0.5 w-12 bg-blue-600" />
-                                                <span className="text-[10px] font-bold  tracking-[0.5em] text-blue-500 ">
+                                                <span className="text-xs font-bold  tracking-[0.5em] text-blue-500 ">
                                                     {banners[currentBanner].badge_text}
                                                 </span>
                                             </div>
@@ -91,14 +91,14 @@ export default function Home() {
                                         <div className="flex flex-wrap gap-6 pt-4">
                                             <Button
                                                 onClick={() => navigate(storeLink("/shop"))}
-                                                className="h-20 px-12 rounded-2xl bg-blue-600 text-white border-none hover:bg-white hover:text-slate-900 shadow-2xl transition-all font-bold  tracking-widest text-[11px]"
+                                                className="h-20 px-12 rounded-2xl bg-blue-600 text-white border-none hover:bg-white hover:text-slate-900 shadow-2xl transition-all font-bold  tracking-widest text-[13px]"
                                             >
                                                 Initialize Access <ArrowRight className="w-5 h-5 ml-4" />
                                             </Button>
                                             <Button
                                                 variant="outline"
                                                 onClick={() => navigate(storeLink("/shop"))}
-                                                className="h-20 px-12 rounded-2xl bg-transparent text-white border-2 border-white/20 hover:border-white shadow-2xl transition-all font-bold  tracking-widest text-[11px]"
+                                                className="h-20 px-12 rounded-2xl bg-transparent text-white border-2 border-white/20 hover:border-white shadow-2xl transition-all font-bold  tracking-widest text-[13px]"
                                             >
                                                 View Documentation
                                             </Button>
@@ -148,7 +148,7 @@ export default function Home() {
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xl font-bold text-slate-900  tracking-tighter ">{item.title}</h4>
-                                        <p className="text-sm text-slate-400 font-medium leading-relaxed  pr-8">{item.description}</p>
+                                        <p className="text-sm text-slate-500 font-medium leading-relaxed  pr-8">{item.description}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -164,11 +164,11 @@ export default function Home() {
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <Box className="w-5 h-5 text-blue-600" />
-                                <span className="text-[10px] font-bold  tracking-widest text-slate-400">Inventory Ecosystem</span>
+                                <span className="text-xs font-bold  tracking-widest text-slate-500">Inventory Ecosystem</span>
                             </div>
                             <h2 className="text-5xl md:text-7xl font-bold text-slate-900  tracking-tighter  leading-[0.8]">Core <span className="text-blue-600">Clusters</span></h2>
                         </div>
-                        <Link to={storeLink("/shop")} className="text-[10px] font-bold text-blue-600  tracking-widest flex items-center gap-4 hover:gap-6 transition-all pb-2">
+                        <Link to={storeLink("/shop")} className="text-xs font-bold text-blue-600  tracking-widest flex items-center gap-4 hover:gap-6 transition-all pb-2">
                             Explore Entire Grid <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -196,7 +196,7 @@ export default function Home() {
                                             alt={cat.name}
                                         />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-400 group-hover:text-blue-600 transition-colors  tracking-widest ">{cat.name}</span>
+                                    <span className="text-[13px] font-bold text-slate-500 group-hover:text-blue-600 transition-colors  tracking-widest ">{cat.name}</span>
                                 </motion.div>
                             ))
                         )}
@@ -210,7 +210,7 @@ export default function Home() {
                     <div className="max-w-3xl mb-24 space-y-8">
                         <div className="flex items-center gap-3">
                             <div className="h-0.5 w-12 bg-blue-600" />
-                            <span className="text-[10px] font-bold  tracking-[0.5em] text-blue-500">Capital Incentives</span>
+                            <span className="text-xs font-bold  tracking-[0.5em] text-blue-500">Capital Incentives</span>
                         </div>
                         <h2 className="text-6xl md:text-8xl font-bold text-white  tracking-tighter  leading-[0.8]">The <span className="text-blue-600">Yield</span> Hub</h2>
                     </div>
@@ -230,7 +230,7 @@ export default function Home() {
                                     alt={offer.title}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent p-12 flex flex-col justify-end gap-6 text-white">
-                                    <div className="bg-blue-600 text-[9px] font-bold px-4 py-2 rounded-xl w-fit  tracking-widest shadow-2xl">
+                                    <div className="bg-blue-600 text-[13px] font-bold px-4 py-2 rounded-xl w-fit  tracking-widest shadow-2xl">
                                         {offer.badge_label || offer.type?.replace("_", " ") || "Special Logic"}
                                     </div>
                                     <h3 className="text-3xl font-bold  tracking-tighter  leading-none">{offer.title}</h3>
@@ -245,7 +245,7 @@ export default function Home() {
                         )) : (
                             <div className="lg:col-span-3 py-32 flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-[4rem] bg-slate-950/50">
                                 <Box className="w-16 h-16 text-white/5 mb-8" />
-                                <p className="text-[10px] font-bold text-white/20  tracking-[0.5em]  ">Optimization Protocol In Progress</p>
+                                <p className="text-xs font-bold text-white/20  tracking-[0.5em]  ">Optimization Protocol In Progress</p>
                             </div>
                         )}
                     </div>
@@ -258,11 +258,11 @@ export default function Home() {
                     <div className="flex flex-col items-center text-center mb-32 space-y-8">
                         <div className="flex items-center gap-4">
                             <div className="h-px w-12 bg-blue-600" />
-                            <span className="text-[10px] font-bold  tracking-[0.5em] text-blue-600">High-Yield Assets</span>
+                            <span className="text-xs font-bold  tracking-[0.5em] text-blue-600">High-Yield Assets</span>
                             <div className="h-px w-12 bg-blue-600" />
                         </div>
                         <h2 className="text-6xl md:text-8xl font-bold text-slate-900  tracking-tighter  leading-[0.8]">Priority <span className="text-blue-600">Units</span></h2>
-                        <p className="text-sm font-medium text-slate-400  max-w-xl">Technically superior inventory verified by our core global intelligence network.</p>
+                        <p className="text-sm font-medium text-slate-500  max-w-xl">Technically superior inventory verified by our core global intelligence network.</p>
                     </div>
 
                     {productsLoading ? (
@@ -298,7 +298,7 @@ export default function Home() {
                                         </div>
                                         <div className="space-y-4 px-2">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-bold  tracking-widest text-blue-600">{p.category || "General"}</span>
+                                                <span className="text-xs font-bold  tracking-widest text-blue-600">{p.category || "General"}</span>
                                                 <div className="h-px grow bg-slate-100" />
                                             </div>
                                             <h3 className="font-bold text-2xl text-slate-900 group-hover:text-blue-600 transition-colors  tracking-tighter  leading-none line-clamp-2">{p.name}</h3>
@@ -307,7 +307,7 @@ export default function Home() {
                                     </Link>
                                     <Button
                                         onClick={() => addToCart(p, 1)}
-                                        className="w-full mt-10 h-16 rounded-[1.5rem] bg-slate-900 hover:bg-blue-600 border-none text-white font-bold  text-[11px] tracking-widest shadow-2xl transition-all"
+                                        className="w-full mt-10 h-16 rounded-[1.5rem] bg-slate-900 hover:bg-blue-600 border-none text-white font-bold  text-[13px] tracking-widest shadow-2xl transition-all"
                                     >
                                         Initialize Order
                                     </Button>

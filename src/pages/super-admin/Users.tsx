@@ -61,10 +61,10 @@ export default function PlatformUsers() {
                 <table className="w-full text-sm table-fixed">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-1/4">User Info</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-[20%]">Platform Role</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-1/4">Linked Companies</th>
-                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-auto">Permissions / Modules</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left w-1/4">User Info</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left w-[20%]">Platform Role</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left w-1/4">Linked Companies</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-xs p-4 text-left w-auto">Permissions / Modules</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50 items-start">
@@ -79,21 +79,21 @@ export default function PlatformUsers() {
                                                 {u.avatar_url ? (
                                                     <img src={u.avatar_url} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Users className="w-5 h-5 text-slate-400" />
+                                                    <Users className="w-5 h-5 text-slate-500" />
                                                 )}
                                             </div>
                                             <div className="flex flex-col overflow-hidden">
                                                 <span className="font-bold text-slate-900 truncate">{u.full_name || 'Unnamed User'}</span>
-                                                <span className="text-xs font-semibold text-slate-400 truncate">{u.username}</span>
+                                                <span className="text-xs font-semibold text-slate-500 truncate">{u.username}</span>
                                             </div>
                                         </div>
                                     </td>
 
                                     <td className="p-4">
                                         {u.is_super_admin ? (
-                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-bold text-[9px]  tracking-widest px-2 py-1">Super Admin</Badge>
+                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-bold text-[13px]  tracking-widest px-2 py-1">Super Admin</Badge>
                                         ) : (
-                                            <Badge variant="outline" className="text-slate-500 font-bold text-[9px]  tracking-widest px-2 py-1">Merchant User</Badge>
+                                            <Badge variant="outline" className="text-slate-500 font-bold text-[13px]  tracking-widest px-2 py-1">Merchant User</Badge>
                                         )}
                                     </td>
 
@@ -103,15 +103,15 @@ export default function PlatformUsers() {
                                                 {mappings.map((m: any) => (
                                                     <div key={m.id} className="flex items-center gap-2">
                                                         <span className="w-2 h-2 rounded-full bg-green-500" />
-                                                        <span className="text-[11px] font-bold text-slate-700">{m.companies?.name || 'Unknown'}</span>
-                                                        <span className="text-[9px]  tracking-wider font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100">
+                                                        <span className="text-[13px] font-bold text-slate-700">{m.companies?.name || 'Unknown'}</span>
+                                                        <span className="text-[13px]  tracking-wider font-bold text-slate-500 px-1.5 py-0.5 rounded bg-slate-100">
                                                             {m.role}
                                                         </span>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-slate-400 font-semibold ">Unlinked Guest</span>
+                                            <span className="text-xs text-slate-500 font-semibold ">Unlinked Guest</span>
                                         )}
                                     </td>
 
@@ -119,22 +119,22 @@ export default function PlatformUsers() {
                                         {u.is_super_admin ? (
                                             <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg w-fit">
                                                 <ShieldCheck className="w-4 h-4" />
-                                                <span className="text-[10px] font-bold  tracking-widest">Global Master Access</span>
+                                                <span className="text-xs font-bold  tracking-widest">Global Master Access</span>
                                             </div>
                                         ) : mappings.length > 0 ? (
                                             <div className="flex flex-wrap gap-1">
                                                 {mappings.some((m: any) => ['admin', 'owner'].includes(m.role)) ? (
-                                                    <span className="text-[10px] font-bold text-green-600  tracking-widest border border-green-200 bg-green-50 px-2 py-1 rounded w-fit">
+                                                    <span className="text-xs font-bold text-green-600  tracking-widest border border-green-200 bg-green-50 px-2 py-1 rounded w-fit">
                                                         ALL TENANT MODULES (Admin)
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[10px] font-bold text-slate-500  tracking-widest bg-slate-100 px-2 py-1 rounded w-fit">
+                                                    <span className="text-xs font-bold text-slate-500  tracking-widest bg-slate-100 px-2 py-1 rounded w-fit">
                                                         Restricted Staff Access
                                                     </span>
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-slate-400">-</span>
+                                            <span className="text-xs text-slate-500">-</span>
                                         )}
                                     </td>
                                 </tr>
@@ -142,7 +142,7 @@ export default function PlatformUsers() {
                         })}
                         {users.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-sm font-semibold text-slate-400">
+                                <td colSpan={4} className="p-8 text-center text-sm font-semibold text-slate-500">
                                     No users found... which means you aren't here.
                                 </td>
                             </tr>

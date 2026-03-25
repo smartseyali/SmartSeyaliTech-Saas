@@ -43,12 +43,12 @@ export default function Items() {
             label: "Item",
             render: (item: any) => (
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
                         <Package className="w-4 h-4" />
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-gray-900   tracking-tight">{item.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{item.category || "General Ledger Group"}</span>
+                        <span className="text-xs text-gray-400 font-bold  tracking-widest mt-1">{item.category || "General Ledger Group"}</span>
                     </div>
                 </div>
             )
@@ -56,7 +56,7 @@ export default function Items() {
         { 
             key: "sku", 
             label: "SKU",
-            render: (item: any) => <span className="text-[11px] font-bold text-gray-500  tracking-widest">{item.sku || "UNASSIGNED"}</span>
+            render: (item: any) => <span className="text-[13px] font-bold text-gray-500  tracking-widest">{item.sku || "UNASSIGNED"}</span>
         },
         { 
             key: "rate", 
@@ -68,7 +68,7 @@ export default function Items() {
             label: "Inventory Level",
             render: (item: any) => (
                 <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-bold text-slate-700">{item.current_stock || 0}</span>
+                    <span className="text-[13px] font-bold text-slate-700">{item.current_stock || 0}</span>
                     <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
                         <div 
                             className={`h-full rounded-full transition-all duration-1000 ${
@@ -122,7 +122,7 @@ export default function Items() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-xs  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2">
                         <TrendingUp className="w-3.5 h-3.5" /> Stock Adjustment
                     </button>
                 </div>

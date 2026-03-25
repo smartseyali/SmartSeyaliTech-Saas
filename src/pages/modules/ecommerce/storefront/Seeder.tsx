@@ -154,20 +154,20 @@ export default function Seeder() {
                     <div className="space-y-4">
                         <div className="flex items-center justify-center gap-2">
                             <Leaf className="w-5 h-5 text-[#f97316]" />
-                            <span className="text-[10px] font-bold  tracking-widest text-[#14532d]/40">System Utility</span>
+                            <span className="text-xs font-bold  tracking-widest text-[#14532d]/40">System Utility</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold text-[#14532d]  tracking-tighter leading-none">Market <br /> <span className="text-[#f97316]">Nurturer</span></h1>
-                        <p className="text-slate-400 font-medium  text-sm">Populate your registry with sample organic specimens for testing.</p>
+                        <p className="text-slate-500 font-medium  text-sm">Populate your registry with sample organic specimens for testing.</p>
                     </div>
 
-                    <div className="p-8 bg-[#fafaf9] rounded-3xl border border-dashed border-slate-200 text-[10px] font-bold  tracking-widest text-[#14532d]/60 leading-relaxed ">
+                    <div className="p-8 bg-[#fafaf9] rounded-3xl border border-dashed border-slate-200 text-xs font-bold  tracking-widest text-[#14532d]/60 leading-relaxed ">
                         {status || "Ready to cultivate data..."}
                     </div>
 
                     <Button
                         onClick={seed}
                         disabled={loading}
-                        className="w-full h-16 rounded-2xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold  tracking-widest text-[10px] shadow-2xl shadow-[#14532d]/20 transition-all"
+                        className="w-full h-16 rounded-2xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold  tracking-widest text-xs shadow-2xl shadow-[#14532d]/20 transition-all"
                     >
                         {loading ? "Planting Seeds..." : "Initialize Organic Seeder"}
                     </Button>

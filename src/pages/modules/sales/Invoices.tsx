@@ -183,7 +183,7 @@ export default function Invoices() {
             render: (i: any) => (
                 <div className="flex flex-col text-sm">
                     <span className="font-bold text-gray-800">{i.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{i.due_date ? `Due: ${i.due_date}` : 'No Due Date'}</span>
+                    <span className="text-xs text-gray-400 font-bold  tracking-widest">{i.due_date ? `Due: ${i.due_date}` : 'No Due Date'}</span>
                 </div>
             )
         },
