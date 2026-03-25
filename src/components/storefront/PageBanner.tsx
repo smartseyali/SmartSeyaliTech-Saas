@@ -58,7 +58,7 @@ export function PageBanner({ position, height = "h-48", className, autoPlay = tr
                                     </span>
                                 )}
                                 {banners[current].title && (
-                                    <h3 className="text-2xl md:text-3xl font-black leading-tight">
+                                    <h3 className="text-2xl md:text-3xl font-bold leading-tight">
                                         {banners[current].title}
                                     </h3>
                                 )}
@@ -68,7 +68,7 @@ export function PageBanner({ position, height = "h-48", className, autoPlay = tr
                                 {banners[current].button_text && banners[current].button_link && (
                                     <a
                                         href={banners[current].button_link}
-                                        className="inline-block mt-2 px-6 py-2.5 bg-white text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-colors"
+                                        className="inline-block mt-2 px-6 py-2.5 bg-white text-slate-900 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-colors"
                                     >
                                         {banners[current].button_text}
                                     </a>

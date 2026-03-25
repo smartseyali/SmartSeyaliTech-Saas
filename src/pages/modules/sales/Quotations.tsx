@@ -145,15 +145,15 @@ export default function Quotations() {
         { 
             key: "reference_no", 
             label: "Reference",
-            render: (q: any) => <span className="font-bold text-gray-900 tracking-tight italic">{q.reference_no}</span>
+            render: (q: any) => <span className="font-bold text-gray-900 tracking-tight ">{q.reference_no}</span>
         },
         { 
             key: "customer_name", 
             label: "Client Engine",
             render: (q: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-800 uppercase italic leading-none">{q.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Issued: {q.date}</span>
+                    <span className="font-bold text-gray-800   leading-none">{q.customer_name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Issued: {q.date}</span>
                 </div>
             )
         },
@@ -162,8 +162,8 @@ export default function Quotations() {
             label: "Valuation",
             render: (q: any) => (
                 <div className="flex flex-col">
-                    <span className="font-black text-indigo-600 tracking-tight">{fmt(q.grand_total)}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Qty: {q.total_qty}</span>
+                    <span className="font-bold text-indigo-600 tracking-tight">{fmt(q.grand_total)}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Qty: {q.total_qty}</span>
                 </div>
             )
         },

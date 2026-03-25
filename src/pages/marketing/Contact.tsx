@@ -104,14 +104,14 @@ const Contact = () => {
           >
             <div className="flex items-center justify-center gap-3">
               <MessageSquare className="w-5 h-5 text-primary-600" />
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">Get In Touch</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ">Get In Touch</span>
             </div>
 
             <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
               Let's Start a <br /> <span className="text-primary-600">Conversation</span>
             </h1>
 
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed italic font-medium">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed  font-medium">
               Ready to take your business to the next level? Our specialists are here to help you navigate your technical journey.
             </p>
           </motion.div>
@@ -133,7 +133,7 @@ const Contact = () => {
                   <CardContent className="p-0 space-y-10">
                     <div className="space-y-2">
                       <h2 className="text-3xl font-bold text-gray-900 leading-tight">Send a Inquiry</h2>
-                      <p className="text-gray-500 font-medium italic">Fill out the form below and we'll respond within 24 hours.</p>
+                      <p className="text-gray-500 font-medium ">Fill out the form below and we'll respond within 24 hours.</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
@@ -239,9 +239,9 @@ const Contact = () => {
                         <info.icon className="h-5 w-5" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-gray-300 italic">{info.title}</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-gray-300 ">{info.title}</h4>
                         <p className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors leading-tight">{info.value}</p>
-                        <p className="text-xs font-medium text-gray-400 italic mt-1">{info.description}</p>
+                        <p className="text-xs font-medium text-gray-400  mt-1">{info.description}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -257,7 +257,7 @@ const Contact = () => {
                     "Transparent pricing models",
                     "Direct access to lead engineers"
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-400 italic">
+                    <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-400 ">
                       <div className="w-1.5 h-1.5 bg-primary-500 rounded-full" /> {item}
                     </li>
                   ))}
@@ -277,22 +277,22 @@ const Contact = () => {
                 <div className="absolute inset-0 bg-primary-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <Globe className="w-16 h-16 text-primary-600 mx-auto mb-8 animate-pulse" />
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">Strategic Location</h3>
-                <p className="text-gray-500 font-bold uppercase tracking-widest text-xs italic mb-4">SR NAGAR, TIRUPPUR, TAMILNADU, IN</p>
-                <p className="text-gray-400 text-sm italic max-w-xs mx-auto">Providing high-end software solutions to the global technical corridor from our regional node.</p>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-xs  mb-4">SR NAGAR, TIRUPPUR, TAMILNADU, IN</p>
+                <p className="text-gray-400 text-sm  max-w-xs mx-auto">Providing high-end software solutions to the global technical corridor from our regional node.</p>
               </div>
             </div>
 
             <div className="space-y-10">
               <div className="space-y-6">
                 <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">Visit Our <br /><span className="text-primary-600">Headquarters</span></h2>
-                <p className="text-lg text-gray-500 font-medium italic leading-relaxed">
+                <p className="text-lg text-gray-500 font-medium  leading-relaxed">
                   Our development center is located in the heart of the technical corridor, enabling high-frequency collaboration and rapid deployment cycles.
                 </p>
               </div>
 
               <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm border-l-8 border-l-primary-600">
-                <p className="text-xl font-bold italic text-gray-900 mb-2">"Quality communication is the foundation of high-performance engineering."</p>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-300 italic">— Lead Architect</p>
+                <p className="text-xl font-bold  text-gray-900 mb-2">"Quality communication is the foundation of high-performance engineering."</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-300 ">— Lead Architect</p>
               </div>
             </div>
           </div>
@@ -304,7 +304,7 @@ const Contact = () => {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-8 relative overflow-hidden shadow-2xl">
             <h2 className="text-4xl md:text-6xl font-bold leading-tight">Start Your Journey</h2>
-            <p className="text-xl text-primary-50 max-w-2xl mx-auto opacity-90 italic">Creating modern solutions for complex business problems. Let's discuss your roadmap today.</p>
+            <p className="text-xl text-primary-50 max-w-2xl mx-auto opacity-90 ">Creating modern solutions for complex business problems. Let's discuss your roadmap today.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
               <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg">
                 <Link to="/contact">Initialize Project</Link>

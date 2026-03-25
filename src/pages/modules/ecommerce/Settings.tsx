@@ -25,7 +25,7 @@ function Section({ icon: Icon, title, children }: { icon: any; title: string; ch
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest ml-0.5">{label}</label>
+            <label className="text-xs font-semibold text-slate-500  tracking-widest ml-0.5">{label}</label>
             {children}
         </div>
     );
@@ -72,7 +72,7 @@ export default function Settings() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">System Configuration</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-400 mb-1">System Configuration</p>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Store Settings</h1>
                     <p className="text-sm text-slate-500 mt-1">Manage your storefront configuration and preferences.</p>
                 </div>

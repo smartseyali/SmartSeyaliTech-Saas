@@ -9,7 +9,7 @@ import { useCrud } from "@/hooks/useCrud";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
-export default function Contacts() {
+export default function Contacts({ defaultType }: { defaultType?: "customer" | "vendor" | "lead" }) {
     const [view, setView] = useState<"list" | "form">("list");
     const [searchTerm, setSearchTerm] = useState("");
     const [editingContact, setEditingContact] = useState<any>(null);
@@ -45,7 +45,7 @@ export default function Contacts() {
         if (editingContact) {
             await updateItem(editingContact.id, header);
         } else {
-            await createItem({ ...header, type: header.type || "customer" });
+            await createItem({ ...header, type: header.type || defaultType || "customer" });
         }
         setView("list");
         setEditingContact(null);
@@ -67,12 +67,12 @@ export default function Contacts() {
                          <Users className="w-5 h-5" />}
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {c.type?.toUpperCase() || "CUSTOMER"}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
                                 {c.job_title || "Unclassified Role"}
                             </span>
                         </div>
@@ -86,7 +86,7 @@ export default function Contacts() {
             render: (c: any) => (
                 <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-gray-400 group-hover:text-slate-900 transition-colors" />
-                    <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest group-hover:text-slate-900 transition-colors">{c.company_name || 'Individual / Personal Node'}</span>
+                    <span className="text-[11px] font-bold text-gray-600  tracking-widest group-hover:text-slate-900 transition-colors">{c.company_name || 'Individual / Personal Node'}</span>
                 </div>
             )
         },
@@ -95,8 +95,8 @@ export default function Contacts() {
             label: "Operational Communication",
             render: (c: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 group-hover:text-indigo-600 transition-colors"><Mail size={12}/> {c.email}</span>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 group-hover:text-amber-600 transition-colors"><Phone size={12}/> {c.phone}</span>
+                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2 group-hover:text-indigo-600 transition-colors"><Mail size={12}/> {c.email}</span>
+                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2 group-hover:text-amber-600 transition-colors"><Phone size={12}/> {c.phone}</span>
                 </div>
             )
         },
@@ -107,11 +107,13 @@ export default function Contacts() {
         }
     ];
 
-    const filteredContacts = (contacts || []).filter(c =>
-        c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredContacts = (contacts || []).filter(c => {
+        const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.email?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = defaultType ? c.type === defaultType : true;
+        return matchesSearch && matchesType;
+    });
 
     if (view === "form") {
         return (
@@ -143,7 +145,7 @@ export default function Contacts() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
                         Matrix Bulk Import
                     </button>
                 </div>

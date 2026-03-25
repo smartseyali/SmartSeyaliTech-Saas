@@ -86,7 +86,7 @@ export default function ResetPassword() {
                                 <Check className="w-10 h-10 text-emerald-500 stroke-[3]" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase italic">Success!</h1>
+                                <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase ">Success!</h1>
                                 <p className="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">
                                     Your password has been reset. <br />Redirecting to login...
                                 </p>
@@ -108,13 +108,13 @@ export default function ResetPassword() {
                             </div>
 
                             <div>
-                                <h1 className="text-4xl font-bold text-slate-900 tracking-tighter uppercase italic leading-none">New <span className="text-primary-600">Password</span></h1>
+                                <h1 className="text-4xl font-bold text-slate-900 tracking-tighter uppercase  leading-none">New <span className="text-primary-600">Password</span></h1>
                                 <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest">Enter a secure new password.</p>
                             </div>
 
                             <form onSubmit={handleResetPassword} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 ml-1">New Password</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">New Password</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                         <input
@@ -137,7 +137,7 @@ export default function ResetPassword() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 ml-1">Confirm Password</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Confirm Password</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary-600 transition-colors" />
                                         <input
@@ -151,7 +151,7 @@ export default function ResetPassword() {
                                     </div>
                                 </div>
 
-                                <Button type="submit" className="w-full h-16 rounded-2xl bg-slate-900 text-white hover:bg-black font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl transform active:scale-95 transition-all group mt-4 leading-none" disabled={loading}>
+                                <Button type="submit" className="w-full h-16 rounded-2xl bg-slate-900 text-white hover:bg-black font-bold uppercase tracking-widest text-[10px] shadow-xl transform active:scale-95 transition-all group mt-4 leading-none" disabled={loading}>
                                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                                         <>
                                             Update Password

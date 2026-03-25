@@ -55,12 +55,12 @@ export default function AttributeMaster() {
                         <Tag className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{a.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{a.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {a.display_type?.toUpperCase() || "TEXT"} INTERFACE
                             </span>
-                            <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-[10px] text-amber-500 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Binary size={10}/> {a.value_count || 0} NODES
                             </span>
                         </div>
@@ -74,11 +74,11 @@ export default function AttributeMaster() {
             render: (a: any) => (
                 <div className="flex gap-1.5 flex-wrap max-w-xs">
                     {(a.sample_values || ['Red', 'Blue', 'Green']).map((v: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                        <span key={i} className="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-bold text-slate-500  tracking-widest">
                             {v}
                         </span>
                     ))}
-                    {a.value_count > 3 && <span className="text-[9px] font-black text-slate-300">+{a.value_count - 3} MORE</span>}
+                    {a.value_count > 3 && <span className="text-[9px] font-bold text-slate-300">+{a.value_count - 3} MORE</span>}
                 </div>
             )
         },
@@ -120,7 +120,7 @@ export default function AttributeMaster() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <Palette className="w-3.5 h-3.5" /> Visualize Hub
                     </button>
                 </div>

@@ -65,10 +65,10 @@ export default function ChartOfAccounts() {
                         {acc.is_group ? <BookOpen className="w-5 h-5" /> : <Layers className="w-5 h-5" />}
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                        <span className="text-[10px] font-bold text-slate-400  tracking-widest leading-none mb-1">
                             {acc.code || "LEDGER-XXX"}
                         </span>
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{acc.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{acc.name}</span>
                     </div>
                 </div>
             )
@@ -84,7 +84,7 @@ export default function ChartOfAccounts() {
                         acc.type === 'equity' ? 'bg-indigo-500' :
                         acc.type === 'income' ? 'bg-blue-500' : 'bg-rose-500'
                     }`} />
-                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">{acc.type || "UNSET"}</span>
+                    <span className="text-[11px] font-bold text-slate-600  tracking-widest">{acc.type || "UNSET"}</span>
                 </div>
             )
         },
@@ -92,7 +92,7 @@ export default function ChartOfAccounts() {
             key: "balance", 
             label: "Current Balance",
             render: (acc: any) => (
-                <span className={`font-black tracking-tighter ${
+                <span className={`font-bold tracking-tighter ${
                     (acc.balance || 0) < 0 ? "text-rose-600" : "text-emerald-600"
                 }`}>
                     {fmt(acc.balance || 0)}
@@ -141,10 +141,10 @@ export default function ChartOfAccounts() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
                         <PieChart className="w-3.5 h-3.5" /> Balance Sheet Node
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
                         <BarChart3 className="w-3.5 h-3.5" /> P&L Matrix
                     </button>
                 </div>

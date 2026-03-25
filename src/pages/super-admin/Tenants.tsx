@@ -45,7 +45,7 @@ export default function Tenants() {
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
-                <h1 className="text-3xl font-black tracking-tight text-slate-900">Tenant Management</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Tenant Management</h1>
                 <p className="text-sm font-medium text-slate-500 mt-2">Manage all registered merchant companies and their plans on the platform.</p>
             </div>
 
@@ -53,10 +53,10 @@ export default function Tenants() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left">Company</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left">Plan / Type</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left">Primary Admins</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-right">Actions</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Company</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Plan / Type</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left">Primary Admins</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -78,11 +78,11 @@ export default function Tenants() {
                                     </td>
                                     <td className="p-4">
                                         <div className="flex flex-col gap-1 inline-flex">
-                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase tracking-wider w-fit">
+                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px]  tracking-wider w-fit">
                                                 {c.plan || 'Starter'}
                                             </span>
                                             {c.industry_type && (
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase">{c.industry_type}</span>
+                                                <span className="text-[10px] font-bold text-slate-400 ">{c.industry_type}</span>
                                             )}
                                         </div>
                                     </td>
@@ -100,7 +100,7 @@ export default function Tenants() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-slate-400 font-semibold italic">No admins linked</span>
+                                            <span className="text-xs text-slate-400 font-semibold ">No admins linked</span>
                                         )}
                                     </td>
                                     <td className="p-4 text-right">

@@ -36,7 +36,7 @@ export default function BooksDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Scale className="w-5 h-5 text-emerald-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Financial Intelligence</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Financial Intelligence</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Books Accounting</h1>
                     <p className="text-slate-500 text-sm font-medium">Chart of Accounts & Ledgers</p>
@@ -64,10 +64,10 @@ export default function BooksDashboard() {
                             <div className={cn("p-2.5 rounded-xl text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{k.label}</span>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 mb-1 leading-none">{k.value}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{k.sub}</p>
+                        <p className="text-2xl font-bold text-slate-900 mb-1 leading-none">{k.value}</p>
+                        <p className="text-[10px] font-bold text-slate-400  tracking-tighter mt-1">{k.sub}</p>
                     </div>
                 ))}
             </div>
@@ -77,14 +77,14 @@ export default function BooksDashboard() {
                 <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col overflow-hidden">
                     <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white relative">
                         <div className="absolute top-0 left-0 w-16 h-1 bg-emerald-600 rounded-full ml-8" />
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Ledger Activity</h2>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:bg-emerald-50">Journal History <ChevronRight className="w-3 h-3 ml-2" /></Button>
+                        <h2 className="text-sm font-bold  tracking-widest text-slate-400">Ledger Activity</h2>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-emerald-600 hover:bg-emerald-50">Journal History <ChevronRight className="w-3 h-3 ml-2" /></Button>
                     </div>
 
                     <div className="p-0">
                         <table className="w-full">
                             <thead>
-                                <tr className="text-[9px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-50 bg-slate-50/20">
+                                <tr className="text-[9px]  font-bold tracking-widest text-slate-400 border-b border-slate-50 bg-slate-50/20">
                                     <th className="px-8 py-4 text-left">Internal ID</th>
                                     <th className="px-8 py-4 text-left">Source / Vendor</th>
                                     <th className="px-8 py-4 text-left">Category</th>
@@ -107,16 +107,16 @@ export default function BooksDashboard() {
                                                 <span className="text-[11px] font-bold text-slate-700">{txn.category}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-tight">{txn.type}</td>
+                                        <td className="px-8 py-5 text-[10px] font-bold text-slate-400  tracking-tight">{txn.type}</td>
                                         <td className={cn(
-                                            "px-8 py-5 text-sm font-black",
+                                            "px-8 py-5 text-sm font-bold",
                                             txn.type === 'Income' ? "text-emerald-600" : "text-rose-600"
                                         )}>
                                             {txn.type === 'Income' ? '+' : '-'}{fmt(txn.amount)}
                                         </td>
                                         <td className="px-8 py-5 text-right">
                                             <span className={cn(
-                                                "px-2.5 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border",
+                                                "px-2.5 py-1 rounded-md text-[8px] font-bold  tracking-widest border",
                                                 txn.status === 'Cleared' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
                                             )}>
                                                 {txn.status}
@@ -136,33 +136,33 @@ export default function BooksDashboard() {
                             <Wallet className="w-32 h-32 rotate-12" />
                         </div>
                         <div className="relative z-10">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-8 border-b border-white/5 pb-4 leading-none font-outfit">Liquidity Status</h3>
+                            <h3 className="text-[10px] font-bold  tracking-widest text-emerald-500 mb-8 border-b border-white/5 pb-4 leading-none ">Liquidity Status</h3>
 
                             <div className="space-y-6">
                                 <div className="p-5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm group-hover:border-emerald-500/30 transition-all">
-                                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5 leading-none">Main Operations Account</p>
+                                    <p className="text-[9px] font-bold text-white/30  tracking-widest mb-1.5 leading-none">Main Operations Account</p>
                                     <div className="flex items-end justify-between">
-                                        <p className="text-2xl font-black italic">₹12,40,500</p>
-                                        <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded uppercase leading-none">HDFC-9021</span>
+                                        <p className="text-2xl font-bold ">₹12,40,500</p>
+                                        <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded  leading-none">HDFC-9021</span>
                                     </div>
                                 </div>
                                 <div className="p-5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm group-hover:border-emerald-500/30 transition-all">
-                                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5 leading-none">Petty Cash / Wallet</p>
+                                    <p className="text-[9px] font-bold text-white/30  tracking-widest mb-1.5 leading-none">Petty Cash / Wallet</p>
                                     <div className="flex items-end justify-between">
-                                        <p className="text-2xl font-black italic">₹45,200</p>
-                                        <span className="text-[9px] font-bold text-slate-400 bg-white/10 px-2 py-0.5 rounded uppercase leading-none">Internal</span>
+                                        <p className="text-2xl font-bold ">₹45,200</p>
+                                        <span className="text-[9px] font-bold text-slate-400 bg-white/10 px-2 py-0.5 rounded  leading-none">Internal</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <Button className="w-full mt-8 h-12 bg-white/10 hover:bg-white/20 border-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl transition-all shadow-xl font-outfit">
+                            <Button className="w-full mt-8 h-12 bg-white/10 hover:bg-white/20 border-white/10 text-white font-bold  tracking-widest text-[10px] rounded-xl transition-all shadow-xl ">
                                 View Balance Sheet
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-6 border-b border-slate-50 pb-4 leading-none">Quick Links</h3>
+                        <h3 className="text-sm font-bold  tracking-widest text-slate-400 mb-6 border-b border-slate-50 pb-4 leading-none">Quick Links</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'COA', icon: Scale },
@@ -172,7 +172,7 @@ export default function BooksDashboard() {
                             ].map(item => (
                                 <button key={item.label} className="p-4 rounded-xl border border-slate-50 flex flex-col items-center gap-3 hover:border-emerald-500 transition-all bg-white hover:shadow-md group">
                                     <item.icon className="w-4 h-4 text-slate-300 group-hover:text-emerald-600 transition-colors" />
-                                    <span className="text-[9px] font-black uppercase text-slate-500 tracking-tighter leading-none">{item.label}</span>
+                                    <span className="text-[9px] font-bold  text-slate-500 tracking-tighter leading-none">{item.label}</span>
                                 </button>
                             ))}
                         </div>

@@ -124,7 +124,7 @@ export default function PurchaseBills() {
         { 
             key: "reference_no", 
             label: "Ref ID",
-            render: (o: any) => <span className="font-bold text-gray-900 tracking-tight italic">{o.reference_no}</span>
+            render: (o: any) => <span className="font-bold text-gray-900 tracking-tight ">{o.reference_no}</span>
         },
         { 
             key: "vendor_name", 
@@ -132,14 +132,14 @@ export default function PurchaseBills() {
             render: (o: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{o.vendor_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Due: {o.due_date || 'N/A'}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Due: {o.due_date || 'N/A'}</span>
                 </div>
             )
         },
         { 
             key: "grand_total", 
             label: "Obligation Amount",
-            render: (o: any) => <span className="font-black text-indigo-600 tracking-tight">{fmt(o.grand_total)}</span>,
+            render: (o: any) => <span className="font-bold text-indigo-600 tracking-tight">{fmt(o.grand_total)}</span>,
             className: "text-right"
         },
         { 

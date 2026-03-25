@@ -31,8 +31,8 @@ export default function Deliveries() {
             label: "Identifier",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">#{row.order_number}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Order Sequence</span>
+                    <span className="font-bold text-gray-900   tracking-tight">#{row.order_number}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Order Sequence</span>
                 </div>
             )
         },
@@ -41,8 +41,8 @@ export default function Deliveries() {
             label: "Consignee",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Shipment Target</span>
+                    <span className="font-bold text-gray-900   tracking-tight">{row.customer_name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Shipment Target</span>
                 </div>
             )
         },
@@ -51,11 +51,11 @@ export default function Deliveries() {
             label: "Tracking",
             render: (row: any) => row.tracking_number ? (
                 <div className="flex items-center gap-2 group">
-                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">{row.tracking_number}</span>
+                    <span className="text-[11px] font-bold text-indigo-600  tracking-widest">{row.tracking_number}</span>
                     <ExternalLink className="w-3 h-3 text-slate-300 group-hover:text-indigo-400 transition-colors" />
                 </div>
             ) : (
-                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Awaiting Scan</span>
+                <span className="text-[10px] font-bold text-slate-300  tracking-widest">Awaiting Scan</span>
             )
         },
         { 
@@ -83,7 +83,7 @@ export default function Deliveries() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
                         <Truck className="w-3.5 h-3.5" /> Manifest Generation
                     </button>
                 </div>

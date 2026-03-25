@@ -56,12 +56,12 @@ export default function VariantMaster() {
                         <Layers className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{v.product_name || 'PARENT PRODUCT NODE'}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{v.product_name || 'PARENT PRODUCT NODE'}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 SKU: {v.sku}
                             </span>
-                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-[10px] text-indigo-400 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Binary size={10}/> {v.attribute_summary || 'RED / XL'}
                             </span>
                         </div>
@@ -74,10 +74,10 @@ export default function VariantMaster() {
             label: "Modification Magnitude",
             render: (v: any) => (
                 <div className="flex flex-col">
-                    <span className="text-[12px] font-black text-slate-700 tracking-tighter">
+                    <span className="text-[12px] font-bold text-slate-700 tracking-tighter">
                         +{v.price_extra || 0} INR
                     </span>
-                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Base Premium Node</span>
+                    <span className="text-[9px] font-bold text-emerald-500  tracking-widest">Base Premium Node</span>
                 </div>
             )
         },
@@ -87,7 +87,7 @@ export default function VariantMaster() {
             render: (v: any) => (
                 <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end">
-                        <span className="text-[12px] font-black text-slate-900 tracking-tighter">{v.stock_qty || 0} NOS</span>
+                        <span className="text-[12px] font-bold text-slate-900 tracking-tighter">{v.stock_qty || 0} NOS</span>
                         <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden mt-1">
                             <div className="h-full bg-indigo-500 w-[65%]" />
                         </div>
@@ -134,7 +134,7 @@ export default function VariantMaster() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <Barcode className="w-3.5 h-3.5" /> Bulk SKU Generation
                     </button>
                 </div>

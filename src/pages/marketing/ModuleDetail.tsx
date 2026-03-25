@@ -95,7 +95,7 @@ const ModuleDetail = () => {
                                     {module.name} <br />
                                     <span className="text-primary-600">Overview</span>
                                 </h1>
-                                <p className="text-lg text-gray-500 font-medium italic leading-relaxed max-w-xl">
+                                <p className="text-lg text-gray-500 font-medium  leading-relaxed max-w-xl">
                                     "{module.tagline || 'Experience high-performance enterprise management logic.'}"
                                 </p>
                             </div>
@@ -143,7 +143,7 @@ const ModuleDetail = () => {
                                             </div>
                                             <div>
                                                 <p className="font-bold text-gray-900 text-md">{feature}</p>
-                                                <p className="text-gray-400 text-xs mt-1 italic leading-relaxed">Industrial grade capability for high-scale operations.</p>
+                                                <p className="text-gray-400 text-xs mt-1  leading-relaxed">Industrial grade capability for high-scale operations.</p>
                                             </div>
                                         </div>
                                     ))}
@@ -153,7 +153,7 @@ const ModuleDetail = () => {
                             <div className="space-y-8">
                                 <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-primary-600 pl-4">Industrial Specification</h2>
                                 <div className="bg-slate-50 rounded-2xl p-8 border border-gray-100">
-                                    <p className="text-lg text-gray-600 leading-relaxed italic">
+                                    <p className="text-lg text-gray-600 leading-relaxed ">
                                         "{module.description || module.long_description || 'Detailed technical analysis and module behavior specifications are available upon request through our lead architects.'}"
                                     </p>
                                 </div>

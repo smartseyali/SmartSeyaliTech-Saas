@@ -53,7 +53,7 @@ export default function PlatformUsers() {
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
-                <h1 className="text-3xl font-black tracking-tight text-slate-900">User Management</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900">User Management</h1>
                 <p className="text-sm font-medium text-slate-500 mt-2">Global view of all user authentications, their linked merchant companies, and module permissions.</p>
             </div>
 
@@ -61,10 +61,10 @@ export default function PlatformUsers() {
                 <table className="w-full text-sm table-fixed">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-100">
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left w-1/4">User Info</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left w-[20%]">Platform Role</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left w-1/4">Linked Companies</th>
-                            <th className="font-bold text-slate-500 uppercase tracking-widest text-[10px] p-4 text-left w-auto">Permissions / Modules</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-1/4">User Info</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-[20%]">Platform Role</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-1/4">Linked Companies</th>
+                            <th className="font-bold text-slate-500  tracking-widest text-[10px] p-4 text-left w-auto">Permissions / Modules</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50 items-start">
@@ -91,9 +91,9 @@ export default function PlatformUsers() {
 
                                     <td className="p-4">
                                         {u.is_super_admin ? (
-                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-black text-[9px] uppercase tracking-widest px-2 py-1">Super Admin</Badge>
+                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-none font-bold text-[9px]  tracking-widest px-2 py-1">Super Admin</Badge>
                                         ) : (
-                                            <Badge variant="outline" className="text-slate-500 font-bold text-[9px] uppercase tracking-widest px-2 py-1">Merchant User</Badge>
+                                            <Badge variant="outline" className="text-slate-500 font-bold text-[9px]  tracking-widest px-2 py-1">Merchant User</Badge>
                                         )}
                                     </td>
 
@@ -104,14 +104,14 @@ export default function PlatformUsers() {
                                                     <div key={m.id} className="flex items-center gap-2">
                                                         <span className="w-2 h-2 rounded-full bg-green-500" />
                                                         <span className="text-[11px] font-bold text-slate-700">{m.companies?.name || 'Unknown'}</span>
-                                                        <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100">
+                                                        <span className="text-[9px]  tracking-wider font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100">
                                                             {m.role}
                                                         </span>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-slate-400 font-semibold italic">Unlinked Guest</span>
+                                            <span className="text-xs text-slate-400 font-semibold ">Unlinked Guest</span>
                                         )}
                                     </td>
 
@@ -119,16 +119,16 @@ export default function PlatformUsers() {
                                         {u.is_super_admin ? (
                                             <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg w-fit">
                                                 <ShieldCheck className="w-4 h-4" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Global Master Access</span>
+                                                <span className="text-[10px] font-bold  tracking-widest">Global Master Access</span>
                                             </div>
                                         ) : mappings.length > 0 ? (
                                             <div className="flex flex-wrap gap-1">
                                                 {mappings.some((m: any) => ['admin', 'owner'].includes(m.role)) ? (
-                                                    <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest border border-green-200 bg-green-50 px-2 py-1 rounded w-fit">
+                                                    <span className="text-[10px] font-bold text-green-600  tracking-widest border border-green-200 bg-green-50 px-2 py-1 rounded w-fit">
                                                         ALL TENANT MODULES (Admin)
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded w-fit">
+                                                    <span className="text-[10px] font-bold text-slate-500  tracking-widest bg-slate-100 px-2 py-1 rounded w-fit">
                                                         Restricted Staff Access
                                                     </span>
                                                 )}

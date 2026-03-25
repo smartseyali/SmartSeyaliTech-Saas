@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { ModuleListPage } from "@/components/modules/ModuleListPage";
-import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { useCrud } from "@/hooks/useCrud";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +15,8 @@ import {
     Key,
     CheckCircle2,
     Calendar,
-    ArrowRight
+    ArrowRight,
+    X
 } from "lucide-react";
 import {
     Dialog,
@@ -23,11 +24,10 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Permission Resources defined in the system
 const RESOURCES = [
@@ -67,7 +67,7 @@ const teamColumns = [
             const isAdmin = val === 'admin';
             return (
                 <div className={cn(
-                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider",
+                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold tracking-wider",
                     isOwner ? "bg-purple-50 text-purple-700 border-purple-200" :
                         isAdmin ? "bg-blue-50 text-blue-700 border-blue-200" :
                             "bg-slate-50 text-slate-700 border-slate-200"
@@ -95,19 +95,20 @@ const teamColumns = [
     }
 ];
 
-const getTeamFields = (isEdit: boolean): FieldConfig[] => [
+const getTeamFields = (isEdit: boolean) => [
     { key: "full_name", label: "Full Name", ph: "John Doe", required: true },
     { key: "username", label: "Email Address", ph: "john.doe@example.com", required: true },
     {
         key: "password",
         label: isEdit ? "Update Password (Leave blank to keep current)" : "Password",
         ph: isEdit ? "Only fill to change" : "Minimum 6 characters",
-        required: !isEdit
+        required: !isEdit,
+        type: "text" as const
     },
     {
         key: "role",
         label: "Account Role",
-        type: "select",
+        type: "select" as const,
         options: [
             { label: "Administrator (Full Access)", value: "admin" },
             { label: "Staff Member (Limited Access)", value: "staff" }
@@ -116,13 +117,11 @@ const getTeamFields = (isEdit: boolean): FieldConfig[] => [
     },
 ];
 
-import { cn } from "@/lib/utils";
-
 export default function Team() {
     const { data: team, loading, createItem, updateItem, deleteItem, fetchItems } = useCrud("company_users", "*, users!user_id(*)");
     const { activeCompany } = useTenant();
     const { toast } = useToast();
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [permissionOpen, setPermissionOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [editingItem, setEditingItem] = useState<any>(null);
@@ -131,19 +130,18 @@ export default function Team() {
 
     const handleNew = () => {
         setEditingItem(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (item: any) => {
-        // Map the flattened data for the form
         const mappedItem = {
             ...item,
             full_name: item.users?.full_name,
             username: item.users?.username,
-            password: "", // Don't pre-fill password
+            password: "",
         };
         setEditingItem(mappedItem);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleSaveUser = async (formData: any) => {
@@ -151,39 +149,25 @@ export default function Team() {
 
         try {
             if (editingItem) {
-                // UPDATE LOGIC
-                // 1. Update the user entry
                 const userUpdate: any = {
                     full_name: formData.full_name,
                     username: formData.username
                 };
-
-                // If password provided, it would need Auth service update, but here we just update profile
-                // In this system, profile 'username' serves as ID
-
                 const { error: uErr } = await supabase
                     .from('users')
                     .update(userUpdate)
                     .eq('id', editingItem.user_id);
 
                 if (uErr) throw uErr;
-
-                // 2. Update company_user role
                 await updateItem(editingItem.id, { role: formData.role });
-
                 toast({ title: "Personnel Re-calibrated", description: `${formData.full_name}'s profile has been updated.` });
             } else {
-                // CREATE LOGIC: Real Auth Integration
                 setSavingPerms(true);
-
-                // 1. Initialize a secondary client to avoid logging out the current merchant session
                 const tempClient = createClient(
                     import.meta.env.VITE_SUPABASE_URL,
                     import.meta.env.VITE_SUPABASE_ANON_KEY,
                     { auth: { persistSession: false } }
                 );
-
-                // 2. Create the Auth user
                 const { data: authData, error: aErr } = await tempClient.auth.signUp({
                     email: formData.username,
                     password: formData.password,
@@ -195,8 +179,6 @@ export default function Team() {
                 if (aErr) throw aErr;
                 if (!authData.user) throw new Error("Security creation failed. Verify connectivity.");
 
-                // 3. Create/Link the User Profile
-                // Note: The public.users record might already exist if they once registered elsewhere
                 const { data: userData, error: uErr } = await supabase.from('users').upsert({
                     id: authData.user.id,
                     username: formData.username,
@@ -205,8 +187,6 @@ export default function Team() {
                 }).select().single();
 
                 if (uErr) throw uErr;
-
-                // 4. Create the mapping in company_users
                 await supabase.from('company_users').insert({
                     company_id: activeCompany.id,
                     user_id: userData.id,
@@ -215,11 +195,11 @@ export default function Team() {
 
                 toast({
                     title: "Personnel Deployed",
-                    description: `${formData.full_name} has been integrated. Note: If email confirmation is enabled, they must verify their inbox.`
+                    description: `${formData.full_name} has been integrated.`
                 });
             }
 
-            setFormOpen(false);
+            setView("list");
             fetchItems();
         } catch (err: any) {
             toast({ variant: "destructive", title: "Operation Failed", description: err.message });
@@ -232,14 +212,11 @@ export default function Team() {
         setSelectedUser(row);
         setMemberPermissions([]);
         setPermissionOpen(true);
-
-        // Fetch existing permissions
         try {
             const { data } = await supabase
                 .from('user_permissions')
                 .select('resource')
                 .eq('company_user_id', row.id);
-
             if (data) setMemberPermissions(data.map(d => d.resource));
         } catch (err) {
             console.error("Failed to load permissions", err);
@@ -256,18 +233,15 @@ export default function Team() {
         if (!selectedUser) return;
         setSavingPerms(true);
         try {
-            // Standard approach: delete all and re-insert
             await supabase.from('user_permissions').delete().eq('company_user_id', selectedUser.id);
-
             if (memberPermissions.length > 0) {
                 const rows = memberPermissions.map(p => ({
                     company_user_id: selectedUser.id,
                     resource: p,
-                    action: 'manage' // default to broad access for now
+                    action: 'manage'
                 }));
                 await supabase.from('user_permissions').insert(rows);
             }
-
             toast({ title: "Authorization Updated", description: "Team member permissions have been re-calibrated." });
             setPermissionOpen(false);
         } catch (err: any) {
@@ -277,6 +251,22 @@ export default function Team() {
         }
     };
 
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingItem ? "Re-calibrate Personnel" : "Integrate Personnel"}
+                    subtitle="Human Resources Hub"
+                    headerFields={getTeamFields(!!editingItem)}
+                    onAbort={() => { setView("list"); setEditingItem(null); }}
+                    onSave={handleSaveUser}
+                    initialData={editingItem}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="p-8 space-y-10 w-full animate-in fade-in duration-500">
             {/* Page Header */}
@@ -284,7 +274,7 @@ export default function Team() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Shield className="w-5 h-5 text-blue-600" />
-                        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Team Management</span>
+                        <span className="text-xs font-bold tracking-widest text-slate-400">Team Management</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Personnel & Staff</h1>
                     <p className="text-sm font-medium text-slate-500">Manage your team members and their access levels</p>
@@ -292,7 +282,7 @@ export default function Team() {
 
                 <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Total Members</span>
+                        <span className="text-[10px] font-bold text-slate-400 tracking-wider">Total Members</span>
                         <span className="text-2xl font-bold text-slate-900">{team?.length || 0}</span>
                     </div>
                     <Button
@@ -344,7 +334,7 @@ export default function Team() {
                                 <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
                                     <Shield className="w-5 h-5 text-blue-600" />
                                 </div>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Permission Access</span>
+                                <span className="text-[10px] font-bold tracking-widest text-slate-400">Permission Access</span>
                             </div>
                             <DialogTitle className="text-xl font-bold tracking-tight text-slate-900">Access Control</DialogTitle>
                             <DialogDescription className="text-sm font-medium text-slate-500 mt-1">
@@ -401,16 +391,7 @@ export default function Team() {
                     </div>
                 </DialogContent>
             </Dialog>
-
-            {/* Invite Form */}
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingItem ? "Re-calibrate Personnel" : "Integrate Personnel"}
-                fields={getTeamFields(!!editingItem)}
-                onSubmit={handleSaveUser}
-                initialData={editingItem}
-            />
         </div>
     );
 }
+

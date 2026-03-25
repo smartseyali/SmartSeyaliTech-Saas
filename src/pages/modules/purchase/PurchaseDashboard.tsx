@@ -41,7 +41,7 @@ export default function PurchaseDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <ShoppingBag className="w-5 h-5 text-pink-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Procurement & Sourcing Hub</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Procurement & Sourcing Hub</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Purchase Intelligence</h1>
                     <div className="flex items-center gap-2">
@@ -79,11 +79,11 @@ export default function PurchaseDashboard() {
                             <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-400">{k.label}</span>
                         </div>
                         <div className="relative z-10">
                             <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
-                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide leading-none">{k.sub}</p>
+                            <p className="text-[10px] font-semibold text-slate-400  tracking-wide leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
@@ -100,10 +100,10 @@ export default function PurchaseDashboard() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Order Lifecycle</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">Live procurement pipeline</p>
+                                <p className="text-[10px] font-bold text-slate-400  tracking-[0.1em] mt-1.5">Live procurement pipeline</p>
                             </div>
                         </div>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest text-pink-600 hover:bg-pink-50">All Orders <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-pink-600 hover:bg-pink-50">All Orders <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
                     </div>
 
                     <div className="p-8">
@@ -118,7 +118,7 @@ export default function PurchaseDashboard() {
                                             <p className="font-semibold text-slate-900 group-hover:text-pink-600 transition-colors">{po.vendor}</p>
                                             <div className="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400">
                                                 <span className={cn(
-                                                    "px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border",
+                                                    "px-1.5 py-0.5 rounded-md text-[9px] font-bold  tracking-wider border",
                                                     po.status === 'Approved' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                                         po.status === 'Received' ? "bg-blue-50 text-blue-600 border-blue-100" :
                                                             "bg-amber-50 text-amber-600 border-amber-100"
@@ -141,17 +141,17 @@ export default function PurchaseDashboard() {
                 <div className="lg:col-span-4 space-y-8">
                     <div className="bg-slate-900 rounded-2xl p-8 shadow-xl relative overflow-hidden group">
                         <div className="absolute -top-12 -right-12 w-48 h-48 bg-pink-600/10 rounded-full blur-3xl group-hover:bg-pink-600/20 transition-all" />
-                        <h2 className="text-lg font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-5">Supply Vitality</h2>
+                        <h2 className="text-lg font-bold text-white  tracking-wider mb-8 border-b border-white/5 pb-5">Supply Vitality</h2>
                         <div className="space-y-6 relative z-10">
                             {vendorStats.map(vendor => (
                                 <div key={vendor.name} className="space-y-2.5">
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">{vendor.name}</p>
-                                            <span className="text-lg font-black text-white">{vendor.amount}</span>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-wider leading-none mb-1">{vendor.name}</p>
+                                            <span className="text-lg font-bold text-white">{vendor.amount}</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-[10px] font-bold text-pink-400 uppercase tracking-tighter">{vendor.orders} Orders</span>
+                                            <span className="text-[10px] font-bold text-pink-400  tracking-tighter">{vendor.orders} Orders</span>
                                         </div>
                                     </div>
                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -163,7 +163,7 @@ export default function PurchaseDashboard() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 uppercase tracking-wide">Procure Commands</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4  tracking-wide">Procure Commands</h2>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: "New Vendor", icon: Building2, color: "text-blue-600 bg-blue-50" },
@@ -175,7 +175,7 @@ export default function PurchaseDashboard() {
                                     <div className={cn("p-2.5 rounded-lg transition-transform group-hover:scale-105", btn.color)}>
                                         <btn.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors text-center">{btn.label}</span>
+                                    <span className="text-[10px] font-bold  tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors text-center">{btn.label}</span>
                                 </button>
                             ))}
                         </div>

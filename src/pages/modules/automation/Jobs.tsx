@@ -66,12 +66,12 @@ export default function Jobs() {
                         <Binary className="w-6 h-6 group-hover:text-white transition-colors" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{job.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{job.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {job.type?.toUpperCase() || "CORE JOB"}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Clock size={10} /> {job.schedule || 'On-Demand'}
                             </span>
                         </div>
@@ -84,14 +84,14 @@ export default function Jobs() {
             label: "Performance Metrics",
             render: (job: any) => (
                 <div className="flex flex-col">
-                    <span className="text-[11px] font-black text-slate-700 uppercase tracking-widest leading-none flex items-center gap-2 mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-700  tracking-widest leading-none flex items-center gap-2 mb-1.5">
                         <Zap size={12} className="text-amber-500 animate-pulse"/> {job.last_duration_ms || '452'}ms
                     </span>
                     <div className="flex items-center gap-2">
                         <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
                             <div className="h-full bg-indigo-500 w-[85%]" />
                         </div>
-                        <span className="text-[9px] font-black text-slate-400 uppercase">98% Avg</span>
+                        <span className="text-[9px] font-bold text-slate-400 ">98% Avg</span>
                     </div>
                 </div>
             )
@@ -101,13 +101,13 @@ export default function Jobs() {
             label: "Last Execution",
             render: (job: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${
+                    <span className={`text-[10px] font-bold  tracking-widest flex items-center gap-2 ${
                         job.last_status === 'error' ? 'text-rose-600' : 'text-emerald-600'
                     }`}>
                         {job.last_status === 'error' ? <AlertCircle size={12}/> : <CheckCircle2 size={12}/>} 
                         {job.last_run_at ? new Date(job.last_run_at).toLocaleTimeString() : 'TBD'}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest leading-none mt-1">
+                    <span className="text-[10px] font-bold text-slate-300  tracking-widest leading-none mt-1">
                          Node Index 04x-BR
                     </span>
                 </div>
@@ -168,7 +168,7 @@ export default function Jobs() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20 underline-offset-4 decoration-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20 underline-offset-4 decoration-2">
                         <Cpu className="w-3.5 h-3.5" /> Force Engine Cycle
                     </button>
                 </div>

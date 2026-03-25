@@ -30,12 +30,12 @@ export default function Cart() {
                         <Box className="w-12 h-12 text-slate-200" />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">The Matrix is <span className="text-blue-600">Empty</span></h2>
-                        <p className="text-slate-400 text-sm font-medium italic">"Operational grid awaiting asset initialization. No active deployments identified."</p>
+                        <h2 className="text-4xl font-bold text-slate-900  tracking-tighter  leading-none">The Matrix is <span className="text-blue-600">Empty</span></h2>
+                        <p className="text-slate-400 text-sm font-medium ">"Operational grid awaiting asset initialization. No active deployments identified."</p>
                     </div>
                     <Button
                         onClick={() => navigate(storeLink("/shop"))}
-                        className="w-full h-20 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl hover:bg-blue-600 transition-all border-none"
+                        className="w-full h-20 bg-slate-900 text-white rounded-3xl font-bold  tracking-widest text-[11px] shadow-2xl hover:bg-blue-600 transition-all border-none"
                     >
                         Initialize Acquisitions <ArrowRight className="w-5 h-5 ml-4" />
                     </Button>
@@ -55,11 +55,11 @@ export default function Cart() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <Box className="w-5 h-5 text-blue-600 font-bold" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Inventory Lock</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">Inventory Lock</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter italic leading-[0.8]">Asset <span className="text-blue-600">Staging</span></h1>
+                        <h1 className="text-5xl md:text-7xl font-bold text-slate-900  tracking-tighter  leading-[0.8]">Asset <span className="text-blue-600">Staging</span></h1>
                     </div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] bg-white px-8 py-4 rounded-2xl border border-slate-50 shadow-xl shadow-slate-200/30 italic">
+                    <p className="text-[10px] font-bold text-slate-400  tracking-widest bg-white px-8 py-4 rounded-2xl border border-slate-50 shadow-xl shadow-slate-200/30 ">
                         {items.length} ACTIVE NODE(S) IDENTIFIED
                     </p>
                 </div>
@@ -92,18 +92,18 @@ export default function Cart() {
                                             {/* Details */}
                                             <div className="flex-grow space-y-6 text-center sm:text-left">
                                                 <div className="space-y-3">
-                                                    <p className="font-black text-slate-900 text-3xl uppercase tracking-tighter italic leading-none group-hover:text-blue-600 transition-colors">{item.name}</p>
-                                                    {item.variant_name && <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-lg border border-blue-100">{item.variant_name}</span>}
+                                                    <p className="font-bold text-slate-900 text-3xl  tracking-tighter  leading-none group-hover:text-blue-600 transition-colors">{item.name}</p>
+                                                    {item.variant_name && <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-[9px] font-bold  tracking-widest rounded-lg border border-blue-100">{item.variant_name}</span>}
                                                 </div>
 
                                                 <div className="flex items-center justify-center sm:justify-start gap-8">
                                                     <div className="flex items-center bg-slate-50 rounded-2xl border border-slate-100 p-1.5 shadow-inner">
-                                                        <button onClick={() => updateQuantity(item.product_id, item.variant_id, -1)} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all font-black text-xl">−</button>
-                                                        <span className="w-12 text-center font-black text-xl tracking-tighter tabular-nums text-slate-900">{item.quantity}</span>
-                                                        <button onClick={() => updateQuantity(item.product_id, item.variant_id, 1)} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all font-black text-xl">+</button>
+                                                        <button onClick={() => updateQuantity(item.product_id, item.variant_id, -1)} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all font-bold text-xl">−</button>
+                                                        <span className="w-12 text-center font-bold text-xl tracking-tighter tabular-nums text-slate-900">{item.quantity}</span>
+                                                        <button onClick={() => updateQuantity(item.product_id, item.variant_id, 1)} className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all font-bold text-xl">+</button>
                                                     </div>
                                                     <div className="h-6 w-px bg-slate-100" />
-                                                    <button onClick={() => removeFromCart(item.product_id, item.variant_id)} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 hover:text-blue-600 transition-all flex items-center gap-3 italic">
+                                                    <button onClick={() => removeFromCart(item.product_id, item.variant_id)} className="text-[10px] font-bold  tracking-widest text-slate-300 hover:text-blue-600 transition-all flex items-center gap-3 ">
                                                         <Trash2 className="w-4 h-4" /> De-Initialize
                                                     </button>
                                                 </div>
@@ -111,8 +111,8 @@ export default function Cart() {
 
                                             {/* Subtotal */}
                                             <div className="text-right sm:w-40 space-y-2">
-                                                <p className="text-3xl font-black text-slate-900 tracking-tighter italic tabular-nums text-center sm:text-right">₹{itemTotal.toLocaleString()}</p>
-                                                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center sm:text-right italic">₹{item.price.toLocaleString()} / UNIT</p>
+                                                <p className="text-3xl font-bold text-slate-900 tracking-tighter  tabular-nums text-center sm:text-right">₹{itemTotal.toLocaleString()}</p>
+                                                <p className="text-[10px] font-bold text-slate-300  tracking-widest text-center sm:text-right ">₹{item.price.toLocaleString()} / UNIT</p>
                                             </div>
                                         </motion.div>
                                     );
@@ -125,7 +125,7 @@ export default function Cart() {
                             <div className="w-16 h-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-blue-600/40 shrink-0">
                                 <Zap className="w-8 h-8 font-bold" />
                             </div>
-                            <p className="text-xs font-black text-white/70 uppercase tracking-[0.2em] leading-relaxed italic pr-4">
+                            <p className="text-xs font-bold text-white/70  tracking-widest leading-relaxed  pr-4">
                                 Strategic Fulfilment: Each unit undergoes <span className="text-blue-500">Tier-1 Verification</span> before logistics synchronization.
                                 <br /><span className="text-[10px] text-white/30">Protocol: RAPID-TRANSIT-V2 ACTIVE</span>
                             </p>
@@ -135,20 +135,20 @@ export default function Cart() {
                     {/* Summary Sidebar */}
                     <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-36">
                         <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/50 border border-slate-50 space-y-10">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 border-b border-slate-100 pb-8 flex items-center gap-4 italic">
+                            <h3 className="text-[11px] font-bold  tracking-widest text-slate-900 border-b border-slate-100 pb-8 flex items-center gap-4 ">
                                 <Layout className="w-5 h-5 text-blue-600" /> Allocation Summary
                             </h3>
 
                             <div className="space-y-6">
-                                <div className="flex justify-between text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
+                                <div className="flex justify-between text-[11px] font-bold text-slate-400  tracking-widest ">
                                     <span>Asset Valuation</span>
                                     <span className="text-slate-900 tabular-nums">₹{cartTotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
+                                <div className="flex justify-between text-[11px] font-bold text-slate-400  tracking-widest ">
                                     <span>Platform Tax (5%)</span>
                                     <span className="text-slate-900 tabular-nums">₹{tax.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
+                                <div className="flex justify-between text-[11px] font-bold text-slate-400  tracking-widest ">
                                     <span>Logistics Protocol</span>
                                     {shipping === 0
                                         ? <span className="text-blue-600">FREE DEPLOYMENT</span>
@@ -156,14 +156,14 @@ export default function Cart() {
                                     }
                                 </div>
                                 <div className="pt-8 border-t border-dashed border-slate-100 flex flex-col gap-2">
-                                    <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em] italic leading-none">Total Exposure</span>
-                                    <span className="text-6xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">₹{total.toLocaleString()}</span>
+                                    <span className="text-[11px] font-bold text-blue-600  tracking-widest  leading-none">Total Exposure</span>
+                                    <span className="text-6xl font-bold text-slate-900 tracking-tighter tabular-nums leading-none">₹{total.toLocaleString()}</span>
                                 </div>
                             </div>
 
                             <Button
                                 onClick={() => navigate(storeLink("/checkout"))}
-                                className="w-full h-20 rounded-[1.5rem] bg-slate-900 hover:bg-blue-600 text-white font-black uppercase tracking-[0.3em] text-[12px] shadow-2xl shadow-slate-900/20 transition-all group overflow-hidden border-none"
+                                className="w-full h-20 rounded-[1.5rem] bg-slate-900 hover:bg-blue-600 text-white font-bold  tracking-widest text-[12px] shadow-2xl shadow-slate-900/20 transition-all group overflow-hidden border-none"
                             >
                                 <span className="flex items-center gap-4 group-hover:gap-8 transition-all">
                                     Finalize Settlement <ArrowRight className="w-5 h-5" />
@@ -175,8 +175,8 @@ export default function Cart() {
                         <div className="flex items-center gap-6 px-10 py-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 shadow-sm">
                             <ShieldCheck className="w-8 h-8 text-blue-600" />
                             <div className="space-y-1">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-900 italic">Encrypted Secure Bridge</p>
-                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                <p className="text-[9px] font-bold  tracking-widest text-slate-900 ">Encrypted Secure Bridge</p>
+                                <p className="text-[9px] font-bold text-slate-300  tracking-widest flex items-center gap-2">
                                     NODE_{Math.random().toString(36).substring(7).toUpperCase()} <span className="w-1 h-1 bg-blue-600 rounded-full animate-pulse" /> ACTIVE
                                 </p>
                             </div>

@@ -47,8 +47,8 @@ export default function Items() {
                         <Package className="w-4 h-4" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{item.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{item.category || "General Ledger Group"}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{item.name}</span>
+                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{item.category || "General Ledger Group"}</span>
                     </div>
                 </div>
             )
@@ -56,19 +56,19 @@ export default function Items() {
         { 
             key: "sku", 
             label: "SKU",
-            render: (item: any) => <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">{item.sku || "UNASSIGNED"}</span>
+            render: (item: any) => <span className="text-[11px] font-bold text-gray-500  tracking-widest">{item.sku || "UNASSIGNED"}</span>
         },
         { 
             key: "rate", 
             label: "Unit Value",
-            render: (item: any) => <span className="font-black text-indigo-600 tracking-tight">{fmt(item.rate)}</span>,
+            render: (item: any) => <span className="font-bold text-indigo-600 tracking-tight">{fmt(item.rate)}</span>,
         },
         { 
             key: "stock", 
             label: "Inventory Level",
             render: (item: any) => (
                 <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-black text-slate-700">{item.current_stock || 0}</span>
+                    <span className="text-[11px] font-bold text-slate-700">{item.current_stock || 0}</span>
                     <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
                         <div 
                             className={`h-full rounded-full transition-all duration-1000 ${
@@ -122,7 +122,7 @@ export default function Items() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2">
                         <TrendingUp className="w-3.5 h-3.5" /> Stock Adjustment
                     </button>
                 </div>

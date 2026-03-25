@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import ERPListView from "@/components/modules/ERPListView";
-import { DynamicFormDialog } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { useCrud } from "@/hooks/useCrud";
 import { useTenant } from "@/contexts/TenantContext";
 import { useDictionary } from "@/hooks/useDictionary";
@@ -23,9 +23,7 @@ export const EcomProducts = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState("");
-
-    // UI States
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [editingItem, setEditingItem] = useState<any>(null);
 
     // Selected product for detailing (Split View)
@@ -51,20 +49,19 @@ export const EcomProducts = () => {
             label: `Entity Identity`,
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">SKU: {row.sku || 'UNASSIGNED'}</span>
+                    <span className="font-bold text-gray-900 tracking-tight">{row.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1">SKU: {row.sku || 'UNASSIGNED'}</span>
                 </div>
             )
         },
         { 
             key: "rate", 
             label: "Ledger Price", 
-            render: (row: any) => <span className="font-black text-indigo-600 tracking-tight">₹{Number(row.rate || 0).toLocaleString('en-IN')}</span> 
+            render: (row: any) => <span className="font-bold text-indigo-600 tracking-tight">₹{Number(row.rate || 0).toLocaleString('en-IN')}</span> 
         },
     ];
 
     const ecomProductFields = [
-        { key: "image_url", label: "Primary Image", type: "image" as const, folder: "products" },
         { key: "name", label: "Product Name", required: true },
         { key: "sku", label: `${t("SKU")} / Model` },
         {
@@ -74,15 +71,13 @@ export const EcomProducts = () => {
             options: (categories || []).map(c => ({ label: c.name, value: String(c.id) }))
         },
         { key: "rate", label: `Price (MRP)`, type: "number" as const },
-        { key: "description", label: "Description", type: "textarea" as const },
+        { key: "description", label: "Description", type: "text" as const },
         {
             key: "is_featured", label: "Visibility", type: "select" as const, options: [
                 { label: "Hide from Featured", value: "false" },
                 { label: "Show in Featured", value: "true" }
             ]
         },
-        { key: "meta_title", label: "SEO Meta Title", ph: "Registry indexing title" },
-        { key: "meta_description", label: "SEO Bio", type: "textarea" as const },
     ];
 
     const ecomData = allProducts.filter(p => (p as any).is_ecommerce !== false && 
@@ -92,7 +87,7 @@ export const EcomProducts = () => {
 
     const handleNew = () => {
         setEditingItem(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (item: any) => {
@@ -102,7 +97,7 @@ export const EcomProducts = () => {
             is_featured: String(item.is_featured)
         };
         setEditingItem(editData);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleSubmit = async (formData: any) => {
@@ -117,13 +112,29 @@ export const EcomProducts = () => {
         } else {
             await createItem(payload);
         }
-        setFormOpen(false);
+        setView("list");
         fetchItems();
     };
 
     const selectProduct = (row: any) => {
         setSearchParams({ id: String(row.id) });
     };
+
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingItem ? `Refine ${t("Product")} Entity` : `Register ${t("Product")} Entry`}
+                    subtitle="Global Master Catalog"
+                    headerFields={ecomProductFields}
+                    onAbort={() => { setView("list"); setEditingItem(null); }}
+                    onSave={handleSubmit}
+                    initialData={editingItem}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="h-full flex flex-col bg-white overflow-hidden">
@@ -145,7 +156,7 @@ export const EcomProducts = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => navigate("/apps/ecommerce/masters/products/import")}
-                                className="h-8 px-4 rounded-xl gap-2 font-black text-[10px] uppercase tracking-widest border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+                                className="h-8 px-4 rounded-xl gap-2 font-bold text-[10px] tracking-widest border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
                             >
                                 <Upload className="w-3.5 h-3.5 text-indigo-600" />
                                 Bulk Import
@@ -172,9 +183,9 @@ export const EcomProducts = () => {
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/80">Registry Profile</p>
+                                                <p className="text-[10px] font-bold tracking-widest text-indigo-600/80">Registry Profile</p>
                                             </div>
-                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight italic uppercase">{selectedProduct.name}</h2>
+                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{selectedProduct.name}</h2>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -199,13 +210,13 @@ export const EcomProducts = () => {
 
                                 <Tabs defaultValue="inventory" className="flex-1 flex flex-col min-h-0">
                                     <TabsList className="bg-white/60 p-1.5 rounded-2xl border border-white/60 shadow-sm mb-6 w-fit h-auto flex gap-1">
-                                        <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="inventory" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Database className="w-3.5 h-3.5" /> Variants
                                         </TabsTrigger>
-                                        <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="details" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Info className="w-3.5 h-3.5" /> Specifications
                                         </TabsTrigger>
-                                        <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-black text-[10px] uppercase tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
+                                        <TabsTrigger value="media" className="rounded-xl h-10 px-6 font-bold text-[10px] tracking-widest data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all gap-2">
                                             <Layers className="w-3.5 h-3.5" /> Asset Ledger
                                         </TabsTrigger>
                                     </TabsList>
@@ -237,13 +248,13 @@ export const EcomProducts = () => {
                                                             <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                                                 <stat.icon className="w-4 h-4" />
                                                             </div>
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</span>
+                                                            <span className="text-[10px] font-bold tracking-widest text-slate-400">{stat.label}</span>
                                                         </div>
                                                         <p className="text-xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
                                                     </div>
                                                 ))}
                                                 <div className="col-span-2 bg-white p-8 rounded-[32px] border border-white/60 shadow-sm">
-                                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
+                                                    <h4 className="text-[10px] font-bold tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                                                         <Info className="w-4 h-4 text-indigo-600" /> Registry Bio
                                                     </h4>
                                                     <p className="text-sm leading-relaxed text-slate-600 font-medium whitespace-pre-wrap">
@@ -259,8 +270,8 @@ export const EcomProducts = () => {
                                                     <Layers className="w-10 h-10" />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <h3 className="text-lg font-bold text-slate-900 uppercase italic">Media Asset Vault</h3>
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[240px]">Expanded gallery indexing sequence engaged.</p>
+                                                    <h3 className="text-lg font-bold text-slate-900">Media Asset Vault</h3>
+                                                    <p className="text-xs font-bold text-slate-400 tracking-widest max-w-[240px]">Expanded gallery indexing sequence engaged.</p>
                                                 </div>
                                             </div>
                                         </TabsContent>
@@ -271,16 +282,8 @@ export const EcomProducts = () => {
                     </>
                 )}
             </ResizablePanelGroup>
-
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingItem ? `Refine ${t("Product")}` : `Register ${t("Product")}`}
-                fields={ecomProductFields}
-                initialData={editingItem}
-                onSubmit={handleSubmit}
-            />
         </div>
     );
 };
+
 

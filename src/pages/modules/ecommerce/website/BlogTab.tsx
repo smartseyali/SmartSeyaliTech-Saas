@@ -9,13 +9,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDataConnector } from "@/hooks/useDataConnector";
-import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { toast } from "sonner";
 
 export function BlogTab({ companyId }: { companyId: any }) {
     const { fetchData, saveData, removeData, loading, config } = useDataConnector("WEBSITE_BLOG", "blog_posts");
     const [posts, setPosts] = useState<any[]>([]);
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [editingPost, setEditingPost] = useState<any>(null);
 
     useEffect(() => {
@@ -29,12 +29,12 @@ export function BlogTab({ companyId }: { companyId: any }) {
 
     const handleNew = () => {
         setEditingPost(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (p: any) => {
         setEditingPost(p);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleDelete = async (id: any) => {
@@ -50,28 +50,43 @@ export function BlogTab({ companyId }: { companyId: any }) {
         const payload = editingPost ? { ...formData, id: editingPost.id } : formData;
         const success = await saveData(payload);
         if (success) {
-            setFormOpen(false);
+            setView("list");
             loadPosts();
         }
     };
 
-    const fields: FieldConfig[] = config?.fields.map(f => ({
+    const fields = config?.fields.map(f => ({
         key: f.id,
         label: f.label,
-        type: f.type === 'url' ? 'text' : f.type === 'json' ? 'textarea' : f.type === 'boolean' ? 'checkbox' : f.type,
+        type: (f.type === 'url' ? 'text' : f.type === 'json' ? 'textarea' : f.type === 'boolean' ? 'checkbox' : f.type) as any,
         required: true
     })) || [];
 
+    if (view === "form") {
+        return (
+            <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingPost ? "Refine Journal Entry" : "Initialize Merchant Journal"}
+                    subtitle="Universal Content Catalog"
+                    headerFields={fields}
+                    onAbort={() => { setView("list"); setEditingPost(null); }}
+                    onSave={handleSubmit}
+                    initialData={editingPost}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="bg-white border rounded-[32px] p-8 md:p-12 shadow-sm animate-in slide-in-from-bottom-4 duration-500 font-sans relative overflow-hidden group">
-
             <div className="flex flex-col md:flex-row md:items-start justify-between mb-16 gap-10 border-b border-slate-50 pb-10">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
                         <Leaf className="w-4 h-4 text-[#f97316]" />
-                        <span className="text-[#14532d]/40 font-bold uppercase tracking-widest text-[10px]">Merchant Journal</span>
+                        <span className="text-[#14532d]/40 font-bold tracking-widest text-[10px]">Merchant Journal</span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black tracking-tight text-[#14532d] leading-none">The <span className="text-[#14532d]/20 italic">Blog</span></h2>
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#14532d] leading-none">The <span className="text-[#14532d]/20 ">Blog</span></h2>
                     <p className="text-sm text-slate-400 font-medium max-w-xl">
                         Share stories, recipes, and organic farming tips with your community. Your blog is a powerful tool for customer engagement.
                     </p>
@@ -86,21 +101,20 @@ export function BlogTab({ companyId }: { companyId: any }) {
                 </div>
             </div>
 
-            {/* Post Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {loading && (
                     <div className="col-span-full py-20 text-center">
                         <RefreshCw className="w-10 h-10 animate-spin mx-auto text-[#14532d]/10" />
-                        <p className="mt-4 text-xs font-bold text-slate-300 uppercase tracking-widest">Retrieving Journal Entries...</p>
+                        <p className="mt-4 text-xs font-bold text-slate-300 tracking-widest">Retrieving Journal Entries...</p>
                     </div>
                 )}
 
                 {!loading && posts.length === 0 && (
                     <div className="col-span-full py-32 text-center bg-[#f8fafc] rounded-[48px] border-2 border-dashed border-slate-100">
                         <MessageCircle className="w-16 h-16 mx-auto mb-6 text-slate-200" />
-                        <p className="text-xl font-bold text-[#14532d] uppercase tracking-tight">The Archive is Silent</p>
-                        <p className="text-slate-400 font-medium italic mt-2">Begin your brand's narrative by publishing your first article.</p>
-                        <Button onClick={handleNew} variant="outline" className="mt-10 rounded-2xl h-14 px-8 font-black uppercase tracking-widest text-[10px]">Start Writing</Button>
+                        <p className="text-xl font-bold text-[#14532d] tracking-tight">The Archive is Silent</p>
+                        <p className="text-slate-400 font-medium mt-2">Begin your brand's narrative by publishing your first article.</p>
+                        <Button onClick={handleNew} variant="outline" className="mt-10 rounded-2xl h-14 px-8 font-bold tracking-widest text-[10px]">Start Writing</Button>
                     </div>
                 )}
 
@@ -111,6 +125,7 @@ export function BlogTab({ companyId }: { companyId: any }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1, duration: 0.3 }}
                         className="group/card flex flex-col h-full bg-[#f8fafc] rounded-3xl border border-transparent hover:bg-white hover:shadow-xl hover:shadow-[#14532d]/5 transition-all duration-300 relative overflow-hidden"
+                        onClick={() => handleEdit(b)}
                     >
                         <div className="h-48 overflow-hidden relative">
                             <img
@@ -118,13 +133,13 @@ export function BlogTab({ companyId }: { companyId: any }) {
                                 alt={b.title}
                                 className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-[2000ms]"
                             />
-                            <span className="absolute top-4 left-4 px-3 py-1 bg-[#14532d] rounded-full text-[9px] font-bold uppercase text-white tracking-widest z-10 shadow-lg shadow-[#14532d]/20">
+                            <span className="absolute top-4 left-4 px-3 py-1 bg-[#14532d] rounded-full text-[9px] font-bold text-white tracking-widest z-10 shadow-lg shadow-[#14532d]/20">
                                 {b.category || "General"}
                             </span>
                         </div>
 
                         <div className="p-8 flex flex-col flex-1">
-                            <div className="flex items-center gap-2 mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <div className="flex items-center gap-2 mb-4 text-[10px] font-bold tracking-widest text-slate-400">
                                 <Sparkles className="w-3.5 h-3.5 text-[#f97316]" /> {b.is_published ? "Published" : "Draft"}
                             </div>
                             <h3 className="font-bold text-xl text-[#14532d] mb-6 line-clamp-2">
@@ -134,21 +149,21 @@ export function BlogTab({ companyId }: { companyId: any }) {
                             <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-100">
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={() => handleEdit(b)}
+                                        onClick={(e) => { e.stopPropagation(); handleEdit(b); }}
                                         className="w-9 h-9 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-[#14532d] flex items-center justify-center transition-all shadow-sm"
                                     >
                                         <Pencil className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(b.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleDelete(b.id); }}
                                         className="w-9 h-9 rounded-xl bg-white border border-slate-100 text-slate-300 hover:text-red-500 flex items-center justify-center transition-all shadow-sm"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                                 <Button
-                                    onClick={() => handleEdit(b)}
-                                    variant="link" className="p-0 h-auto text-[10px] font-bold uppercase tracking-widest text-[#14532d]/60 hover:text-[#14532d] flex items-center gap-2 group/link transition-all"
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(b); }}
+                                    variant="link" className="p-0 h-auto text-[10px] font-bold tracking-widest text-[#14532d]/60 hover:text-[#14532d] flex items-center gap-2 group/link transition-all"
                                 >
                                     Edit Post <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                                 </Button>
@@ -157,15 +172,7 @@ export function BlogTab({ companyId }: { companyId: any }) {
                     </motion.div>
                 ))}
             </div>
-
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingPost ? "Refine Article" : "Compose Journal Entry"}
-                fields={fields}
-                initialData={editingPost}
-                onSubmit={handleSubmit}
-            />
         </div>
     );
 }
+

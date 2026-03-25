@@ -53,12 +53,12 @@ export default function Tickets() {
                         <Tag className="w-4 h-4" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 tracking-tight italic uppercase">{t.subject}</span>
+                        <span className="font-bold text-gray-900 tracking-tight  ">{t.subject}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none border-r pr-2 border-gray-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-gray-200">
                                 {t.id?.slice(0,8).toUpperCase()}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
                                 {new Date(t.created_at).toLocaleDateString()}
                             </span>
                         </div>
@@ -70,7 +70,7 @@ export default function Tickets() {
             key: "priority", 
             label: "Priority",
             render: (t: any) => (
-                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold  tracking-widest border ${
                     t.priority === 'critical' ? 'bg-rose-50 text-rose-600 border-rose-100' :
                     t.priority === 'high' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                     'bg-slate-50 text-slate-500 border-slate-100'
@@ -121,7 +121,7 @@ export default function Tickets() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-cyan-50 text-cyan-600 border border-cyan-100 hover:bg-cyan-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-cyan-50 text-cyan-600 border border-cyan-100 hover:bg-cyan-100 transition-all flex items-center gap-2">
                         <LifeBuoy className="w-3.5 h-3.5" /> help center
                     </button>
                 </div>

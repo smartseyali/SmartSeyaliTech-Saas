@@ -53,7 +53,7 @@ export function StoreHeader() {
             {/* Top Strip */}
             <div className="bg-slate-900 overflow-hidden">
                 <div className="max-w-screen-xl mx-auto px-4 py-2 text-center">
-                    <p className="text-white/80 text-[10px] md:text-[11px] font-black tracking-[0.4em] uppercase italic flex items-center justify-center gap-6">
+                    <p className="text-white/80 text-[10px] md:text-[11px] font-bold tracking-widest uppercase  flex items-center justify-center gap-6">
                         <span className="flex items-center gap-2"><Activity className="w-3 h-3 text-blue-500" /> GLOBAL_STANDARDS</span>
                         <span className="hidden md:inline text-white/20">|</span>
                         <span className="hidden md:inline">ENTERPRISE_SOLUTIONS</span>
@@ -76,7 +76,7 @@ export function StoreHeader() {
                             {settings?.logo_url ? (
                                 <img src={settings.logo_url} alt={settings.store_name} className="h-10 md:h-12 w-auto object-contain" />
                             ) : (
-                                <span className="text-slate-900 font-black text-2xl md:text-3xl tracking-tighter uppercase italic leading-none">
+                                <span className="text-slate-900 font-bold text-2xl md:text-3xl tracking-tighter uppercase  leading-none">
                                     {settings?.store_name || "SmartStore"}
                                 </span>
                             )}
@@ -90,7 +90,7 @@ export function StoreHeader() {
                                 key={link.label}
                                 to={storeLink(link.path)}
                                 className={cn(
-                                    "text-[11px] font-black uppercase tracking-widest transition-all italic hover:text-blue-600",
+                                    "text-[11px] font-bold uppercase tracking-widest transition-all  hover:text-blue-600",
                                     location.pathname === storeLink(link.path) || (link.path === "/" && location.pathname === storeLink("/"))
                                         ? "text-blue-600"
                                         : "text-slate-400"
@@ -112,7 +112,7 @@ export function StoreHeader() {
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
                                 placeholder="Search products..."
-                                className="flex-grow px-4 text-xs font-black uppercase tracking-widest outline-none bg-transparent text-slate-900 placeholder:text-slate-200"
+                                className="flex-grow px-4 text-xs font-bold uppercase tracking-widest outline-none bg-transparent text-slate-900 placeholder:text-slate-200"
                             />
                         </form>
 
@@ -139,14 +139,14 @@ export function StoreHeader() {
                                         className="absolute right-0 mt-4 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-50 z-50 overflow-hidden"
                                     >
                                         <div className="px-8 py-6 bg-slate-50 border-b border-slate-100">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">User Identity</p>
-                                            <p className="font-black text-slate-900 text-sm truncate mt-1 italic uppercase">{user.email}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ">User Identity</p>
+                                            <p className="font-bold text-slate-900 text-sm truncate mt-1  uppercase">{user.email}</p>
                                         </div>
                                         <div className="p-4 space-y-2">
-                                            <Link to={storeLink("/orders")} onClick={() => setAccountOpen(false)} className="flex items-center gap-4 px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-[1.25rem] transition-all italic">
+                                            <Link to={storeLink("/orders")} onClick={() => setAccountOpen(false)} className="flex items-center gap-4 px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-[1.25rem] transition-all ">
                                                 <Package className="w-4 h-4" /> Order History
                                             </Link>
-                                            <button onClick={() => { setAccountOpen(false); signOut(); }} className="w-full flex items-center gap-4 px-6 py-4 text-xs font-black uppercase tracking-widest text-red-600 hover:bg-red-50 rounded-[1.25rem] transition-all italic border-none text-left">
+                                            <button onClick={() => { setAccountOpen(false); signOut(); }} className="w-full flex items-center gap-4 px-6 py-4 text-xs font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 rounded-[1.25rem] transition-all  border-none text-left">
                                                 <LogOut className="w-4 h-4" /> Logout
                                             </button>
                                         </div>
@@ -159,7 +159,7 @@ export function StoreHeader() {
                         <Link to={storeLink("/cart")} className="p-3 bg-slate-900 text-white hover:bg-blue-600 rounded-2xl transition-all relative flex items-center shadow-xl shadow-slate-900/10">
                             <ShoppingCart className="w-5 h-5" />
                             {itemCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
                                     {itemCount > 9 ? "9+" : itemCount}
                                 </span>
                             )}
@@ -182,12 +182,12 @@ export function StoreHeader() {
                                 <Link
                                     key={link.label}
                                     to={storeLink(link.path)}
-                                    className="block px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all italic"
+                                    className="block px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all "
                                 >
                                     {link.label}
                                 </Link>
                             ))}
-                            {!user && <Link to="/login" className="block px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 border-t border-slate-50 mt-4 italic">Login Access</Link>}
+                            {!user && <Link to="/login" className="block px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-blue-600 border-t border-slate-50 mt-4 ">Login Access</Link>}
                         </div>
                     </motion.div>
                 )}

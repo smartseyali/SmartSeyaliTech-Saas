@@ -61,12 +61,12 @@ export default function Journals() {
                         <Book className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{j.reference_no}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{j.reference_no}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest border-r pr-2 border-slate-200">
                                 {j.type?.toUpperCase()} ENTRY
                             </span>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                            <span className="text-[10px] text-slate-400 font-bold  tracking-widest flex items-center gap-1">
                                 <Calendar size={10}/> {j.date}
                             </span>
                         </div>
@@ -78,7 +78,7 @@ export default function Journals() {
             key: "description", 
             label: "Narrative",
             render: (j: any) => (
-                <p className="text-[11px] font-medium text-slate-500 max-w-xs truncate uppercase tracking-tight">
+                <p className="text-[11px] font-medium text-slate-500 max-w-xs truncate  tracking-tight">
                     {j.note || "System Generated Protocol Entry"}
                 </p>
             )
@@ -88,10 +88,10 @@ export default function Journals() {
             label: "Transaction Volume",
             render: (j: any) => (
                 <div className="flex flex-col text-right">
-                    <span className="text-[13px] font-black text-slate-900 tracking-tighter">
+                    <span className="text-[13px] font-bold text-slate-900 tracking-tighter">
                         ₹{(j.total_amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
-                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Balanced Ledger</span>
+                    <span className="text-[9px] font-bold text-emerald-500  tracking-widest">Balanced Ledger</span>
                 </div>
             )
         },
@@ -133,10 +133,10 @@ export default function Journals() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <FileSpreadsheet className="w-3.5 h-3.5" /> Import Entries
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
                         <ArrowRightLeft className="w-3.5 h-3.5" /> Reconciliation
                     </button>
                 </div>

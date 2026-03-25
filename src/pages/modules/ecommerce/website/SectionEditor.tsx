@@ -83,7 +83,7 @@ export function SectionEditor({ companyId }: { companyId: any }) {
                 {bannersLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[32px] border border-dashed border-border">
                         <RefreshCw className="w-8 h-8 text-[#14532d]/20 animate-spin" />
-                        <p className="mt-4 text-xs font-bold text-[#14532d]/40 uppercase tracking-widest">Loading Slides...</p>
+                        <p className="mt-4 text-xs font-bold text-[#14532d]/40  tracking-widest">Loading Slides...</p>
                     </div>
                 ) : (
                     <>
@@ -98,7 +98,7 @@ export function SectionEditor({ companyId }: { companyId: any }) {
 
                         <Button
                             onClick={handleAddBanner}
-                            className="w-full h-24 border-2 border-dashed border-[#14532d]/20 bg-[#14532d]/5 hover:bg-white hover:border-[#14532d] rounded-[32px] font-black uppercase tracking-[0.2em] text-[11px] text-[#14532d] transition-all duration-300 group/add"
+                            className="w-full h-24 border-2 border-dashed border-[#14532d]/20 bg-[#14532d]/5 hover:bg-white hover:border-[#14532d] rounded-[32px] font-bold  tracking-widest text-[11px] text-[#14532d] transition-all duration-300 group/add"
                         >
                             <Plus className="w-6 h-6 mr-2 group-hover/add:rotate-90 transition-transform" /> Add New Banner Slide
                         </Button>
@@ -114,13 +114,13 @@ export function SectionEditor({ companyId }: { companyId: any }) {
                         <ShieldCheck className="w-7 h-7" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-white uppercase tracking-tight">Layout Integrity Active</p>
+                        <p className="text-sm font-bold text-white  tracking-tight">Layout Integrity Active</p>
                         <p className="text-xs text-white/50 font-medium">Your banners are responsive and optimized for mobile devices.</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/10 relative z-10">
                     <Leaf className="w-3.5 h-3.5 text-[#f97316]" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Node: {activeCompany?.subdomain}</span>
+                    <span className="text-[10px] font-bold  tracking-widest">Node: {activeCompany?.subdomain}</span>
                 </div>
             </div>
         </div>

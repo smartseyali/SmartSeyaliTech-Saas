@@ -54,10 +54,10 @@ export default function Approvals() {
                         <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                        <span className="text-[10px] font-bold text-slate-400  tracking-widest leading-none mb-1">
                             {app.resource_type?.replace(/_/g, ' ').toUpperCase() || "CORE PROTOCOL"}
                         </span>
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight flex items-center gap-2">
+                        <span className="font-bold text-gray-900   tracking-tight flex items-center gap-2">
                             {app.reference_no || `REQ-${app.id?.substring(0, 8).toUpperCase()}`}
                             <ExternalLink size={12} className="text-slate-300 pointer-events-none" />
                         </span>
@@ -71,7 +71,7 @@ export default function Approvals() {
             render: (app: any) => (
                 <div className="flex items-center gap-2">
                     <UserCheck className="w-4 h-4 text-slate-400" />
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest leading-none">
+                    <span className="text-[11px] font-bold text-slate-600  tracking-widest leading-none">
                         {app.requester_name || "System Admin"}
                     </span>
                 </div>
@@ -82,10 +82,10 @@ export default function Approvals() {
             label: "Governance Timeline",
             render: (app: any) => (
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 flex items-center gap-1">
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest leading-none mb-1 flex items-center gap-1">
                         <AlarmClock size={10} /> {app.created_at ? new Date(app.created_at).toLocaleDateString() : 'Active'}
                     </span>
-                    <span className="text-[11px] font-black text-slate-700 tracking-tighter">
+                    <span className="text-[11px] font-bold text-slate-700 tracking-tighter">
                         {app.current_step_name || 'Protocol Finalization'}
                     </span>
                 </div>
@@ -133,10 +133,10 @@ export default function Approvals() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Batch Authorization
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition-all flex items-center gap-2 shadow-sm">
                         <XCircle className="w-3.5 h-3.5" /> Batch Rejection
                     </button>
                 </div>

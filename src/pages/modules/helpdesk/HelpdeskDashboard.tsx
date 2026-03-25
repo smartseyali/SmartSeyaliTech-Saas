@@ -33,7 +33,7 @@ export default function HelpdeskDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Headphones className="w-5 h-5 text-cyan-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Customer Support Operations</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Customer Support Operations</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Helpdesk Console</h1>
                     <p className="text-slate-500 text-sm font-medium">Service Level Agreement (SLA) Tracking</p>
@@ -61,10 +61,10 @@ export default function HelpdeskDashboard() {
                             <div className={cn("p-2.5 rounded-xl text-white transition-transform group-hover:scale-110 shadow-sm", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{k.label}</span>
                         </div>
-                        <p className="text-3xl font-black text-slate-900 mb-1 leading-none">{k.value}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-2 truncate">{k.sub}</p>
+                        <p className="text-3xl font-bold text-slate-900 mb-1 leading-none">{k.value}</p>
+                        <p className="text-[10px] font-bold text-slate-400  tracking-tighter mt-2 truncate">{k.sub}</p>
                     </div>
                 ))}
             </div>
@@ -74,12 +74,12 @@ export default function HelpdeskDashboard() {
                 <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-fit">
                     <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white relative">
                         <div className="absolute top-0 left-0 w-16 h-1 bg-cyan-600 rounded-full ml-8" />
-                        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Response Pipeline</h2>
-                        <Button variant="ghost" className="text-cyan-600 text-[10px] font-black uppercase tracking-widest h-8">All Tickets <ChevronRight className="w-3 h-3 ml-1" /></Button>
+                        <h2 className="text-[11px] font-bold  tracking-widest text-slate-400">Response Pipeline</h2>
+                        <Button variant="ghost" className="text-cyan-600 text-[10px] font-bold  tracking-widest h-8">All Tickets <ChevronRight className="w-3 h-3 ml-1" /></Button>
                     </div>
                     <table className="w-full">
                         <thead className="bg-slate-50/20">
-                            <tr className="text-[8px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-50">
+                            <tr className="text-[8px]  font-bold tracking-widest text-slate-400 border-b border-slate-50">
                                 <th className="px-8 py-4 text-left">Ticket ID</th>
                                 <th className="px-8 py-4 text-left">Subject / User</th>
                                 <th className="px-8 py-4 text-left">Priority</th>
@@ -93,13 +93,13 @@ export default function HelpdeskDashboard() {
                                     <td className="px-8 py-5 text-[11px] font-bold text-slate-900">{tkt.id}</td>
                                     <td className="px-8 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] font-bold text-slate-700 group-hover:text-cyan-600 transition-colors uppercase italic">{tkt.subject}</span>
-                                            <span className="text-[9px] font-medium text-slate-400 font-outfit uppercase tracking-widest">{tkt.user}</span>
+                                            <span className="text-[11px] font-bold text-slate-700 group-hover:text-cyan-600 transition-colors  ">{tkt.subject}</span>
+                                            <span className="text-[9px] font-medium text-slate-400   tracking-widest">{tkt.user}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter",
+                                            "px-2 py-0.5 rounded text-[8px] font-bold  tracking-tighter",
                                             tkt.priority === 'Critical' ? "text-rose-600 bg-rose-50" :
                                                 tkt.priority === 'High' ? "text-amber-600 bg-amber-50" :
                                                     "text-slate-500 bg-slate-50"
@@ -109,7 +109,7 @@ export default function HelpdeskDashboard() {
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest",
+                                            "flex items-center gap-1.5 text-[9px] font-bold  tracking-widest",
                                             tkt.status === 'Open' ? "text-cyan-600" :
                                                 tkt.status === 'In-Progress' ? "text-amber-500" :
                                                     "text-emerald-500"
@@ -122,7 +122,7 @@ export default function HelpdeskDashboard() {
                                             {tkt.status}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{tkt.time}</td>
+                                    <td className="px-8 py-5 text-right text-[10px] font-bold text-slate-400  tracking-tighter">{tkt.time}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -135,20 +135,20 @@ export default function HelpdeskDashboard() {
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Zap className="w-32 h-32 rotate-12 text-cyan-500" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-6 border-b border-white/5 pb-4 leading-none font-outfit">SLA Shield</h3>
+                        <h3 className="text-[10px] font-bold  tracking-widest text-cyan-500 mb-6 border-b border-white/5 pb-4 leading-none ">SLA Shield</h3>
                         <div className="space-y-6 relative z-10">
                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 group-hover:border-cyan-500/30 transition-all">
-                                <p className="text-[11px] font-bold text-white mb-2 italic">Critical Escalation</p>
+                                <p className="text-[11px] font-bold text-white mb-2 ">Critical Escalation</p>
                                 <p className="text-[9px] text-white/40 leading-relaxed font-medium">Automatic manager alert triggered if Critical priority tickets are not responded to within 30 minutes.</p>
                             </div>
-                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all font-outfit shadow-xl">
+                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold  tracking-widest text-[9px] rounded-xl transition-all  shadow-xl">
                                 Response Policy
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none font-outfit">Workbench</h3>
+                        <h3 className="text-sm font-bold  tracking-widest text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none ">Workbench</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'Knowledge', icon: LifeBuoy },
@@ -158,7 +158,7 @@ export default function HelpdeskDashboard() {
                             ].map(item => (
                                 <button key={item.label} className="p-5 rounded-xl border border-slate-50 flex flex-col items-center gap-3 hover:bg-cyan-50 hover:border-cyan-200 transition-all bg-white hover:shadow-md group">
                                     <item.icon className="w-4 h-4 text-slate-300 group-hover:text-cyan-600 transition-colors" />
-                                    <span className="text-[9px] font-bold uppercase text-slate-500 tracking-tighter leading-none">{item.label}</span>
+                                    <span className="text-[9px] font-bold  text-slate-500 tracking-tighter leading-none">{item.label}</span>
                                 </button>
                             ))}
                         </div>

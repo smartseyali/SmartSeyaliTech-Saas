@@ -67,8 +67,8 @@ export default function CRMLeads() {
                         }`} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{lead.full_name || "Lead Node"}</span>
-                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">{lead.company_name || "Independent Actor"}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{lead.full_name || "Lead Node"}</span>
+                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-0.5">{lead.company_name || "Independent Actor"}</span>
                     </div>
                 </div>
             )
@@ -78,10 +78,10 @@ export default function CRMLeads() {
             label: "Communication",
             render: (lead: any) => (
                 <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
                         <Mail size={12}/> {lead.email || 'N/A'}
                     </span>
-                    <span className="text-[11px] font-black text-slate-700 tracking-tighter">
+                    <span className="text-[11px] font-bold text-slate-700 tracking-tighter">
                         {lead.phone || '+91 0000 0000'}
                     </span>
                 </div>
@@ -94,7 +94,7 @@ export default function CRMLeads() {
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-1.5">
                         <TrendingUp size={12} className="text-emerald-500" />
-                        <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest leading-none">
+                        <span className="text-[11px] font-bold text-slate-600  tracking-widest leading-none">
                             {lead.status?.toUpperCase() || "NEW PROTOCOL"}
                         </span>
                     </div>
@@ -148,7 +148,7 @@ export default function CRMLeads() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm">
                         <Star className="w-3.5 h-3.5 fill-emerald-600" /> Top Rated Nodes
                     </button>
                 </div>

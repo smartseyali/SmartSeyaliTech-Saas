@@ -17,7 +17,7 @@ export const Footer = () => {
               </div>
               <span className="text-2xl font-bold tracking-tight">{PLATFORM_CONFIG.name} <span className="text-primary-500">Tech</span></span>
             </Link>
-            <p className="text-slate-400 font-medium italic max-w-sm leading-relaxed">
+            <p className="text-slate-400 font-medium  max-w-sm leading-relaxed">
               We engineer robust enterprise software solutions designed for global scalability and high-performance operational efficiency.
             </p>
             <div className="flex space-x-6 pt-4">
@@ -79,7 +79,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-20 pt-10 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest italic">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ">
             © {currentYear} {PLATFORM_CONFIG.name} TECH. ALL RIGHTS RESERVED.
           </p>
           <div className="flex items-center gap-3 bg-slate-800/50 px-5 py-2 rounded-full border border-slate-700">

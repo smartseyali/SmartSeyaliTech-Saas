@@ -104,7 +104,7 @@ export default function ERPListView({
                 <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-100 flex flex-col">
                     <div className="flex items-center justify-between h-14 px-4">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-[12px] font-black tracking-tight text-gray-950 uppercase italic leading-none">{title}</h1>
+                            <h1 className="text-[12px] font-bold tracking-tight text-gray-950 uppercase  leading-none">{title}</h1>
                             <div className="h-4 w-px bg-gray-200" />
                             <span className="text-[11px] font-bold text-gray-400">{data.length} Total</span>
                         </div>

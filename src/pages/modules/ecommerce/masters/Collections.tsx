@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useCrud } from "@/hooks/useCrud";
 import { Layers } from "lucide-react";
 import ERPListView from "@/components/modules/ERPListView";
-import { DynamicFormDialog } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
 export const Collections = () => {
     const { data, loading, createItem, updateItem, fetchItems } = useCrud("collections");
     const [searchTerm, setSearchTerm] = useState("");
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [editingItem, setEditingItem] = useState<any>(null);
 
     const colColumns = [
@@ -27,8 +27,8 @@ export const Collections = () => {
             label: "Collection",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[200px]">{row.slug || "NO_SLUG"}</span>
+                    <span className="font-bold text-gray-900 tracking-tight">{row.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1 truncate max-w-[200px]">{row.slug || "NO_SLUG"}</span>
                 </div>
             )
         },
@@ -36,7 +36,7 @@ export const Collections = () => {
             key: "is_active", 
             label: "Status", 
             render: (row: any) => (
-                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${
+                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-widest border ${
                     row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
                 }`}>
                     {row.is_active ? 'Published' : 'Draft'}
@@ -46,20 +46,19 @@ export const Collections = () => {
     ];
 
     const colFields = [
-        { key: "image_url", label: "Cover Image", type: "image" as const, folder: "collections" },
         { key: "name", label: "Collection Title", required: true, ph: "e.g. Summer Essentials" },
         { key: "slug", label: "Url Slug", ph: "e.g. summer-essentials" },
-        { key: "description", label: "Public Description", type: "textarea" as const },
+        { key: "description", label: "Public Description", type: "text" as const },
     ];
 
     const handleNew = () => {
         setEditingItem(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (item: any) => {
         setEditingItem(item);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleSubmit = async (formData: any) => {
@@ -68,7 +67,7 @@ export const Collections = () => {
         } else {
             await createItem(formData);
         }
-        setFormOpen(false);
+        setView("list");
         fetchItems();
     };
 
@@ -76,29 +75,36 @@ export const Collections = () => {
         c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingItem ? "Refine Collection Hub" : "Build Collection Entry"}
+                    subtitle="Universal Master Catalog"
+                    headerFields={colFields}
+                    onAbort={() => { setView("list"); setEditingItem(null); }}
+                    onSave={handleSubmit}
+                    initialData={editingItem}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className="h-full flex flex-col">
-            <ERPListView
-                title="Store Collections"
-                data={filteredData}
-                columns={colColumns}
-                onNew={handleNew}
-                onRefresh={fetchItems}
-                onRowClick={handleEdit}
-                isLoading={loading}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                primaryKey="id"
-            />
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingItem ? "Refine Collection" : "Build Collection"}
-                fields={colFields}
-                initialData={editingItem}
-                onSubmit={handleSubmit}
-            />
-        </div>
+        <ERPListView
+            title="Store Collections"
+            data={filteredData}
+            columns={colColumns}
+            onNew={handleNew}
+            onRefresh={fetchItems}
+            onRowClick={handleEdit}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+        />
     );
 };
+
 

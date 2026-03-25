@@ -15,6 +15,7 @@ interface MediaUploadProps {
     type?: "image" | "video";
     accept?: string;
     className?: string;
+    compact?: boolean;
 }
 
 export function MediaUpload({
@@ -25,7 +26,8 @@ export function MediaUpload({
     bucket = "ecommerce",
     type = "image",
     accept,
-    className
+    className,
+    compact
 }: MediaUploadProps) {
     const [uploading, setUploading] = useState(false);
     const { toast } = useToast();
@@ -75,6 +77,36 @@ export function MediaUpload({
     };
 
     const isVideo = type === "video" || value.toLowerCase().match(/\.(mp4|webm|ogg)$/);
+
+    if (compact) {
+        return (
+            <div className={cn("relative group/media", className)}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleUpload}
+                    accept={accept || (type === "image" ? "image/*" : "video/*")}
+                    className="hidden"
+                />
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="h-9 px-4 rounded-xl border-gray-200 hover:bg-gray-50 text-xs font-bold gap-2"
+                >
+                    {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : value ? <img src={value} className="w-4 h-4 rounded-full object-cover" /> : <Upload className="w-3.5 h-3.5 text-gray-400" />}
+                    {uploading ? "Uploading..." : value ? "Change Image" : label || "Upload"}
+                    {value && !uploading && (
+                        <div onClick={(e) => { e.stopPropagation(); removeMedia(); }} className="ml-1 p-1 hover:bg-rose-50 text-rose-400 rounded-lg">
+                            <X className="w-3 h-3" />
+                        </div>
+                    )}
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className={cn("flex flex-col h-full w-full", className)}>

@@ -33,7 +33,7 @@ export default function WhatsAppDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <MessageSquare className="w-5 h-5 text-emerald-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Official Business API (WABA)</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Official Business API (WABA)</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">WhatsApp Integration</h1>
                     <p className="text-slate-500 text-sm font-medium">Synced with {activeCompany?.name} Marketing</p>
@@ -61,10 +61,10 @@ export default function WhatsAppDashboard() {
                             <div className={cn("p-2.5 rounded-xl text-white transition-transform group-hover:scale-110 shadow-sm shadow-black/10", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{k.label}</span>
                         </div>
-                        <p className="text-3xl font-black text-slate-900 mb-1 leading-none">{k.value}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-2 truncate font-outfit">{k.sub}</p>
+                        <p className="text-3xl font-bold text-slate-900 mb-1 leading-none">{k.value}</p>
+                        <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-2 truncate">{k.sub}</p>
                     </div>
                 ))}
             </div>
@@ -74,12 +74,12 @@ export default function WhatsAppDashboard() {
                 <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-fit">
                     <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white relative">
                         <div className="absolute top-0 left-0 w-16 h-1 bg-emerald-600 rounded-full ml-8" />
-                        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Message Streams</h2>
-                        <Button variant="ghost" className="text-emerald-600 text-[10px] font-black uppercase tracking-widest h-8">Template Manager <ChevronRight className="w-3 h-3 ml-1" /></Button>
+                        <h2 className="text-[11px] font-bold  tracking-widest text-slate-400">Message Streams</h2>
+                        <Button variant="ghost" className="text-emerald-600 text-[10px] font-bold  tracking-widest h-8">Template Manager <ChevronRight className="w-3 h-3 ml-1" /></Button>
                     </div>
                     <table className="w-full">
                         <thead className="bg-slate-50/20">
-                            <tr className="text-[8px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-50">
+                            <tr className="text-[8px]  font-bold tracking-widest text-slate-400 border-b border-slate-50">
                                 <th className="px-8 py-4 text-left">Internal ID</th>
                                 <th className="px-8 py-4 text-left">Campaign / Type</th>
                                 <th className="px-8 py-4 text-left">Reach (Sent)</th>
@@ -93,14 +93,14 @@ export default function WhatsAppDashboard() {
                                     <td className="px-8 py-5 text-[11px] font-bold text-slate-900">{camp.id}</td>
                                     <td className="px-8 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] font-black text-slate-700 group-hover:text-emerald-600 transition-colors uppercase italic leading-none mb-1">{camp.name}</span>
-                                            <span className="text-[9px] font-bold text-slate-400 font-outfit uppercase tracking-widest leading-none">{camp.type}</span>
+                                            <span className="text-[11px] font-bold text-slate-700 group-hover:text-emerald-600 transition-colors  leading-none mb-1">{camp.name}</span>
+                                            <span className="text-[9px] font-bold text-slate-400  tracking-widest leading-none">{camp.type}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-[11px] font-black text-slate-900">{camp.sent.toLocaleString()} Units</td>
+                                    <td className="px-8 py-5 text-[11px] font-bold text-slate-900">{camp.sent.toLocaleString()} Units</td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest",
+                                            "flex items-center gap-1.5 text-[9px] font-bold  tracking-widest",
                                             camp.status === 'Active' ? "text-emerald-600" :
                                                 camp.status === 'Completed' ? "text-slate-400" :
                                                     "text-rose-500"
@@ -112,7 +112,7 @@ export default function WhatsAppDashboard() {
                                             {camp.status}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5 text-right text-[10px] font-black text-emerald-600 uppercase tracking-tighter">{camp.read}</td>
+                                    <td className="px-8 py-5 text-right text-[10px] font-bold text-emerald-600  tracking-tighter">{camp.read}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -125,20 +125,20 @@ export default function WhatsAppDashboard() {
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Shield className="w-32 h-32 rotate-12 text-emerald-500" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6 border-b border-white/5 pb-4 leading-none font-outfit">Meta Verification</h3>
+                        <h3 className="text-[10px] font-bold  tracking-widest text-emerald-500 mb-6 border-b border-white/5 pb-4 leading-none">Meta Verification</h3>
                         <div className="space-y-6 relative z-10">
                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 group-hover:border-emerald-500/30 transition-all font-sans">
-                                <p className="text-[11px] font-bold text-white mb-2 italic tracking-tight italic">Quality Rating: High</p>
-                                <p className="text-[9px] text-white/40 leading-relaxed font-medium uppercase tracking-wide">Your WABA score is optimal. You can send up to 100,000 messages per 24 hours.</p>
+                                <p className="text-[11px] font-bold text-white mb-2 tracking-tight">Quality Rating: High</p>
+                                <p className="text-[9px] text-white/40 leading-relaxed font-medium  tracking-wide">Your WABA score is optimal. You can send up to 100,000 messages per 24 hours.</p>
                             </div>
-                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all font-outfit shadow-xl">
+                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold  tracking-widest text-[9px] rounded-xl transition-all shadow-xl">
                                 Manage Templates
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none font-outfit">Bot Workbench</h3>
+                        <h3 className="text-sm font-bold  tracking-widest text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none">Bot Workbench</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'Webhooks', icon: Zap },
@@ -148,7 +148,7 @@ export default function WhatsAppDashboard() {
                             ].map(item => (
                                 <button key={item.label} className="p-5 rounded-xl border border-slate-50 flex flex-col items-center gap-3 hover:bg-emerald-50 hover:border-emerald-200 transition-all bg-white hover:shadow-md group">
                                     <item.icon className="w-4 h-4 text-slate-300 group-hover:text-emerald-600 transition-colors" />
-                                    <span className="text-[9px] font-bold uppercase text-slate-500 tracking-tighter leading-none">{item.label}</span>
+                                    <span className="text-[9px] font-bold  text-slate-500 tracking-tighter leading-none">{item.label}</span>
                                 </button>
                             ))}
                         </div>

@@ -175,7 +175,7 @@ export default function Invoices() {
         { 
             key: "reference_no", 
             label: "Invoice ID",
-            render: (i: any) => <span className="font-bold text-gray-900 italic">{i.reference_no}</span>
+            render: (i: any) => <span className="font-bold text-gray-900 ">{i.reference_no}</span>
         },
         { 
             key: "customer_name", 
@@ -183,14 +183,14 @@ export default function Invoices() {
             render: (i: any) => (
                 <div className="flex flex-col text-sm">
                     <span className="font-bold text-gray-800">{i.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i.due_date ? `Due: ${i.due_date}` : 'No Due Date'}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{i.due_date ? `Due: ${i.due_date}` : 'No Due Date'}</span>
                 </div>
             )
         },
         { 
             key: "grand_total", 
             label: "Payment Valuation",
-            render: (i: any) => <span className="font-black text-indigo-600 tabular-nums">{fmt(i.grand_total)}</span>,
+            render: (i: any) => <span className="font-bold text-indigo-600 tabular-nums">{fmt(i.grand_total)}</span>,
             className: "text-right"
         },
         { 

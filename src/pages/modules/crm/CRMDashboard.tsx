@@ -68,7 +68,7 @@ export default function CRMDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Target className="w-5 h-5 text-violet-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Sales Intelligence Hub</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Sales Intelligence Hub</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">CRM Analytics</h1>
                     <div className="flex items-center gap-2">
@@ -110,12 +110,12 @@ export default function CRMDashboard() {
                             <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-400">{k.label}</span>
                         </div>
                         <div className="relative z-10">
                             <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
                             <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide leading-none">{k.sub}</p>
+                                <p className="text-[10px] font-semibold text-slate-400  tracking-wide leading-none">{k.sub}</p>
                             </div>
                         </div>
                     </div>
@@ -133,10 +133,10 @@ export default function CRMDashboard() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Deal Momentum</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">Live activity stream</p>
+                                <p className="text-[10px] font-bold text-slate-400  tracking-[0.1em] mt-1.5">Live activity stream</p>
                             </div>
                         </div>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest text-violet-600 hover:bg-violet-50">View Pipeline <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-violet-600 hover:bg-violet-50">View Pipeline <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
                     </div>
 
                     <div className="p-8">
@@ -157,7 +157,7 @@ export default function CRMDashboard() {
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <span className="text-[11px] font-medium text-slate-500">{act.person}</span>
                                                 <span className="text-[10px] text-slate-300">•</span>
-                                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{act.status}</span>
+                                                <span className="text-[10px] font-bold  tracking-wider text-slate-400">{act.status}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -174,8 +174,8 @@ export default function CRMDashboard() {
 
                         <div className="relative z-10 flex flex-col h-full justify-between">
                             <div>
-                                <h2 className="text-lg font-bold tracking-tight text-white mb-2 border-b border-white/5 pb-4 uppercase tracking-wide">Engagement Metrics</h2>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-6 mb-8">Performance Funnel</p>
+                                <h2 className="text-lg font-bold tracking-tight text-white mb-2 border-b border-white/5 pb-4  tracking-wide">Engagement Metrics</h2>
+                                <p className="text-[10px] font-bold text-slate-500  tracking-widest mt-6 mb-8">Performance Funnel</p>
 
                                 <div className="space-y-6">
                                     {[
@@ -185,8 +185,8 @@ export default function CRMDashboard() {
                                     ].map(metric => (
                                         <div key={metric.label} className="space-y-2.5">
                                             <div className="flex justify-between items-end">
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{metric.label}</span>
-                                                <span className="text-lg font-black text-white">{metric.value}</span>
+                                                <span className="text-[10px] font-bold text-slate-400  tracking-wider">{metric.label}</span>
+                                                <span className="text-lg font-bold text-white">{metric.value}</span>
                                             </div>
                                             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                 <div
@@ -200,7 +200,7 @@ export default function CRMDashboard() {
                             </div>
 
                             <div className="pt-8">
-                                <Button className="w-full h-11 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-[10px] uppercase tracking-[0.1em] border border-white/10 transition-all">
+                                <Button className="w-full h-11 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-[10px]  tracking-[0.1em] border border-white/10 transition-all">
                                     Export Performance Report
                                 </Button>
                             </div>
@@ -209,7 +209,7 @@ export default function CRMDashboard() {
 
                     {/* Quick Access Actions */}
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 uppercase tracking-wide">Sales Commands</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4  tracking-wide">Sales Commands</h2>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: "Schedule Demo", icon: Calendar, color: "text-blue-600 bg-blue-50" },
@@ -221,7 +221,7 @@ export default function CRMDashboard() {
                                     <div className={cn("p-2.5 rounded-lg border transition-transform group-hover:scale-105", cmd.color)}>
                                         <cmd.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors text-center">{cmd.label}</span>
+                                    <span className="text-[10px] font-bold  tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors text-center">{cmd.label}</span>
                                 </button>
                             ))}
                         </div>

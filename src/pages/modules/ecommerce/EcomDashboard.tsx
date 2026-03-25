@@ -120,7 +120,7 @@ export default function EcomDashboard() {
     if (loading) return (
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
             <RefreshCw className="w-6 h-6 text-blue-600 animate-spin opacity-40" />
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Synchronizing Data...</p>
+            <p className="text-xs font-bold  tracking-widest text-slate-400">Synchronizing Data...</p>
         </div>
     );
 
@@ -131,7 +131,7 @@ export default function EcomDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <TrendingUp className="w-5 h-5 text-blue-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Store Performance</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Store Performance</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">E-commerce Dashboard</h1>
                     <div className="flex items-center gap-2">
@@ -171,12 +171,12 @@ export default function EcomDashboard() {
                             <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-500">{k.label}</span>
                         </div>
                         <div className="relative z-10">
                             <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
                             <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide leading-none">{k.sub}</p>
+                                <p className="text-[10px] font-semibold text-slate-500  tracking-wide leading-none">{k.sub}</p>
                             </div>
                         </div>
                     </div>
@@ -193,11 +193,11 @@ export default function EcomDashboard() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Order Fulfillment</h2>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.1em] mt-1.5">Recent updates</p>
+                                <p className="text-[10px] font-bold text-slate-500  tracking-[0.1em] mt-1.5">Recent updates</p>
                             </div>
                         </div>
                         <Link to="/apps/ecommerce/orders">
-                            <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:bg-blue-50">View All Orders <ExternalLink className="w-3 h-3 ml-2" /></Button>
+                            <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-blue-600 hover:bg-blue-50">View All Orders <ExternalLink className="w-3 h-3 ml-2" /></Button>
                         </Link>
                     </div>
 
@@ -216,18 +216,18 @@ export default function EcomDashboard() {
                                         </div>
                                         <span className="text-2xl font-bold tracking-tight text-slate-900">{s.value || 0}</span>
                                     </div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-600 relative z-10 mt-1">{s.label}</p>
+                                    <p className="text-[10px] font-bold  tracking-[0.1em] text-slate-600 relative z-10 mt-1">{s.label}</p>
                                 </div>
                             ))}
                         </div>
 
                         {/* Recent Orders Table */}
                         <div className="space-y-5">
-                            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 ml-1">Recent Orders</h3>
+                            <h3 className="text-[10px] font-bold  tracking-widest text-slate-500 ml-1">Recent Orders</h3>
                             <div className="rounded-xl border border-slate-50 overflow-hidden bg-white shadow-inner">
                                 <table className="w-full">
                                     <thead>
-                                        <tr className="bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 border-b border-slate-100">
+                                        <tr className="bg-slate-50 text-[10px] font-bold  tracking-widest text-slate-500 border-b border-slate-100">
                                             <th className="px-8 py-5 text-left">Order ID</th>
                                             <th className="px-8 py-5 text-left">Customer</th>
                                             <th className="px-8 py-5 text-right">Amount</th>
@@ -241,7 +241,7 @@ export default function EcomDashboard() {
                                             return (
                                                 <tr key={o.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => navigate(`/apps/ecommerce/orders/${o.id}`)}>
                                                     <td className="px-8 py-4">
-                                                        <span className="font-bold text-blue-600 group-hover:underline uppercase tracking-widest text-xs font-mono">{o.order_number}</span>
+                                                        <span className="font-bold text-blue-600 group-hover:underline  tracking-widest text-xs font-mono">{o.order_number}</span>
                                                     </td>
                                                     <td className="px-8 py-4">
                                                         <p className="font-bold text-slate-700 truncate max-w-[150px]">{o.customer_name}</p>
@@ -250,12 +250,12 @@ export default function EcomDashboard() {
                                                         {fmt(Number(o.grand_total))}
                                                     </td>
                                                     <td className="px-8 py-4 text-center">
-                                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase border shadow-sm", s.color.replace('dark:', ''))}>
+                                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold  border shadow-sm", s.color.replace('dark:', ''))}>
                                                             <s.icon className="w-3 h-3" /> {s.label}
                                                         </div>
                                                     </td>
                                                     <td className="px-8 py-4">
-                                                        <p className="text-[10px] font-bold text-slate-500 italic">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
+                                                        <p className="text-[10px] font-bold text-slate-500 ">{new Date(o.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}</p>
                                                     </td>
                                                 </tr>
                                             );
@@ -273,7 +273,7 @@ export default function EcomDashboard() {
                         <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-5 relative">
                             <div className="absolute top-0 left-0 w-10 h-1 bg-blue-600 rounded-full" />
                             <h2 className="text-lg font-bold tracking-tight text-slate-900">Alerts</h2>
-                            <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md border border-blue-100 uppercase">Updates</span>
+                            <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md border border-blue-100 ">Updates</span>
                         </div>
                         <div className="space-y-4">
                             {[
@@ -291,7 +291,7 @@ export default function EcomDashboard() {
                                             <a.icon className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-0.5">{a.label}</p>
+                                            <p className="text-[9px] font-bold  tracking-[0.1em] text-slate-500 mb-0.5">{a.label}</p>
                                             <p className="text-xl font-bold tracking-tight text-slate-900">{a.value}</p>
                                         </div>
                                     </div>
@@ -303,7 +303,7 @@ export default function EcomDashboard() {
                     {/* Fast Navigation */}
                     <div className="bg-slate-900 rounded-2xl p-8 shadow-xl relative overflow-hidden group">
                         <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-all" />
-                        <h2 className="text-lg font-bold tracking-tight text-white mb-8 border-b border-white/5 pb-5 uppercase tracking-wide">Shortcuts</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-white mb-8 border-b border-white/5 pb-5  tracking-wide">Shortcuts</h2>
                         <div className="grid grid-cols-2 gap-4 relative z-10">
                             {[
                                 { label: "Zones", icon: MapPin, link: "/apps/ecommerce/shipping-zones", color: "bg-blue-600" },
@@ -318,7 +318,7 @@ export default function EcomDashboard() {
                                     <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transition-transform group-hover:-translate-y-1 text-white", q.color)}>
                                         <q.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-300 group-hover:text-white transition-colors text-center">{q.label}</span>
+                                    <span className="text-[9px] font-bold  tracking-[0.1em] text-slate-300 group-hover:text-white transition-colors text-center">{q.label}</span>
                                 </Link>
                             ))}
                         </div>

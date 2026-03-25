@@ -207,7 +207,7 @@ export function ProductVariantDialog({
                                         {/* Status + Delete row */}
                                         <div className="flex items-end justify-between col-span-2 lg:col-span-3 pt-4 mt-2 border-t border-slate-100">
                                             <span className="text-xs font-medium text-slate-400">
-                                                {v.id ? `ID: ${v.id}` : <span className="text-blue-500 italic">Unsaved variant</span>}
+                                                {v.id ? `ID: ${v.id}` : <span className="text-blue-500 ">Unsaved variant</span>}
                                             </span>
                                             <button
                                                 onClick={() => removeVariant(i, v.id)}

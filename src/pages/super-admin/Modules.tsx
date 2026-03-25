@@ -269,11 +269,11 @@ export default function PlatformModules() {
                         >
                             <Layers className="w-6 h-6" />
                         </motion.div>
-                        <h1 className="text-4xl font-black tracking-tight uppercase italic text-slate-900 leading-none">
+                        <h1 className="text-4xl font-bold tracking-tight   text-slate-900 leading-none">
                             Ecosystem <span className="text-blue-600">Hub</span>
                         </h1>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 ml-1">Universal Registry of SaaS Engines & Logic Packs</p>
+                    <p className="text-[10px] font-bold  tracking-widest text-slate-400 ml-1">Universal Registry of SaaS Engines & Logic Packs</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -288,10 +288,10 @@ export default function PlatformModules() {
                         />
                     </div>
                     <div className="flex gap-4">
-                        <Button variant="outline" onClick={handleSyncFromConfig} className="h-14 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest bg-white hover:bg-slate-50 transition-all border-slate-200">
+                        <Button variant="outline" onClick={handleSyncFromConfig} className="h-14 px-6 rounded-2xl font-bold  text-[10px] tracking-widest bg-white hover:bg-slate-50 transition-all border-slate-200">
                             <RefreshCw className="w-4 h-4 mr-2" /> Sync Engine
                         </Button>
-                        <Button onClick={() => handleOpenDialog()} className="h-14 bg-blue-600 hover:bg-blue-700 text-white font-black px-10 rounded-2xl shadow-2xl shadow-blue-500/20 flex gap-3 transition-all hover:scale-105 active:scale-95 group">
+                        <Button onClick={() => handleOpenDialog()} className="h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold px-10 rounded-2xl shadow-2xl shadow-blue-500/20 flex gap-3 transition-all hover:scale-105 active:scale-95 group">
                             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" /> Initialize New
                         </Button>
                     </div>
@@ -311,7 +311,7 @@ export default function PlatformModules() {
                     >
                         <Zap className="w-8 h-8 text-blue-600" />
                     </motion.div>
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.5em] animate-pulse">Scanning Platform Cores</span>
+                    <span className="text-[10px] font-bold text-blue-600  tracking-[0.5em] animate-pulse">Scanning Platform Cores</span>
                 </div>
             ) : filteredModules.length > 0 ? (
                 <motion.div
@@ -381,7 +381,7 @@ export default function PlatformModules() {
 
                                         <div className="absolute bottom-6 left-6">
                                             <span className={cn(
-                                                "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border backdrop-blur-md",
+                                                "px-3 py-1.5 rounded-xl text-[10px] font-bold  tracking-widest border backdrop-blur-md",
                                                 mod.status === 'live' ? "bg-green-500/10 text-green-600 border-green-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
                                             )}>
                                                 {mod.status}
@@ -391,14 +391,14 @@ export default function PlatformModules() {
 
                                     <div className="p-8 space-y-6">
                                         <div>
-                                            <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic group-hover:text-blue-600 transition-colors duration-500">
+                                            <h3 className="text-2xl font-bold text-slate-900 tracking-tight   group-hover:text-blue-600 transition-colors duration-500">
                                                 {mod.name}
                                             </h3>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">{mod.tagline || "Engine Interface Core"}</p>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1">{mod.tagline || "Engine Interface Core"}</p>
                                         </div>
 
                                         <div className="h-12 overflow-hidden">
-                                            <p className="text-xs font-semibold text-slate-500 leading-relaxed line-clamp-2 italic opacity-80">
+                                            <p className="text-xs font-semibold text-slate-500 leading-relaxed line-clamp-2  opacity-80">
                                                 {mod.description ? `"${mod.description}"` : "Architectural logic ready for deployment."}
                                             </p>
                                         </div>
@@ -411,7 +411,7 @@ export default function PlatformModules() {
                                                 { label: "Template", value: mod.needs_template ? "REQ" : "OPT" }
                                             ].map((spec, i) => (
                                                 <div key={i} className="space-y-1">
-                                                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">{spec.label}</p>
+                                                    <p className="text-[8px] font-bold text-slate-300  tracking-widest">{spec.label}</p>
                                                     <p className="text-[10px] font-bold text-slate-600 truncate">{spec.value}</p>
                                                 </div>
                                             ))}
@@ -425,12 +425,12 @@ export default function PlatformModules() {
                                                 className="flex gap-2 whitespace-nowrap"
                                             >
                                                 {[...(Array.isArray(mod.features) ? mod.features : []), ...(Array.isArray(mod.features) ? mod.features : [])].map((feat: string, i: number) => (
-                                                    <span key={i} className="text-[8px] font-black uppercase bg-slate-50 text-slate-400 px-3 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
+                                                    <span key={i} className="text-[8px] font-bold  bg-slate-50 text-slate-400 px-3 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
                                                         <Zap className="w-2.5 h-2.5 text-blue-500" /> {feat}
                                                     </span>
                                                 ))}
                                                 {(!mod.features || mod.features.length === 0) && (
-                                                    <span className="text-[8px] font-black uppercase bg-slate-50 text-slate-400 px-3 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
+                                                    <span className="text-[8px] font-bold  bg-slate-50 text-slate-400 px-3 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5">
                                                         <Zap className="w-2.5 h-2.5 text-blue-500" /> Standard Logic
                                                     </span>
                                                 )}
@@ -438,7 +438,7 @@ export default function PlatformModules() {
                                         </div>
 
                                         <div className="pt-4 border-t border-slate-50 flex justify-between items-center">
-                                            <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                            <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400  tracking-widest leading-none">
                                                 <Smartphone className="w-3.5 h-3.5 text-blue-500" />
                                                 <span className="truncate">{mod.route}</span>
                                             </div>
@@ -451,7 +451,7 @@ export default function PlatformModules() {
 
                                         <Button
                                             onClick={() => handleOpenDialog(mod)}
-                                            className="w-full h-14 rounded-[1.5rem] bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-black/10 transition-all opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 duration-500"
+                                            className="w-full h-14 rounded-[1.5rem] bg-slate-900 hover:bg-black text-white font-bold  tracking-widest text-[10px] shadow-2xl shadow-black/10 transition-all opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 duration-500"
                                         >
                                             Modify Specifications
                                         </Button>
@@ -471,10 +471,10 @@ export default function PlatformModules() {
                         <Grid className="w-10 h-10 text-slate-200" />
                     </div>
                     <div className="max-w-md mx-auto space-y-2">
-                        <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">Registry Null</h2>
+                        <h2 className="text-3xl font-bold text-slate-900   tracking-tighter leading-none">Registry Null</h2>
                         <p className="text-sm font-semibold text-slate-400 leading-relaxed">No SaaS engines detected in the primary database tier. Initialize the system from configuration.</p>
                     </div>
-                    <Button onClick={handleSyncFromConfig} className="bg-black text-white h-16 px-10 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-2xl">
+                    <Button onClick={handleSyncFromConfig} className="bg-black text-white h-16 px-10 rounded-[2rem] font-bold  text-xs tracking-widest shadow-2xl">
                         Boot from Master Config
                     </Button>
                 </motion.div>
@@ -487,39 +487,39 @@ export default function PlatformModules() {
                     onEscapeKeyDown={(e) => e.preventDefault()}
                 >
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">{editingId ? 'Modify Engine Specs' : 'Register New Engine'}</DialogTitle>
+                        <DialogTitle className="text-2xl font-bold   tracking-tighter">{editingId ? 'Modify Engine Specs' : 'Register New Engine'}</DialogTitle>
                     </DialogHeader>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
                         {/* Column 1: Core Info */}
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Unique Slug</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Unique Slug</Label>
                                     <Input value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="e.g. ecommerce" className="font-mono text-sm h-12 rounded-xl" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Display Name</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Display Name</Label>
                                     <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. E-Commerce Pro" className="font-bold h-12 rounded-xl" />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Tagline</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Short Tagline</Label>
                                 <Input value={formData.tagline} onChange={(e) => setFormData({ ...formData, tagline: e.target.value })} placeholder="Short marketing hook" className="font-medium h-12 rounded-xl" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Base Description</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Base Description</Label>
                                 <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Technical summary" className="min-h-[80px] font-medium text-sm rounded-xl" />
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Icon Emoji</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Icon Emoji</Label>
                                     <Input value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} className="h-12 rounded-xl text-center text-xl" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Category</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Category</Label>
                                     <select
                                         className="h-12 w-full rounded-xl border-2 px-3 font-bold text-sm bg-white"
                                         value={formData.category}
@@ -534,7 +534,7 @@ export default function PlatformModules() {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Status</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Status</Label>
                                     <select
                                         className="h-12 w-full rounded-xl border-2 px-3 font-bold text-sm bg-white"
                                         value={formData.status}
@@ -549,12 +549,12 @@ export default function PlatformModules() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Key Features (One per line)</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Key Features (One per line)</Label>
                                 <Textarea value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} placeholder="Feature A&#10;Feature B" className="min-h-[100px] font-medium text-sm rounded-xl" />
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-blue-600">Technologies (Comma separated)</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400 text-blue-600">Technologies (Comma separated)</Label>
                                 <Input value={formData.technologies} onChange={(e) => setFormData({ ...formData, technologies: e.target.value })} placeholder="React, Node.js, etc" className="font-bold h-12 rounded-xl" />
                             </div>
                         </div>
@@ -564,7 +564,7 @@ export default function PlatformModules() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <Layout className="w-4 h-4 text-blue-600" />
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Detailed Overview (Elaborate Use Case)</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Detailed Overview (Elaborate Use Case)</Label>
                                 </div>
                                 <Textarea value={formData.long_description} onChange={(e) => setFormData({ ...formData, long_description: e.target.value })} placeholder="Tell the full story of this module..." className="min-h-[150px] font-medium text-sm rounded-xl border-blue-100 focus:border-blue-500" />
                             </div>
@@ -572,7 +572,7 @@ export default function PlatformModules() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <Zap className="w-4 h-4 text-blue-600" />
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Post-Deployment Interface Overview</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Post-Deployment Interface Overview</Label>
                                 </div>
                                 <Textarea value={formData.interface_overview} onChange={(e) => setFormData({ ...formData, interface_overview: e.target.value })} placeholder="Explain how it looks after deployment..." className="min-h-[100px] font-medium text-sm rounded-xl border-blue-100 focus:border-blue-500" />
                             </div>
@@ -580,7 +580,7 @@ export default function PlatformModules() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <Image className="w-4 h-4 text-blue-600" />
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Screenshots (One URL per line)</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Screenshots (One URL per line)</Label>
                                 </div>
                                 <Textarea value={formData.screenshots} onChange={(e) => setFormData({ ...formData, screenshots: e.target.value })} placeholder="https://example.com/img1.png&#10;https://example.com/img2.png" className="min-h-[100px] font-mono text-xs rounded-xl border-blue-100 focus:border-blue-500" />
                             </div>
@@ -588,7 +588,7 @@ export default function PlatformModules() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <Plus className="w-4 h-4 text-blue-600" />
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Use Cases (JSON List)</Label>
+                                    <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Use Cases (JSON List)</Label>
                                 </div>
                                 <Textarea value={formData.use_cases} onChange={(e) => setFormData({ ...formData, use_cases: e.target.value })} placeholder='[{"title": "Retail", "description": "Manage shops", "icon": "store"}]' className="min-h-[100px] font-mono text-xs rounded-xl border-blue-100 focus:border-blue-500" />
                             </div>
@@ -601,20 +601,20 @@ export default function PlatformModules() {
                                 className={cn("w-12 h-6 rounded-full relative transition-colors", formData.is_core ? 'bg-indigo-600' : 'bg-slate-200')}>
                                 <span className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-all", formData.is_core ? 'left-7' : 'left-1')} />
                             </button>
-                            <Label className="text-xs font-black uppercase tracking-widest cursor-pointer">Core Module</Label>
+                            <Label className="text-xs font-bold  tracking-widest cursor-pointer">Core Module</Label>
                         </div>
                         <div className="flex items-center gap-3">
                             <button type="button" onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
                                 className={cn("w-12 h-6 rounded-full relative transition-colors", formData.is_active ? 'bg-green-600' : 'bg-slate-200')}>
                                 <span className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-all", formData.is_active ? 'left-7' : 'left-1')} />
                             </button>
-                            <Label className="text-xs font-black uppercase tracking-widest cursor-pointer">Active Module</Label>
+                            <Label className="text-xs font-bold  tracking-widest cursor-pointer">Active Module</Label>
                         </div>
                     </div>
 
                     <DialogFooter className="bg-slate-50 p-6 rounded-b-[40px]">
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="font-black uppercase text-[10px] tracking-widest">Abort</Button>
-                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 bg-black text-white hover:bg-slate-900 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="font-bold  text-[10px] tracking-widest">Abort</Button>
+                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 bg-black text-white hover:bg-slate-900 px-10 rounded-2xl font-bold  text-[10px] tracking-widest shadow-2xl">
                             {isSubmitting ? "Syncing Platform..." : "Commit Engine Build"}
                         </Button>
                     </DialogFooter>

@@ -35,7 +35,7 @@ export default function InvoicingDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Receipt className="w-5 h-5 text-amber-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Billing & Receivables</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Billing & Receivables</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Invoicing Console</h1>
                     <p className="text-slate-500 text-sm font-medium">Billed under {activeCompany?.name}</p>
@@ -63,10 +63,10 @@ export default function InvoicingDashboard() {
                             <div className={cn("p-2.5 rounded-xl text-white transition-transform group-hover:scale-110", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{k.label}</span>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 mb-1 leading-none">{k.value}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">{k.sub}</p>
+                        <p className="text-2xl font-bold text-slate-900 mb-1 leading-none">{k.value}</p>
+                        <p className="text-[10px] font-bold text-slate-400  tracking-tighter mt-1">{k.sub}</p>
                     </div>
                 ))}
             </div>
@@ -75,12 +75,12 @@ export default function InvoicingDashboard() {
                 {/* Invoice Table */}
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-fit">
                     <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-                        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Current Receivables</h2>
-                        <Button variant="ghost" className="text-amber-600 text-[10px] font-black uppercase tracking-widest h-8">All History <ChevronRight className="w-3 h-3 ml-1" /></Button>
+                        <h2 className="text-[11px] font-bold  tracking-widest text-slate-400">Current Receivables</h2>
+                        <Button variant="ghost" className="text-amber-600 text-[10px] font-bold  tracking-widest h-8">All History <ChevronRight className="w-3 h-3 ml-1" /></Button>
                     </div>
                     <table className="w-full">
                         <thead className="bg-slate-50/50">
-                            <tr className="text-[8px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-50">
+                            <tr className="text-[8px]  font-bold tracking-widest text-slate-400 border-b border-slate-50">
                                 <th className="px-6 py-4 text-left">Internal ID</th>
                                 <th className="px-6 py-4 text-left">Relationship</th>
                                 <th className="px-6 py-4 text-left">Valuation</th>
@@ -93,10 +93,10 @@ export default function InvoicingDashboard() {
                                 <tr key={inv.id} className="group hover:bg-slate-50/20 transition-all">
                                     <td className="px-6 py-5 text-[11px] font-bold text-slate-900">{inv.id}</td>
                                     <td className="px-6 py-5 text-[11px] font-medium text-slate-500">{inv.customer}</td>
-                                    <td className="px-6 py-5 text-[11px] font-black text-slate-900">{fmt(inv.amount)}</td>
+                                    <td className="px-6 py-5 text-[11px] font-bold text-slate-900">{fmt(inv.amount)}</td>
                                     <td className="px-6 py-5">
                                         <span className={cn(
-                                            "px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest border",
+                                            "px-2.5 py-1 rounded text-[8px] font-bold  tracking-widest border",
                                             inv.status === 'Paid' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                                 inv.status === 'Overdue' ? "bg-rose-50 text-rose-600 border-rose-100" :
                                                     inv.status === 'Sent' ? "bg-amber-50 text-amber-600 border-amber-100" :
@@ -105,7 +105,7 @@ export default function InvoicingDashboard() {
                                             {inv.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{inv.date}</td>
+                                    <td className="px-6 py-5 text-right text-[10px] font-bold text-slate-400  tracking-tighter">{inv.date}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -118,20 +118,20 @@ export default function InvoicingDashboard() {
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Mail className="w-32 h-32 rotate-12" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 mb-6 border-b border-white/5 pb-4 leading-none font-outfit">Auto-Collections</h3>
+                        <h3 className="text-[10px] font-bold  tracking-widest text-amber-500 mb-6 border-b border-white/5 pb-4 leading-none ">Auto-Collections</h3>
                         <div className="space-y-6 relative z-10">
                             <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                                <p className="text-[11px] font-bold text-white mb-2 italic">Reminder Rule #1</p>
+                                <p className="text-[11px] font-bold text-white mb-2 ">Reminder Rule #1</p>
                                 <p className="text-[9px] text-white/40 leading-relaxed font-medium">Send automatic reminder email 3 days before due date to all Professional Plan clients.</p>
                             </div>
-                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all font-outfit">
+                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold  tracking-widest text-[9px] rounded-xl transition-all ">
                                 Manage Workflows
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-6 border-b border-slate-50 pb-4 leading-none font-outfit">Design Center</h3>
+                        <h3 className="text-sm font-bold  tracking-widest text-slate-400 mb-6 border-b border-slate-50 pb-4 leading-none ">Design Center</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'Templates', icon: FileText },
@@ -141,7 +141,7 @@ export default function InvoicingDashboard() {
                             ].map(item => (
                                 <button key={item.label} className="p-4 rounded-xl border border-slate-50 flex flex-col items-center gap-3 hover:bg-amber-50 hover:border-amber-200 transition-all bg-white hover:shadow-md group">
                                     <item.icon className="w-4 h-4 text-slate-300 group-hover:text-amber-600 transition-colors" />
-                                    <span className="text-[9px] font-bold uppercase text-slate-500 tracking-tighter leading-none">{item.label}</span>
+                                    <span className="text-[9px] font-bold  text-slate-500 tracking-tighter leading-none">{item.label}</span>
                                 </button>
                             ))}
                         </div>

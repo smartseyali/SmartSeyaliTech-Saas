@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 interface ERPField {
     key: string;
     label: string;
-    type?: "text" | "number" | "date" | "select" | "datetime-local";
+    type?: "text" | "number" | "date" | "select" | "datetime-local" | "checkbox";
     required?: boolean;
     options?: { label: string; value: string }[];
     ph?: string; // Standardize ph vs placeholder
@@ -137,6 +137,23 @@ export default function ERPEntryForm({
                 </div>
             );
         }
+        if (field.type === "checkbox") {
+            return (
+                <button
+                    type="button"
+                    onClick={() => onChange(!value)}
+                    className={cn(
+                        "relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none",
+                        value ? "bg-indigo-600" : "bg-gray-200"
+                    )}
+                >
+                    <div className={cn(
+                        "absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300",
+                        value ? "translate-x-5" : ""
+                    )} />
+                </button>
+            );
+        }
         return (
             <input
                 type={field.type || "text"}
@@ -188,7 +205,7 @@ export default function ERPEntryForm({
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}
                                 className={cn(
-                                    "pb-3 pt-4 text-[11px] font-black uppercase tracking-widest relative transition-all outline-none",
+                                    "pb-3 pt-4 text-[11px] font-bold uppercase tracking-widest relative transition-all outline-none",
                                     activeTab === tab ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
                                 )}
                             >
@@ -207,12 +224,12 @@ export default function ERPEntryForm({
                     <>
                         <div className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/30">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Main Details</h3>
+                        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Main Details</h3>
                     </div>
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         {headerFields.map(field => (
                             <div key={field.key} className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{field.label}</Label>
+                                <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{field.label}</Label>
                                 {renderInput(field, header[field.key], (val) => setHeader({ ...header, [field.key]: val }))}
                             </div>
                         ))}
@@ -223,12 +240,12 @@ export default function ERPEntryForm({
                     <>
                         <div className="bg-white rounded-[1.5rem] border border-gray-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/30 flex items-center justify-between">
-                                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">{itemTitle}</h3>
+                                <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">{itemTitle}</h3>
                                 <Button 
                                     variant="ghost" 
                                     size="sm" 
                                     onClick={handleAddItem}
-                                    className="h-8 rounded-xl text-[10px] font-black text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4"
+                                    className="h-8 rounded-xl text-[10px] font-bold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4"
                                 >
                                     <Plus className="w-3.5 h-3.5 mr-2" />
                                     Add New Row
@@ -239,18 +256,18 @@ export default function ERPEntryForm({
                                 <Table>
                                     <TableHeader className="bg-gray-50/50 border-b border-gray-100">
                                         <TableRow className="h-12 hover:bg-transparent">
-                                            <TableHead className="pl-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Idx</TableHead>
+                                            <TableHead className="pl-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Idx</TableHead>
                                             {itemFields ? (
                                                 itemFields.map(f => (
-                                                    <TableHead key={f.key} className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{f.label}</TableHead>
+                                                    <TableHead key={f.key} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{f.label}</TableHead>
                                                 ))
                                             ) : (
                                                 <>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[300px]">Item Description</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Qty</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Rate</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">GST %</TableHead>
-                                                    <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right pr-8">Amount</TableHead>
+                                                    <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest min-w-[300px]">Item Description</TableHead>
+                                                    <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Qty</TableHead>
+                                                    <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Rate</TableHead>
+                                                    <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">GST %</TableHead>
+                                                    <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right pr-8">Amount</TableHead>
                                                 </>
                                             )}
                                             <TableHead className="w-12"></TableHead>
@@ -260,7 +277,7 @@ export default function ERPEntryForm({
                                         <AnimatePresence mode="popLayout">
                                             {items.map((item, index) => (
                                                 <motion.tr key={index} layout className="group hover:bg-slate-50/50 transition-colors">
-                                                    <TableCell className="pl-8 text-[11px] font-black text-slate-300 w-12">{index + 1}</TableCell>
+                                                    <TableCell className="pl-8 text-[11px] font-bold text-slate-300 w-12">{index + 1}</TableCell>
                                                     {itemFields ? (
                                                         itemFields.map(field => (
                                                             <TableCell key={field.key}>
@@ -332,7 +349,7 @@ export default function ERPEntryForm({
                             <div className="flex flex-col md:flex-row gap-8 items-start">
                                 <div className="flex-1 space-y-4">
                                     <div className="bg-white p-6 rounded-[1.5rem] border border-gray-200 shadow-sm space-y-3">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Remarks</h4>
+                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Remarks</h4>
                                         <textarea 
                                             className="w-full min-h-[100px] p-4 rounded-2xl bg-gray-50 border border-gray-200 text-sm font-medium outline-none focus:bg-white focus:border-indigo-500 transition-all resize-none"
                                             placeholder="Write remarks or terms..."
@@ -353,13 +370,13 @@ export default function ERPEntryForm({
                                     </div>
                                     <div className="h-px bg-slate-100" />
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Grand Total</span>
-                                        <span className="text-xl font-black text-indigo-600 tracking-tighter">{fmt(totals.grandTotal)}</span>
+                                        <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Grand Total</span>
+                                        <span className="text-xl font-bold text-indigo-600 tracking-tighter">{fmt(totals.grandTotal)}</span>
                                     </div>
                                     <div className="pt-4">
                                         <Button
                                             onClick={() => onSave(header, items)}
-                                            className="w-full h-14 bg-slate-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-xl shadow-slate-900/10"
+                                            className="w-full h-14 bg-slate-900 hover:bg-black text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-slate-900/10"
                                         >
                                             <Save className="w-4 h-4 mr-2" />
                                             Save Entry
@@ -373,7 +390,7 @@ export default function ERPEntryForm({
                             <div className="flex justify-end pt-6 pb-12">
                                 <Button
                                     onClick={() => onSave(header, items)}
-                                    className="h-14 px-12 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-xl shadow-indigo-600/20"
+                                    className="h-14 px-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-indigo-600/20"
                                 >
                                     <Save className="w-4 h-4 mr-3" />
                                     Finalize Node Entry
@@ -385,7 +402,7 @@ export default function ERPEntryForm({
                     <div className="max-w-2xl mx-auto pt-8 pb-20">
                         <Button
                             onClick={() => onSave(header, [])}
-                            className="w-full h-14 bg-slate-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-xl shadow-slate-900/10 transition-all"
+                            className="w-full h-14 bg-slate-900 hover:bg-black text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-slate-900/10 transition-all"
                         >
                             <Save className="w-4 h-4 mr-3" />
                             Submit Verification Hub
@@ -398,7 +415,7 @@ export default function ERPEntryForm({
                 {activeTab !== "detail" && initialData && (
                     <div className="bg-white rounded-3xl p-8 border border-dashed border-gray-300 shadow-sm flex flex-col items-center justify-center min-h-[300px]">
                         <ImageIcon className="w-12 h-12 text-slate-200 mb-4" />
-                        <h3 className="text-xl font-black text-slate-800 tracking-tight capitalize">{activeTab} Log</h3>
+                        <h3 className="text-xl font-bold text-slate-800 tracking-tight capitalize">{activeTab} Log</h3>
                         <p className="text-sm font-medium text-slate-500 mt-2">
                             This structural endpoint is tracking standard {activeTab} history for record ID: <span className="text-slate-900 font-bold">{initialData.id || "N/A"}</span>
                         </p>

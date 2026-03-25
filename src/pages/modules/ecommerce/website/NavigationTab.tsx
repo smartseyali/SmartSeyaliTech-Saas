@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useDataConnector } from "@/hooks/useDataConnector";
 import { useTenant } from "@/contexts/TenantContext";
 import { cn } from "@/lib/utils";
-import { DynamicFormDialog, FieldConfig } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { toast } from "sonner";
 
 export function NavigationTab({ companyId }: { companyId: any }) {
@@ -18,7 +18,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
     const { fetchData, saveData, removeData, loading, config } = useDataConnector("SITE_NAVIGATION", "nav_menus");
     const [menus, setMenus] = useState<any[]>([]);
     const [activeMenuSet, setActiveMenuSet] = useState("Main Navigation");
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [editingLink, setEditingLink] = useState<any>(null);
 
     useEffect(() => {
@@ -27,18 +27,17 @@ export function NavigationTab({ companyId }: { companyId: any }) {
 
     const loadMenus = async () => {
         const data = await fetchData();
-        // Filter by activeMenuSet locally for now, in a real app this would be a query param
         setMenus(data.filter((m: any) => m.menu_set === activeMenuSet));
     };
 
     const handleNew = () => {
         setEditingLink(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (li: any) => {
         setEditingLink(li);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleDelete = async (id: any) => {
@@ -58,21 +57,36 @@ export function NavigationTab({ companyId }: { companyId: any }) {
         };
         const success = await saveData(payload);
         if (success) {
-            setFormOpen(false);
+            setView("list");
             loadMenus();
         }
     };
 
-    const fields: FieldConfig[] = config?.fields.map(f => ({
+    const fields = config?.fields.map(f => ({
         key: f.id,
         label: f.label,
-        type: f.type === 'url' ? 'text' : f.type === 'boolean' ? 'checkbox' : f.type === 'json' ? 'textarea' : f.type,
+        type: (f.type === 'url' ? 'text' : f.type === 'boolean' ? 'checkbox' : f.type === 'json' ? 'textarea' : f.type) as any,
         required: true
     })) || [];
 
+    if (view === "form") {
+        return (
+            <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingLink ? "Refine Navigation Node" : "Initialize Link Registry"}
+                    subtitle={`Active Set: ${activeMenuSet}`}
+                    headerFields={fields}
+                    onAbort={() => { setView("list"); setEditingLink(null); }}
+                    onSave={handleSubmit}
+                    initialData={editingLink}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500 font-sans">
-            {/* Sidebar - Menu Sets */}
             <div className="lg:col-span-4 space-y-8">
                 <section className="bg-white border rounded-[32px] p-8 shadow-sm relative overflow-hidden group">
                     <div className="flex items-center gap-3 mb-10 border-b border-border pb-6">
@@ -81,7 +95,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-[#14532d]">Menu Sets</h2>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Define Your Links</p>
+                            <p className="text-[10px] font-bold text-slate-400 tracking-widest mt-0.5">Define Your Links</p>
                         </div>
                     </div>
 
@@ -109,7 +123,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                                     )}>
                                         {m}
                                     </span>
-                                    <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest leading-none">Global Scope</p>
+                                    <p className="text-[9px] font-bold text-slate-300 tracking-widest leading-none">Global Scope</p>
                                 </div>
                                 <ChevronRight className={cn("w-4 h-4 transition-all", activeMenuSet === m ? "translate-x-0 opacity-100 text-[#f97316]" : "-translate-x-2 opacity-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100")} />
                             </button>
@@ -119,25 +133,24 @@ export function NavigationTab({ companyId }: { companyId: any }) {
 
                 <div className="p-6 bg-[#14532d] rounded-[24px] text-white flex items-center gap-4 shadow-xl">
                     <ShieldCheck className="w-6 h-6 text-[#f97316]" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest italic text-white/60">Hierarchy Guard Active</p>
+                    <p className="text-[10px] font-bold tracking-widest text-white/60">Hierarchy Guard Active</p>
                 </div>
             </div>
 
-            {/* Main Content - Links */}
             <div className="lg:col-span-8">
                 <section className="bg-white border rounded-[32px] p-8 md:p-12 shadow-sm relative overflow-hidden group min-h-[500px]">
                     <div className="flex flex-col md:flex-row md:items-start justify-between mb-12 gap-8 border-b border-border pb-8">
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Leaf className="w-4 h-4 text-[#f97316]" />
-                                <span className="text-[#14532d]/40 font-bold uppercase tracking-widest text-[10px]">Active Node Registry</span>
+                                <span className="text-[#14532d]/40 font-bold tracking-widest text-[10px]">Active Node Registry</span>
                             </div>
-                            <h2 className="text-3xl md:text-5xl font-black text-[#14532d] leading-none">{activeMenuSet}</h2>
+                            <h2 className="text-3xl md:text-5xl font-bold text-[#14532d] leading-none">{activeMenuSet}</h2>
                         </div>
                         <div className="flex gap-3">
                             <Button
                                 onClick={handleNew}
-                                className="h-10 px-6 rounded-xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold text-xs hover:bg-slate-800 transition-all shadow-lg shadow-[#14532d]/10 flex items-center gap-2 group/btn"
+                                className="h-10 px-6 rounded-xl bg-[#14532d] hover:bg-[#14532d]/90 text-white font-bold text-xs transition-all shadow-lg shadow-[#14532d]/10 flex items-center gap-2 group/btn"
                             >
                                 <Plus className="w-4 h-4" /> Add Link
                             </Button>
@@ -151,7 +164,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                         {!loading && menus.length === 0 && (
                             <div className="p-20 text-center border-2 border-dashed border-slate-50 rounded-3xl">
                                 <Menu className="w-10 h-10 text-slate-100 mx-auto mb-4" />
-                                <p className="text-sm font-bold text-slate-200 uppercase tracking-widest">No links in this set</p>
+                                <p className="text-sm font-bold text-slate-200 tracking-widest">No links in this set</p>
                             </div>
                         )}
                         {menus.map((li, idx) => (
@@ -161,6 +174,7 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.05 }}
                                 className="flex items-center justify-between p-6 bg-[#f8fafc] rounded-2xl border border-transparent hover:border-[#14532d]/10 transition-all hover:bg-white hover:shadow-lg hover:shadow-[#14532d]/5 group/node"
+                                onClick={() => handleEdit(li)}
                             >
                                 <div className="flex items-center gap-6">
                                     <div className="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-[#14532d]/20 font-bold text-xs group-hover/node:text-[#14532d] shadow-sm">
@@ -169,21 +183,21 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                                     <div className="space-y-0.5">
                                         <p className="font-bold text-lg text-[#14532d] leading-none mb-1">{li.label}</p>
                                         <div className="flex items-center gap-3">
-                                            <code className="text-[10px] font-bold text-[#14532d]/40 uppercase tracking-tight">{li.link_url}</code>
+                                            <code className="text-[10px] font-bold text-[#14532d]/40 tracking-tight">{li.link_url}</code>
                                             <span className="w-1 h-1 rounded-full bg-[#f97316]" />
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sort: {li.display_order}</span>
+                                            <span className="text-[9px] font-bold text-slate-400 tracking-widest">Sort: {li.display_order}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 opacity-0 group-hover/node:opacity-100 transition-opacity">
                                     <button
-                                        onClick={() => handleEdit(li)}
+                                        onClick={(e) => { e.stopPropagation(); handleEdit(li); }}
                                         className="w-9 h-9 bg-white border border-slate-100 rounded-xl text-slate-300 hover:text-[#14532d] transition-all flex items-center justify-center shadow-sm"
                                     >
                                         <Pencil className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(li.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleDelete(li.id); }}
                                         className="w-9 h-9 bg-white border border-slate-100 rounded-xl text-slate-300 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
                                     >
                                         <Trash2 className="w-4 h-4" />
@@ -196,21 +210,13 @@ export function NavigationTab({ companyId }: { companyId: any }) {
                     <div className="mt-12 pt-8 border-t border-slate-50 flex items-center justify-between opacity-30 group-hover:opacity-100 transition-opacity">
                         <div className="flex items-center gap-4">
                             <Lock className="w-5 h-5 text-[#14532d]" />
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#14532d]">Link Masking Active</p>
+                            <p className="text-[10px] font-bold tracking-widest text-[#14532d]">Link Masking Active</p>
                         </div>
                         <Zap className="w-5 h-5 text-[#f97316] animate-pulse" />
                     </div>
                 </section>
             </div>
-
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingLink ? "Refine Navigation Node" : "Integrate New Link"}
-                fields={fields}
-                initialData={editingLink}
-                onSubmit={handleSubmit}
-            />
         </div>
     );
 }
+

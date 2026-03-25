@@ -43,14 +43,14 @@ const About = () => {
           >
             <div className="flex items-center justify-center gap-3">
               <Activity className="w-5 h-5 text-primary-600" />
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">Our Identity</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ">Our Identity</span>
             </div>
 
             <h1 className="text-4xl md:text-7xl font-bold text-gray-900 tracking-tight leading-tight">
               Crafting Future-Ready <br /> <span className="text-primary-600">Technologies</span>
             </h1>
 
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed italic font-medium">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed  font-medium">
               {PLATFORM_CONFIG.name} Tech is a team of passionate software engineers dedicated to building robust digital ecosystems for enterprises worldwide.
             </p>
           </motion.div>
@@ -64,7 +64,7 @@ const About = () => {
             <div className="space-y-10">
               <div className="space-y-6">
                 <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">Our <span className="text-primary-600">Journey</span></h2>
-                <p className="text-xl text-gray-500 leading-relaxed font-medium italic">
+                <p className="text-xl text-gray-500 leading-relaxed font-medium ">
                   {PLATFORM_CONFIG.name} Tech was founded to bridge the gap between complex software challenges and innovative, user-friendly solutions.
                 </p>
               </div>
@@ -94,7 +94,7 @@ const About = () => {
               <div className="absolute -bottom-8 -left-8 bg-white p-8 rounded-3xl shadow-xl z-20 border border-gray-50 flex items-center gap-6">
                 <ShieldCheck className="w-10 h-10 text-primary-600" />
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300 italic mb-1">Status</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300  mb-1">Status</p>
                   <p className="text-xl font-bold text-gray-900 tracking-tight">Enterprise Verified</p>
                 </div>
               </div>
@@ -108,7 +108,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20 space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">Our Core <span className="text-primary-600">Values</span></h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto italic font-medium">The principles that drive our engineering culture and client success.</p>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto  font-medium">The principles that drive our engineering culture and client success.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -124,7 +124,7 @@ const About = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
                   {value.title}
                 </h3>
-                <p className="text-gray-500 font-medium italic leading-relaxed text-sm mb-6 flex-grow">
+                <p className="text-gray-500 font-medium  leading-relaxed text-sm mb-6 flex-grow">
                   "{value.description}"
                 </p>
                 <div className="h-px bg-gray-50 w-full" />
@@ -141,7 +141,7 @@ const About = () => {
             <div className="space-y-10">
               <div className="space-y-6">
                 <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">Strategic <span className="text-primary-600">Expertise</span></h2>
-                <p className="text-lg text-gray-500 leading-relaxed italic font-medium">
+                <p className="text-lg text-gray-500 leading-relaxed  font-medium">
                   We don't just write code — we design and implement robust digital strategies that help businesses achieve sustainable scalability.
                 </p>
               </div>
@@ -149,11 +149,11 @@ const About = () => {
               <div className="grid grid-cols-2 gap-10">
                 <div className="space-y-2 border-l-2 border-primary-500 pl-6">
                   <h4 className="text-4xl font-bold text-gray-900 tracking-tight">100%</h4>
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 italic">Custom Solutions</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 ">Custom Solutions</p>
                 </div>
                 <div className="space-y-2 border-l-2 border-primary-500 pl-6">
                   <h4 className="text-4xl font-bold text-gray-900 tracking-tight">24/7</h4>
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 italic">Technical Support</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 ">Technical Support</p>
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@ const About = () => {
                   <div className={cn("w-12 h-12 rounded-xl mx-auto flex items-center justify-center", item.bg, item.color)}>
                     <item.icon className="w-6 h-6" />
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 italic">{item.label}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 ">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -185,7 +185,7 @@ const About = () => {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
             <h2 className="text-4xl md:text-5xl font-bold leading-tight">Ready to Work with Us?</h2>
-            <p className="text-xl text-primary-100 max-w-2xl mx-auto opacity-90 italic">Let's collaborate to build the digital infrastructure your business deserves.</p>
+            <p className="text-xl text-primary-100 max-w-2xl mx-auto opacity-90 ">Let's collaborate to build the digital infrastructure your business deserves.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
               <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
                 <Link to="/contact">Initialize Project</Link>

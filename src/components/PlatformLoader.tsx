@@ -42,7 +42,7 @@ export const PlatformLoader = ({
             </div>
 
             <div className="flex flex-col items-center text-center space-y-3 relative z-10">
-                <span className="text-[12px] font-black uppercase tracking-[0.6em] text-slate-800 animate-pulse">
+                <span className="text-[12px] font-bold uppercase tracking-[0.6em] text-slate-800 animate-pulse">
                     {PLATFORM_CONFIG.name} <span className="text-primary-600">Enterprise</span>
                 </span>
                 
@@ -57,11 +57,11 @@ export const PlatformLoader = ({
                 </div>
 
                 <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 italic">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ">
                         {message}
                     </p>
                     {subtext && (
-                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-primary-500/60 transition-all">
+                        <p className="text-[8px] font-bold uppercase tracking-widest text-primary-500/60 transition-all">
                             {subtext}
                         </p>
                     )}
@@ -71,18 +71,18 @@ export const PlatformLoader = ({
             {/* Platform Spec Indicator */}
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-8 opacity-20 grayscale hover:opacity-100 transition-all duration-700">
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Tier</span>
-                    <span className="text-[10px] font-black uppercase text-slate-900 italic">L1-Security</span>
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Tier</span>
+                    <span className="text-[10px] font-bold uppercase text-slate-900 ">L1-Security</span>
                 </div>
                 <div className="w-px h-6 bg-slate-200" />
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Node</span>
-                    <span className="text-[10px] font-black uppercase text-slate-900 italic">Universal-Core</span>
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Node</span>
+                    <span className="text-[10px] font-bold uppercase text-slate-900 ">Universal-Core</span>
                 </div>
                 <div className="w-px h-6 bg-slate-200" />
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Async</span>
-                    <span className="text-[10px] font-black uppercase text-slate-900 italic">Enabled</span>
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Async</span>
+                    <span className="text-[10px] font-bold uppercase text-slate-900 ">Enabled</span>
                 </div>
             </div>
         </div>

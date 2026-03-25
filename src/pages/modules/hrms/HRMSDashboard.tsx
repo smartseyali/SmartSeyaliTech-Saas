@@ -39,7 +39,7 @@ export default function HRMSDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Users className="w-5 h-5 text-emerald-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">People Operations Hub</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">People Operations Hub</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Employee Experience</h1>
                     <div className="flex items-center gap-2">
@@ -77,11 +77,11 @@ export default function HRMSDashboard() {
                             <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-400">{k.label}</span>
                         </div>
                         <div className="relative z-10">
                             <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
-                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide leading-none">{k.sub}</p>
+                            <p className="text-[10px] font-semibold text-slate-400  tracking-wide leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
@@ -98,10 +98,10 @@ export default function HRMSDashboard() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Organizational DNA</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">Departmental distribution</p>
+                                <p className="text-[10px] font-bold text-slate-400  tracking-[0.1em] mt-1.5">Departmental distribution</p>
                             </div>
                         </div>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest text-emerald-600 hover:bg-emerald-50">View Org Chart <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-emerald-600 hover:bg-emerald-50">View Org Chart <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
                     </div>
 
                     <div className="p-8">
@@ -110,12 +110,12 @@ export default function HRMSDashboard() {
                                 <div key={dept.name} className="space-y-4 group">
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Entity Group</p>
-                                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors uppercase italic">{dept.name}</h3>
+                                            <p className="text-[10px] font-bold text-slate-300  tracking-widest mb-1">Entity Group</p>
+                                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors  ">{dept.name}</h3>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{dept.count}</p>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mt-1">Personnel</p>
+                                            <p className="text-2xl font-bold text-slate-900 tracking-tighter leading-none">{dept.count}</p>
+                                            <p className="text-[10px] font-bold text-slate-300  tracking-widest leading-none mt-1">Personnel</p>
                                         </div>
                                     </div>
                                     <div className="h-3 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5 relative">
@@ -136,7 +136,7 @@ export default function HRMSDashboard() {
                 <div className="lg:col-span-4 space-y-8">
                     <div className="bg-slate-900 rounded-2xl p-8 shadow-xl relative overflow-hidden group">
                         <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-600/10 rounded-full blur-3xl group-hover:bg-emerald-600/20 transition-all" />
-                        <h2 className="text-lg font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-5">Cultural Vibe</h2>
+                        <h2 className="text-lg font-bold text-white  tracking-wider mb-8 border-b border-white/5 pb-5">Cultural Vibe</h2>
                         <div className="space-y-4 relative z-10">
                             {upcomingEvents.map(event => (
                                 <div key={event.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 group">
@@ -145,21 +145,21 @@ export default function HRMSDashboard() {
                                             <event.icon className="w-3.5 h-3.5" />
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{event.type}</p>
+                                            <p className="text-[9px] font-bold text-slate-500  tracking-widest leading-none mb-1">{event.type}</p>
                                             <p className="text-[13px] font-semibold text-white">{event.person}</p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-tighter">{event.date}</span>
+                                    <span className="text-[10px] font-bold text-emerald-400  tracking-tighter">{event.date}</span>
                                 </div>
                             ))}
                         </div>
-                        <Button className="w-full mt-8 h-12 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-bold text-[10px] uppercase tracking-[0.1em] transition-all border-0">
+                        <Button className="w-full mt-8 h-12 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-bold text-[10px]  tracking-[0.1em] transition-all border-0">
                             View Team Calendar
                         </Button>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 uppercase tracking-wide">HR Commands</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4  tracking-wide">HR Commands</h2>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: "Policy Doc", icon: GraduationCap, color: "text-blue-600 bg-blue-50" },
@@ -171,7 +171,7 @@ export default function HRMSDashboard() {
                                     <div className={cn("p-2.5 rounded-lg transition-transform group-hover:scale-105", btn.color)}>
                                         <btn.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{btn.label}</span>
+                                    <span className="text-[10px] font-bold  tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{btn.label}</span>
                                 </button>
                             ))}
                         </div>

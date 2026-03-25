@@ -70,12 +70,12 @@ export default function Documents() {
                         {getIcon(doc.type)}
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{doc.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{doc.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {doc.version || "V1.0"}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
                                 {doc.size_kb || "1.2"} MB
                             </span>
                         </div>
@@ -89,7 +89,7 @@ export default function Documents() {
             render: (doc: any) => (
                 <div className="flex items-center gap-2">
                     <Folder className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10" />
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest leading-none">
+                    <span className="text-[11px] font-bold text-slate-600  tracking-widest leading-none">
                         {doc.folder_name || "Enterprise Root"}
                     </span>
                 </div>
@@ -100,10 +100,10 @@ export default function Documents() {
             label: "Authorization",
             render: (doc: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2">
                         <ShieldCheck size={12} className="text-emerald-500"/> {doc.owner_name || 'System Admin'}
                     </span>
-                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-0.5 font-mono">
+                    <span className="text-[10px] font-bold text-slate-300  tracking-widest mt-0.5 font-mono">
                          {doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : '2026-03-12'}
                     </span>
                 </div>
@@ -161,7 +161,7 @@ export default function Documents() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-900/10">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-900/10">
                         <FileUp className="w-3.5 h-3.5" /> Bulk Protocol Upload
                     </button>
                 </div>

@@ -234,12 +234,12 @@ export default function Checkout() {
                         <Box className="w-12 h-12 text-slate-200" />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">Checkout <span className="text-blue-600">Inactive</span></h2>
-                        <p className="text-slate-400 text-sm font-medium italic">"No active stagings identified. Please initialize acquisitions in the inventory matrix."</p>
+                        <h2 className="text-4xl font-bold text-slate-900  tracking-tighter  leading-none">Checkout <span className="text-blue-600">Inactive</span></h2>
+                        <p className="text-slate-400 text-sm font-medium ">"No active stagings identified. Please initialize acquisitions in the inventory matrix."</p>
                     </div>
                     <Button
                         onClick={() => navigate(storeLink("/shop"))}
-                        className="w-full h-20 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl hover:bg-blue-600 transition-all border-none"
+                        className="w-full h-20 bg-slate-900 text-white rounded-3xl font-bold  tracking-widest text-[11px] shadow-2xl hover:bg-blue-600 transition-all border-none"
                     >
                         Return to Inventory Hub <ArrowRight className="w-5 h-5 ml-4" />
                     </Button>
@@ -258,7 +258,7 @@ export default function Checkout() {
             <div className="max-w-7xl mx-auto px-6">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-4 text-[11px] font-black text-slate-400 hover:text-blue-600 mb-16 transition-all uppercase tracking-[0.3em] font-sans"
+                    className="flex items-center gap-4 text-[11px] font-bold text-slate-400 hover:text-blue-600 mb-16 transition-all  tracking-widest font-sans"
                 >
                     <ChevronLeft className="w-5 h-5" /> RE-ENTER STAGING MATRIX
                 </button>
@@ -268,9 +268,9 @@ export default function Checkout() {
                     <div className="space-y-4 mr-auto">
                         <div className="flex items-center gap-3">
                             <ShieldCheck className="w-5 h-5 text-blue-600 font-bold" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Lock Protocol</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">Lock Protocol</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black text-slate-900 uppercase tracking-tighter italic leading-[0.8]">Stage <span className="text-blue-600">Initialization</span></h1>
+                        <h1 className="text-5xl md:text-7xl font-bold text-slate-900  tracking-tighter  leading-[0.8]">Stage <span className="text-blue-600">Initialization</span></h1>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -281,7 +281,7 @@ export default function Checkout() {
                                 <button
                                     onClick={() => { if (i === 1 && step === "address" && validateAddress()) setStep("payment"); if (i === 0) setStep("address"); }}
                                     className={cn(
-                                        "flex items-center gap-3 px-8 py-4 rounded-xl transition-all text-[11px] font-black uppercase tracking-widest italic border-2",
+                                        "flex items-center gap-3 px-8 py-4 rounded-xl transition-all text-[11px] font-bold  tracking-widest  border-2",
                                         step === s.id
                                             ? "bg-slate-900 border-slate-900 text-white shadow-2xl"
                                             : i === 0 || step === "payment"
@@ -310,115 +310,115 @@ export default function Checkout() {
                                     exit={{ opacity: 0, x: 20 }}
                                     className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-12"
                                 >
-                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4 italic">
+                                    <h2 className="text-xl font-bold text-slate-900  tracking-widest flex items-center gap-4 ">
                                         <MapPin className="w-5 h-5 text-blue-600" /> Allocation Signal
                                     </h2>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {/* Full Name */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 ">
                                                 <User className="w-3.5 h-3.5" /> Identity Signature *
                                             </label>
                                             <input
                                                 value={address.full_name}
                                                 onChange={e => setAddress(a => ({ ...a, full_name: e.target.value }))}
                                                 placeholder="AUTHORIZED PERSONNEL"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Phone */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 ">
                                                 <Phone className="w-3.5 h-3.5" /> Comms Uplink *
                                             </label>
                                             <input
                                                 value={address.phone}
                                                 onChange={e => setAddress(a => ({ ...a, phone: e.target.value }))}
                                                 placeholder="+91 [NODE_NUMBER]"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Email */}
                                         <div className="space-y-3 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 ">
                                                 <Mail className="w-3.5 h-3.5" /> Network Address
                                             </label>
                                             <input
                                                 value={address.email}
                                                 onChange={e => setAddress(a => ({ ...a, email: e.target.value }))}
                                                 placeholder="INTEL@ECOSYSTEM.CORP"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Street */}
                                         <div className="space-y-3 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 ">
                                                 <Home className="w-3.5 h-3.5" /> Deployment Sector *
                                             </label>
                                             <input
                                                 value={address.line1}
                                                 onChange={e => setAddress(a => ({ ...a, line1: e.target.value }))}
                                                 placeholder="SECTOR / GRID / BLOCK"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Landmark */}
                                         <div className="space-y-3 md:col-span-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 italic">
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 ">
                                                 <Building className="w-3.5 h-3.5" /> Proximity Marker
                                             </label>
                                             <input
                                                 value={address.line2}
                                                 onChange={e => setAddress(a => ({ ...a, line2: e.target.value }))}
                                                 placeholder="LANDMARK LOGIC (OPTIONAL)"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* City */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">City *</label>
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest ">City *</label>
                                             <input
                                                 value={address.city}
                                                 onChange={e => setAddress(a => ({ ...a, city: e.target.value }))}
                                                 placeholder="METROPOLIS"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* State */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Territory *</label>
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest ">Territory *</label>
                                             <input
                                                 value={address.state}
                                                 onChange={e => setAddress(a => ({ ...a, state: e.target.value }))}
                                                 placeholder="STATE_PROTOCOL"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Pincode */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Node Index *</label>
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest ">Node Index *</label>
                                             <input
                                                 value={address.pincode}
                                                 onChange={e => setAddress(a => ({ ...a, pincode: e.target.value }))}
                                                 placeholder="6-DIGIT_INDEX"
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white transition-all  tracking-widest"
                                             />
                                         </div>
                                         {/* Country */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Geographic Domain</label>
+                                            <label className="text-[10px] font-bold text-slate-400  tracking-widest ">Geographic Domain</label>
                                             <input
                                                 value={address.country}
                                                 onChange={e => setAddress(a => ({ ...a, country: e.target.value }))}
-                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-black text-slate-900 outline-none uppercase tracking-widest"
+                                                className="w-full h-16 px-6 rounded-2xl border-2 border-slate-50 bg-slate-50 text-xs font-bold text-slate-900 outline-none  tracking-widest"
                                             />
                                         </div>
                                     </div>
 
                                     <Button
                                         onClick={() => { if (validateAddress()) setStep("payment"); }}
-                                        className="w-full h-20 rounded-[1.5rem] bg-blue-600 text-white font-black uppercase tracking-[0.4em] text-[11px] border-none group shadow-2xl shadow-blue-600/30 hover:bg-slate-900 transition-all"
+                                        className="w-full h-20 rounded-[1.5rem] bg-blue-600 text-white font-bold  tracking-widest text-[11px] border-none group shadow-2xl shadow-blue-600/30 hover:bg-slate-900 transition-all"
                                     >
                                         Synchronize Node <ArrowRight className="w-5 h-5 ml-4 group-hover:translate-x-2 transition-transform" />
                                     </Button>
@@ -431,7 +431,7 @@ export default function Checkout() {
                                     exit={{ opacity: 0, x: -20 }}
                                     className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-12"
                                 >
-                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4 italic text-slate-900">
+                                    <h2 className="text-xl font-bold text-slate-900  tracking-widest flex items-center gap-4  text-slate-900">
                                         <CreditCard className="w-5 h-5 text-blue-600" /> Financial Node
                                     </h2>
 
@@ -441,11 +441,11 @@ export default function Checkout() {
                                             <MapPin className="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div className="space-y-2 grow">
-                                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] italic">Active Sector</p>
-                                            <p className="text-sm font-black text-slate-900 uppercase tracking-tighter">{address.full_name} · {address.phone}</p>
-                                            <p className="text-xs text-slate-400 font-medium italic">{address.line1}{address.line2 ? `, ${address.line2}` : ""}, {address.city}, {address.state}</p>
+                                            <p className="text-[10px] font-bold text-blue-600  tracking-widest ">Active Sector</p>
+                                            <p className="text-sm font-bold text-slate-900  tracking-tighter">{address.full_name} · {address.phone}</p>
+                                            <p className="text-xs text-slate-400 font-medium ">{address.line1}{address.line2 ? `, ${address.line2}` : ""}, {address.city}, {address.state}</p>
                                         </div>
-                                        <button onClick={() => setStep("address")} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline pt-1 italic">Re-Configure</button>
+                                        <button onClick={() => setStep("address")} className="text-[10px] font-bold text-blue-600  tracking-widest hover:underline pt-1 ">Re-Configure</button>
                                     </div>
 
                                     {/* Payment Options */}
@@ -464,8 +464,8 @@ export default function Checkout() {
                                                 <Package className={cn("w-6 h-6", paymentMethod === "cod" ? "text-white" : "text-slate-200 group-hover:text-blue-600")} />
                                             </div>
                                             <div className="text-left grow">
-                                                <p className={cn("text-sm font-black uppercase tracking-[0.1em] italic", paymentMethod === "cod" ? "text-white" : "text-slate-900")}>Manual Settlement (COD)</p>
-                                                <p className={cn("text-[10px] font-medium italic mt-1", paymentMethod === "cod" ? "text-white/40" : "text-slate-400")}>Finalize credentials upon physical delivery</p>
+                                                <p className={cn("text-sm font-bold  tracking-[0.1em] ", paymentMethod === "cod" ? "text-white" : "text-slate-900")}>Manual Settlement (COD)</p>
+                                                <p className={cn("text-[10px] font-medium  mt-1", paymentMethod === "cod" ? "text-white/40" : "text-slate-400")}>Finalize credentials upon physical delivery</p>
                                             </div>
                                             <div className={cn("w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all", paymentMethod === "cod" ? "border-blue-600 bg-white" : "border-slate-100")}>
                                                 {paymentMethod === "cod" && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
@@ -491,8 +491,8 @@ export default function Checkout() {
                                                         <span className={cn(paymentMethod === gw.gateway ? "grayscale brightness-200" : "grayscale opacity-50")}>{meta.icon}</span>
                                                     </div>
                                                     <div className="text-left grow">
-                                                        <p className={cn("text-sm font-black uppercase tracking-[0.1em] italic", paymentMethod === gw.gateway ? "text-white" : "text-slate-900")}>{meta.name} Bridge</p>
-                                                        <p className={cn("text-[10px] font-medium italic mt-1", paymentMethod === gw.gateway ? "text-white/40" : "text-slate-400")}>Encrypted direct-link confirmation</p>
+                                                        <p className={cn("text-sm font-bold  tracking-[0.1em] ", paymentMethod === gw.gateway ? "text-white" : "text-slate-900")}>{meta.name} Bridge</p>
+                                                        <p className={cn("text-[10px] font-medium  mt-1", paymentMethod === gw.gateway ? "text-white/40" : "text-slate-400")}>Encrypted direct-link confirmation</p>
                                                     </div>
                                                     <div className={cn("w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all", paymentMethod === gw.gateway ? "border-blue-600 bg-white" : "border-slate-100")}>
                                                         {paymentMethod === gw.gateway && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
@@ -511,7 +511,7 @@ export default function Checkout() {
                                         ].map((b, i) => (
                                             <div key={i} className="flex items-center gap-5 p-6 bg-slate-50 rounded-2xl border border-slate-100">
                                                 <b.icon className="w-5 h-5 text-blue-600 font-bold" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic leading-none">{b.text}</span>
+                                                <span className="text-[9px] font-bold  tracking-widest text-slate-400  leading-none">{b.text}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -519,7 +519,7 @@ export default function Checkout() {
                                     <Button
                                         onClick={handlePlaceOrder}
                                         disabled={loading}
-                                        className="w-full h-24 rounded-[2rem] bg-blue-600 hover:bg-slate-900 text-white font-black uppercase tracking-[0.4em] text-[12px] border-none shadow-2xl shadow-blue-600/30 transition-all flex items-center justify-center gap-4"
+                                        className="w-full h-24 rounded-[2rem] bg-blue-600 hover:bg-slate-900 text-white font-bold  tracking-widest text-[12px] border-none shadow-2xl shadow-blue-600/30 transition-all flex items-center justify-center gap-4"
                                     >
                                         {loading ? (
                                             <div className="flex items-center gap-4">
@@ -528,7 +528,7 @@ export default function Checkout() {
                                             </div>
                                         ) : (
                                             <>
-                                                Initialize Settlement <ArrowRight className="w-6 h-6" /> <span className="text-white/30 font-black pl-4">₹{grandTotal.toLocaleString()}</span>
+                                                Initialize Settlement <ArrowRight className="w-6 h-6" /> <span className="text-white/30 font-bold pl-4">₹{grandTotal.toLocaleString()}</span>
                                             </>
                                         )}
                                     </Button>
@@ -542,7 +542,7 @@ export default function Checkout() {
 
                         {/* Items Summary */}
                         <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-10">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 flex items-center gap-4 border-b border-slate-100 pb-8 italic">
+                            <h3 className="text-[11px] font-bold  tracking-widest text-slate-900 flex items-center gap-4 border-b border-slate-100 pb-8 ">
                                 <Layout className="w-5 h-5 text-blue-600" /> Staging Array ({items.length})
                             </h3>
 
@@ -557,11 +557,11 @@ export default function Checkout() {
                                             />
                                         </div>
                                         <div className="flex-grow min-w-0 space-y-1">
-                                            <p className="text-[11px] font-black text-slate-900 truncate uppercase tracking-tight italic group-hover:text-blue-600 transition-colors">{item.name}</p>
-                                            {item.variant_name && <p className="text-[9px] text-blue-600 font-black uppercase tracking-widest">{item.variant_name}</p>}
-                                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">QUANTITY: {item.quantity}</p>
+                                            <p className="text-[11px] font-bold text-slate-900 truncate  tracking-tight  group-hover:text-blue-600 transition-colors">{item.name}</p>
+                                            {item.variant_name && <p className="text-[9px] text-blue-600 font-bold  tracking-widest">{item.variant_name}</p>}
+                                            <p className="text-[9px] text-slate-400 font-bold  tracking-widest ">QUANTITY: {item.quantity}</p>
                                         </div>
-                                        <p className="text-xs font-black text-slate-900 tabular-nums shrink-0 italic">₹{item.price * item.quantity}</p>
+                                        <p className="text-xs font-bold text-slate-900 tabular-nums shrink-0 ">₹{item.price * item.quantity}</p>
                                     </div>
                                 ))}
                             </div>
@@ -569,7 +569,7 @@ export default function Checkout() {
 
                         {/* Coupon Code as Auth Token */}
                         <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl space-y-6 border border-white/5">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white flex items-center gap-4 italic">
+                            <h3 className="text-[10px] font-bold  tracking-widest text-white flex items-center gap-4 ">
                                 <Tag className="w-4 h-4 text-blue-500" /> Redemption Hash
                             </h3>
                             {couponApplied ? (
@@ -577,8 +577,8 @@ export default function Checkout() {
                                     <div className="flex items-center gap-4">
                                         <Zap className="w-5 h-5 text-white animate-pulse" />
                                         <div>
-                                            <p className="text-[10px] font-black text-white uppercase tracking-widest">{couponApplied.code}</p>
-                                            <p className="text-[9px] text-white/60 font-black uppercase tracking-widest italic">
+                                            <p className="text-[10px] font-bold text-white  tracking-widest">{couponApplied.code}</p>
+                                            <p className="text-[9px] text-white/60 font-bold  tracking-widest ">
                                                 {couponApplied.type === "percentage" ? `${couponApplied.value}% VALIDATED` : `₹${couponApplied.value} REDEEMED`}
                                             </p>
                                         </div>
@@ -594,19 +594,19 @@ export default function Checkout() {
                                         onChange={e => { setCouponCode(e.target.value); setCouponError(""); }}
                                         onKeyDown={e => e.key === "Enter" && applyCoupon()}
                                         placeholder="ENTER_HASH"
-                                        className="flex-1 h-14 px-6 rounded-2xl border border-white/10 bg-white/5 text-[11px] font-black text-white outline-none focus:border-blue-500 focus:bg-white/10 transition-all uppercase tracking-[0.2em]"
+                                        className="flex-1 h-14 px-6 rounded-2xl border border-white/10 bg-white/5 text-[11px] font-bold text-white outline-none focus:border-blue-500 focus:bg-white/10 transition-all  tracking-widest"
                                     />
                                     <Button
                                         onClick={applyCoupon}
                                         disabled={couponLoading || !couponCode}
-                                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-[10px] font-black uppercase tracking-widest transition-all border-none"
+                                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-[10px] font-bold  tracking-widest transition-all border-none"
                                     >
                                         {couponLoading ? "..." : "AUTH"}
                                     </Button>
                                 </div>
                             )}
                             {couponError && (
-                                <p className="text-[9px] text-red-400 font-black flex items-center gap-2 uppercase tracking-widest italic">
+                                <p className="text-[9px] text-red-400 font-bold flex items-center gap-2  tracking-widest ">
                                     <AlertCircle className="w-3.5 h-3.5" /> {couponError}
                                 </p>
                             )}
@@ -614,9 +614,9 @@ export default function Checkout() {
 
                         {/* Price Breakdown as Data Matrix */}
                         <div className="bg-white rounded-[4rem] p-12 shadow-2xl shadow-slate-200/30 border border-slate-50 space-y-8">
-                            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 border-b border-slate-100 pb-8 italic">Allocation Matrix</h3>
+                            <h3 className="text-[11px] font-bold  tracking-widest text-slate-900 border-b border-slate-100 pb-8 ">Allocation Matrix</h3>
 
-                            <div className="space-y-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
+                            <div className="space-y-5 text-[11px] font-bold text-slate-400  tracking-widest ">
                                 <div className="flex justify-between items-center">
                                     <span>Base Valuation</span>
                                     <span className="text-slate-900 tabular-nums">₹{cartTotal.toLocaleString()}</span>
@@ -641,8 +641,8 @@ export default function Checkout() {
                             </div>
 
                             <div className="pt-10 border-t border-dashed border-slate-100 flex flex-col gap-2">
-                                <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em] italic leading-none">Total Exposure</span>
-                                <span className="text-6xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">₹{grandTotal.toLocaleString()}</span>
+                                <span className="text-[11px] font-bold text-blue-600  tracking-widest  leading-none">Total Exposure</span>
+                                <span className="text-6xl font-bold text-slate-900 tracking-tighter tabular-nums leading-none">₹{grandTotal.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

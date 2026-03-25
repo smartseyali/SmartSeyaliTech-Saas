@@ -70,8 +70,8 @@ export default function EcomOrders() {
             label: "Transaction ID",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-blue-600 uppercase tracking-widest text-[11px] font-mono group-hover:underline">#{row.order_number}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Order Sequence</span>
+                    <span className="font-bold text-blue-600  tracking-widest text-[11px] font-mono group-hover:underline">#{row.order_number}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">Order Sequence</span>
                 </div>
             )
         },
@@ -80,8 +80,8 @@ export default function EcomOrders() {
             label: "Identification",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.customer_name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{row.customer_phone || "LEDGER UNKNOWN"}</span>
+                    <span className="font-bold text-gray-900   tracking-tight">{row.customer_name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{row.customer_phone || "LEDGER UNKNOWN"}</span>
                 </div>
             )
         },
@@ -90,9 +90,9 @@ export default function EcomOrders() {
             label: "Fiscal impact",
             render: (row: any) => (
                 <div className="flex flex-col items-start">
-                    <span className="font-black text-slate-900 tracking-tight">{fmt(row.grand_total)}</span>
+                    <span className="font-bold text-slate-900 tracking-tight">{fmt(row.grand_total)}</span>
                     <div className={cn(
-                        "mt-1 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
+                        "mt-1 px-2 py-0.5 rounded text-[8px] font-bold  tracking-widest border",
                         row.payment_status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
                     )}>
                         {row.payment_status}
@@ -113,7 +113,7 @@ export default function EcomOrders() {
                     {NEXT_STATUS[row.status] && (
                         <button 
                             onClick={(e) => advanceStatus(e, row)}
-                            className="h-7 px-3 rounded-lg bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center gap-1.5"
+                            className="h-7 px-3 rounded-lg bg-blue-600 text-white text-[9px] font-bold  tracking-widest hover:bg-black transition-all flex items-center gap-1.5"
                         >
                             <ArrowRight className="w-3 h-3" /> Advance
                         </button>
@@ -148,7 +148,7 @@ export default function EcomOrders() {
             onRowClick={(row) => navigate(`/apps/ecommerce/orders/${row.id}`)}
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
                         <Download className="w-3.5 h-3.5" /> Registry Export
                     </button>
                 </div>
@@ -159,7 +159,7 @@ export default function EcomOrders() {
                         key={s.key}
                         onClick={() => setActiveStatus(s.key)}
                         className={cn(
-                            "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                            "px-3 py-1.5 rounded-lg text-[10px] font-bold  tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
                             activeStatus === s.key 
                                 ? "bg-slate-900 text-white shadow-lg" 
                                 : "text-slate-400 hover:text-slate-900 hover:bg-slate-50"

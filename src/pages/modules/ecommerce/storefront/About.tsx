@@ -49,12 +49,12 @@ export default function About() {
                 >
                     <div className="flex items-center justify-center gap-3">
                         <Activity className="w-5 h-5 text-blue-600" />
-                        <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px] italic">Our Vision</span>
+                        <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">Our Vision</span>
                     </div>
-                    <h1 className="text-6xl md:text-[9rem] font-black tracking-tighter text-slate-900 uppercase leading-[0.8] italic">
+                    <h1 className="text-6xl md:text-[9rem] font-bold tracking-tighter text-slate-900  leading-[0.8] ">
                         Our <span className="text-blue-600">Mission</span>
                     </h1>
-                    <p className="text-xl md:text-2xl font-medium italic text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-xl md:text-2xl font-medium  text-slate-400 max-w-3xl mx-auto leading-relaxed">
                         Engineering reliable infrastructure for the next generation of commerce and enterprise management. High-yield results through technical excellence.
                     </p>
                 </motion.div>
@@ -67,25 +67,25 @@ export default function About() {
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className="w-16 h-1 bg-blue-600" />
-                                <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px] italic">The Genesis</span>
+                                <span className="text-slate-400 font-bold  tracking-widest text-[10px] ">The Genesis</span>
                             </div>
-                            <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-slate-900 uppercase leading-[0.8] italic">Quality <br /><span className="text-blue-600">Engineering</span></h2>
+                            <h2 className="text-5xl md:text-8xl font-bold tracking-tighter text-slate-900  leading-[0.8] ">Quality <br /><span className="text-blue-600">Engineering</span></h2>
                         </div>
-                        <p className="text-xl text-slate-500 leading-relaxed font-medium italic border-l-4 border-blue-600/10 pl-10 py-4 max-w-xl">
+                        <p className="text-xl text-slate-500 leading-relaxed font-medium  border-l-4 border-blue-600/10 pl-10 py-4 max-w-xl">
                             "What started as a specialized vision for logistics has evolved into a comprehensive SaaS framework, empowering thousands of enterprises with precision-grade reliability and scalable logic."
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 pt-12 border-t border-slate-100">
                             <div className="space-y-6">
-                                <h4 className="font-black text-slate-900 uppercase tracking-[0.3em] text-[11px] flex items-center gap-3 italic font-black">
+                                <h4 className="font-bold text-slate-900  tracking-widest text-[11px] flex items-center gap-3  font-bold">
                                     <CheckCircle2 className="w-5 h-5 text-blue-600" /> Built for Integrity
                                 </h4>
-                                <p className="text-slate-400 text-sm leading-relaxed italic font-medium">Direct-to-market protocols ensuring zero-compromise product verification and localized auditing.</p>
+                                <p className="text-slate-400 text-sm leading-relaxed  font-medium">Direct-to-market protocols ensuring zero-compromise product verification and localized auditing.</p>
                             </div>
                             <div className="space-y-6">
-                                <h4 className="font-black text-slate-900 uppercase tracking-[0.3em] text-[11px] flex items-center gap-3 italic font-black">
+                                <h4 className="font-bold text-slate-900  tracking-widest text-[11px] flex items-center gap-3  font-bold">
                                     <Target className="w-5 h-5 text-blue-600" /> Scalable Growth
                                 </h4>
-                                <p className="text-slate-400 text-sm leading-relaxed italic font-medium">Advanced resource optimization across our global distribution network, built on sustainable architecture.</p>
+                                <p className="text-slate-400 text-sm leading-relaxed  font-medium">Advanced resource optimization across our global distribution network, built on sustainable architecture.</p>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ export default function About() {
                         </div>
                         <div className="absolute top-16 left-16 flex items-center gap-4 px-6 py-3 bg-slate-900/90 backdrop-blur-md rounded-full shadow-2xl">
                             <CheckCircle2 className="w-5 h-5 text-blue-400" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white italic">Operational Status: Verified</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-white ">Operational Status: Verified</span>
                         </div>
                     </div>
                 </div>
@@ -108,11 +108,11 @@ export default function About() {
                     {stats.map((stat, idx) => (
                         <div key={idx} className="text-center space-y-6 p-12 bg-white rounded-[3.5rem] border border-slate-50 shadow-2xl shadow-slate-200/20 group hover:bg-slate-900 transition-all duration-700 hover:-translate-y-4">
                             <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto text-blue-600 group-hover:bg-white group-hover:text-slate-900 transition-all shadow-inner">
-                                <stat.icon className="w-8 h-8 font-black" />
+                                <stat.icon className="w-8 h-8 font-bold" />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-5xl font-black text-slate-900 tracking-tighter italic group-hover:text-white transition-colors tabular-nums">{stat.value}</h3>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic group-hover:text-blue-400">{stat.label}</p>
+                                <h3 className="text-5xl font-bold text-slate-900 tracking-tighter  group-hover:text-white transition-colors tabular-nums">{stat.value}</h3>
+                                <p className="text-[10px] font-bold text-slate-400  tracking-widest  group-hover:text-blue-400">{stat.label}</p>
                             </div>
                         </div>
                     ))}
@@ -129,8 +129,8 @@ export default function About() {
                             <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center text-blue-400 shadow-2xl shadow-slate-900/10">
                                 <Mail className="w-10 h-10" />
                             </div>
-                            <h2 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none italic text-slate-900">Get in <br /><span className="text-blue-600">Touch</span></h2>
-                            <p className="text-slate-400 text-xl md:text-2xl font-medium italic max-w-2xl mx-auto leading-relaxed">
+                            <h2 className="text-6xl md:text-8xl font-bold tracking-tighter  leading-none  text-slate-900">Get in <br /><span className="text-blue-600">Touch</span></h2>
+                            <p className="text-slate-400 text-xl md:text-2xl font-medium  max-w-2xl mx-auto leading-relaxed">
                                 Connect with our corporate headquarters for partnership inquiries and technical support. Secure channels initialized.
                             </p>
                         </div>
@@ -138,21 +138,21 @@ export default function About() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 pt-16 border-t border-slate-50 mt-16">
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <Phone className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-900 italic">{settings?.contact_phone || "+1 (555) 000-0000"}</p>
+                                <p className="text-[11px] font-bold  tracking-widest text-slate-900 ">{settings?.contact_phone || "+1 (555) 000-0000"}</p>
                             </div>
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <Mail className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-900 italic truncate px-4">{settings?.contact_email || "office@ecosystem.io"}</p>
+                                <p className="text-[11px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.contact_email || "office@ecosystem.io"}</p>
                             </div>
                             <div className="space-y-4 group cursor-pointer transition-all hover:scale-105">
                                 <MapPin className="w-8 h-8 mx-auto text-blue-600" />
-                                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-900 italic truncate px-4">{settings?.address || "Silicon Valley, Global HQ"}</p>
+                                <p className="text-[11px] font-bold  tracking-widest text-slate-900  truncate px-4">{settings?.address || "Silicon Valley, Global HQ"}</p>
                             </div>
                         </div>
 
                         <Button
                             onClick={() => navigate(storeLink("/contact"))}
-                            className="mt-16 h-24 px-20 rounded-[2rem] bg-slate-900 text-white font-black uppercase tracking-[0.4em] text-[13px] hover:bg-blue-600 transition-all shadow-2xl shadow-slate-900/10 italic border-none"
+                            className="mt-16 h-24 px-20 rounded-[2rem] bg-slate-900 text-white font-bold  tracking-widest text-[13px] hover:bg-blue-600 transition-all shadow-2xl shadow-slate-900/10  border-none"
                         >
                             Contact Support <ArrowRight className="ml-5 w-6 h-6" />
                         </Button>

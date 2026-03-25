@@ -52,9 +52,9 @@ export default function WhatsAppAccounts() {
                         <Smartphone className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{a.display_name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{a.display_name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 WABA ID: {a.waba_id || '987-XXX-YYY'}
                             </span>
                         </div>
@@ -69,11 +69,11 @@ export default function WhatsAppAccounts() {
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2 text-slate-400">
                         <Database size={12}/>
-                        <span className="text-[10px] font-black uppercase tracking-widest">PNID: {a.phone_number_id || '109XXXXXXXX'}</span>
+                        <span className="text-[10px] font-bold  tracking-widest">PNID: {a.phone_number_id || '109XXXXXXXX'}</span>
                     </div>
                     <div className="flex items-center gap-2 text-indigo-400 mt-1">
                         <Facebook size={12}/>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Business API Authorized</span>
+                        <span className="text-[10px] font-bold  tracking-widest">Business API Authorized</span>
                     </div>
                 </div>
             )
@@ -84,7 +84,7 @@ export default function WhatsAppAccounts() {
             render: (a: any) => (
                 <div className="flex items-center gap-2">
                     <Key size={14} className="text-amber-500" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Token encrypted & rotating</span>
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest">Token encrypted & rotating</span>
                 </div>
             )
         },
@@ -125,10 +125,10 @@ export default function WhatsAppAccounts() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <ShieldCheck className="w-3.5 h-3.5" /> Security Audit
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-all flex items-center gap-2">
                         <ExternalLink className="w-3.5 h-3.5" /> Meta Dev Hub
                     </button>
                 </div>

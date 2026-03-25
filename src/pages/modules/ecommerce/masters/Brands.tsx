@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useCrud } from "@/hooks/useCrud";
 import { Award } from "lucide-react";
 import ERPListView from "@/components/modules/ERPListView";
-import { DynamicFormDialog } from "@/components/modules/DynamicFormDialog";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 
 export const Brands = () => {
     const { data, loading, createItem, updateItem, fetchItems } = useCrud("brands");
     const [searchTerm, setSearchTerm] = useState("");
-    const [formOpen, setFormOpen] = useState(false);
+    const [view, setView] = useState<"list" | "form">("list");
     const [editingItem, setEditingItem] = useState<any>(null);
 
     const brandColumns = [
@@ -27,8 +27,8 @@ export const Brands = () => {
             label: "Brand",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[200px]">{row.description || "Vendor Registry Bio"}</span>
+                    <span className="font-bold text-gray-900 tracking-tight">{row.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold tracking-widest mt-1 truncate max-w-[200px]">{row.description || "Vendor Registry Bio"}</span>
                 </div>
             )
         },
@@ -36,7 +36,7 @@ export const Brands = () => {
             key: "is_active", 
             label: "Ledger", 
             render: (row: any) => (
-                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${
+                <div className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-widest border ${
                     row.is_active ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
                 }`}>
                     {row.is_active ? 'Live' : 'Hidden'}
@@ -46,19 +46,18 @@ export const Brands = () => {
     ];
 
     const brandFields = [
-        { key: "logo_url", label: "Brand Logo", type: "image" as const, folder: "brands" },
         { key: "name", label: "Brand Name", required: true },
-        { key: "description", label: "Short History/Bio", type: "textarea" as const },
+        { key: "description", label: "Short History/Bio", type: "text" as const },
     ];
 
     const handleNew = () => {
         setEditingItem(null);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleEdit = (item: any) => {
         setEditingItem(item);
-        setFormOpen(true);
+        setView("form");
     };
 
     const handleSubmit = async (formData: any) => {
@@ -67,7 +66,7 @@ export const Brands = () => {
         } else {
             await createItem(formData);
         }
-        setFormOpen(false);
+        setView("list");
         fetchItems();
     };
 
@@ -75,29 +74,36 @@ export const Brands = () => {
         b.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    if (view === "form") {
+        return (
+            <div className="p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                <ERPEntryForm
+                    title={editingItem ? "Refine Brand Identity" : "Initialize Brand Entry"}
+                    subtitle="Global Master Matrix"
+                    headerFields={brandFields}
+                    onAbort={() => { setView("list"); setEditingItem(null); }}
+                    onSave={handleSubmit}
+                    initialData={editingItem}
+                    showItems={false}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className="h-full flex flex-col">
-            <ERPListView
-                title="Store Brands"
-                data={filteredData}
-                columns={brandColumns}
-                onNew={handleNew}
-                onRefresh={fetchItems}
-                onRowClick={handleEdit}
-                isLoading={loading}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                primaryKey="id"
-            />
-            <DynamicFormDialog
-                open={formOpen}
-                onOpenChange={setFormOpen}
-                title={editingItem ? "Edit Brand Details" : "Register Brand"}
-                fields={brandFields}
-                initialData={editingItem}
-                onSubmit={handleSubmit}
-            />
-        </div>
+        <ERPListView
+            title="Store Brands"
+            data={filteredData}
+            columns={brandColumns}
+            onNew={handleNew}
+            onRefresh={fetchItems}
+            onRowClick={handleEdit}
+            isLoading={loading}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            primaryKey="id"
+        />
     );
 };
+
 

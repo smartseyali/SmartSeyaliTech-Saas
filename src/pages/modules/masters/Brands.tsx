@@ -59,12 +59,12 @@ export default function BrandMaster() {
                         )}
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{b.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{b.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {b.website ? 'GLOBAL HUB AUTHORIZED' : 'INTERNAL NODE'}
                             </span>
-                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest leading-none flex items-center gap-1">
+                            <span className="text-[10px] text-indigo-400 font-bold  tracking-widest leading-none flex items-center gap-1">
                                 <Library size={10}/> {b.sub_brand_count || 0} SUB-NODES
                             </span>
                         </div>
@@ -78,7 +78,7 @@ export default function BrandMaster() {
             render: (b: any) => (
                 <div className="flex items-center gap-2">
                     {b.website && (
-                        <a href={b.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                        <a href={b.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-bold  tracking-widest hover:bg-blue-600 hover:text-white transition-all">
                             <Globe size={10} /> Visit Hub <ExternalLink size={8} />
                         </a>
                     )}
@@ -123,7 +123,7 @@ export default function BrandMaster() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <Building2 className="w-3.5 h-3.5" /> Corporation Matrix
                     </button>
                 </div>

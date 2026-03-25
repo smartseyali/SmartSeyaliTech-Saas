@@ -68,8 +68,8 @@ export default function Customers() {
                         {row.full_name?.charAt(0) || <User className="w-3.5 h-3.5" />}
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{row.full_name || "Anonymous Entity"}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">ID: {row.id.slice(0, 8)}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{row.full_name || "Anonymous Entity"}</span>
+                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">ID: {row.id.slice(0, 8)}</span>
                     </div>
                 </div>
             )
@@ -79,11 +79,11 @@ export default function Customers() {
             label: "Digital contact",
             render: (row: any) => (
                 <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500  tracking-widest">
                         <Mail className="w-3 h-3 text-slate-300" /> {row.email}
                     </div>
                     {row.phone && (
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500  tracking-widest">
                             <Phone className="w-3 h-3 text-slate-300" /> {row.phone}
                         </div>
                     )}
@@ -94,7 +94,7 @@ export default function Customers() {
             key: "created_at", 
             label: "Date",
             render: (row: any) => (
-                <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">
+                <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400  tracking-widest ">
                     <Calendar className="w-3 h-3" />
                     {new Date(row.created_at).toLocaleDateString("en-IN")}
                 </div>
@@ -125,7 +125,7 @@ export default function Customers() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all">
                         Registry Export
                     </button>
                 </div>

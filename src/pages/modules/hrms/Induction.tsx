@@ -62,9 +62,9 @@ export default function EmployeeInduction() {
                         <UserCircle className="w-7 h-7 opacity-80" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{inc.employee_name || 'System Resource Node'}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{inc.employee_name || 'System Resource Node'}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-indigo-600 font-black uppercase tracking-widest leading-none bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                            <span className="text-[10px] text-indigo-600 font-bold  tracking-widest leading-none bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                                 {inc.protocol_name || "CORE INDUCTION"}
                             </span>
                         </div>
@@ -78,8 +78,8 @@ export default function EmployeeInduction() {
             render: (inc: any) => (
                 <div className="flex flex-col">
                     <div className="flex items-center justify-between mb-1.5 w-32">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Nodes</span>
-                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{inc.completed_tasks || 2} / {inc.total_tasks || 8}</span>
+                        <span className="text-[10px] font-bold text-slate-400  tracking-widest">Task Nodes</span>
+                        <span className="text-[10px] font-bold text-slate-900  tracking-widest">{inc.completed_tasks || 2} / {inc.total_tasks || 8}</span>
                     </div>
                     <div className="w-32 h-1 bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-500 w-[25%]" />
@@ -93,7 +93,7 @@ export default function EmployeeInduction() {
             render: (inc: any) => (
                 <div className="flex items-center gap-2">
                     <Clock size={14} className="text-slate-300" />
-                    <span className="text-[11px] font-black text-slate-700 uppercase tracking-tighter">
+                    <span className="text-[11px] font-bold text-slate-700  tracking-tighter">
                          Deadline: {inc.completion_date || '2026-03-25'}
                     </span>
                 </div>
@@ -136,7 +136,7 @@ export default function EmployeeInduction() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all shadow-sm flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all shadow-sm flex items-center gap-2">
                         <Zap className="w-3.5 h-3.5" /> Rapid Induction Sequence
                     </button>
                 </div>

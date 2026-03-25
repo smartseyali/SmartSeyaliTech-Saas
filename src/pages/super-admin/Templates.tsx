@@ -174,15 +174,15 @@ export default function PlatformTemplates() {
         <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Template Engine</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900  ">Template Engine</h1>
                     <p className="text-sm font-medium text-slate-500 mt-2">Manage the visual DNA of the {PLATFORM_CONFIG.name} SaaS ecosystem.</p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" onClick={() => loadData()} className="h-14 border-slate-200 text-slate-700 bg-white font-black rounded-2xl px-6">
+                    <Button variant="outline" onClick={() => loadData()} className="h-14 border-slate-200 text-slate-700 bg-white font-bold rounded-2xl px-6">
                         <Server className="w-5 h-5 mr-2" /> Sync Records
                     </Button>
-                    <Button onClick={() => handleOpenDialog()} className="h-14 bg-black hover:bg-slate-900 text-white font-black rounded-2xl shadow-xl px-8 flex gap-3 transition-transform hover:scale-105 active:scale-95">
+                    <Button onClick={() => handleOpenDialog()} className="h-14 bg-black hover:bg-slate-900 text-white font-bold rounded-2xl shadow-xl px-8 flex gap-3 transition-transform hover:scale-105 active:scale-95">
                         <Plus className="w-5 h-5" /> Register Architecture
                     </Button>
                 </div>
@@ -191,7 +191,7 @@ export default function PlatformTemplates() {
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4">
                     <LayoutTemplate className="w-12 h-12 text-slate-200 animate-pulse" />
-                    <span className="text-xs font-black text-slate-300 uppercase tracking-[0.3em]">Decoding Designs...</span>
+                    <span className="text-xs font-bold text-slate-300  tracking-widest">Decoding Designs...</span>
                 </div>
             ) : templates.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -206,15 +206,15 @@ export default function PlatformTemplates() {
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                                    <Button size="sm" onClick={() => handleOpenDialog(tpl)} className="h-12 rounded-xl bg-white text-slate-900 hover:bg-slate-50 font-black px-8">
+                                    <Button size="sm" onClick={() => handleOpenDialog(tpl)} className="h-12 rounded-xl bg-white text-slate-900 hover:bg-slate-50 font-bold px-8">
                                         <Edit className="w-4 h-4 mr-2" /> Modify
                                     </Button>
-                                    <button onClick={() => handleDelete(tpl.id)} className="w-12 h-12 rounded-xl bg-red-600 text-white hover:bg-red-700 font-black flex items-center justify-center transition-colors">
+                                    <button onClick={() => handleDelete(tpl.id)} className="w-12 h-12 rounded-xl bg-red-600 text-white hover:bg-red-700 font-bold flex items-center justify-center transition-colors">
                                         <Trash2 className="w-5 h-5" />
                                     </button>
                                 </div>
                                 <div className="absolute top-4 left-4 flex gap-2">
-                                    <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-900 shadow-sm transition-transform group-hover:scale-110">
+                                    <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-bold  tracking-widest text-slate-900 shadow-sm transition-transform group-hover:scale-110">
                                         {tpl.industry}
                                     </span>
                                     <div className="w-4 h-4 rounded-full border border-white shadow-sm" style={{ backgroundColor: tpl.color }} />
@@ -223,22 +223,22 @@ export default function PlatformTemplates() {
                             <div className="p-8">
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex-1">
-                                        <h3 className="font-black text-xl text-slate-900 tracking-tight uppercase leading-tight italic">
+                                        <h3 className="font-bold text-xl text-slate-900 tracking-tight  leading-tight ">
                                             {tpl.name}
                                         </h3>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mt-2">Architecture v{tpl.version || '1.0.0'}</p>
+                                        <p className="text-[10px] font-bold  tracking-widest text-blue-600 mt-2">Architecture v{tpl.version || '1.0.0'}</p>
                                     </div>
                                     <div className="px-4 py-2 rounded-2xl bg-slate-50 border border-slate-100 shrink-0">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{tpl.folder}</span>
+                                        <span className="text-[10px] font-bold  tracking-widest text-slate-500 ">{tpl.folder}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-4">
-                                    <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-2 italic mb-4">"{tpl.description}"</p>
-                                    <div className="flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-50 pt-4">
+                                    <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-2  mb-4">"{tpl.description}"</p>
+                                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-400  tracking-widest border-t border-slate-50 pt-4">
                                         <span>Status</span>
                                         <button
                                             onClick={() => handleToggleActive(tpl.id, tpl.is_active)}
-                                            className={`px-4 py-1.5 rounded-full font-black transition-all ${tpl.is_active ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
+                                            className={`px-4 py-1.5 rounded-full font-bold transition-all ${tpl.is_active ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
                                         >
                                             {tpl.is_active ? 'Synchronized' : 'Offline'}
                                         </button>
@@ -254,7 +254,7 @@ export default function PlatformTemplates() {
                         <Box className="w-10 h-10 text-blue-500" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black text-slate-900">No Master Templates Found</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">No Master Templates Found</h2>
                         <p className="text-sm font-medium text-slate-500 mt-2 max-w-md mx-auto">Create a template record pointing to a local physical folder inside `src/templates`.</p>
                     </div>
                     <Button onClick={() => handleOpenDialog()} className="h-14 px-8 bg-black hover:bg-slate-800 text-white font-bold rounded-2xl shadow-xl hover:scale-105 transition-all w-fit mx-auto mt-4">
@@ -271,12 +271,12 @@ export default function PlatformTemplates() {
                     onEscapeKeyDown={(e) => e.preventDefault()}
                 >
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">{editingId ? 'Modify Engine Architecture' : 'Initialize New Design'}</DialogTitle>
+                        <DialogTitle className="text-2xl font-bold   tracking-tighter">{editingId ? 'Modify Engine Architecture' : 'Initialize New Design'}</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-6 py-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Public Name</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Public Name</Label>
                                 <Input
                                     className="font-bold h-12 rounded-xl"
                                     value={formData.name}
@@ -285,7 +285,7 @@ export default function PlatformTemplates() {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">System Folder Name</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">System Folder Name</Label>
                                 <Input
                                     className="font-mono text-sm h-12 rounded-xl bg-slate-50 border-none"
                                     value={formData.folder}
@@ -296,7 +296,7 @@ export default function PlatformTemplates() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Marketing Pitch / Description</Label>
+                            <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Marketing Pitch / Description</Label>
                             <Input
                                 className="font-semibold h-12 rounded-xl"
                                 value={formData.description}
@@ -307,7 +307,7 @@ export default function PlatformTemplates() {
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Core Industry</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Core Industry</Label>
                                 <select
                                     className="h-12 rounded-xl bg-white border-2 font-bold px-3 text-sm focus:border-black outline-none transition-colors"
                                     value={formData.industry}
@@ -319,7 +319,7 @@ export default function PlatformTemplates() {
                                 </select>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Version Sync</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Version Sync</Label>
                                 <Input
                                     className="font-bold h-12 rounded-xl"
                                     value={formData.version}
@@ -328,7 +328,7 @@ export default function PlatformTemplates() {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Comp. Count</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Comp. Count</Label>
                                 <Input
                                     type="number"
                                     className="font-bold h-12 rounded-xl"
@@ -340,7 +340,7 @@ export default function PlatformTemplates() {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Primary Branding Color</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Primary Branding Color</Label>
                                 <div className="flex items-center gap-3">
                                     <Input
                                         type="color"
@@ -349,14 +349,14 @@ export default function PlatformTemplates() {
                                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     />
                                     <Input
-                                        className="font-mono text-xs uppercase flex-1 h-12 rounded-xl bg-slate-50 border-none"
+                                        className="font-mono text-xs  flex-1 h-12 rounded-xl bg-slate-50 border-none"
                                         value={formData.color}
                                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Global Categories (Comma separated)</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Global Categories (Comma separated)</Label>
                                 <Input
                                     className="font-bold text-sm h-12 rounded-xl"
                                     value={formData.tags}
@@ -368,7 +368,7 @@ export default function PlatformTemplates() {
 
                         <div className="space-y-4 bg-slate-50 p-6 rounded-[32px] border border-slate-100">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Primary Feature Image (URL)</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-blue-600">Primary Feature Image (URL)</Label>
                                 <Input
                                     className="font-medium text-xs h-12 rounded-xl bg-white border-none shadow-sm"
                                     value={formData.preview_image}
@@ -378,14 +378,14 @@ export default function PlatformTemplates() {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gallery Preview Nodes (One URL per line)</Label>
+                                <Label className="text-[10px] font-bold  tracking-widest text-slate-400">Gallery Preview Nodes (One URL per line)</Label>
                                 <Textarea
                                     className="min-h-[140px] font-medium text-[10px] leading-relaxed rounded-2xl bg-white border-none shadow-sm p-4"
                                     value={formData.gallery_images}
                                     onChange={(e) => setFormData({ ...formData, gallery_images: e.target.value })}
                                     placeholder="https://images.unsplash.com/photo-1... &#10;https://images.unsplash.com/photo-2..."
                                 />
-                                <span className="text-[9px] font-bold text-slate-400 italic">This powers the multi-image swiper in the onboarding preview.</span>
+                                <span className="text-[9px] font-bold text-slate-400 ">This powers the multi-image swiper in the onboarding preview.</span>
                             </div>
                         </div>
 
@@ -397,14 +397,14 @@ export default function PlatformTemplates() {
                             >
                                 <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all ${formData.is_active ? 'left-[32px]' : 'left-1'}`} />
                             </button>
-                            <Label className="text-xs font-black text-slate-900 uppercase tracking-widest cursor-pointer" onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}>
+                            <Label className="text-xs font-bold text-slate-900  tracking-widest cursor-pointer" onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}>
                                 Deploy Architecture Globally
                             </Label>
                         </div>
                     </div>
                     <DialogFooter className="gap-2">
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="font-black uppercase text-[10px] tracking-widest px-8">Abort</Button>
-                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 px-10 bg-black text-white hover:bg-slate-900 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="font-bold  text-[10px] tracking-widest px-8">Abort</Button>
+                        <Button onClick={handleSave} disabled={isSubmitting} className="h-14 px-10 bg-black text-white hover:bg-slate-900 rounded-2xl font-bold  text-[10px] tracking-widest shadow-xl">
                             {isSubmitting ? "Processing..." : "Commit Infrastructure"}
                         </Button>
                     </DialogFooter>

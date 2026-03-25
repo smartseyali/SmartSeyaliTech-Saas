@@ -32,7 +32,6 @@ import {
     Building2,
     Database,
     Key,
-    Ruler,
     Palette,
     Flag,
     Hash,
@@ -43,7 +42,12 @@ import {
     Smartphone,
     Binary,
     Flame,
-    Clock
+    Clock,
+    Layers,
+    ListTree,
+    Ruler,
+    DollarSign,
+    Percent
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -100,14 +104,10 @@ const INDUSTRY_MAP: Record<string, any> = {
 const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
     ecommerce: [
         {
-            label: "Catalog & Media",
+            label: "Website & Media",
             module: "ecommerce",
-            icon: Library,
+            icon: Layout,
             items: [
-                { title: "Item Master", url: "/apps/ecommerce/masters/products", icon: Boxes, resource: "products" },
-                { title: "Department Matrix", url: "/apps/ecommerce/masters/categories", icon: LayoutGrid, resource: "products" },
-                { title: "Brand Entries", url: "/apps/ecommerce/masters/brands", icon: Award, resource: "products" },
-                { title: "Category Hub", url: "/apps/ecommerce/masters/collections", icon: Library, resource: "products" },
                 { title: "Landing Banners", url: "/apps/ecommerce/banners", icon: Layout, resource: "marketing" },
                 { title: "Asset Gallery", url: "/apps/ecommerce/gallery", icon: ImageIcon, resource: "products" },
             ],
@@ -118,7 +118,6 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
             icon: ShoppingBag,
             items: [
                 { title: "Sales Orders", url: "/apps/ecommerce/orders", icon: EcomCart, resource: "orders" },
-                { title: "Party Master", url: "/apps/ecommerce/customers", icon: Users, resource: "customers" },
                 { title: "Delivery Challans", url: "/apps/ecommerce/deliveries", icon: Truck, resource: "orders" },
                 { title: "Sales Returns", url: "/apps/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
                 { title: "Pending Inquiry", url: "/apps/ecommerce/abandoned-carts", icon: ShoppingBag, resource: "orders" },
@@ -161,23 +160,14 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
     ],
     crm: [
         {
-            label: "Sales Pipeline",
+            label: "Pipeline Matrix",
             module: "crm",
             icon: Zap,
             items: [
                 { title: "Inquiry Nodes", url: "/apps/crm/leads", icon: Users, resource: "leads" },
                 { title: "Deal Pipeline", url: "/apps/crm/deals", icon: ShoppingBag, resource: "deals" },
-                { title: "Kanban View", url: "/apps/crm/pipeline", icon: LayoutGrid, resource: "deals" },
+                { title: "Segments Hub", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
                 { title: "Sales Forecast", url: "/apps/crm/forecast", icon: BarChart3, resource: "analytics" },
-            ],
-        },
-        {
-            label: "Customer Data",
-            module: "crm",
-            icon: Users,
-            items: [
-                { title: "Accounts", url: "/apps/crm/accounts", icon: Library, resource: "customers" },
-                { title: "Segments", url: "/apps/crm/segments", icon: Tag, resource: "marketing" },
             ],
         }
     ],
@@ -350,33 +340,40 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
     ],
     masters: [
         {
-            label: "Operational Resources",
+            label: "Product Master",
             module: "masters",
             icon: Boxes,
             items: [
-                { title: "Item Master", url: "/apps/masters/items", icon: Box, resource: "products" },
-                { title: "Category Tree", url: "/apps/masters/categories", icon: LayoutGrid, resource: "products" },
-                { title: "Brand Entries", url: "/apps/masters/brands", icon: Flag, resource: "products" },
-                { title: "UOM Registry", url: "/apps/masters/uoms", icon: Scale, resource: "products" },
+                { title: "Product Catalogue", url: "/apps/masters/items", icon: Box, resource: "products" },
+                { title: "Variant Registry", url: "/apps/masters/variants", icon: Binary, resource: "products" },
+                { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
             ]
         },
         {
-            label: "Catalog Engineering",
+            label: "Category & Brand",
             module: "masters",
-            icon: Settings,
+            icon: LayoutGrid,
             items: [
-                { title: "Attribute Master", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
-                { title: "Variant Hub", url: "/apps/masters/variants", icon: Binary, resource: "products" },
-                { title: "Review Moderation", url: "/apps/masters/reviews", icon: Star, resource: "products" },
+                { title: "Category Tree", url: "/apps/masters/categories", icon: ListTree, resource: "products" },
+                { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
             ]
         },
         {
-            label: "Entity Management",
+            label: "UOM & Fiscal",
+            module: "masters",
+            icon: Scale,
+            items: [
+                { title: "UOM Register", url: "/apps/masters/uoms", icon: Ruler, resource: "products" },
+                { title: "Tax Mapping", url: "/apps/masters/tax", icon: Percent, resource: "products" },
+                { title: "Price Lists", url: "/apps/masters/pricing", icon: DollarSign, resource: "products" },
+            ]
+        },
+        {
+            label: "Entity Control",
             module: "masters",
             icon: Users,
             items: [
-                { title: "Party Hub", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
-                { title: "Location Master", url: "/apps/masters/departments", icon: Building2, resource: "team" },
+                { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
             ]
         }
     ],
@@ -428,16 +425,11 @@ const MODULE_NAV_MAP: Record<string, NavGroup[]> = {
 
 const INIT_NAV_GROUPS: NavGroup[] = [
     {
-        label: "INIT & MASTERS",
+        label: "FOUNDATION",
         module: "masters",
-        icon: Settings,
+        icon: Database,
         items: [
-            { title: "Item Registry", url: "/apps/masters/items", icon: Box, resource: "products" },
-            { title: "Category Matrix", url: "/apps/masters/categories", icon: LayoutGrid, resource: "products" },
-            { title: "Brand Identities", url: "/apps/masters/brands", icon: Flag, resource: "products" },
-            { title: "UOM Protocols", url: "/apps/masters/uoms", icon: Scale, resource: "products" },
-            { title: "Attribute Matrix", url: "/apps/masters/attributes", icon: Tag, resource: "products" },
-            { title: "Unified Contacts", url: "/apps/masters/contacts", icon: Users, resource: "customers" },
+            { title: "Master Hub", url: "/apps/masters", icon: Layers, resource: "products" },
         ]
     }
 ];
@@ -451,8 +443,7 @@ export const getCurrentModule = (pathname: string): string => {
         
         // Seamless Universal Module Logic: Unify navigation focus
         if (mod === 'masters') {
-            const cachedModule = localStorage.getItem('erp_active_framework') || 'ecommerce';
-            return MODULE_NAV_MAP[cachedModule] ? cachedModule : 'ecommerce';
+            return 'masters';
         }
         
         // Cache module state if it's a valid root
@@ -651,7 +642,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                             activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
                         >
                             <LayoutGrid className="w-4 h-4 shrink-0" />
-                            {!collapsed && <span className="flex-1 truncate font-bold uppercase tracking-widest text-[9px]">App Launcher</span>}
+                            {!collapsed && <span className="flex-1 truncate font-bold text-[10px]">App Launcher</span>}
                         </NavLink>
                     )}
                     <NavLink
@@ -675,45 +666,66 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
                         return (
                             <div key={group.label} className="space-y-0.5">
-                                {!collapsed && (
-                                    <div className="px-3 py-1 mt-2">
-                                        <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-slate-400">{group.label}</p>
-                                    </div>
-                                )}
-                                {visibleItems.map((item) => {
-                                    const isExternal = item.url === "STOREFRONT";
-                                    if (isExternal) {
-                                        return (
-                                            <a
+                                {group.label === "FOUNDATION" ? (
+                                    <div className="px-2 py-4">
+                                        {visibleItems.map((item) => (
+                                            <NavLink
                                                 key={item.url}
-                                                href={`/${activeCompany?.subdomain || ''}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                                to={item.url}
                                                 className={cn(
-                                                    "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-600 hover:text-slate-900 hover:bg-slate-50",
-                                                    collapsed ? "justify-center" : ""
+                                                    "group flex flex-col items-center justify-center p-4 rounded-2xl transition-all font-bold text-[13px] relative bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:scale-[1.02] active:scale-95",
+                                                    collapsed ? "p-2" : ""
                                                 )}
+                                                activeClassName="ring-2 ring-indigo-300 ring-offset-2"
                                             >
-                                                <item.icon className="w-3.5 h-3.5 shrink-0" />
-                                                {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
-                                            </a>
-                                        );
-                                    }
-                                    return (
-                                        <NavLink
-                                            key={item.url}
-                                            to={item.url}
-                                            className={cn(
-                                                "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-500 hover:text-slate-900 relative",
-                                                collapsed ? "justify-center" : ""
-                                            )}
-                                            activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
-                                        >
-                                            <item.icon className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110" />
-                                            {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
-                                        </NavLink>
-                                    );
-                                })}
+                                                <item.icon className={cn("w-6 h-6 mb-2 transition-transform group-hover:rotate-12", collapsed ? "mb-0" : "")} />
+                                                {!collapsed && <span className="text-[11px] uppercase tracking-widest">{item.title}</span>}
+                                            </NavLink>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <>
+                                        {!collapsed && (
+                                            <div className="px-3 py-1 mt-2">
+                                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{group.label}</p>
+                                            </div>
+                                        )}
+                                        {visibleItems.map((item) => {
+                                            const isExternal = item.url === "STOREFRONT";
+                                            if (isExternal) {
+                                                return (
+                                                    <a
+                                                        key={item.url}
+                                                        href={`/${activeCompany?.subdomain || ''}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={cn(
+                                                            "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+                                                            collapsed ? "justify-center" : ""
+                                                        )}
+                                                    >
+                                                        <item.icon className="w-3.5 h-3.5 shrink-0" />
+                                                        {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
+                                                    </a>
+                                                );
+                                            }
+                                            return (
+                                                <NavLink
+                                                    key={item.url}
+                                                    to={item.url}
+                                                    className={cn(
+                                                        "group flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-[12px] text-slate-500 hover:text-slate-900 relative",
+                                                        collapsed ? "justify-center" : ""
+                                                    )}
+                                                    activeClassName="text-blue-600 bg-blue-50/50 font-semibold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:bg-blue-600 before:rounded-r-full"
+                                                >
+                                                    <item.icon className="w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                                                    {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
+                                                </NavLink>
+                                            );
+                                        })}
+                                    </>
+                                )}
                             </div>
                         );
                     })}

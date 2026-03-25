@@ -54,8 +54,8 @@ export default function Projects() {
                         <Construction className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{p.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">{p.code || "PRJ-IDENTITY-UNSET"}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{p.name}</span>
+                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none mt-1">{p.code || "PRJ-IDENTITY-UNSET"}</span>
                     </div>
                 </div>
             )
@@ -65,7 +65,7 @@ export default function Projects() {
             label: "Delivery Schedule",
             render: (p: any) => (
                 <div className="flex flex-col">
-                    <span className="text-[11px] font-black text-slate-700 uppercase tracking-tighter flex items-center gap-2">
+                    <span className="text-[11px] font-bold text-slate-700  tracking-tighter flex items-center gap-2">
                         <Calendar size={12} className="text-slate-300"/> {p.start_date || 'TBD'} → {p.end_date || 'TBD'}
                     </span>
                     <div className="w-24 h-1 bg-slate-100 rounded-full mt-2 overflow-hidden">
@@ -80,7 +80,7 @@ export default function Projects() {
             render: () => (
                 <div className="flex items-center gap-2">
                     <Milestone size={14} className="text-amber-500" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">4 / 12 Nodes</span>
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest">4 / 12 Nodes</span>
                 </div>
             )
         },
@@ -126,7 +126,7 @@ export default function Projects() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-violet-50 text-violet-600 border border-violet-100 hover:bg-violet-100 transition-all flex items-center gap-2 shadow-sm">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-violet-50 text-violet-600 border border-violet-100 hover:bg-violet-100 transition-all flex items-center gap-2 shadow-sm">
                         <BarChart3 className="w-3.5 h-3.5" /> Gantt Timeline
                     </button>
                 </div>

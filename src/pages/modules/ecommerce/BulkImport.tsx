@@ -87,7 +87,7 @@ export default function BulkImport() {
                         <ArrowLeft className="w-4 h-4 mr-1.5" /> Back
                     </Button>
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-0.5">Catalog Operations</p>
+                        <p className="text-xs font-bold  tracking-widest text-slate-400 mb-0.5">Catalog Operations</p>
                         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Bulk Product Import</h1>
                     </div>
                 </div>
@@ -124,7 +124,7 @@ export default function BulkImport() {
                                 <FileText className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">File Preview</p>
+                                <p className="text-xs font-bold text-slate-400  tracking-widest">File Preview</p>
                                 <p className="text-sm font-bold text-slate-900">{file?.name} · {previewData.length} products found</p>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ export default function BulkImport() {
                                 <thead className="bg-slate-50 border-b border-slate-100">
                                     <tr>
                                         {TEMPLATE_HEADERS.map(h => (
-                                            <th key={h} className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
+                                            <th key={h} className="px-4 py-3 text-[10px] font-bold  tracking-widest text-slate-400 whitespace-nowrap">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
@@ -198,7 +198,7 @@ export default function BulkImport() {
                         <Button variant="ghost" onClick={() => setStatus("preview")} className="rounded-xl text-rose-600 hover:bg-rose-100 shrink-0">Retry</Button>
                     </div>
                     <div className="bg-slate-900 rounded-2xl p-5 font-mono text-xs text-rose-400 space-y-2 max-h-52 overflow-y-auto">
-                        <p className="text-slate-500 border-b border-slate-700 pb-2 mb-3 font-sans text-[10px] uppercase tracking-widest">Error Log</p>
+                        <p className="text-slate-500 border-b border-slate-700 pb-2 mb-3 font-sans text-[10px]  tracking-widest">Error Log</p>
                         {errorLogs.map((log, i) => <p key={i}>&gt; {log}</p>)}
                     </div>
                 </div>

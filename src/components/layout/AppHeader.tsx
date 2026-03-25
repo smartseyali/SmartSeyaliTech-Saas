@@ -60,8 +60,8 @@ export function AppHeader() {
                         </PopoverTrigger>
                         <PopoverContent align="end" sideOffset={8} className="w-[340px] p-4 rounded-2xl shadow-2xl border border-slate-100">
                             <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{PLATFORM_CONFIG.name} Apps</p>
-                                <Link to="/apps" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                <p className="text-[10px] font-bold  tracking-widest text-slate-400">{PLATFORM_CONFIG.name} Apps</p>
+                                <Link to="/apps" className="text-[10px] font-bold  tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1">
                                     All Apps <ExternalLink className="w-3 h-3" />
                                 </Link>
                             </div>
@@ -137,7 +137,7 @@ export function AppHeader() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl border-slate-200">
-                            <DropdownMenuLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wider text-slate-400">Account</DropdownMenuLabel>
+                            <DropdownMenuLabel className="px-2 py-2 text-xs font-bold  tracking-wider text-slate-400">Account</DropdownMenuLabel>
                             <DropdownMenuItem className="rounded-lg gap-3 cursor-pointer py-2.5 text-slate-600 focus:bg-slate-50 focus:text-blue-600">
                                 <User className="w-4 h-4" />
                                 <span className="font-medium">Profile</span>

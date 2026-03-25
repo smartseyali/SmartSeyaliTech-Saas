@@ -132,7 +132,7 @@ import InventoryItems from "./pages/modules/inventory/Items";
 import Warehouses from "./pages/modules/inventory/Warehouses";
 
 // ── MASTER REGISTRY (Common Foundation) ──
-import RegistryDashboard from "./pages/modules/masters/RegistryDashboard";
+import MasterDashboard from "./pages/modules/masters/MasterDashboard";
 import MastersItems from "./pages/modules/masters/Items";
 import MastersContacts from "./pages/modules/masters/Contacts";
 import MastersCategories from "./pages/modules/masters/Categories";
@@ -429,7 +429,7 @@ const App = () => (
                                             <Route path="/apps/inventory/batches" element={<ProtectedRoute><BatchTracking /></ProtectedRoute>} />
 
                                             {/* Master Registry (Foundation) */}
-                                            <Route path="/apps/masters" element={<ProtectedRoute><RegistryDashboard /></ProtectedRoute>} />
+                                            <Route path="/apps/masters" element={<ProtectedRoute><MasterDashboard /></ProtectedRoute>} />
                                             <Route path="/apps/masters/items" element={<ProtectedRoute><MastersItems /></ProtectedRoute>} />
                                              <Route path="/apps/masters/contacts" element={<ProtectedRoute><MastersContacts /></ProtectedRoute>} />
                                              <Route path="/apps/masters/categories" element={<ProtectedRoute><MastersCategories /></ProtectedRoute>} />

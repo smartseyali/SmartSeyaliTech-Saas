@@ -119,7 +119,7 @@ function StepDots({ current, steps }: { current: number, steps: string[] }) {
                             {isDone ? <Check className="w-4 h-4 stroke-[3]" /> : stepNum}
                         </div>
                         {isActive && (
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-900 mr-2">
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-900 mr-2">
                                 {label}
                             </span>
                         )}
@@ -564,8 +564,8 @@ export default function Onboarding() {
 
     // ── UI Styles ──────────────────────────────────────────────
     // ── UI Styles ──────────────────────────────────────────────
-    const nextBtnCls = "w-full h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary-600/10";
-    const backBtnCls = "h-14 px-6 border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all border shadow-sm";
+    const nextBtnCls = "w-full h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold  tracking-widest text-xs flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary-600/10";
+    const backBtnCls = "h-14 px-6 border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-bold  text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all border shadow-sm";
 
     // Orchestration Guard: If auth is loading, a redirect is imminent, or system is initializing
     if (initializing || pLoading || isRedirecting) {
@@ -633,7 +633,7 @@ export default function Onboarding() {
                                 <div key={i} className="flex items-center gap-4 lg:gap-8">
                                     <div className="space-y-1">
                                         <p className="text-xl lg:text-2xl font-bold">{stat.val}</p>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                                        <p className="text-[10px] font-bold text-slate-400  tracking-widest">{stat.label}</p>
                                     </div>
                                     {i < brandingContent[bgImageIndex].stats.length - 1 && (
                                         <div className="w-px h-8 bg-slate-700" />
@@ -655,19 +655,19 @@ export default function Onboarding() {
                             <span className="text-lg font-bold text-gray-900">{PLATFORM_CONFIG.name}</span>
                         </Link>
                     </div>
-                    <div className="hidden lg:block text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">
+                    <div className="hidden lg:block text-[10px] font-bold text-slate-400  tracking-widest">
                         Project Configuration Environment
                     </div>
                     <div className="flex items-center gap-4">
                         {user && (
                             <button
                                 onClick={async () => { await signOut(); navigate('/login'); }}
-                                className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
+                                className="text-[10px] font-bold  tracking-widest text-red-500 hover:text-red-600 transition-colors"
                             >
                                 Sign Out
                             </button>
                         )}
-                        <Link to="/login" className="text-[10px] font-bold uppercase tracking-widest text-primary-600 hover:underline">
+                        <Link to="/login" className="text-[10px] font-bold  tracking-widest text-primary-600 hover:underline">
                             Login Support →
                         </Link>
                     </div>
@@ -693,7 +693,7 @@ export default function Onboarding() {
 
                                     <div className="space-y-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Business Name</label>
+                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Business Name</label>
                                             <input
                                                 type="text"
                                                 value={storeName}
@@ -705,8 +705,8 @@ export default function Onboarding() {
 
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Select Solution Suites</label>
-                                                <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Select Solution Suites</label>
+                                                <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full  tracking-widest">
                                                     {selectedModules.length} Selected
                                                 </span>
                                             </div>
@@ -738,7 +738,7 @@ export default function Onboarding() {
                                                             </div>
                                                             <div className="flex-1 min-w-0">
                                                                 <h3 className="font-bold text-[13px] text-gray-900 truncate">{mod.name}</h3>
-                                                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tight truncate">{mod.tagline || 'Essential app'}</p>
+                                                                <p className="text-[9px] font-bold text-gray-400  tracking-tight truncate">{mod.tagline || 'Essential app'}</p>
                                                             </div>
                                                             {isSelected && (
                                                                 <div className="w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center shadow-lg">
@@ -783,10 +783,10 @@ export default function Onboarding() {
                                                         selectedPlan === plan.id ? "border-primary-600 bg-primary-50/20 ring-1 ring-primary-600 shadow-xl" : "border-gray-100 bg-slate-50/50 hover:border-gray-200"
                                                     )}>
                                                     {selectedPlan === plan.id && (
-                                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Most Popular</div>
+                                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-full  tracking-widest shadow-lg">Most Popular</div>
                                                     )}
                                                     <div className="space-y-1">
-                                                        <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400 group-hover:text-primary-600">{plan.name}</h3>
+                                                        <h3 className="font-bold text-xs  tracking-widest text-slate-400 group-hover:text-primary-600">{plan.name}</h3>
                                                         <p className="text-3xl font-bold text-slate-900 tracking-tight">${plan.price_monthly}<span className="text-sm font-bold text-slate-400 ml-1">/mo</span></p>
                                                     </div>
                                                     <ul className="space-y-3 flex-1">
@@ -821,7 +821,7 @@ export default function Onboarding() {
                                             {['retail', 'education', 'services'].map(t => (
                                                 <button key={t} onClick={() => setIndustryType(t as any)}
                                                     className={cn(
-                                                        "px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                        "px-5 py-2 rounded-lg text-[10px] font-bold  tracking-widest transition-all",
                                                         industryType === t ? "bg-white text-primary-600 shadow-sm border border-gray-100" : "text-slate-500 hover:text-slate-700"
                                                     )}>
                                                     {t === 'retail' ? 'Modern' : t === 'education' ? 'Corporate' : 'Creative'}
@@ -843,8 +843,8 @@ export default function Onboarding() {
                                                     <div className="aspect-[16/10] relative overflow-hidden">
                                                         <img src={tmpl.preview_image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                                                         <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-3">
-                                                            <Button onClick={() => setPreviewingTemplate(tmpl)} variant="outline" className="h-10 px-6 bg-white/10 backdrop-blur-md border-white/20 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-white/20">Preview</Button>
-                                                            <Button onClick={() => setSelectedTemplate(tmpl.id)} className="h-10 px-6 bg-primary-600 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl shadow-lg">
+                                                            <Button onClick={() => setPreviewingTemplate(tmpl)} variant="outline" className="h-10 px-6 bg-white/10 backdrop-blur-md border-white/20 text-white font-bold text-[10px]  tracking-widest rounded-xl hover:bg-white/20">Preview</Button>
+                                                            <Button onClick={() => setSelectedTemplate(tmpl.id)} className="h-10 px-6 bg-primary-600 text-white font-bold text-[10px]  tracking-widest rounded-xl shadow-lg">
                                                                 {selectedTemplate === tmpl.id ? 'Selected' : 'Choose Theme'}
                                                             </Button>
                                                         </div>
@@ -853,7 +853,7 @@ export default function Onboarding() {
                                                         <h3 className="font-bold text-gray-900 text-sm tracking-tight">{tmpl.name}</h3>
                                                         <div className="flex items-center gap-2 mt-2">
                                                             <div className="w-2 h-2 rounded-full bg-primary-600" />
-                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tmpl.tags?.[0] || 'Modern'} Layout</p>
+                                                            <p className="text-[10px] font-bold text-gray-400  tracking-widest">{tmpl.tags?.[0] || 'Modern'} Layout</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -884,7 +884,7 @@ export default function Onboarding() {
 
                                     <div className="space-y-5 max-w-2xl">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Full Name</label>
                                             <div className="relative group">
                                                 <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
                                                 <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Natesh Kumar"
@@ -893,7 +893,7 @@ export default function Onboarding() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Work Email</label>
+                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Work Email</label>
                                             <div className="relative group">
                                                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
                                                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@company.com"
@@ -903,7 +903,7 @@ export default function Onboarding() {
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Password</label>
                                                 <div className="relative group">
                                                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
                                                     <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
@@ -914,7 +914,7 @@ export default function Onboarding() {
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm</label>
+                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Confirm</label>
                                                 <div className="relative group">
                                                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
                                                     <input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••"
@@ -934,7 +934,7 @@ export default function Onboarding() {
                                         </div>
                                     </div>
 
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center pt-10 border-t border-gray-50 grayscale opacity-50">
+                                    <p className="text-[10px] text-gray-400 font-bold  tracking-widest text-center pt-10 border-t border-gray-50 grayscale opacity-50">
                                         Secured by {PLATFORM_CONFIG.name} Identity Protocol
                                     </p>
                                 </motion.div>
@@ -962,8 +962,8 @@ export default function Onboarding() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <h1 className="text-xs font-bold text-emerald-500 uppercase tracking-[0.8em]">Deployment Complete</h1>
-                                        <h2 className="text-4xl font-bold text-gray-900 tracking-tighter italic">
+                                        <h1 className="text-xs font-bold text-emerald-500  tracking-[0.8em]">Deployment Complete</h1>
+                                        <h2 className="text-4xl font-bold text-gray-900 tracking-tighter ">
                                             Ready to <span className="text-primary-600">Scale</span>
                                         </h2>
                                         <p className="text-gray-500 font-medium max-w-sm mx-auto">
@@ -973,14 +973,14 @@ export default function Onboarding() {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-lg mx-auto pt-6">
                                         <Button onClick={() => window.location.href = `/stores/${slug}/index.html`}
-                                            className="h-16 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-2xl transition-all">
+                                            className="h-16 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold  tracking-widest text-[10px] shadow-2xl transition-all">
                                             <Rocket className="w-4 h-4 mr-2" /> View Shop
                                         </Button>
                                         <Button onClick={async () => {
                                             await refreshTenant();
                                             navigate("/apps");
                                         }}
-                                            className="h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-2xl shadow-primary-600/20 transition-all">
+                                            className="h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold  tracking-widest text-[10px] shadow-2xl shadow-primary-600/20 transition-all">
                                             <Layers className="w-4 h-4 mr-2" /> Launch Console
                                         </Button>
                                     </div>
@@ -994,15 +994,15 @@ export default function Onboarding() {
                 <div className="p-6 border-t border-gray-50 flex justify-center gap-10 opacity-30 grayscale pointer-events-none mt-auto">
                     <div className="flex flex-col items-center">
                         <Check className="w-6 h-6 mb-1" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Enterprise</span>
+                        <span className="text-[10px] font-bold  tracking-widest">Enterprise</span>
                     </div>
                     <div className="flex flex-col items-center">
                         <Lock className="w-6 h-6 mb-1" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
+                        <span className="text-[10px] font-bold  tracking-widest">Encrypted</span>
                     </div>
                     <div className="flex flex-col items-center">
                         <Rocket className="w-6 h-6 mb-1" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Global</span>
+                        <span className="text-[10px] font-bold  tracking-widest">Global</span>
                     </div>
                 </div>
             </div>
@@ -1033,8 +1033,8 @@ export default function Onboarding() {
                                     ))}
                                 </div>
                                 <div className="absolute top-12 left-12 text-slate-900 p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-100 shadow-xl">
-                                    <h3 className="text-2xl font-black tracking-tighter uppercase italic leading-none">{previewingTemplate.name}</h3>
-                                    <p className="text-primary-600 text-[9px] font-bold mt-1 tracking-[0.3em] uppercase">Enterprise Theme</p>
+                                    <h3 className="text-2xl font-bold tracking-tighter   leading-none">{previewingTemplate.name}</h3>
+                                    <p className="text-primary-600 text-[9px] font-bold mt-1 tracking-widest ">Enterprise Theme</p>
                                 </div>
                             </div>
 
@@ -1046,28 +1046,28 @@ export default function Onboarding() {
 
                                 <div className="mt-8 space-y-10 flex-1">
                                     <div>
-                                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary-600 mb-4">About Theme</h4>
-                                        <p className="text-slate-500 font-bold text-xs leading-relaxed border-l-4 border-slate-100 pl-6 uppercase tracking-wide">{previewingTemplate.description}</p>
+                                        <h4 className="text-[10px] font-bold  tracking-widest text-primary-600 mb-4">About Theme</h4>
+                                        <p className="text-slate-500 font-bold text-xs leading-relaxed border-l-4 border-slate-100 pl-6  tracking-wide">{previewingTemplate.description}</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">
                                         <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300 mb-1">Industry</p>
-                                            <p className="text-sm font-bold text-slate-800 uppercase tracking-tight">{previewingTemplate.industry}</p>
+                                            <p className="text-[9px] font-bold  tracking-widest text-slate-300 mb-1">Industry</p>
+                                            <p className="text-sm font-bold text-slate-800  tracking-tight">{previewingTemplate.industry}</p>
                                         </div>
                                         <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300 mb-1">Architecture</p>
-                                            <p className="text-sm font-bold text-slate-800 uppercase tracking-tight">{previewingTemplate.component_count || 12}+ Standard Modules</p>
+                                            <p className="text-[9px] font-bold  tracking-widest text-slate-300 mb-1">Architecture</p>
+                                            <p className="text-sm font-bold text-slate-800  tracking-tight">{previewingTemplate.component_count || 12}+ Standard Modules</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="mt-auto pt-8 border-t border-slate-50 space-y-4">
                                     <Button onClick={() => { setSelectedTemplate(previewingTemplate.id); setPreviewingTemplate(null); }}
-                                        className="w-full h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary-600/10 transition-all">
+                                        className="w-full h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold  tracking-widest text-[10px] shadow-xl shadow-primary-600/10 transition-all">
                                         Use This Theme
                                     </Button>
-                                    <p className="text-center text-[8px] font-bold text-slate-200 uppercase tracking-[0.3em]">{PLATFORM_CONFIG.name} Proprietary Design</p>
+                                    <p className="text-center text-[8px] font-bold text-slate-200  tracking-widest">{PLATFORM_CONFIG.name} Proprietary Design</p>
                                 </div>
                             </div>
                         </motion.div>

@@ -59,7 +59,7 @@ function ModalShell({ open, onClose, title, subtitle, onSave, saving, saveLabel,
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <div>
                         <h2 className="text-xl font-bold tracking-tight text-slate-900">{title}</h2>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{subtitle}</p>
+                        <p className="text-[10px] font-bold  tracking-widest text-slate-400 mt-0.5">{subtitle}</p>
                     </div>
                     <button onClick={onClose} className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-all active:scale-90">
                         <X className="w-5 h-5" />
@@ -208,7 +208,7 @@ function BannersTab({ companyId }: { companyId: number }) {
                                         <>
                                             <img src={b.image_url} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent flex flex-col justify-end p-5">
-                                                {b.badge_text && <span className="px-2.5 py-1 bg-blue-600 text-white text-[9px] font-bold rounded-lg w-fit mb-2 uppercase tracking-wide">{b.badge_text}</span>}
+                                                {b.badge_text && <span className="px-2.5 py-1 bg-blue-600 text-white text-[9px] font-bold rounded-lg w-fit mb-2  tracking-wide">{b.badge_text}</span>}
                                                 {b.title && <p className="text-white text-lg font-bold leading-tight">{b.title}</p>}
                                             </div>
                                         </>
@@ -221,9 +221,9 @@ function BannersTab({ companyId }: { companyId: number }) {
                                 <div className="flex-1 p-6 flex items-start justify-between gap-4">
                                     <div className="space-y-3 flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-wide">{pos.label}</span>
-                                            {isExpired && <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-rose-50 text-rose-500 uppercase">Expired</span>}
-                                            {!b.is_active && <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-500 uppercase">Inactive</span>}
+                                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500  tracking-wide">{pos.label}</span>
+                                            {isExpired && <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-rose-50 text-rose-500 ">Expired</span>}
+                                            {!b.is_active && <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-500 ">Inactive</span>}
                                         </div>
                                         <h4 className="text-base font-bold text-slate-900 truncate">{b.title || "Untitled Banner"}</h4>
                                         {b.subtitle && <p className="text-sm text-slate-400 line-clamp-1">{b.subtitle}</p>}
@@ -260,7 +260,7 @@ function BannersTab({ companyId }: { companyId: number }) {
                     <div className="relative w-full h-40 rounded-xl overflow-hidden">
                         <img src={form.image_url} className="w-full h-full object-cover" alt="preview" />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex flex-col justify-end p-4">
-                            {form.badge_text && <span className="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded w-fit mb-1 uppercase">{form.badge_text}</span>}
+                            {form.badge_text && <span className="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded w-fit mb-1 ">{form.badge_text}</span>}
                             {form.title && <p className="text-white font-bold text-sm">{form.title}</p>}
                         </div>
                     </div>
@@ -462,7 +462,7 @@ function ImagesTab({ companyId }: { companyId: number }) {
                                     </div>
                                 )}
                                 <div className="absolute top-2 left-2">
-                                    <span className="px-2 py-0.5 bg-white/90 text-slate-700 text-[9px] font-bold rounded-md uppercase">{img.category}</span>
+                                    <span className="px-2 py-0.5 bg-white/90 text-slate-700 text-[9px] font-bold rounded-md ">{img.category}</span>
                                 </div>
                                 <div className="absolute bottom-0 inset-x-0 bg-white px-3 py-2 border-t border-slate-100">
                                     <p className="text-xs font-semibold text-slate-800 truncate">{img.name || "Untitled"}</p>
@@ -632,7 +632,7 @@ function VideosTab({ companyId }: { companyId: number }) {
                                                 </button>
                                             )}
                                             <div className="absolute top-3 left-3">
-                                                <span className={cn("px-2.5 py-1 rounded-lg text-[9px] font-bold text-white uppercase tracking-wide", typeColors[v.type] || "bg-slate-700")}>{v.type}</span>
+                                                <span className={cn("px-2.5 py-1 rounded-lg text-[9px] font-bold text-white  tracking-wide", typeColors[v.type] || "bg-slate-700")}>{v.type}</span>
                                             </div>
                                             {v.duration && <span className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 text-white text-xs rounded font-mono">{v.duration}</span>}
                                         </>
@@ -640,8 +640,8 @@ function VideosTab({ companyId }: { companyId: number }) {
                                 </div>
                                 <div className="p-5 space-y-3">
                                     <div className="flex items-center gap-2">
-                                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-100 text-slate-500 uppercase">{v.category?.replace(/_/g, " ")}</span>
-                                        {!v.is_active && <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-amber-50 text-amber-600 uppercase">Inactive</span>}
+                                        <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-slate-100 text-slate-500 ">{v.category?.replace(/_/g, " ")}</span>
+                                        {!v.is_active && <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-amber-50 text-amber-600 ">Inactive</span>}
                                     </div>
                                     <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{v.title || "Untitled Video"}</h4>
                                     {v.description && <p className="text-xs text-slate-400 line-clamp-2">{v.description}</p>}
@@ -664,7 +664,7 @@ function VideosTab({ companyId }: { companyId: number }) {
                     <div className="grid grid-cols-4 gap-2">
                         {["youtube", "vimeo", "instagram", "mp4"].map(t => (
                             <button key={t} type="button" onClick={() => set("type", t)} className={cn(
-                                "h-10 rounded-xl text-xs font-bold uppercase border-2 transition-all",
+                                "h-10 rounded-xl text-xs font-bold  border-2 transition-all",
                                 form.type === t ? "border-slate-800 bg-slate-800 text-white" : "border-slate-100 text-slate-500 bg-white hover:border-slate-200"
                             )}>{t}</button>
                         ))}
@@ -744,7 +744,7 @@ export default function Gallery() {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Content & Digital Assets</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-400 mb-1">Content & Digital Assets</p>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Media Vault</h1>
                     <p className="text-sm text-slate-500 mt-1">Manage storefront banners, product images, and video content</p>
                 </div>
@@ -752,15 +752,15 @@ export default function Gallery() {
                 <div className="flex items-center gap-3">
                     <div className="px-5 py-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center min-w-[80px]">
                         <p className="text-xl font-bold text-slate-900">{counts.banners}</p>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-0.5">Banners</p>
+                        <p className="text-[10px] font-semibold  tracking-widest text-slate-400 mt-0.5">Banners</p>
                     </div>
                     <div className="px-5 py-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center min-w-[80px]">
                         <p className="text-xl font-bold text-slate-900">{counts.images}</p>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-0.5">Images</p>
+                        <p className="text-[10px] font-semibold  tracking-widest text-slate-400 mt-0.5">Images</p>
                     </div>
                     <div className="px-5 py-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center min-w-[80px]">
                         <p className="text-xl font-bold text-slate-900">{counts.videos}</p>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-0.5">Videos</p>
+                        <p className="text-[10px] font-semibold  tracking-widest text-slate-400 mt-0.5">Videos</p>
                     </div>
                 </div>
             </div>

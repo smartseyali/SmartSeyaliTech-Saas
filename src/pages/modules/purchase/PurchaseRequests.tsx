@@ -106,7 +106,7 @@ export default function PurchaseRequests() {
         { 
             key: "reference_no", 
             label: "Request ID",
-            render: (r: any) => <span className="font-bold text-gray-900 tracking-tight italic">{r.reference_no}</span>
+            render: (r: any) => <span className="font-bold text-gray-900 tracking-tight ">{r.reference_no}</span>
         },
         { 
             key: "date", 
@@ -114,14 +114,14 @@ export default function PurchaseRequests() {
             render: (r: any) => (
                 <div className="flex flex-col">
                     <span className="font-bold text-gray-800">{r.date || 'No Date'}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Required by: {r.required_by || 'ASAP'}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">Required by: {r.required_by || 'ASAP'}</span>
                 </div>
             )
         },
         { 
             key: "total_qty", 
             label: "Volume",
-            render: (r: any) => <span className="font-black text-slate-600 tracking-tight">{r.total_qty || 0} Units</span>
+            render: (r: any) => <span className="font-bold text-slate-600 tracking-tight">{r.total_qty || 0} Units</span>
         },
         { 
             key: "status", 

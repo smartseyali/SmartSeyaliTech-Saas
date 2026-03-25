@@ -17,10 +17,10 @@ export default function Patients() {
             label: "Medical ID",
             render: (pat: any) => (
                 <div className="flex flex-col">
-                    <span className="font-black text-gray-900 uppercase italic leading-none">{pat.id}</span>
+                    <span className="font-bold text-gray-900   leading-none">{pat.id}</span>
                     <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{pat.blood}</span>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{pat.gender}</span>
+                        <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{pat.blood}</span>
+                        <span className="text-[10px] font-bold text-gray-400  tracking-widest">{pat.gender}</span>
                     </div>
                 </div>
             )
@@ -31,14 +31,14 @@ export default function Patients() {
             render: (pat: any) => (
                 <div className="flex flex-col">
                     <span className="text-sm font-bold text-gray-700 leading-none">{pat.name}</span>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-1">{pat.age} Years Old</span>
+                    <span className="text-[10px] font-bold text-gray-400  tracking-tighter mt-1">{pat.age} Years Old</span>
                 </div>
             )
         },
         { 
             key: "dept", 
             label: "Department",
-            render: (pat: any) => <span className="text-sm font-black text-gray-900 uppercase italic">{pat.dept}</span>
+            render: (pat: any) => <span className="text-sm font-bold text-gray-900  ">{pat.dept}</span>
         },
         { 
             key: "status", 

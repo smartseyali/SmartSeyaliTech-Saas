@@ -18,20 +18,20 @@ export default function Attendance() {
             label: "Employee",
             render: (log: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 tracking-tight italic uppercase leading-none">{log.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{log.location}</span>
+                    <span className="font-bold text-gray-900 tracking-tight   leading-none">{log.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{log.location}</span>
                 </div>
             )
         },
         { 
             key: "timeIn", 
             label: "Check-In",
-            render: (log: any) => <span className="font-bold text-gray-700 italic">{log.timeIn}</span>
+            render: (log: any) => <span className="font-bold text-gray-700 ">{log.timeIn}</span>
         },
         { 
             key: "timeOut", 
             label: "Check-Out",
-            render: (log: any) => <span className="font-bold text-gray-700 italic">{log.timeOut}</span>
+            render: (log: any) => <span className="font-bold text-gray-700 ">{log.timeOut}</span>
         },
         { 
             key: "status", 

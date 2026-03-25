@@ -45,8 +45,8 @@ export default function Categories() {
                         <LayoutGrid className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Registry Classification Node</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
+                        <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none mt-1">Registry Classification Node</span>
                     </div>
                 </div>
             )

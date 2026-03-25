@@ -64,13 +64,13 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 leading-tight">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 leading-tight">
                 {!hasModuleAccess ? "Module Not" : "Access"} <br />
                 <span className={cn(!hasModuleAccess ? "text-blue-600" : "text-red-500")}>
                   {!hasModuleAccess ? "Subscribed" : "Restricted"}
                 </span>
               </h2>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed px-4 italic">
+              <p className="text-sm font-medium text-slate-500 leading-relaxed px-4 ">
                 {!hasModuleAccess
                   ? `Your enterprise ecosystem does not currently include the ${activeModule.toUpperCase()} infrastructure.`
                   : `Your current operational tier does not have authorization to access the ${requiredResource?.toUpperCase()} module resources.`}
@@ -81,7 +81,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {!hasModuleAccess ? (
                 <Button
                   onClick={() => navigate(`/apps/ecommerce/billing?module=${activeModule}`)}
-                  className="h-14 px-8 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-bold uppercase tracking-widest text-[10px] gap-3 active:scale-95 transition-all shadow-xl shadow-blue-100"
+                  className="h-14 px-8 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-[11px] gap-3 active:scale-95 transition-all shadow-xl shadow-blue-100"
                 >
                   <Sparkles className="w-4 h-4" /> Activate {activeModule}
                 </Button>
@@ -89,7 +89,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <Button
                 onClick={() => navigate('/apps')}
                 variant="outline"
-                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-900 font-bold uppercase tracking-widest text-[10px] gap-3 active:scale-95 transition-all"
+                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-900 font-bold text-[11px] gap-3 active:scale-95 transition-all"
               >
                 <Home className="w-4 h-4" /> Go to App Launcher
               </Button>

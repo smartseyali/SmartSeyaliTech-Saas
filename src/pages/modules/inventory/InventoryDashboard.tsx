@@ -34,7 +34,7 @@ export default function InventoryDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Boxes className="w-5 h-5 text-orange-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Logistics & Supply Chain</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Logistics & Supply Chain</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Inventory Control</h1>
                     <div className="flex items-center gap-2">
@@ -72,11 +72,11 @@ export default function InventoryDashboard() {
                             <div className={cn("p-3 rounded-xl shadow-md text-white transition-transform group-hover:scale-105", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-[0.1em] text-slate-400">{k.label}</span>
                         </div>
                         <div className="relative z-10">
                             <p className="text-3xl font-bold tracking-tight text-slate-900 mb-1.5 truncate">{k.value}</p>
-                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide leading-none">{k.sub}</p>
+                            <p className="text-[10px] font-semibold text-slate-400  tracking-wide leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
@@ -93,10 +93,10 @@ export default function InventoryDashboard() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-none">Vulnerability Report</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1.5">Critical depletion alerts</p>
+                                <p className="text-[10px] font-bold text-slate-400  tracking-[0.1em] mt-1.5">Critical depletion alerts</p>
                             </div>
                         </div>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest text-orange-600 hover:bg-orange-50">Procurement List <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
+                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-[10px] font-bold  tracking-widest text-orange-600 hover:bg-orange-50">Procurement List <ArrowUpRight className="w-3 h-3 ml-2" /></Button>
                     </div>
 
                     <div className="p-8">
@@ -112,16 +112,16 @@ export default function InventoryDashboard() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors">{item.product}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{item.sku}</p>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-widest mt-1">{item.sku}</p>
                                         </div>
                                     </div>
                                     <div className="text-right flex items-center gap-10">
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Available</p>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-widest text-right">Available</p>
                                             <p className={cn("text-xl font-bold tracking-tight", item.stock <= 2 ? "text-rose-600" : "text-orange-600")}>{item.stock}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Min Limit</p>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-widest text-right">Min Limit</p>
                                             <p className="text-xl font-bold text-slate-900 tracking-tight">{item.limit}</p>
                                         </div>
                                         <button className="h-10 w-10 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/20 hover:scale-110 transition-transform">
@@ -138,7 +138,7 @@ export default function InventoryDashboard() {
                 <div className="lg:col-span-4 space-y-8">
                     <div className="bg-slate-900 rounded-2xl p-8 shadow-xl relative overflow-hidden group">
                         <div className="absolute -top-12 -right-12 w-48 h-48 bg-orange-600/10 rounded-full blur-3xl group-hover:bg-orange-600/20 transition-all" />
-                        <h2 className="text-lg font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-5">Node Distribution</h2>
+                        <h2 className="text-lg font-bold text-white  tracking-wider mb-8 border-b border-white/5 pb-5">Node Distribution</h2>
                         <div className="space-y-6 relative z-10">
                             {[
                                 { name: "Main Warehouse", load: 78, location: "Bangalore South" },
@@ -148,13 +148,13 @@ export default function InventoryDashboard() {
                                 <div key={node.name} className="space-y-2.5">
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">{node.name}</p>
+                                            <p className="text-[10px] font-bold text-slate-400  tracking-wider leading-none mb-1">{node.name}</p>
                                             <div className="flex items-center gap-1.5 opacity-60">
                                                 <MapPin className="w-3 h-3 text-orange-400" />
-                                                <span className="text-[9px] font-medium text-white/50 uppercase tracking-widest">{node.location}</span>
+                                                <span className="text-[9px] font-medium text-white/50  tracking-widest">{node.location}</span>
                                             </div>
                                         </div>
-                                        <span className="text-lg font-black text-orange-500">{node.load}%</span>
+                                        <span className="text-lg font-bold text-orange-500">{node.load}%</span>
                                     </div>
                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                         <div className="h-full bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.3)] transition-all duration-1000" style={{ width: `${node.load}%` }} />
@@ -165,7 +165,7 @@ export default function InventoryDashboard() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 uppercase tracking-wide">Quick Logistics</h2>
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4  tracking-wide">Quick Logistics</h2>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: "Inter-Stock", icon: ArrowRightLeft, color: "text-orange-600 bg-orange-50" },
@@ -177,7 +177,7 @@ export default function InventoryDashboard() {
                                     <div className={cn("p-2.5 rounded-lg transition-transform group-hover:scale-105", btn.color)}>
                                         <btn.icon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{btn.label}</span>
+                                    <span className="text-[10px] font-bold  tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{btn.label}</span>
                                 </button>
                             ))}
                         </div>

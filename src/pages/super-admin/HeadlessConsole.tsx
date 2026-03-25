@@ -63,12 +63,12 @@ fetch('https://api.belibeli.com/v1/content', {
                             <Zap className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black tracking-tighter uppercase">Headless <span className="text-indigo-600 italic">API</span> Console</h1>
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60">Connector Path Management • Super Admin Only</p>
+                            <h1 className="text-3xl font-bold tracking-tighter ">Headless <span className="text-indigo-600 ">API</span> Console</h1>
+                            <p className="text-[10px] font-bold  tracking-widest text-muted-foreground opacity-60">Connector Path Management • Super Admin Only</p>
                         </div>
                     </div>
                 </div>
-                <Button className="h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-indigo-600 shadow-xl shadow-indigo-600/20 gap-3">
+                <Button className="h-14 px-8 rounded-2xl font-bold text-xs  tracking-widest bg-indigo-600 shadow-xl shadow-indigo-600/20 gap-3">
                     <Plus className="w-5 h-5" /> Architect New Path
                 </Button>
             </div>
@@ -76,7 +76,7 @@ fetch('https://api.belibeli.com/v1/content', {
             {/* Info Card */}
             <div className="bg-indigo-600 rounded-[2.5rem] p-10 text-white flex flex-col md:flex-row items-center gap-10 relative overflow-hidden">
                 <div className="relative z-10 space-y-4 max-w-2xl">
-                    <h2 className="text-3xl font-black leading-tight italic">Empower companies with "Backend-as-a-Service".</h2>
+                    <h2 className="text-3xl font-bold leading-tight ">Empower companies with "Backend-as-a-Service".</h2>
                     <p className="text-sm font-medium opacity-80 leading-relaxed">
                         Use this console to connect external frontends to the BeliBeli engine.
                         Super Admins can map custom UI sections to our institutional database tables,
@@ -95,7 +95,7 @@ fetch('https://api.belibeli.com/v1/content', {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="lg:col-span-4 space-y-6">
                     <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-xl shadow-black/5">
-                        <h3 className="text-lg font-black tracking-tight mb-6 flex items-center gap-2 uppercase italic text-indigo-600">
+                        <h3 className="text-lg font-bold tracking-tight mb-6 flex items-center gap-2   text-indigo-600">
                             <Globe className="w-5 h-5" /> Institutional Roster
                         </h3>
                         <div className="space-y-3">
@@ -109,12 +109,12 @@ fetch('https://api.belibeli.com/v1/content', {
                                     )}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-secondary group-hover:bg-indigo-600/10 flex items-center justify-center font-black text-xs transition-colors">
+                                        <div className="w-10 h-10 rounded-xl bg-secondary group-hover:bg-indigo-600/10 flex items-center justify-center font-bold text-xs transition-colors">
                                             {c.name[0]}
                                         </div>
                                         <div className="text-left">
                                             <p className="font-bold text-xs tracking-tight">{c.name}</p>
-                                            <p className="text-[9px] font-medium opacity-50 uppercase tracking-widest">{c.subdomain}</p>
+                                            <p className="text-[9px] font-medium opacity-50  tracking-widest">{c.subdomain}</p>
                                         </div>
                                     </div>
                                     <div className={cn(
@@ -129,17 +129,17 @@ fetch('https://api.belibeli.com/v1/content', {
                     <div className="bg-black rounded-[2.5rem] p-8 text-white space-y-4">
                         <div className="flex items-center gap-3 mb-2">
                             <ShieldCheck className="w-5 h-5 text-indigo-400" />
-                            <h4 className="text-xs font-black uppercase tracking-widest">Master API Status</h4>
+                            <h4 className="text-xs font-bold  tracking-widest">Master API Status</h4>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Global Endpoint</p>
+                            <p className="text-[10px] font-bold opacity-50  tracking-widest">Global Endpoint</p>
                             <code className="text-[10px] font-mono text-indigo-300 break-all">https://api.belibeli.com/v1/headless</code>
                         </div>
                         <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
+                            <span className="text-[9px] font-bold  tracking-widest text-emerald-400 flex items-center gap-1.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Systems Nominal
                             </span>
-                            <span className="text-[9px] font-black uppercase tracking-widest opacity-40">v2.4.0-stable</span>
+                            <span className="text-[9px] font-bold  tracking-widest opacity-40">v2.4.0-stable</span>
                         </div>
                     </div>
                 </div>
@@ -149,13 +149,13 @@ fetch('https://api.belibeli.com/v1/content', {
                         {!selectedCompany ? (
                             <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-20 opacity-40">
                                 <Code className="w-16 h-16" />
-                                <p className="font-black text-sm uppercase tracking-widest">Select a Merchant to manage API Paths</p>
+                                <p className="font-bold text-sm  tracking-widest">Select a Merchant to manage API Paths</p>
                             </div>
                         ) : (
                             <div className="space-y-8 animate-in slide-in-from-bottom-5 duration-500">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-xl font-black tracking-tighter uppercase">API Configurations</h3>
-                                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest">
+                                    <h3 className="text-xl font-bold tracking-tighter ">API Configurations</h3>
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[9px] font-bold  tracking-widest">
                                         <ShieldCheck className="w-3 h-3" /> Secure Endpoint
                                     </div>
                                 </div>
@@ -163,7 +163,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                 <div className="space-y-6">
                                     {configList.filter(cf => cf.company_id === selectedCompany).length === 0 ? (
                                         <div className="p-10 border-2 border-dashed border-border rounded-3xl text-center">
-                                            <p className="text-muted-foreground font-medium italic">No paths architected for this merchant yet.</p>
+                                            <p className="text-muted-foreground font-medium ">No paths architected for this merchant yet.</p>
                                         </div>
                                     ) : (
                                         configList.filter(cf => cf.company_id === selectedCompany).map(config => (
@@ -174,8 +174,8 @@ fetch('https://api.belibeli.com/v1/content', {
                                                             <Database className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-black text-sm uppercase tracking-tight">{config.section_id}</p>
-                                                            <p className="text-[10px] text-muted-foreground font-bold italic">Mapping: {config.screen_id} → {config.mapping_config?.table || 'N/A'}</p>
+                                                            <p className="font-bold text-sm  tracking-tight">{config.section_id}</p>
+                                                            <p className="text-[10px] text-muted-foreground font-bold ">Mapping: {config.screen_id} → {config.mapping_config?.table || 'N/A'}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2">
@@ -185,7 +185,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600 ml-1">Frontend Implementation Path</p>
+                                                    <p className="text-[10px] font-bold  tracking-widest text-indigo-600 ml-1">Frontend Implementation Path</p>
                                                     <div className="relative group">
                                                         <pre className="p-6 rounded-2xl bg-black text-indigo-400 text-[11px] font-mono overflow-x-auto border-2 border-indigo-600/20">
                                                             {generateSnippet(config)}
@@ -199,7 +199,7 @@ fetch('https://api.belibeli.com/v1/content', {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest opacity-50">
+                                                <div className="flex items-center gap-4 text-[10px] font-bold  tracking-widest opacity-50">
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> CORS Enabled</span>
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> SSL Active</span>
                                                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Rate Limited</span>

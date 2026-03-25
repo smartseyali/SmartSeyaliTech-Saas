@@ -153,7 +153,7 @@ const Services = () => {
                     </div>
                     <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{service.title}</h2>
                   </div>
-                  <p className="text-xl text-gray-500 font-medium italic leading-relaxed">"{service.description}"</p>
+                  <p className="text-xl text-gray-500 font-medium  leading-relaxed">"{service.description}"</p>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-5">
@@ -198,7 +198,7 @@ const Services = () => {
       <section className="py-32 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6 text-center space-y-6 mb-24">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">Auxiliary <span className="text-primary-600">Solutions</span></h2>
-          <p className="text-xl text-gray-500 max-w-2xl mx-auto italic font-medium">Supporting services designed to enhance your core operational ecosystem.</p>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto  font-medium">Supporting services designed to enhance your core operational ecosystem.</p>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -221,7 +221,7 @@ const Services = () => {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <div className="bg-primary-600 rounded-[3rem] p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
             <h2 className="text-4xl md:text-6xl font-bold leading-tight">Ready to Innovate?</h2>
-            <p className="text-xl text-primary-50 max-w-2xl mx-auto opacity-90 italic">Let's discuss your requirements and build a roadmap for your next business milestone.</p>
+            <p className="text-xl text-primary-50 max-w-2xl mx-auto opacity-90 ">Let's discuss your requirements and build a roadmap for your next business milestone.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
               <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
                 <Link to="/contact">Initialize Project</Link>

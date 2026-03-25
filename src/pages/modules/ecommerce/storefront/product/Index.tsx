@@ -63,11 +63,11 @@ export default function ProductDetail() {
     if (loading) return (
         <div className="bg-[#f8fafc] min-h-screen container mx-auto px-6 py-32 flex flex-col items-center justify-center gap-8">
             <Box className="w-16 h-16 text-blue-600/20 animate-pulse" />
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Interrogating Inventory Matrix...</p>
+            <p className="text-[10px] font-bold  tracking-widest text-slate-400">Interrogating Inventory Matrix...</p>
         </div>
     );
 
-    if (!product) return <div className="text-center py-40 font-black text-slate-400 bg-[#f8fafc] min-h-screen uppercase tracking-[0.5em] italic">Critical Error: Asset Signature Not Identified</div>;
+    if (!product) return <div className="text-center py-40 font-bold text-slate-400 bg-[#f8fafc] min-h-screen  tracking-[0.5em] ">Critical Error: Asset Signature Not Identified</div>;
 
     const currentPrice = selectedVariant?.price || product.rate || product.price || 0;
 
@@ -92,10 +92,10 @@ export default function ProductDetail() {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Architectural Breadcrumb */}
                 <nav className="py-12">
-                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                        <Link to={storeLink("/")} className="hover:text-blue-600 transition-colors italic">Core Ecosystem</Link>
+                    <div className="flex items-center gap-4 text-[10px] font-bold  tracking-widest text-slate-400">
+                        <Link to={storeLink("/")} className="hover:text-blue-600 transition-colors ">Core Ecosystem</Link>
                         <ChevronRight className="w-3.5 h-3.5 text-slate-200" />
-                        <Link to={storeLink("/shop")} className="hover:text-blue-600 transition-colors italic">Inventory Hub</Link>
+                        <Link to={storeLink("/shop")} className="hover:text-blue-600 transition-colors ">Inventory Hub</Link>
                         <ChevronRight className="w-3.5 h-3.5 text-slate-200" />
                         <span className="text-slate-900">{product.name}</span>
                     </div>
@@ -121,7 +121,7 @@ export default function ProductDetail() {
                                     <Share2 className="w-5 h-5" />
                                 </button>
                             </div>
-                            <div className="absolute bottom-10 left-10 flex items-center gap-4 px-8 py-3 bg-slate-900/90 backdrop-blur-xl rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-white shadow-2xl border border-white/10">
+                            <div className="absolute bottom-10 left-10 flex items-center gap-4 px-8 py-3 bg-slate-900/90 backdrop-blur-xl rounded-2xl text-[10px] font-bold  tracking-widest text-white shadow-2xl border border-white/10">
                                 <Zap className="w-4 h-4 text-blue-400" /> Verified Platform Spec
                             </div>
                         </div>
@@ -132,26 +132,26 @@ export default function ProductDetail() {
                         <div className="space-y-8">
                             <div className="flex items-center gap-3">
                                 <div className="h-0.5 w-12 bg-blue-600" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600">
+                                <span className="text-[10px] font-bold  tracking-widest text-blue-600">
                                     {product.category || "General Asset"} System
                                 </span>
                             </div>
-                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 leading-[0.8] uppercase italic">
+                            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-slate-900 leading-[0.8]  ">
                                 {product.name}
                             </h1>
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-1.5 text-blue-600">
                                     {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
                                 </div>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-l border-slate-100 pl-6 italic">Performance Yield: 4.9/5</span>
+                                <span className="text-[10px] font-bold text-slate-400  tracking-widest border-l border-slate-100 pl-6 ">Performance Yield: 4.9/5</span>
                             </div>
                             <div className="flex items-baseline gap-8 pt-4">
-                                <span className="text-5xl font-black text-slate-900 tracking-tighter italic leading-none">₹{Number(currentPrice).toLocaleString()}</span>
-                                <span className="text-xl text-slate-200 font-black uppercase tracking-[0.2em] italic line-through decoration-blue-600/30 decoration-4">
+                                <span className="text-5xl font-bold text-slate-900 tracking-tighter  leading-none">₹{Number(currentPrice).toLocaleString()}</span>
+                                <span className="text-xl text-slate-200 font-bold  tracking-widest  line-through decoration-blue-600/30 decoration-4">
                                     ₹{(Number(currentPrice) * 1.5).toLocaleString()}
                                 </span>
                             </div>
-                            <p className="text-[11px] font-black text-slate-400 flex items-center gap-3 uppercase tracking-widest">
+                            <p className="text-[11px] font-bold text-slate-400 flex items-center gap-3  tracking-widest">
                                 <Layout className="w-5 h-5 text-blue-600" /> High-frequency delivery ready
                             </p>
                         </div>
@@ -159,8 +159,8 @@ export default function ProductDetail() {
                         <div className="h-px bg-slate-100" />
 
                         <div className="space-y-4">
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Core Overview</p>
-                            <p className="text-lg text-slate-500 leading-relaxed italic font-medium">
+                            <p className="text-[10px] font-bold  tracking-widest text-slate-400 ">Core Overview</p>
+                            <p className="text-lg text-slate-500 leading-relaxed  font-medium">
                                 "{product.description || "Optimized for high-demand environments, this asset delivers superior efficiency and architectural reliability within your operational framework."}"
                             </p>
                         </div>
@@ -168,7 +168,7 @@ export default function ProductDetail() {
                         {/* Variants as Logic Nodes */}
                         {variants.length > 0 && (
                             <div className="space-y-8">
-                                <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-900 flex items-center gap-3">
+                                <h4 className="text-[11px] font-bold  tracking-widest text-slate-900 flex items-center gap-3">
                                     <Box className="w-4 h-4 text-blue-600" /> Select Configuration
                                 </h4>
                                 <div className="flex flex-wrap gap-4">
@@ -177,7 +177,7 @@ export default function ProductDetail() {
                                             key={v.id}
                                             onClick={() => setSelectedVariant(v)}
                                             className={cn(
-                                                "px-10 py-4 rounded-2xl border-2 transition-all font-black text-[10px] uppercase tracking-widest",
+                                                "px-10 py-4 rounded-2xl border-2 transition-all font-bold text-[10px]  tracking-widest",
                                                 selectedVariant?.id === v.id
                                                     ? "border-slate-900 bg-slate-900 text-white shadow-2xl shadow-slate-900/20"
                                                     : "border-slate-100 bg-white text-slate-300 hover:border-slate-900"
@@ -196,14 +196,14 @@ export default function ProductDetail() {
                                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-14 h-14 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-2xl transition-all">
                                     <Minus className="w-4 h-4" />
                                 </button>
-                                <span className="w-16 text-center font-black text-2xl text-slate-900 tracking-tighter">{quantity}</span>
+                                <span className="w-16 text-center font-bold text-2xl text-slate-900 tracking-tighter">{quantity}</span>
                                 <button onClick={() => setQuantity(quantity + 1)} className="w-14 h-14 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-2xl transition-all">
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>
                             <Button
                                 onClick={handleAddToCart}
-                                className="h-16 rounded-[2rem] bg-blue-600 hover:bg-slate-900 text-white font-black uppercase tracking-[.3em] text-[11px] flex-1 shadow-2xl shadow-blue-600/20 transition-all border-none"
+                                className="h-16 rounded-[2rem] bg-blue-600 hover:bg-slate-900 text-white font-bold  tracking-[.3em] text-[11px] flex-1 shadow-2xl shadow-blue-600/20 transition-all border-none"
                             >
                                 <ShoppingCart className="w-5 h-5 mr-4" /> Initialize Deployment
                             </Button>
@@ -214,7 +214,7 @@ export default function ProductDetail() {
                             href={`https://wa.me/${settings?.whatsapp_number || "919000000000"}?text=Operational Inquiry: ${product.name}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-4 w-full h-16 bg-slate-50 text-slate-900 hover:bg-slate-900 hover:text-white rounded-[2rem] font-black uppercase text-[10px] tracking-[0.3em] transition-all border border-slate-100"
+                            className="flex items-center justify-center gap-4 w-full h-16 bg-slate-50 text-slate-900 hover:bg-slate-900 hover:text-white rounded-[2rem] font-bold  text-[10px] tracking-widest transition-all border border-slate-100"
                         >
                             <MessageCircle className="w-5 h-5 text-blue-600" /> Acquire Technical Support
                         </a>
@@ -230,8 +230,8 @@ export default function ProductDetail() {
                                         <g.icon className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-black uppercase tracking-widest text-slate-900">{g.title}</p>
-                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">{g.sub}</p>
+                                        <p className="text-[11px] font-bold  tracking-widest text-slate-900">{g.title}</p>
+                                        <p className="text-[9px] font-bold text-slate-300  tracking-widest mt-1">{g.sub}</p>
                                     </div>
                                 </div>
                             ))}
@@ -247,7 +247,7 @@ export default function ProductDetail() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
-                                    "pb-8 text-[11px] font-black uppercase tracking-[0.4em] transition-all border-b-4 whitespace-nowrap",
+                                    "pb-8 text-[11px] font-bold  tracking-widest transition-all border-b-4 whitespace-nowrap",
                                     activeTab === tab ? "text-blue-600 border-blue-600" : "text-slate-200 border-transparent hover:text-slate-400"
                                 )}
                             >
@@ -267,7 +267,7 @@ export default function ProductDetail() {
                                 className="min-h-[300px]"
                             >
                                 {activeTab === "System Intel" && (
-                                    <div className="space-y-10 text-slate-500 text-xl leading-relaxed italic font-medium">
+                                    <div className="space-y-10 text-slate-500 text-xl leading-relaxed  font-medium">
                                         <p>"{product.description || "Our platform guarantees the highest level of component integrity and operational reliability for this specified asset."}"</p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-10">
                                             {[
@@ -279,8 +279,8 @@ export default function ProductDetail() {
                                                 <div key={i} className="flex gap-5">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-3 shrink-0" />
                                                     <div>
-                                                        <h5 className="font-black uppercase text-[11px] tracking-[0.2em] text-slate-900 mb-2">{f.t}</h5>
-                                                        <p className="text-sm font-medium italic text-slate-400">{f.s}</p>
+                                                        <h5 className="font-bold  text-[11px] tracking-widest text-slate-900 mb-2">{f.t}</h5>
+                                                        <p className="text-sm font-medium  text-slate-400">{f.s}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -296,8 +296,8 @@ export default function ProductDetail() {
                                             ["Redundancy", "Triple-Layer Cache"]
                                         ].map(([k, v]) => (
                                             <div key={k} className="flex justify-between py-6 border-b last:border-0 border-slate-50">
-                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">{k}</span>
-                                                <span className="text-xs font-black text-slate-900 uppercase tracking-widest">{v}</span>
+                                                <span className="text-[10px] font-bold  tracking-widest text-slate-300">{k}</span>
+                                                <span className="text-xs font-bold text-slate-900  tracking-widest">{v}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -307,16 +307,16 @@ export default function ProductDetail() {
                                         <div className="space-y-6">
                                             <div className="flex items-center gap-3">
                                                 <Shield className="w-5 h-5 text-blue-600" />
-                                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-900">Regulatory Framework</h4>
+                                                <h4 className="font-bold text-xs  tracking-widest text-slate-900">Regulatory Framework</h4>
                                             </div>
-                                            <p className="text-slate-400 text-sm leading-relaxed italic">Fully compliant with the latest enterprise safety and security protocols, ensuring data sovereignty and operational continuity.</p>
+                                            <p className="text-slate-400 text-sm leading-relaxed ">Fully compliant with the latest enterprise safety and security protocols, ensuring data sovereignty and operational continuity.</p>
                                         </div>
                                         <div className="space-y-6">
                                             <div className="flex items-center gap-3">
                                                 <Code className="w-5 h-5 text-blue-600" />
-                                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-900">Architecture Zero</h4>
+                                                <h4 className="font-bold text-xs  tracking-widest text-slate-900">Architecture Zero</h4>
                                             </div>
-                                            <p className="text-slate-400 text-sm leading-relaxed italic">Built on a zero-trust model to eliminate systemic vulnerabilities and optimize resource utilization across the ecosystem.</p>
+                                            <p className="text-slate-400 text-sm leading-relaxed ">Built on a zero-trust model to eliminate systemic vulnerabilities and optimize resource utilization across the ecosystem.</p>
                                         </div>
                                     </div>
                                 )}
@@ -332,13 +332,13 @@ export default function ProductDetail() {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <Layout className="w-5 h-5 text-blue-600" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Inventory Clusters</span>
+                                    <span className="text-[10px] font-bold  tracking-widest text-slate-400 ">Inventory Clusters</span>
                                 </div>
-                                <h2 className="text-4xl lg:text-6xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">Similar <span className="text-blue-600">Assets</span></h2>
+                                <h2 className="text-4xl lg:text-6xl font-bold text-slate-900  tracking-tighter  leading-none">Similar <span className="text-blue-600">Assets</span></h2>
                             </div>
                             <Link
                                 to={storeLink("/shop")}
-                                className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600 hover:text-slate-900 transition-all border-b-2 border-transparent hover:border-slate-900 pb-2 italic"
+                                className="text-[10px] font-bold  tracking-widest text-blue-600 hover:text-slate-900 transition-all border-b-2 border-transparent hover:border-slate-900 pb-2 "
                             >
                                 Full Discovery Hub
                             </Link>
@@ -363,8 +363,8 @@ export default function ProductDetail() {
                                             <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/5 transition-colors" />
                                         </div>
                                         <div className="space-y-2 px-2">
-                                            <h4 className="font-black text-lg text-slate-900 leading-tight uppercase tracking-tighter italic group-hover:text-blue-600 transition-colors line-clamp-1">{p.name}</h4>
-                                            <p className="text-xl font-black text-slate-900 tracking-tighter italic opacity-80">
+                                            <h4 className="font-bold text-lg text-slate-900 leading-tight  tracking-tighter  group-hover:text-blue-600 transition-colors line-clamp-1">{p.name}</h4>
+                                            <p className="text-xl font-bold text-slate-900 tracking-tighter  opacity-80">
                                                 ₹ {Number(p.rate || p.price || 0).toLocaleString()}
                                             </p>
                                         </div>

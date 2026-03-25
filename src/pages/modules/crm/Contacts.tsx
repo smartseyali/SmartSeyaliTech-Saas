@@ -52,8 +52,8 @@ export default function Contacts() {
             label: "Entity Name",
             render: (c: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{c.job_title || "Unclassified Role"}</span>
+                    <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">{c.job_title || "Unclassified Role"}</span>
                 </div>
             )
         },
@@ -63,7 +63,7 @@ export default function Contacts() {
             render: (c: any) => (
                 <div className="flex items-center gap-2">
                     <Building2 className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">{c.company_name || 'Individual'}</span>
+                    <span className="text-[11px] font-bold text-gray-600  tracking-widest">{c.company_name || 'Individual'}</span>
                 </div>
             )
         },
@@ -72,8 +72,8 @@ export default function Contacts() {
             label: "Communication",
             render: (c: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2"><Mail size={10}/> {c.email}</span>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2"><Phone size={10}/> {c.phone}</span>
+                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2"><Mail size={10}/> {c.email}</span>
+                    <span className="text-[10px] font-bold text-gray-500  tracking-widest flex items-center gap-2"><Phone size={10}/> {c.phone}</span>
                 </div>
             )
         },

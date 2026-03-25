@@ -129,7 +129,7 @@ export default function PaymentGateways() {
     if (loading) return (
         <div className="h-[60vh] flex items-center justify-center flex-col gap-4">
             <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-            <p className="font-bold text-xs uppercase tracking-widest text-slate-400">Loading Payment Gateways...</p>
+            <p className="font-bold text-xs  tracking-widest text-slate-400">Loading Payment Gateways...</p>
         </div>
     );
 
@@ -138,7 +138,7 @@ export default function PaymentGateways() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-slate-100">
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Financial</p>
+                    <p className="text-xs font-bold  tracking-widest text-slate-400 mb-1">Financial</p>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">Payment Gateways</h1>
                     <p className="text-sm text-slate-500 mt-1">Configure payment channels and settlement options for your store.</p>
                 </div>
@@ -173,10 +173,10 @@ export default function PaymentGateways() {
                                             <meta.icon className="w-8 h-8 text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-2xl font-bold text-slate-900 leading-none mb-2 tracking-tight uppercase">{meta.name}</h3>
-                                            <p className="text-sm font-medium text-slate-500 italic leading-relaxed">"{meta.tagline}"</p>
+                                            <h3 className="text-2xl font-bold text-slate-900 leading-none mb-2 tracking-tight ">{meta.name}</h3>
+                                            <p className="text-sm font-medium text-slate-500  leading-relaxed">"{meta.tagline}"</p>
                                             {meta.docsUrl && (
-                                                <a href={meta.docsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-4 rounded-lg border border-slate-100 hover:bg-white transition-all">
+                                                <a href={meta.docsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 text-[9px] font-bold text-blue-600  tracking-widest mt-4 rounded-lg border border-slate-100 hover:bg-white transition-all">
                                                     Integration Specs <ExternalLink className="w-3 h-3" />
                                                 </a>
                                             )}
@@ -198,7 +198,7 @@ export default function PaymentGateways() {
 
                                 <div className="flex flex-wrap gap-3">
                                     <div className={cn(
-                                        "px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-2 border shadow-sm",
+                                        "px-4 py-1.5 rounded-full text-[9px] font-bold  tracking-widest flex items-center gap-2 border shadow-sm",
                                         isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
                                     )}>
                                         <div className={cn("w-1.5 h-1.5 rounded-full", isActive ? "bg-emerald-500 animate-pulse" : "bg-slate-300")} />
@@ -209,7 +209,7 @@ export default function PaymentGateways() {
                                         <button
                                             onClick={() => toggleTestMode(key, isTestMode)}
                                             className={cn(
-                                                "px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all border shadow-sm flex items-center gap-2",
+                                                "px-4 py-1.5 rounded-full text-[9px] font-bold  tracking-widest transition-all border shadow-sm flex items-center gap-2",
                                                 isTestMode ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-blue-50 text-blue-600 border-blue-200"
                                             )}
                                         >
@@ -249,7 +249,7 @@ export default function PaymentGateways() {
                                     <div className="grid grid-cols-1 gap-4">
                                         {meta.fields.map(field => (
                                             <div key={field.key} className="space-y-1.5">
-                                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{field.label}</label>
+                                                <label className="text-xs font-semibold text-slate-500  tracking-widest">{field.label}</label>
                                                 <div className="relative">
                                                     <input
                                                         type={field.type === "password" && !showSecrets[`${key}_${field.key}`] ? "password" : "text"}

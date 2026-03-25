@@ -27,9 +27,9 @@ export default function Pipelines() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <GitBranch className="w-6 h-6 text-violet-600" />
-                        <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Workflow Engine</span>
+                        <span className="text-xs font-bold  tracking-widest text-slate-400">Workflow Engine</span>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900 uppercase italic">Sales Pipelines</h1>
+                    <h1 className="text-4xl font-bold tracking-tight text-slate-900  ">Sales Pipelines</h1>
                     <p className="text-sm font-medium text-slate-500">Configure your deal stages and visual workflows.</p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -45,7 +45,7 @@ export default function Pipelines() {
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-1">{pipe.name}</h3>
-                                <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400  tracking-widest">
                                     <span className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> {pipe.metrics.active} Deals</span>
                                     <span className="flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> ₹{(pipe.metrics.value / 100000).toFixed(1)}L Value</span>
                                 </div>
@@ -57,7 +57,7 @@ export default function Pipelines() {
                             {pipe.stages.map((stage, idx) => (
                                 <div key={stage} className="flex-1 flex items-center gap-4 group">
                                     <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100 group-hover:border-violet-200 group-hover:bg-violet-50 transition-all text-center">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-violet-600 mb-1">{idx + 1}</p>
+                                        <p className="text-[10px] font-bold  tracking-widest text-slate-400 group-hover:text-violet-600 mb-1">{idx + 1}</p>
                                         <p className="text-xs font-bold text-slate-900">{stage}</p>
                                     </div>
                                     {idx < pipe.stages.length - 1 && (

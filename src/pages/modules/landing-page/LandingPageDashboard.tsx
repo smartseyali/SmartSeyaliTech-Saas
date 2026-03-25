@@ -34,7 +34,7 @@ export default function LandingPageDashboard() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-3">
                         <Globe className="w-5 h-5 text-teal-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Marketing Conversion Engine</span>
+                        <span className="text-[10px] font-bold  tracking-widest text-slate-500">Marketing Conversion Engine</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Page Builder</h1>
                     <p className="text-slate-500 text-sm font-medium">Domain: {activeCompany?.subdomain}.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com</p>
@@ -62,10 +62,10 @@ export default function LandingPageDashboard() {
                             <div className={cn("p-2.5 rounded-xl text-white transition-transform group-hover:scale-110 shadow-sm shadow-black/10", k.color)}>
                                 <k.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{k.label}</span>
+                            <span className="text-[10px] font-bold  tracking-widest text-slate-400">{k.label}</span>
                         </div>
-                        <p className="text-3xl font-black text-slate-900 mb-1 leading-none">{k.value}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-2 truncate font-outfit">{k.sub}</p>
+                        <p className="text-3xl font-bold text-slate-900 mb-1 leading-none">{k.value}</p>
+                        <p className="text-[10px] font-bold text-slate-400  tracking-tighter mt-2 truncate ">{k.sub}</p>
                     </div>
                 ))}
             </div>
@@ -74,10 +74,10 @@ export default function LandingPageDashboard() {
                 {/* Pages List */}
                 <div className="lg:col-span-8 space-y-4">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Marketing Assets</h2>
+                        <h2 className="text-[11px] font-bold  tracking-widest text-slate-400">Marketing Assets</h2>
                         <div className="flex items-center gap-2">
-                            <button className="p-1 px-3 text-[10px] font-black uppercase bg-slate-900 text-white rounded-md tracking-tighter">Live</button>
-                            <button className="p-1 px-3 text-[10px] font-black uppercase bg-white text-slate-400 rounded-md tracking-tighter border">Draft</button>
+                            <button className="p-1 px-3 text-[10px] font-bold  bg-slate-900 text-white rounded-md tracking-tighter">Live</button>
+                            <button className="p-1 px-3 text-[10px] font-bold  bg-white text-slate-400 rounded-md tracking-tighter border">Draft</button>
                         </div>
                     </div>
 
@@ -90,7 +90,7 @@ export default function LandingPageDashboard() {
                                         <Globe className="w-5 h-5" />
                                     </div>
                                     <span className={cn(
-                                        "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
+                                        "px-2 py-0.5 rounded text-[8px] font-bold  tracking-widest border",
                                         page.status === 'Published' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                             page.status === 'A/B Testing' ? "bg-amber-50 text-amber-600 border-amber-100" :
                                                 "bg-slate-50 text-slate-400 border-slate-100"
@@ -98,13 +98,13 @@ export default function LandingPageDashboard() {
                                         {page.status}
                                     </span>
                                 </div>
-                                <h3 className="text-lg font-black text-slate-900 tracking-tighter uppercase italic leading-tight mb-2 group-hover:text-teal-600 transition-colors font-outfit">{page.title}</h3>
-                                <div className="flex items-center gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-6">
+                                <h3 className="text-lg font-bold text-slate-900 tracking-tighter   leading-tight mb-2 group-hover:text-teal-600 transition-colors ">{page.title}</h3>
+                                <div className="flex items-center gap-4 text-[11px] font-bold text-slate-400  tracking-tight mb-6">
                                     <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {page.visitor}</span>
                                     <span className="flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5" /> {page.conversion} Conv</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Button className="flex-1 bg-slate-900 hover:bg-black text-[9px] font-black uppercase h-9 rounded-lg tracking-widest font-outfit">Open Editor</Button>
+                                    <Button className="flex-1 bg-slate-900 hover:bg-black text-[9px] font-bold  h-9 rounded-lg tracking-widest ">Open Editor</Button>
                                     <button className="w-9 h-9 border border-slate-100 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-50"><Share2 className="w-3.5 h-3.5" /></button>
                                 </div>
                             </div>
@@ -118,20 +118,20 @@ export default function LandingPageDashboard() {
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Zap className="w-32 h-32 rotate-12 text-teal-400" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-400 mb-6 border-b border-white/5 pb-4 leading-none font-outfit">Lead Capture</h3>
+                        <h3 className="text-[10px] font-bold  tracking-widest text-teal-400 mb-6 border-b border-white/5 pb-4 leading-none ">Lead Capture</h3>
                         <div className="space-y-6 relative z-10">
                             <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-teal-500/30 transition-all group/card">
-                                <p className="text-[11px] font-bold text-white mb-2 italic">A/B Intelligence</p>
+                                <p className="text-[11px] font-bold text-white mb-2 ">A/B Intelligence</p>
                                 <p className="text-[9px] text-white/40 leading-relaxed font-medium">Your 'Summer Sale' variant B is outperforming variant A by 42%. We recommend switching traffic to B.</p>
                             </div>
-                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all font-outfit shadow-xl">
+                            <Button className="w-full h-11 bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold  tracking-widest text-[9px] rounded-xl transition-all  shadow-xl">
                                 Content Optimizer
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none font-outfit">UI Elements</h3>
+                        <h3 className="text-sm font-bold  tracking-widest text-slate-400 mb-8 border-b border-slate-50 pb-4 leading-none ">UI Elements</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'Templates', icon: Layout },
@@ -141,7 +141,7 @@ export default function LandingPageDashboard() {
                             ].map(item => (
                                 <button key={item.label} className="p-5 rounded-xl border border-slate-100 flex flex-col items-center gap-3 hover:bg-teal-50 hover:border-teal-200 transition-all bg-white hover:shadow-md group">
                                     <item.icon className="w-4 h-4 text-slate-300 group-hover:text-teal-600 transition-colors" />
-                                    <span className="text-[9px] font-bold uppercase text-slate-500 tracking-tighter leading-none">{item.label}</span>
+                                    <span className="text-[9px] font-bold  text-slate-500 tracking-tighter leading-none">{item.label}</span>
                                 </button>
                             ))}
                         </div>

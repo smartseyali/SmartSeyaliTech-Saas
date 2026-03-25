@@ -70,9 +70,9 @@ export default function PayrollPayslips() {
                         <UserCircle className="w-7 h-7 opacity-80" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{p.employee_name || 'System Resource Node'}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{p.employee_name || 'System Resource Node'}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {p.period_start} TO {p.period_end}
                             </span>
                         </div>
@@ -85,10 +85,10 @@ export default function PayrollPayslips() {
             label: "Compensation Magnitude",
             render: (p: any) => (
                 <div className="flex flex-col">
-                    <span className="text-[13px] font-black text-slate-900 tracking-tighter">
+                    <span className="text-[13px] font-bold text-slate-900 tracking-tighter">
                         ₹{(p.net_pay || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
-                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Calculated Logic</span>
+                    <span className="text-[9px] font-bold text-emerald-500  tracking-widest">Calculated Logic</span>
                 </div>
             )
         },
@@ -103,7 +103,7 @@ export default function PayrollPayslips() {
             render: (p: any) => (
                 <div className="flex items-center gap-2 text-slate-400">
                     <Landmark size={14}/>
-                    <span className="text-[10px] font-black uppercase tracking-widest">{p.payment_ref || 'BANK_POST_IND...'}</span>
+                    <span className="text-[10px] font-bold  tracking-widest">{p.payment_ref || 'BANK_POST_IND...'}</span>
                 </div>
             )
         }
@@ -140,10 +140,10 @@ export default function PayrollPayslips() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg flex items-center gap-2">
                         <TrendingUp className="w-3.5 h-3.5" /> Batch Calculation
                     </button>
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2">
                         <CreditCard className="w-3.5 h-3.5" /> Disburse Batch
                     </button>
                 </div>

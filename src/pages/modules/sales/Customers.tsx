@@ -18,8 +18,8 @@ export default function Customers() {
             label: "Entity Name",
             render: (c: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 uppercase italic tracking-tight">{c.name}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">POC: {c.contact}</span>
+                    <span className="font-bold text-gray-900   tracking-tight">{c.name}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest mt-1">POC: {c.contact}</span>
                 </div>
             )
         },
@@ -29,14 +29,14 @@ export default function Customers() {
             render: (c: any) => (
                 <div className="flex items-center gap-2">
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">{c.location}</span>
+                    <span className="text-[11px] font-bold text-gray-600  tracking-widest">{c.location}</span>
                 </div>
             )
         },
         { 
             key: "revenue", 
             label: "Lifetime Value",
-            render: (c: any) => <span className="font-black text-indigo-600 tracking-tight">{fmt(c.revenue)}</span>,
+            render: (c: any) => <span className="font-bold text-indigo-600 tracking-tight">{fmt(c.revenue)}</span>,
             className: "text-right"
         },
         { 

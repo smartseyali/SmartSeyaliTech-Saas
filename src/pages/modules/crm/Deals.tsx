@@ -54,15 +54,15 @@ export default function Deals() {
             label: "Deal",
             render: (deal: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 tracking-tight italic uppercase">{deal.title}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{deal.priority || "Standard"} Priority</span>
+                    <span className="font-bold text-gray-900 tracking-tight  ">{deal.title}</span>
+                    <span className="text-[10px] text-gray-400 font-bold  tracking-widest">{deal.priority || "Standard"} Priority</span>
                 </div>
             )
         },
         { 
             key: "amount", 
             label: "Yield",
-            render: (deal: any) => <span className="font-black text-gray-900 tracking-tight">{fmt(deal.amount)}</span>,
+            render: (deal: any) => <span className="font-bold text-gray-900 tracking-tight">{fmt(deal.amount)}</span>,
             className: "text-right"
         },
         { 

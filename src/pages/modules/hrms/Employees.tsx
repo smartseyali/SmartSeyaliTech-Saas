@@ -71,12 +71,12 @@ export default function Employees() {
                         </div>
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase italic tracking-tight">{emp.full_name || emp.name}</span>
+                        <span className="font-bold text-gray-900   tracking-tight">{emp.full_name || emp.name}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none border-r pr-2 border-slate-200">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none border-r pr-2 border-slate-200">
                                 {emp.employee_code || "EMP-XXXX"}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                            <span className="text-[10px] text-gray-400 font-bold  tracking-widest leading-none">
                                 {emp.designation_name || "Unassigned Designation"}
                             </span>
                         </div>
@@ -90,7 +90,7 @@ export default function Employees() {
             render: (emp: any) => (
                 <div className="flex items-center gap-2">
                     <Building2 className="w-3.5 h-3.5 text-slate-300" />
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest leading-none">
+                    <span className="text-[11px] font-bold text-slate-600  tracking-widest leading-none">
                         {emp.department_name || "Corporate Hub"}
                     </span>
                 </div>
@@ -101,10 +101,10 @@ export default function Employees() {
             label: "Communication",
             render: (emp: any) => (
                 <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
+                    <span className="text-[10px] font-bold text-slate-400  tracking-widest flex items-center gap-2 group-hover:text-slate-900 transition-colors">
                         <Mail size={12}/> {emp.email || 'N/A'}
                     </span>
-                    <span className="text-[11px] font-black text-slate-700 tracking-tighter">
+                    <span className="text-[11px] font-bold text-slate-700 tracking-tighter">
                         {emp.phone || '+91 0000 0000'}
                     </span>
                 </div>
@@ -152,7 +152,7 @@ export default function Employees() {
             primaryKey="id"
             headerActions={
                 <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-900/10">
+                    <button className="h-8 px-4 rounded-xl font-bold text-[10px]  tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg shadow-slate-900/10">
                         <UserPlus className="w-3.5 h-3.5" /> Rapid Induction
                     </button>
                 </div>
