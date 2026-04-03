@@ -14,7 +14,7 @@ export default function GoodsReceipts() {
       { key: 'name', label: 'Receipt Reference', required: true }, 
       { key: 'po_reference', label: 'Purchase Order Ref' }, 
       { key: 'supplier_name', label: 'Supplier' }, 
-      { key: 'receipt_date', label: 'Date', type: 'date' } 
+      { key: 'receipt_date', label: 'Date', type: 'date' as const } 
     ];
 
     const handleSave = async (header: any) => {

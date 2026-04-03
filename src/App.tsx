@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,147 +9,47 @@ import { TenantProvider, useTenant } from "@/contexts/TenantContext";
 import { PermissionsProvider, usePermissions } from "@/contexts/PermissionsContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { AppLayout } from "@/components/layout/AppLayout";
-import PLATFORM_CONFIG from "@/config/platform";
 import { PlatformLoader } from "@/components/PlatformLoader";
-import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import ResetPassword from "./pages/ResetPassword";
 import { SessionTimeoutHandler } from "@/components/auth/SessionTimeoutHandler";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
-// ── E-Commerce Module ──
-import EcommerceDashboard from "./pages/modules/ecommerce/EcommerceDashboard";
-import EcomOrders from "./pages/modules/ecommerce/EcomOrders";
-import EcomOrderDetail from "./pages/modules/ecommerce/EcomOrderDetail";
-import Billing from "./pages/modules/ecommerce/Billing";
-import Coupons from "./pages/modules/ecommerce/Coupons";
-import Offers from "./pages/modules/ecommerce/Offers";
-import Refunds from "./pages/modules/ecommerce/Refunds";
-import PaymentGateways from "./pages/modules/ecommerce/PaymentGateways";
-import Reviews from "./pages/modules/ecommerce/Reviews";
-import AbandonedCarts from "./pages/modules/ecommerce/AbandonedCarts";
-import Gallery from "./pages/modules/ecommerce/Gallery";
-import ShippingZones from "./pages/modules/ecommerce/ShippingZones";
-import Deliveries from "./pages/modules/ecommerce/Deliveries";
-import Website from "./pages/modules/ecommerce/Website";
-import { EcomProducts } from "./pages/modules/ecommerce/masters/EcomProducts";
-import { Categories } from "./pages/modules/ecommerce/masters/Categories";
-import { Brands } from "./pages/modules/ecommerce/masters/Brands";
-import { Collections } from "./pages/modules/ecommerce/masters/Collections";
-import Banners from "./pages/modules/ecommerce/Banners";
-import BulkImport from "./pages/modules/ecommerce/BulkImport";
-import Team from "./pages/modules/ecommerce/Team";
-import Analytics from "./pages/modules/ecommerce/Analytics";
-import Reports from "./pages/modules/ecommerce/Reports";
-import APIIntegrations from "./pages/modules/ecommerce/APIIntegrations";
-import Settings from "./pages/modules/ecommerce/Settings";
-import Customers from "./pages/modules/ecommerce/Customers";
-
-import { StoreLayout } from "./components/storefront/StoreLayout";
-import StoreHome from "./pages/modules/ecommerce/storefront/home/Index";
-import StoreShop from "./pages/modules/ecommerce/storefront/shop/Index";
-import StoreProductDetail from "./pages/modules/ecommerce/storefront/product/Index";
-import StoreCart from "./pages/modules/ecommerce/storefront/Cart";
-import StoreCheckout from "./pages/modules/ecommerce/storefront/Checkout";
-import StoreSeeder from "./pages/modules/ecommerce/storefront/Seeder";
-import StoreAbout from "./pages/modules/ecommerce/storefront/About";
-import StoreOrders from "./pages/modules/ecommerce/storefront/Orders";
-import StoreOrderDetail from "./pages/modules/ecommerce/storefront/OrderDetail";
-import StoreOrderSuccess from "./pages/modules/ecommerce/storefront/OrderSuccess";
-import StoreContact from "./pages/modules/ecommerce/storefront/Contact";
-
-import SuperAdminDashboard from "./pages/super-admin/Dashboard";
-import HeadlessConsole from "./pages/super-admin/HeadlessConsole";
-import PlatformTenants from "./pages/super-admin/Tenants";
-import PlatformUsers from "./pages/super-admin/Users";
-import PlatformTemplates from "./pages/super-admin/Templates";
-import PlatformPlans from "./pages/super-admin/Plans";
-import PlatformModules from "./pages/super-admin/Modules";
-import Onboarding from "./pages/modules/ecommerce/Onboarding";
-import AppLauncher from "./pages/AppLauncher";
-
-// ── CRM Module ──
-import CRMDashboard from "./pages/modules/crm/CRMDashboard";
-import CRMLeads from "./pages/modules/crm/Leads";
-import CRMDeals from "./pages/modules/crm/Deals";
-import CRMContacts from "./pages/modules/crm/Contacts";
-import CRMPipelines from "./pages/modules/crm/Pipelines";
-import Forecast from "./pages/modules/crm/Forecast";
-import Accounts from "./pages/modules/crm/Accounts";
-import Segments from "./pages/modules/crm/Segments";
-
-// ── SALES Module (with Integrated Invoicing) ──
-import SalesDashboard from "./pages/modules/sales/SalesDashboard";
-import SalesQuotations from "./pages/modules/sales/Quotations";
-import SalesOrders from "./pages/modules/sales/Orders";
-import SalesDeliveries from "./pages/modules/sales/Deliveries";
-import SalesCustomers from "./pages/modules/sales/Customers";
-import InvoiceList from "./pages/modules/sales/Invoices";
-import ReceiptVouchers from "./pages/modules/sales/ReceiptVouchers";
-
-// ── POS Module ──
-import POSDashboard from "./pages/modules/pos/POSDashboard";
-import POSTerminal from "./pages/modules/pos/Terminal";
-import POSRegister from "./pages/modules/pos/Register";
-import POSOrdersLedger from "./pages/modules/pos/POSOrders";
-
-// ── INVENTORY Module ──
-import InventoryDashboard from "./pages/modules/inventory/InventoryDashboard";
-import InventoryItems from "./pages/modules/inventory/Items";
-import Warehouses from "./pages/modules/inventory/Warehouses";
-import StockLevels from "./pages/modules/inventory/StockLevels";
-import StockTransfers from "./pages/modules/inventory/StockTransfers";
-import StockAudits from "./pages/modules/inventory/StockAudits";
-import BatchTracking from "./pages/modules/inventory/BatchTracking";
-
-// ── HRMS Module ──
-import HRMSDashboard from "./pages/modules/hrms/HRMSDashboard";
-import HRMSRegistry from "./pages/modules/hrms/Employees";
-import HRMSInduction from "./pages/modules/hrms/Induction";
-import Attendance from "./pages/modules/hrms/Attendance";
-import LeaveManagement from "./pages/modules/hrms/LeaveManagement";
-import Departments from "./pages/modules/hrms/Departments";
-import EmployeeClaims from "./pages/modules/hrms/Claims";
-import EmployeeAppraisals from "./pages/modules/hrms/Appraisals";
-
-// ── PURCHASE Module ──
-import PurchaseDashboard from "./pages/modules/purchase/PurchaseDashboard";
-import PurchaseVendors from "./pages/modules/purchase/Vendors";
-import PurchaseOrders from "./pages/modules/purchase/PurchaseOrders";
-import PurchaseRequests from "./pages/modules/purchase/PurchaseRequests";
-import PurchaseBills from "./pages/modules/purchase/PurchaseBills";
-import GoodsReceipts from "./pages/modules/purchase/GoodsReceipts";
-
-// ── WHATSAPP Module ──
-import WhatsAppDashboard from "./pages/modules/whatsapp/WhatsAppDashboard";
-import WhatsAppAccounts from "./pages/modules/whatsapp/Accounts";
-import WhatsAppTemplates from "./pages/modules/whatsapp/Templates";
-import WhatsAppCampaigns from "./pages/modules/whatsapp/Campaigns";
-
-// ── MASTER REGISTRY (Common Foundation) ──
-import MasterDashboard from "./pages/modules/masters/MasterDashboard";
-import MastersItems from "./pages/modules/masters/Items";
-import MastersContacts from "./pages/modules/masters/Contacts";
-import MastersCategories from "./pages/modules/masters/Categories";
-import UOMMaster from "./pages/modules/masters/UOMs";
-import AttributeMaster from "./pages/modules/masters/Attributes";
-import BrandMaster from "./pages/modules/masters/Brands";
-import VariantMaster from "./pages/modules/masters/Variants";
-import ChartOfAccounts from "./pages/modules/masters/ChartOfAccounts";
-import FiscalYears from "./pages/modules/masters/FiscalYears";
-import ReviewMaster from "./pages/modules/masters/Reviews";
-
-// ── MARKETING (Smartseyali) ──
+// ── Eagerly loaded layouts (needed immediately for route structure) ──
 import { MarketingLayout } from "./components/marketing/MarketingLayout";
-import MarketingIndex from "./pages/marketing/Index";
-import MarketingAbout from "./pages/marketing/About";
-import MarketingServices from "./pages/marketing/Services";
-import MarketingProducts from "./pages/marketing/Products";
-import MarketingModuleDetail from "./pages/marketing/ModuleDetail";
-import MarketingContact from "./pages/marketing/Contact";
-import MarketingPolicy from "./pages/marketing/License";
 
+// ── Lazy-loaded standalone pages (not part of any module) ──
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AppLauncher = lazy(() => import("./pages/AppLauncher"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
 
+// ── Lazy-loaded marketing pages ──
+const MarketingIndex = lazy(() => import("./pages/marketing/Index"));
+const MarketingAbout = lazy(() => import("./pages/marketing/About"));
+const MarketingServices = lazy(() => import("./pages/marketing/Services"));
+const MarketingProducts = lazy(() => import("./pages/marketing/Products"));
+const MarketingModuleDetail = lazy(() => import("./pages/marketing/ModuleDetail"));
+const MarketingContact = lazy(() => import("./pages/marketing/Contact"));
+const MarketingPolicy = lazy(() => import("./pages/marketing/License"));
+
+// ── Per-module route arrays (each file lazy-imports its own pages) ──
+import { ecomAdminRoutes } from "./routes/ecomRoutes";
+import { salesRoutes } from "./routes/salesRoutes";
+import { purchaseRoutes } from "./routes/purchaseRoutes";
+import { inventoryRoutes } from "./routes/inventoryRoutes";
+import { crmRoutes } from "./routes/crmRoutes";
+import { hrmsRoutes } from "./routes/hrmsRoutes";
+import { posRoutes } from "./routes/posRoutes";
+import { financeRoutes } from "./routes/financeRoutes";
+import { mastersRoutes } from "./routes/mastersRoutes";
+import { whatsappRoutes } from "./routes/whatsappRoutes";
+import { websiteRoutes } from "./routes/websiteRoutes";
+import { superAdminRoutes } from "./routes/superAdminRoutes";
+
+// ── Query Client ──
 const queryClient = new QueryClient();
+
+// ── Route Guards ──
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
@@ -179,9 +80,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
 };
 
-// Dedicated route for onboarding — FULLY PUBLIC since account doesn't exist yet
-// The onboarding page itself handles: already-logged-in-with-company → redirect to /ecommerce
-
 const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
     const { isSuperAdmin, loading: pLoading } = usePermissions();
@@ -199,7 +97,7 @@ const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
 };
 
-import { ThemeProvider } from "@/components/ThemeProvider";
+// ── App ──
 
 const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" storageKey="ecom-suite-theme">
@@ -213,161 +111,104 @@ const App = () => (
                         <PermissionsProvider>
                             <CartProvider>
                                 <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                                    <Routes>
-                                        {/* Storefront Routes (Dynamic Path-based Multi-tenancy) */}
-                                        <Route path="/:companySlug" element={<StoreLayout />}>
-                                            <Route index element={<StoreHome />} />
-                                            <Route path="shop" element={<StoreShop />} />
-                                            <Route path="product/:id" element={<StoreProductDetail />} />
-                                            <Route path="cart" element={<StoreCart />} />
-                                            <Route path="checkout" element={<StoreCheckout />} />
-                                            <Route path="about" element={<StoreAbout />} />
-                                            <Route path="account/orders" element={<StoreOrders />} />
-                                            <Route path="account/orders/:id" element={<StoreOrderDetail />} />
-                                            <Route path="order-detail/:id" element={<StoreOrderDetail />} />
-                                            <Route path="order-success/:id" element={<StoreOrderSuccess />} />
-                                            <Route path="orders" element={<StoreOrders />} />
-                                            <Route path="contact" element={<StoreContact />} />
-                                        </Route>
+                                    <Suspense fallback={<PlatformLoader />}>
+                                        <Routes>
+                                            {/* ── Marketing Site ── */}
+                                            <Route element={<MarketingLayout />}>
+                                                <Route path="/" element={<MarketingIndex />} />
+                                                <Route path="/about" element={<MarketingAbout />} />
+                                                <Route path="/services" element={<MarketingServices />} />
+                                                <Route path="/products" element={<MarketingProducts />} />
+                                                <Route path="/products/:slug" element={<MarketingModuleDetail />} />
+                                                <Route path="/contact" element={<MarketingContact />} />
+                                                <Route path="/policy" element={<MarketingPolicy />} />
+                                            </Route>
 
-                                        {/* ══ MARKETING ═══════════════════ */}
-                                        <Route element={<MarketingLayout />}>
-                                            <Route path="/" element={<MarketingIndex />} />
-                                            <Route path="/about" element={<MarketingAbout />} />
-                                            <Route path="/services" element={<MarketingServices />} />
-                                            <Route path="/products" element={<MarketingProducts />} />
-                                            <Route path="/products/:slug" element={<MarketingModuleDetail />} />
-                                            <Route path="/contact" element={<MarketingContact />} />
-                                            <Route path="/policy" element={<MarketingPolicy />} />
-                                        </Route>
+                                            {/* ── Auth ── */}
+                                            <Route path="/login" element={<Login />} />
+                                            <Route path="/ecommerce-login" element={<Login />} />
+                                            <Route path="/reset-password" element={<ResetPassword />} />
 
-                                        <Route element={<StoreLayout />}>
-                                            <Route path="/seed" element={<StoreSeeder />} />
-                                        </Route>
+                                            {/* ── Super Admin Control Center ── */}
+                                            <Route element={<AppLayout />}>
+                                                {superAdminRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<SuperAdminRoute>{r.element}</SuperAdminRoute>} />
+                                                ))}
+                                            </Route>
 
-                                        <Route path="/login" element={<Login />} />
-                                        <Route path="/ecommerce-login" element={<Login />} />
-                                        <Route path="/reset-password" element={<ResetPassword />} />
+                                            {/* Onboarding — Public route, no auth needed.
+                                                Account is created at the END of the onboarding flow. */}
+                                            <Route path="/onboarding" element={<Onboarding />} />
 
-                                        {/* Super Admin Control Center */}
-                                        <Route element={<AppLayout />}>
-                                            <Route path="/super-admin" element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/tenants" element={<SuperAdminRoute><PlatformTenants /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/users" element={<SuperAdminRoute><PlatformUsers /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/plans" element={<SuperAdminRoute><PlatformPlans /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/modules" element={<SuperAdminRoute><PlatformModules /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/templates" element={<SuperAdminRoute><PlatformTemplates /></SuperAdminRoute>} />
-                                            <Route path="/super-admin/connectors" element={<SuperAdminRoute><HeadlessConsole /></SuperAdminRoute>} />
-                                        </Route>
+                                            {/* ── Platform App Launcher ── */}
+                                            <Route path="/apps" element={<ProtectedRoute><AppLauncher /></ProtectedRoute>} />
 
-                                        {/* Onboarding — Public route, no auth needed.
-                                            Account is created at the END of the onboarding flow. */}
-                                        <Route path="/onboarding" element={<Onboarding />} />
+                                            {/* Backward compat: /ecommerce → /apps/ecommerce */}
+                                            <Route path="/ecommerce" element={<Navigate to="/apps/ecommerce" replace />} />
 
-                                        {/* ══ PLATFORM APP LAUNCHER ═══════════════════ */}
-                                        <Route path="/apps" element={<ProtectedRoute><AppLauncher /></ProtectedRoute>} />
+                                            {/* ── E-Commerce Module ── */}
+                                            <Route element={<AppLayout />}>
+                                                {ecomAdminRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
+                                            </Route>
 
-                                        {/* Backward compat: /ecommerce → /apps/ecommerce */}
-                                        <Route path="/ecommerce" element={<Navigate to="/apps/ecommerce" replace />} />
+                                            {/* ── All Other Modules ── */}
+                                            <Route element={<AppLayout />}>
+                                                {/* CRM */}
+                                                {crmRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                        {/* ══ E-COMMERCE MODULE ═══════════════════ */}
-                                        <Route element={<AppLayout />}>
-                                            <Route path="/apps/ecommerce" element={<ProtectedRoute><EcommerceDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/orders" element={<ProtectedRoute><EcomOrders /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/orders/:id" element={<ProtectedRoute><EcomOrderDetail /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/refunds" element={<ProtectedRoute><Refunds /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/payment-gateways" element={<ProtectedRoute><PaymentGateways /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/abandoned-carts" element={<ProtectedRoute><AbandonedCarts /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/shipping-zones" element={<ProtectedRoute><ShippingZones /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/website" element={<ProtectedRoute><Website /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/masters/products" element={<ProtectedRoute><EcomProducts /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/masters/products/import" element={<ProtectedRoute><BulkImport /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/masters/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/masters/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/masters/collections" element={<ProtectedRoute><Collections /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/banners" element={<ProtectedRoute><Banners /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/api-integrations" element={<ProtectedRoute><APIIntegrations /></ProtectedRoute>} />
-                                            <Route path="/apps/ecommerce/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                                        </Route>
+                                                {/* POS */}
+                                                {posRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                        {/* ══ OTHER MODULES ═════════════════════════════ */}
-                                        <Route element={<AppLayout />}>
-                                            {/* CRM */}
-                                            <Route path="/apps/crm" element={<ProtectedRoute><CRMDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/leads" element={<ProtectedRoute><CRMLeads /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/deals" element={<ProtectedRoute><CRMDeals /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/contacts" element={<ProtectedRoute><CRMContacts /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/pipelines" element={<ProtectedRoute><CRMPipelines /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
-                                            <Route path="/apps/crm/segments" element={<ProtectedRoute><Segments /></ProtectedRoute>} />
+                                                {/* Sales */}
+                                                {salesRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* POS */}
-                                            <Route path="/apps/pos" element={<ProtectedRoute><POSDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/terminal" element={<ProtectedRoute><POSTerminal /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/register" element={<ProtectedRoute><POSRegister /></ProtectedRoute>} />
-                                            <Route path="/apps/pos/orders" element={<ProtectedRoute><POSOrdersLedger /></ProtectedRoute>} />
+                                                {/* Inventory */}
+                                                {inventoryRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* Sales */}
-                                            <Route path="/apps/sales" element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/quotations" element={<ProtectedRoute><SalesQuotations /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/orders" element={<ProtectedRoute><SalesOrders /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/deliveries" element={<ProtectedRoute><SalesDeliveries /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/customers" element={<ProtectedRoute><SalesCustomers /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/invoices" element={<ProtectedRoute><InvoiceList /></ProtectedRoute>} />
-                                            <Route path="/apps/sales/payments" element={<ProtectedRoute><ReceiptVouchers /></ProtectedRoute>} />
+                                                {/* HRMS */}
+                                                {hrmsRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* Inventory */}
-                                            <Route path="/apps/inventory" element={<ProtectedRoute><InventoryDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/items" element={<ProtectedRoute><InventoryItems /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/warehouses" element={<ProtectedRoute><Warehouses /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/levels" element={<ProtectedRoute><StockLevels /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/transfers" element={<ProtectedRoute><StockTransfers /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/audits" element={<ProtectedRoute><StockAudits /></ProtectedRoute>} />
-                                            <Route path="/apps/inventory/batches" element={<ProtectedRoute><BatchTracking /></ProtectedRoute>} />
+                                                {/* Purchase */}
+                                                {purchaseRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* HRMS */}
-                                            <Route path="/apps/hrms" element={<ProtectedRoute><HRMSDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/employees" element={<ProtectedRoute><HRMSRegistry /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/induction" element={<ProtectedRoute><HRMSInduction /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/leaves" element={<ProtectedRoute><LeaveManagement /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/claims" element={<ProtectedRoute><EmployeeClaims /></ProtectedRoute>} />
-                                            <Route path="/apps/hrms/appraisals" element={<ProtectedRoute><EmployeeAppraisals /></ProtectedRoute>} />
+                                                {/* WhatsApp */}
+                                                {whatsappRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* Purchase */}
-                                            <Route path="/apps/purchase" element={<ProtectedRoute><PurchaseDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/vendors" element={<ProtectedRoute><PurchaseVendors /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/requests" element={<ProtectedRoute><PurchaseRequests /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/bills" element={<ProtectedRoute><PurchaseBills /></ProtectedRoute>} />
-                                            <Route path="/apps/purchase/receipts" element={<ProtectedRoute><GoodsReceipts /></ProtectedRoute>} />
+                                                {/* Finance */}
+                                                {financeRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* WhatsApp */}
-                                            <Route path="/apps/whatsapp" element={<ProtectedRoute><WhatsAppDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/whatsapp/accounts" element={<ProtectedRoute><WhatsAppAccounts /></ProtectedRoute>} />
-                                            <Route path="/apps/whatsapp/templates" element={<ProtectedRoute><WhatsAppTemplates /></ProtectedRoute>} />
-                                            <Route path="/apps/whatsapp/campaigns" element={<ProtectedRoute><WhatsAppCampaigns /></ProtectedRoute>} />
+                                                {/* Website */}
+                                                {websiteRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
 
-                                            {/* Master Registry (Foundation) */}
-                                            <Route path="/apps/masters/*" element={<ProtectedRoute><MasterDashboard /></ProtectedRoute>} />
-                                            <Route path="/apps/masters/fiscal-years" element={<ProtectedRoute><FiscalYears /></ProtectedRoute>} />
-                                        </Route>
+                                                {/* Master Registry (Unified Hub) */}
+                                                {mastersRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
+                                            </Route>
 
-
-                                        <Route path="*" element={<StoreLayout><NotFound /></StoreLayout>} />
-                                    </Routes>
+                                            <Route path="*" element={<NotFound />} />
+                                        </Routes>
+                                    </Suspense>
                                 </BrowserRouter>
                             </CartProvider>
                         </PermissionsProvider>

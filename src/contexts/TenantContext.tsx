@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import PLATFORM_CONFIG from "@/config/platform";
 import { PlatformLoader } from "@/components/PlatformLoader";
+import { RESERVED_ROUTES } from "@/constants/routes";
 
 interface Company {
     id: number;
@@ -42,10 +43,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
         // If the first part of the path is likely a company subdomain/slug
         // We exclude known reserved routes like 'ecommerce', 'login', 'super-admin'
-        const reserved = ['ecommerce', 'login', 'ecommerce-login', 'onboarding', 'super-admin', 'reset-password', 'cart', 'checkout', 'apps', 'about', 'services', 'products', 'contact', 'policy'];
         const potentialSlug = pathParts[0];
 
-        if (potentialSlug && !reserved.includes(potentialSlug)) {
+        if (potentialSlug && !RESERVED_ROUTES.includes(potentialSlug as any)) {
             const { data: companyBySlug } = await supabase
                 .from('companies')
                 .select('id, name, subdomain, user_id')

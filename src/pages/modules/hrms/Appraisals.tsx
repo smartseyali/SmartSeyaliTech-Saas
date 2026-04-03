@@ -13,7 +13,7 @@ export default function EmployeeAppraisals() {
     const fields = [ 
       { key: 'name', label: 'Appraisal Title', required: true }, 
       { key: 'employee_name', label: 'Employee Name' }, 
-      { key: 'rating', label: 'Performance Rating (1-5)', type: 'number' } 
+      { key: 'rating', label: 'Performance Rating (1-5)', type: 'number' as const } 
     ];
 
     const handleSave = async (header: any) => {

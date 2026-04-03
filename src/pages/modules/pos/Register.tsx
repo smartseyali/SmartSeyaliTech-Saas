@@ -8,12 +8,12 @@ export default function POSRegister() {
     const [searchTerm, setSearchTerm] = useState("");
     const [editingItem, setEditingItem] = useState<any>(null);
     
-    const { data: items, loading, fetchItems, createItem, updateItem } = useCrud("pos_registers");
+    const { data: items, loading, fetchItems, createItem, updateItem } = useCrud("pos_sessions");
 
     const fields = [ 
       { key: 'name', label: 'Shift Identifier', required: true }, 
       { key: 'cashier', label: 'Attributed Cashier' }, 
-      { key: 'opening_amount', label: 'Drawer Baseline Float', type: 'number' } 
+      { key: 'opening_amount', label: 'Drawer Baseline Float', type: 'number' as const } 
     ];
 
     const handleSave = async (header: any) => {

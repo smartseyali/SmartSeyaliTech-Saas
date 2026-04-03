@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTenant } from "@/contexts/TenantContext";
 import {
     Boxes, Package, AlertTriangle, ArrowRightLeft,
@@ -8,149 +8,197 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import db from "@/lib/db";
 
 export default function InventoryDashboard() {
     const { activeCompany } = useTenant();
+    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({
+        totalSkus: 0,
+        lowStock: 0,
+        outOfStock: 0,
+        totalValue: 0
+    });
+    const [alerts, setAlerts] = useState<any[]>([]);
+    const [warehouses, setWarehouses] = useState<any[]>([]);
 
-    const stats = {
-        totalSkus: 4820,
-        lowStock: 12,
-        outOfStock: 4,
-        totalValue: 5840000
+    const fetchData = async () => {
+        if (!activeCompany) return;
+        setLoading(true);
+        try {
+            // Live counts and data
+            const [itemsRes, whRes] = await Promise.all([
+                db.from('items').select('*').eq('company_id', activeCompany.id),
+                db.from('warehouses').select('*').eq('company_id', activeCompany.id)
+            ]);
+
+            if (itemsRes.data) {
+                const items = itemsRes.data;
+                const totalValue = items.reduce((acc: number, curr: any) => acc + (Number(curr.purchase_price || 0) * Number(curr.stock_qty || 0)), 0);
+                const outOfStock = items.filter((i: any) => (i.stock_qty || 0) <= 0).length;
+                const lowStockList = items.filter((i: any) => (i.stock_qty || 0) > 0 && (i.stock_qty || 0) <= (i.reorder_level || 5));
+                
+                setStats({
+                    totalSkus: items.length,
+                    lowStock: lowStockList.length,
+                    outOfStock: outOfStock,
+                    totalValue: totalValue
+                });
+                setAlerts(lowStockList.slice(0, 4));
+            }
+
+            if (whRes.data) {
+                setWarehouses(whRes.data.map((w: any) => ({
+                    name: w.name,
+                    location: w.location || "Primary",
+                    load: Math.floor(Math.random() * 40) + 50 // Simulated load since we don't have capacity in DB yet
+                })));
+            }
+        } catch (err) {
+            console.error("Inventory data fetch failed:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const alerts = [
-        { id: "1", product: "Organic Arabica Coffee", sku: "BF-COF-001", stock: 2, limit: 10, status: 'Critical' },
-        { id: "2", product: "Stainless Steel Tumbler", sku: "HW-TUM-042", stock: 5, limit: 20, status: 'Low' },
-        { id: "3", product: "Eco-Friendly Yoga Mat", sku: "SP-MAT-105", stock: 0, limit: 15, status: 'Out of Stock' },
-    ];
+    useEffect(() => {
+        fetchData();
+    }, [activeCompany]);
 
-    const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+    const fmt = (n: number) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
     if (!activeCompany) return null;
-
     return (
-        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
+        <div className="min-h-screen bg-slate-50/20 font-sans p-4 lg:p-6 space-y-6 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase tracking-wider">Inventory Hub</h1>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase leading-none">Logistics & Supply Chain • {activeCompany?.name}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 border-l-4 border-orange-600 pl-4 uppercase">Inventory Hub</h1>
+                    <div className="flex items-center gap-2 pl-4">
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                        <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase leading-none">Logistics & Supply Chain • {activeCompany?.name}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-orange-600 transition-all shadow-sm">
-                        <RefreshCw className="w-4 h-4" />
-                    </button>
-                    <Button className="h-10 px-6 rounded-xl bg-orange-600 hover:bg-slate-900 text-white font-bold text-xs tracking-widest uppercase transition-all shadow-xl shadow-orange-600/20 gap-2 border-0">
-                        <Plus className="w-4 h-4" /> Inward Stock
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={fetchData} className="h-8 w-8 text-slate-400 hover:text-orange-600 border border-slate-200 hover:border-orange-200 bg-white">
+                        <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+                    </Button>
+                    <Button size="sm" className="h-8 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black shadow-lg shadow-slate-900/10 uppercase tracking-widest rounded-lg">
+                        <Plus className="w-3.5 h-3.5 mr-2" /> Inward Stock
                     </Button>
                 </div>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* KPI Cards - Unified Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: "Inventory Value", value: fmt(stats.totalValue), sub: "Asset valuation", icon: BarChart3, color: "bg-orange-600" },
-                    { label: "Active SKUs", value: stats.totalSkus.toLocaleString(), sub: "Catalog variants", icon: Box, color: "bg-slate-900" },
-                    { label: "Stock Alerts", value: stats.lowStock, sub: "Immediate action", icon: AlertTriangle, color: "bg-rose-600" },
-                    { label: "Out of Stock", value: stats.outOfStock, sub: "Depleted product", icon: Package, color: "bg-slate-900" },
+                    { label: "Inventory Value", value: fmt(stats.totalValue), sub: "Asset valuation", icon: BarChart3, color: "text-orange-600", bg: "bg-orange-50" },
+                    { label: "Active SKUs", value: stats.totalSkus.toLocaleString(), sub: "Catalog variants", icon: Box, color: "text-slate-600", bg: "bg-slate-100" },
+                    { label: "Stock Alerts", value: stats.lowStock, sub: "Immediate action", icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-50" },
+                    { label: "Out of Stock", value: stats.outOfStock, sub: "Depleted product", icon: Package, color: "text-slate-600", bg: "bg-slate-100" },
                 ].map(k => (
-                    <div key={k.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all h-64">
-                        <div className="flex items-center justify-between mb-8">
-                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white", k.color)}>
-                                <k.icon className="w-5 h-5" />
+                    <div key={k.label} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={cn("p-2 rounded-lg", k.bg, k.color)}>
+                                <k.icon className="w-4 h-4" />
                             </div>
-                            <span className="text-xs font-bold tracking-[0.1em] text-slate-500 uppercase leading-none">{k.label}</span>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{k.label}</span>
                         </div>
                         <div>
-                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2">{k.value}</p>
-                            <p className="text-xs font-bold text-slate-500 tracking-widest uppercase leading-none">{k.sub}</p>
+                            <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{loading ? "..." : k.value}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                    <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between">
-                        <h2 className="text-xl font-bold tracking-tight text-slate-900 uppercase tracking-wider leading-none">Vulnerability Log</h2>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-xs font-bold tracking-widest text-orange-600 uppercase hover:bg-orange-50 transition-all">Procure List</Button>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Stock Alerts Table */}
+                <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-3.5 bg-slate-400 rounded-full" />
+                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Stock Pipeline</h2>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-orange-600 text-[10px] font-black uppercase tracking-widest hover:bg-orange-50">Stock Registry</Button>
                     </div>
-
-                    <div className="p-10 space-y-6">
-                        {alerts.map(item => (
-                            <div key={item.id} className="flex items-center justify-between p-7 rounded-[2.5rem] border border-slate-50 hover:border-orange-100 hover:bg-slate-50/50 transition-all group">
-                                <div className="flex items-center gap-6">
-                                    <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-300",
-                                        item.status === 'Out of Stock' ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-orange-50 text-orange-600 border-orange-100"
-                                    )}>
-                                        <Package className="w-6 h-6" />
+                    <div className="p-4 space-y-3">
+                        {loading ? (
+                            <div className="p-10 text-center animate-pulse text-slate-300 font-black uppercase tracking-widest text-[10px]">Syncing Logistics...</div>
+                        ) : alerts.length === 0 ? (
+                            <div className="p-10 text-center text-slate-300 font-black uppercase tracking-widest text-[10px]">Stock Levels Optimized</div>
+                        ) : (
+                            alerts.map(item => (
+                                <div key={item.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-orange-200 hover:bg-slate-50/50 transition-all group cursor-pointer shadow-sm">
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-lg flex items-center justify-center border font-black text-[10px] shadow-sm transition-all",
+                                            (item.stock_qty || 0) <= 0 ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-orange-50 text-orange-600 border-orange-100"
+                                        )}>
+                                            <Package className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-black text-slate-900 uppercase leading-none mb-1 group-hover:text-orange-600">{item.name}</p>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">{item.sku}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-slate-900 group-hover:text-orange-600 transition-colors uppercase text-[12px] tracking-tight leading-none">{item.product}</p>
-                                        <p className="text-xs font-bold text-slate-500 tracking-widest uppercase mt-2">{item.sku}</p>
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-right">
+                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Stock</p>
+                                            <p className={cn("text-lg font-black tracking-tight leading-none", (item.stock_qty || 0) <= (item.reorder_level / 2) ? "text-rose-600" : "text-orange-600")}>{item.stock_qty}</p>
+                                        </div>
+                                        <button className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 text-white flex items-center justify-center hover:bg-orange-600 hover:border-orange-500 transition-all shadow-md">
+                                            <Plus className="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="text-right flex items-center gap-10">
-                                    <div className="space-y-1">
-                                        <p className="text-[13px] font-bold text-slate-500 uppercase tracking-widest text-right leading-none mb-1">Stock</p>
-                                        <p className={cn("text-2xl font-bold tracking-tighter leading-none", item.stock <= 2 ? "text-rose-600" : "text-orange-600")}>{item.stock}</p>
-                                    </div>
-                                    <button className="h-10 w-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                                        <Plus className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </div>
 
-                <div className="lg:col-span-4 space-y-8">
-                    <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-8 opacity-10">
-                            <Warehouse className="w-32 h-32 text-orange-500 -rotate-12 translate-x-12" />
-                        </div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-6">Node Status</h2>
-                        <div className="space-y-6 relative z-10 p-2">
-                            {[
-                                { name: "Main Warehouse", load: 78, location: "Bangalore" },
-                                { name: "Dark Store", load: 92, location: "Mumbai" },
-                                { name: "Regional Hub", load: 45, location: "Noida" },
-                            ].map(node => (
-                                <div key={node.name} className="space-y-3">
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{node.name}</p>
-                                            <span className="text-xs font-bold text-white/40 uppercase tracking-widest leading-none">{node.location}</span>
+                <div className="space-y-4">
+                    {/* Warehouse Hubs */}
+                    <div className="bg-slate-900 rounded-xl p-5 text-white shadow-xl relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <h3 className="text-[9px] font-black tracking-widest text-orange-400 mb-5 uppercase leading-none">Global Logistcs Nodes</h3>
+                            <div className="space-y-5">
+                                {warehouses.length === 0 ? (
+                                    <p className="text-[9px] font-black text-white/20 uppercase tracking-widest text-center py-6">No Registered Nodes</p>
+                                ) : (
+                                    warehouses.map(node => (
+                                        <div key={node.name} className="space-y-2">
+                                            <div className="flex justify-between items-center px-1">
+                                                <div>
+                                                    <p className="text-[9px] font-black text-white uppercase tracking-widest leading-none mb-1">{node.name}</p>
+                                                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none">{node.location}</span>
+                                                </div>
+                                                <span className="text-[11px] font-black text-orange-500 tracking-tight leading-none">{node.load}%</span>
+                                            </div>
+                                            <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                                                <div className="h-full bg-orange-600 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(249,115,22,0.5)]" style={{ width: `${node.load}%` }} />
+                                            </div>
                                         </div>
-                                        <span className="text-xl font-bold text-orange-500 tracking-tighter leading-none">{node.load}%</span>
-                                    </div>
-                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-orange-500 rounded-full transition-all duration-1000" style={{ width: `${node.load}%` }} />
-                                    </div>
-                                </div>
-                            ))}
+                                    ))
+                                )}
+                            </div>
                         </div>
+                        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-orange-600/10 rounded-full blur-3xl group-hover:bg-orange-600/20 transition-all pointer-events-none" />
                     </div>
 
-                    <div className="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm flex flex-col items-center">
-                        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-8 border-b border-slate-50 pb-4 tracking-wider uppercase w-full text-center">Logistics</h2>
-                        <div className="grid grid-cols-2 gap-4">
+                    {/* Quick Access Grid */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                        <h3 className="text-[9px] font-black tracking-widest text-slate-400 mb-4 border-b border-slate-50 pb-2 uppercase leading-none">Internal Logistics</h3>
+                        <div className="grid grid-cols-2 gap-2">
                             {[
-                                { label: "Inter-Stock", icon: ArrowRightLeft, color: "text-orange-600 bg-orange-50" },
-                                { label: "Audit Scan", icon: Box, color: "text-blue-600 bg-blue-50" },
-                                { label: "Batch Track", icon: Clock, color: "text-emerald-600 bg-emerald-50" },
-                                { label: "Reports", icon: BarChart3, color: "text-violet-600 bg-violet-50" },
+                                { label: "Transfer", icon: ArrowRightLeft, color: "text-orange-500" },
+                                { label: "Audit Scan", icon: Box, color: "text-blue-500" },
+                                { label: "Batch Track", icon: Clock, color: "text-emerald-500" },
+                                { label: "Logistics", icon: BarChart3, color: "text-violet-500" },
                             ].map(btn => (
-                                <button key={btn.label} className="flex flex-col items-center justify-center p-6 rounded-3xl border border-slate-50 hover:bg-slate-50 transition-all gap-4 bg-white group/log shadow-sm">
-                                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-all group-hover/log:scale-105", btn.color)}>
-                                        <btn.icon className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[13px] font-bold tracking-widest text-slate-500 uppercase group-hover/log:text-orange-600 transition-colors text-center">{btn.label}</span>
+                                <button key={btn.label} className="p-3 rounded-lg border border-slate-100 bg-slate-50/50 flex flex-col items-center gap-2 hover:bg-white hover:border-orange-200 transition-all group shadow-sm">
+                                    <btn.icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", btn.color)} />
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none text-center">{btn.label}</span>
                                 </button>
                             ))}
                         </div>

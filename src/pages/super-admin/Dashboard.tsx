@@ -1,216 +1,355 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { useTenant } from "@/contexts/TenantContext";
+import { PLATFORM_MODULES } from "@/config/modules";
+import { toast } from "sonner";
 import {
-    Users, Building2, LayoutDashboard, Search,
-    MoreVertical, ExternalLink, ShieldCheck,
-    TrendingUp, ArrowUpRight, Globe, Settings
+    Building2, Users, CreditCard, LayoutGrid,
+    Eye, Pause, Loader2
 } from "lucide-react";
-import PLATFORM_CONFIG from "@/config/platform";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
+interface DashboardStats {
+    totalTenants: number;
+    tenantsThisMonth: number;
+    activeUsers: number;
+    monthlyRevenue: number;
+    appsInstalled: number;
+}
+
+interface RecentTenant {
+    id: number;
+    name: string;
+    industry_type: string;
+    contact_email: string;
+    is_active: boolean;
+    created_at: string;
+    apps_count: number;
+}
 
 export default function SuperAdminDashboard() {
-    const { setCompany } = useTenant();
     const navigate = useNavigate();
-    const [companiesList, setCompaniesList] = useState<any[]>([]);
-    const [stats, setStats] = useState({ companies: 0, users: 0, revenue: 0 });
+    const [stats, setStats] = useState<DashboardStats>({
+        totalTenants: 0,
+        tenantsThisMonth: 0,
+        activeUsers: 0,
+        monthlyRevenue: 0,
+        appsInstalled: 0,
+    });
+    const [recentTenants, setRecentTenants] = useState<RecentTenant[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        const fetchGlobalData = async () => {
-            setLoading(true);
-            try {
-                // Fetch companies with their selected system plans
-                const { data: compData, error: compErr } = await supabase
-                    .from("companies")
-                    .select(`
-                        *,
-                        system_plans (
-                            name,
-                            price_monthly
-                        )
-                    `)
-                    .order("created_at", { ascending: false });
-
-                if (compErr) throw compErr;
-
-                // Fetch total user count
-                const { count: userCount, error: userErr } = await supabase
-                    .from("users")
-                    .select("id", { count: "exact" });
-
-                if (userErr) throw userErr;
-
-                setCompaniesList(compData || []);
-
-                // Calculate MRR based on active company plan prices
-                const totalRevenue = (compData || []).reduce((acc, company: any) => {
-                    return acc + (company.system_plans?.price_monthly || 0);
-                }, 0);
-
-                setStats({
-                    companies: compData?.length || 0,
-                    users: userCount || 0,
-                    revenue: totalRevenue
-                });
-            } catch (err) {
-                console.error("Super Admin Data Fetch Error:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGlobalData();
+        fetchDashboardData();
     }, []);
 
-    const filteredCompanies = companiesList.filter(c =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.subdomain.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        try {
+            // Fetch companies
+            const { data: companies, error: compErr } = await supabase
+                .from("companies")
+                .select("id, name, industry_type, contact_email, is_active, created_at")
+                .order("created_at", { ascending: false });
+
+            if (compErr) throw compErr;
+
+            // Fetch user count
+            const { count: userCount, error: userErr } = await supabase
+                .from("users")
+                .select("id", { count: "exact" });
+
+            if (userErr) throw userErr;
+
+            // Fetch active company modules with system_modules for pricing
+            const { data: companyModules, error: modErr } = await supabase
+                .from("company_modules")
+                .select("id, company_id, is_active, system_modules(price_monthly)")
+                .eq("is_active", true);
+
+            if (modErr) throw modErr;
+
+            // Calculate monthly revenue from active module prices
+            const monthlyRevenue = (companyModules || []).reduce((sum: number, cm: any) => {
+                return sum + (cm.system_modules?.price_monthly || 0);
+            }, 0);
+
+            // Count tenants created this month
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+            const tenantsThisMonth = (companies || []).filter(
+                (c: any) => c.created_at >= monthStart
+            ).length;
+
+            // Build apps count per company for recent tenants
+            const appsByCompany: Record<number, number> = {};
+            (companyModules || []).forEach((cm: any) => {
+                appsByCompany[cm.company_id] = (appsByCompany[cm.company_id] || 0) + 1;
+            });
+
+            const recent: RecentTenant[] = (companies || []).slice(0, 10).map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                industry_type: c.industry_type || "-",
+                contact_email: c.contact_email || "-",
+                is_active: c.is_active !== false,
+                created_at: c.created_at,
+                apps_count: appsByCompany[c.id] || 0,
+            }));
+
+            setStats({
+                totalTenants: companies?.length || 0,
+                tenantsThisMonth,
+                activeUsers: userCount || 0,
+                monthlyRevenue,
+                appsInstalled: companyModules?.length || 0,
+            });
+            setRecentTenants(recent);
+        } catch (err) {
+            console.error("Dashboard fetch error:", err);
+            toast.error("Failed to load dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSuspend = async (tenantId: number, tenantName: string) => {
+        if (!confirm(`Suspend "${tenantName}"? This will deactivate their account.`)) return;
+
+        const { error } = await supabase
+            .from("companies")
+            .update({ is_active: false })
+            .eq("id", tenantId);
+
+        if (error) {
+            toast.error("Failed to suspend tenant");
+            return;
+        }
+
+        toast.success(`${tenantName} has been suspended`);
+        setRecentTenants((prev) =>
+            prev.map((t) => (t.id === tenantId ? { ...t, is_active: false } : t))
+        );
+    };
+
+    const statCards = [
+        {
+            label: "Total tenants",
+            value: stats.totalTenants,
+            subtitle: `+${stats.tenantsThisMonth} this month`,
+            icon: Building2,
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-600",
+        },
+        {
+            label: "Active users",
+            value: stats.activeUsers,
+            subtitle: "Across all tenants",
+            icon: Users,
+            iconBg: "bg-violet-50",
+            iconColor: "text-violet-600",
+        },
+        {
+            label: "Monthly revenue",
+            value: `₹${stats.monthlyRevenue.toLocaleString("en-IN")}`,
+            subtitle: "From active app subscriptions",
+            icon: CreditCard,
+            iconBg: "bg-emerald-50",
+            iconColor: "text-emerald-600",
+        },
+        {
+            label: "Apps installed",
+            value: stats.appsInstalled,
+            subtitle: "Active module installs",
+            icon: LayoutGrid,
+            iconBg: "bg-amber-50",
+            iconColor: "text-amber-600",
+        },
+    ];
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+            </div>
+        );
+    }
 
     return (
-        <div className="p-8 space-y-10 animate-in fade-in duration-700">
+        <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
-                            <ShieldCheck className="w-6 h-6" />
-                        </div>
-                        <h1 className="text-3xl font-bold tracking-tight">Control Center</h1>
-                    </div>
-                    <p className="text-xs font-semibold text-muted-foreground opacity-70 ml-1">Universal {PLATFORM_CONFIG.name} Administration</p>
-                </div>
-
-                <div className="flex gap-4">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <input
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search Ecosystem..."
-                            className="h-14 pl-12 pr-6 w-full md:w-[300px] rounded-2xl bg-card border border-border focus:ring-2 focus:ring-primary/20 focus:outline-none font-bold text-sm"
-                        />
-                    </div>
-                    <Button variant="outline" className="h-14 w-14 rounded-2xl p-0">
-                        <Settings className="w-5 h-5" />
-                    </Button>
-                </div>
+            <div>
+                <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
+                <p className="text-sm text-slate-500 mt-0.5">
+                    Platform overview and recent activity
+                </p>
             </div>
 
-            {/* Global Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { label: "Active Nodes", value: stats.companies, Icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
-                    { label: "Total Accounts", value: stats.users, Icon: Users, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-                    { label: "Platform MRR", value: `$ ${stats.revenue.toLocaleString()}`, Icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" }
-                ].map((s, i) => (
-                    <div key={i} className="bg-card rounded-[2.5rem] border border-border p-8 space-y-4 hover:shadow-xl hover:shadow-primary/5 transition-all group">
-                        <div className="flex items-center justify-between">
-                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", s.bg)}>
-                                <s.Icon className={cn("w-7 h-7", s.color)} />
-                            </div>
-                            <div className="px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-xs font-bold flex items-center gap-1">
-                                <ArrowUpRight className="w-3 h-3" /> 100%
+            {/* Stat cards — 2x2 grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statCards.map((card, i) => (
+                    <div
+                        key={i}
+                        className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
+                    >
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`p-2 rounded-lg ${card.iconBg}`}>
+                                <card.icon className={`w-4 h-4 ${card.iconColor}`} />
                             </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold text-muted-foreground mb-1">{s.label}</p>
-                            <p className="text-3xl font-bold tracking-tight">{s.value}</p>
-                        </div>
+                        <p className="text-2xl font-semibold text-slate-900 tracking-tight">
+                            {card.value}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">{card.label}</p>
+                        <p className="text-xs text-slate-400 mt-1">{card.subtitle}</p>
                     </div>
                 ))}
             </div>
 
-            {/* Companies Table */}
-            <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-2xl shadow-black/5">
-                <div className="p-8 border-b border-border flex items-center justify-between bg-secondary/5">
-                    <h2 className="text-xl font-bold tracking-tight">Enterprise Registry</h2>
-                    <div className="flex gap-3">
-                        <Button variant="outline" className="rounded-xl font-bold gap-2" onClick={() => navigate('/super-admin/modules')}>
-                            <LayoutDashboard className="w-4 h-4" /> Manage Modules
-                        </Button>
-                        <Button className="rounded-xl font-bold gap-2">
-                            <Settings className="w-4 h-4" /> System Logs
-                        </Button>
+            {/* Middle row: Revenue chart + Recent tenants */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Revenue chart placeholder */}
+                <div className="bg-white border border-slate-200 rounded-lg p-5 lg:col-span-1">
+                    <h2 className="text-sm font-medium text-slate-900 mb-4">
+                        Revenue trend
+                    </h2>
+                    <div className="flex items-center justify-center h-48 bg-slate-50 rounded-md border border-dashed border-slate-200">
+                        <p className="text-xs text-slate-400">
+                            Chart coming soon
+                        </p>
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="border-b border-border/40">
-                                <th className="px-8 py-5 text-xs font-bold text-muted-foreground">Ecosystem</th>
-                                <th className="px-8 py-5 text-xs font-bold text-muted-foreground">Live Endpoint</th>
-                                <th className="px-8 py-5 text-xs font-bold text-muted-foreground">Engine Pack</th>
-                                <th className="px-8 py-5 text-xs font-bold text-muted-foreground">Deployment</th>
-                                <th className="px-8 py-5 text-xs font-bold text-muted-foreground text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/40">
-                            {filteredCompanies.map((company) => {
-                                const plan = company.system_plans;
-                                return (
-                                    <tr key={company.id} className="hover:bg-secondary/5 transition-colors group">
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center font-bold text-primary">
-                                                    {company.name[0]}
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-sm tracking-tight">{company.name}</p>
-                                                    <p className="text-xs text-muted-foreground font-medium  opacity-60">REF: {company.id}</p>
-                                                </div>
-                                            </div>
+                {/* Recent tenants table */}
+                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden lg:col-span-2">
+                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                        <h2 className="text-sm font-medium text-slate-900">
+                            Recent tenants
+                        </h2>
+                        <button
+                            onClick={() => navigate("/super-admin/tenants")}
+                            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                            View all
+                        </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-slate-100 bg-slate-50/60">
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Company
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Industry
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Apps
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Email
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Status
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
+                                        Created
+                                    </th>
+                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500 text-right">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {recentTenants.map((tenant) => (
+                                    <tr
+                                        key={tenant.id}
+                                        className="hover:bg-slate-50/50 transition-colors"
+                                    >
+                                        <td className="px-4 py-2.5">
+                                            <span className="text-sm font-medium text-slate-900">
+                                                {tenant.name}
+                                            </span>
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer">
-                                                <Globe className="w-3.5 h-3.5" />
-                                                <span className="text-xs font-bold tracking-tight underline decoration-indigo-500/30 underline-offset-4">
-                                                    {company.subdomain}.{PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.tech
+                                        <td className="px-4 py-2.5 text-sm text-slate-600">
+                                            {tenant.industry_type}
+                                        </td>
+                                        <td className="px-4 py-2.5 text-sm text-slate-600">
+                                            {tenant.apps_count}
+                                        </td>
+                                        <td className="px-4 py-2.5 text-sm text-slate-500">
+                                            {tenant.contact_email}
+                                        </td>
+                                        <td className="px-4 py-2.5">
+                                            {tenant.is_active ? (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    Active
                                                 </span>
-                                            </div>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                                    Suspended
+                                                </span>
+                                            )}
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className={cn(
-                                                "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[13px] font-bold border",
-                                                company.plan === 'enterprise' || company.plan === 'Enterprise' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
-                                                    company.plan === 'professional' || company.plan === 'Professional' ? "bg-blue-500/10 text-blue-600 border-blue-500/20" : "bg-muted text-muted-foreground border-border"
-                                            )}>
-                                                {plan?.name || company.plan || 'Starter'}
-                                            </div>
+                                        <td className="px-4 py-2.5 text-sm text-slate-500">
+                                            {new Date(tenant.created_at).toLocaleDateString("en-IN", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            })}
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <p className="text-xs font-bold text-muted-foreground">
-                                                {new Date(company.created_at).toLocaleDateString()}
-                                            </p>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="rounded-xl font-bold h-10 gap-2 border-slate-200"
-                                                    onClick={() => {
-                                                        setCompany(company.id);
-                                                        navigate("/ecommerce");
-                                                    }}
+                                        <td className="px-4 py-2.5 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <button
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/super-admin/tenants?id=${tenant.id}`
+                                                        )
+                                                    }
+                                                    className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                                                    title="View"
                                                 >
-                                                    Access Node <ExternalLink className="w-3.5 h-3.5" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10">
-                                                    <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                                                </Button>
+                                                    <Eye className="w-3.5 h-3.5" />
+                                                </button>
+                                                {tenant.is_active && (
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSuspend(tenant.id, tenant.name)
+                                                        }
+                                                        className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors"
+                                                        title="Suspend"
+                                                    >
+                                                        <Pause className="w-3.5 h-3.5" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                ))}
+                                {recentTenants.length === 0 && (
+                                    <tr>
+                                        <td
+                                            colSpan={7}
+                                            className="px-4 py-8 text-center text-sm text-slate-400"
+                                        >
+                                            No tenants found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom: Recent activity placeholder */}
+            <div className="bg-white border border-slate-200 rounded-lg p-5">
+                <h2 className="text-sm font-medium text-slate-900 mb-4">
+                    Recent activity
+                </h2>
+                <div className="flex items-center justify-center h-32 bg-slate-50 rounded-md border border-dashed border-slate-200">
+                    <p className="text-xs text-slate-400">
+                        Activity feed coming soon
+                    </p>
                 </div>
             </div>
         </div>

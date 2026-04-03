@@ -10,10 +10,10 @@ export default function Forecast() {
     
     const { data: items, loading, fetchItems, createItem, updateItem } = useCrud("crm_forecasts");
 
-    const fields = [ 
-      { key: 'name', label: 'Forecast Quarter', required: true }, 
-      { key: 'target_revenue', label: 'Target Revenue', type: 'number' }, 
-      { key: 'confidence', label: 'Confidence %' } 
+    const fields = [
+      { key: 'name', label: 'Forecast Quarter', required: true },
+      { key: 'target_revenue', label: 'Target Revenue', type: 'number' as const },
+      { key: 'confidence', label: 'Confidence %' }
     ];
 
     const handleSave = async (header: any) => {

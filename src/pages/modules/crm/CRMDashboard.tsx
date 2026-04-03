@@ -59,126 +59,125 @@ export default function CRMDashboard() {
     if (!activeCompany) return null;
 
     return (
-        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
+        <div className="min-h-screen bg-slate-50/20 font-sans p-4 lg:p-6 space-y-6 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase tracking-wider">CRM Analytics</h1>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-                        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase leading-none">Sales Intelligence Hub • {activeCompany?.name}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 border-l-4 border-indigo-600 pl-4 uppercase">CRM Intelligence</h1>
+                    <div className="flex items-center gap-2 pl-4">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                        <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase leading-none">Sales Pipeline & Lead Management • {activeCompany?.name}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="hidden lg:flex items-center bg-slate-100 rounded-xl px-4 h-10 border border-slate-200 shadow-inner">
-                        <Search className="w-4 h-4 text-slate-500 mr-2" />
-                        <input type="text" placeholder="Search Master..." className="bg-transparent border-0 focus:ring-0 text-xs w-40 font-bold uppercase tracking-widest text-slate-500 placeholder:text-slate-300" />
-                    </div>
-                    <Button className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-slate-900 text-white font-bold text-xs tracking-widest uppercase transition-all shadow-xl shadow-indigo-600/20 gap-2 border-0">
-                        <Plus className="w-4 h-4" /> New Lead
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => setLoading(true)} className="h-8 w-8 text-slate-400 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200 bg-white">
+                        <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+                    </Button>
+                    <Button size="sm" className="h-8 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black shadow-lg shadow-slate-900/10 uppercase tracking-widest rounded-lg">
+                        <Plus className="w-3.5 h-3.5 mr-2" /> New Lead
                     </Button>
                 </div>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* KPI Cards - Sales Pipeline */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: "Active Revenue", value: fmt(stats.pipelineValue), sub: "Pipeline Valuation", icon: TrendingUp, color: "bg-indigo-600" },
-                    { label: "Lead Inflow", value: `+${stats.newLeads}`, sub: "Growth trajectory", icon: Users, color: "bg-slate-900" },
-                    { label: "Win Rate", value: `${stats.winRate}%`, sub: "Conversion health", icon: Target, color: "bg-indigo-600" },
-                    { label: "Open Deals", value: stats.activeDeals, sub: "Negotiation matrix", icon: Briefcase, color: "bg-slate-900" },
+                    { label: "Pipeline Value", value: fmt(stats.pipelineValue), sub: "Projected Revenue", icon: TrendingUp, color: "text-indigo-600", bg: "bg-indigo-50" },
+                    { label: "New Leads", value: `+${stats.newLeads}`, sub: "Growth Trajectory", icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+                    { label: "Win Yield", value: `${stats.winRate}%`, sub: "Conversion Efficiency", icon: Target, color: "text-emerald-600", bg: "bg-emerald-50" },
+                    { label: "Active Deals", value: stats.activeDeals, sub: "Negotiation Phase", icon: Briefcase, color: "text-slate-600", bg: "bg-slate-100" },
                 ].map(k => (
-                    <div key={k.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all h-64">
-                        <div className="flex items-center justify-between mb-8">
-                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white", k.color)}>
-                                <k.icon className="w-5 h-5" />
+                    <div key={k.label} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={cn("p-2 rounded-lg", k.bg, k.color)}>
+                                <k.icon className="w-4 h-4" />
                             </div>
-                            <span className="text-xs font-bold tracking-[0.1em] text-slate-500 uppercase leading-none">{k.label}</span>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{k.label}</span>
                         </div>
                         <div>
-                            <p className="text-4xl font-bold tracking-tight text-slate-900 mb-2 truncate">{k.value}</p>
-                            <p className="text-xs font-bold text-slate-500 tracking-widest uppercase leading-none">{k.sub}</p>
+                            <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{k.value}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                    <div className="px-10 py-8 border-b border-slate-50 bg-white flex items-center justify-between">
-                        <h2 className="text-xl font-bold tracking-tight text-slate-900 uppercase tracking-wider leading-none">Activity Stream</h2>
-                        <Button variant="ghost" className="h-9 px-4 rounded-lg text-xs font-bold tracking-widest text-indigo-600 uppercase hover:bg-indigo-50 transition-all">Historical Feed</Button>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Activity Feed */}
+                <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-3.5 bg-slate-400 rounded-full" />
+                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Activity Stream</h2>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50">Historical Log</Button>
                     </div>
-
-                    <div className="p-10 space-y-6">
+                    <div className="p-4 space-y-3">
                         {activities.map(act => (
-                            <div key={act.id} className="flex items-center justify-between p-6 rounded-[2rem] border border-slate-50 hover:border-indigo-100 hover:bg-slate-50/50 transition-all group">
-                                <div className="flex items-center gap-5">
+                            <div key={act.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-slate-50/50 transition-all group cursor-pointer shadow-sm">
+                                <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-300",
+                                        "w-10 h-10 rounded-lg flex items-center justify-center border font-black text-[10px] shadow-sm transition-all",
                                         act.type === 'lead' ? "bg-blue-50 text-blue-600 border-blue-100" :
-                                            act.type === 'deal' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                                "bg-amber-50 text-amber-600 border-amber-100"
+                                        act.type === 'deal' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                        "bg-amber-50 text-amber-600 border-amber-100"
                                     )}>
-                                        {act.type === 'lead' ? <Users className="w-5 h-5" /> : act.type === 'deal' ? <Briefcase className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
+                                        {act.type === 'lead' ? <Users className="w-4 h-4" /> : act.type === 'deal' ? <Briefcase className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors uppercase text-[12px] tracking-tight leading-none">{act.title}</p>
-                                        <div className="flex items-center gap-3 mt-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                        <p className="text-[11px] font-black text-slate-900 uppercase leading-none mb-1 group-hover:text-indigo-600">{act.title}</p>
+                                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                                             <span>{act.person}</span>
-                                            <span className="text-slate-200">•</span>
+                                            <span>•</span>
                                             <span className="text-indigo-600">{act.status}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <span className="text-xs font-bold text-slate-300 uppercase leading-none">{act.time}</span>
+                                <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{act.time}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="lg:col-span-4 space-y-8">
-                    <div className="bg-slate-900 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-8 opacity-10">
-                            <Binary className="w-32 h-32 text-indigo-500 -rotate-12 translate-x-12" />
-                        </div>
-                        <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-8 border-b border-white/5 pb-6">Performance</h2>
-                        <div className="space-y-6 relative z-10 p-2">
-                            {[
-                                { label: "Lead Res Time", value: "14m", progress: 85, color: "bg-indigo-500" },
-                                { label: "Meeting Rate", value: "92%", progress: 92, color: "bg-emerald-500" },
-                                { label: "Win Yield", value: "48%", progress: 48, color: "bg-rose-500" },
-                            ].map(metric => (
-                                <div key={metric.label} className="space-y-3">
-                                    <div className="flex justify-between items-end">
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{metric.label}</span>
-                                        <span className="text-xl font-bold text-white leading-none tracking-tighter">{metric.value}</span>
+                <div className="space-y-4">
+                    {/* Performance Dark Card */}
+                    <div className="bg-slate-900 rounded-xl p-5 text-white shadow-xl relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <h3 className="text-[9px] font-black tracking-widest text-indigo-400 mb-5 uppercase leading-none">Sales Yield Metrics</h3>
+                            <div className="space-y-4">
+                                {[
+                                    { label: "Avg Res Time", value: "12m", progress: 85, color: "bg-indigo-500" },
+                                    { label: "Meeting Ratio", value: "94%", progress: 94, color: "bg-blue-500" },
+                                    { label: "Close Speed", value: "4.2d", progress: 42, color: "bg-emerald-500" },
+                                ].map(metric => (
+                                    <div key={metric.label} className="space-y-2">
+                                        <div className="flex justify-between items-end px-1">
+                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{metric.label}</span>
+                                            <span className="text-[11px] font-black text-white tracking-tight">{metric.value}</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                                            <div className={cn("h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(99,102,241,0.5)]", metric.color)} style={{ width: `${metric.progress}%` }} />
+                                        </div>
                                     </div>
-                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                        <div
-                                            className={cn("h-full rounded-full transition-all duration-1000", metric.color)}
-                                            style={{ width: `${metric.progress}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
+                        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-600/10 rounded-full blur-3xl group-hover:bg-indigo-600/20 transition-all pointer-events-none" />
                     </div>
 
-                    <div className="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm flex flex-col">
-                        <h2 className="text-xl font-bold text-slate-900 mb-8 uppercase tracking-wider border-b border-slate-50 pb-6 w-full text-center">Sales Force</h2>
-                        <div className="grid grid-cols-2 gap-4">
+                    {/* Quick CRM Hub */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                        <h3 className="text-[9px] font-black tracking-widest text-slate-400 mb-4 border-b border-slate-50 pb-2 uppercase leading-none">Sales Catalyst Nodes</h3>
+                        <div className="grid grid-cols-2 gap-2">
                             {[
-                                { label: "Sched Demo", icon: Calendar, color: "text-blue-600 bg-blue-50" },
-                                { label: "Sales Log", icon: Clock, color: "text-slate-600 bg-slate-50" },
-                                { label: "Email Node", icon: Mail, color: "text-amber-600 bg-amber-50" },
-                                { label: "SLA Matrix", icon: ShieldCheck, color: "text-emerald-600 bg-emerald-50" },
-                            ].map(cmd => (
-                                <button key={cmd.label} className="flex flex-col items-center justify-center p-6 rounded-3xl border border-slate-50 hover:bg-slate-50 transition-all gap-4 bg-white group/cmd shadow-sm">
-                                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-all group-hover/cmd:scale-105", cmd.color)}>
-                                        <cmd.icon className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-[13px] font-bold tracking-widest text-slate-500 uppercase group-hover/cmd:text-indigo-600 transition-colors text-center">{cmd.label}</span>
+                                { label: "Schedule", icon: Calendar, color: "text-blue-500" },
+                                { label: "Audit Log", icon: Clock, color: "text-slate-500" },
+                                { label: "Messenger", icon: Mail, color: "text-amber-500" },
+                                { label: "Contracts", icon: ShieldCheck, color: "text-emerald-500" },
+                            ].map(btn => (
+                                <button key={btn.label} className="p-3 rounded-lg border border-slate-100 bg-slate-50/50 flex flex-col items-center gap-2 hover:bg-white hover:border-indigo-200 transition-all group shadow-sm">
+                                    <btn.icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", btn.color)} />
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none text-center">{btn.label}</span>
                                 </button>
                             ))}
                         </div>

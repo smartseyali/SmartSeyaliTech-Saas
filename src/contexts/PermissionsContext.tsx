@@ -183,11 +183,10 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
 
             } catch (err) {
                 console.error("Error loading permissions:", err);
-                // Fail-open: if something breaks, keep user accessible
-                if (user) {
-                    setIsAdmin(true);
-                    setAvailableModules(["Masters"]); // Only basic fallback
-                }
+                // Fail-closed: don't grant admin on error
+                setIsAdmin(false);
+                setAvailableModules(["Masters"]); // Only basic fallback
+                setPermissions([]);
             } finally {
                 setLoading(false);
             }

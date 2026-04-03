@@ -1,298 +1,356 @@
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, Grid3X3, Lock, Settings, LogOut, LayoutGrid, ChevronDown, PlusCircle } from "lucide-react";
 import { useState, useMemo } from "react";
-import {
-    PLATFORM_MODULES,
-    CATEGORY_LABELS,
-    ModuleCategory,
-    type PlatformModule,
-} from "@/config/modules";
-import PLATFORM_CONFIG from "@/config/platform";
-import { useTenant } from "@/contexts/TenantContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Search, Check, Download, ExternalLink, X } from "lucide-react";
+import { PLATFORM_MODULES, CATEGORY_LABELS } from "@/config/modules";
+import type { PlatformModule } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
-import { cn } from "@/lib/utils";
+import { useTenant } from "@/contexts/TenantContext";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import PLATFORM_CONFIG from "@/config/platform";
 
-const CATEGORY_ORDER: ModuleCategory[] = [
-    'commerce', 'finance', 'operations', 'people', 'customer', 'analytics', 'collaboration'
+type CategoryFilter = "all" | PlatformModule["category"];
+
+const CATEGORY_PILLS: { key: CategoryFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "commerce", label: "Commerce" },
+    { key: "operations", label: "Operations" },
+    { key: "customer", label: "Customer" },
+    { key: "people", label: "People" },
+    { key: "finance", label: "Finance" },
+    { key: "analytics", label: "Analytics" },
+    { key: "collaboration", label: "Collaboration" },
 ];
-
-function ModuleCard({ mod, isSubscribed, onOpen }: { mod: PlatformModule; isSubscribed: boolean, onOpen: (m: PlatformModule) => void }) {
-    const isAvailable = mod.status === 'live' || mod.status === 'beta';
-    const canAccess = isSubscribed && isAvailable;
-    const navigate = useNavigate();
-
-    return (
-        <motion.div
-            whileHover={{ scale: 1.05, y: -4 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => isAvailable && (canAccess ? onOpen(mod) : navigate(`/apps/ecommerce/billing?module=${mod.id}`))}
-            className={cn(
-                "relative flex flex-col items-center gap-3 p-3 rounded-[1.5rem] transition-all duration-500 group cursor-pointer",
-                !isAvailable && "opacity-30 grayscale pointer-events-none"
-            )}
-        >
-            {/* Odoo-style App Icon */}
-            <div className={cn(
-                "relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-3xl shadow-lg transition-all duration-500",
-                "bg-gradient-to-br", mod.colorFrom, mod.colorTo,
-                "group-hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.2)] group-hover:ring-4 group-hover:ring-emerald-500/10",
-                !canAccess && "ring-1 ring-gray-200 shadow-none border border-gray-100"
-            )}>
-                <span className="group-hover:scale-105 transition-transform duration-500">{mod.icon}</span>
-                
-                {!canAccess && isAvailable && (
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                        <Lock className="w-3 h-3 text-white" />
-                    </div>
-                )}
-                
-                {/* Micro-sparkle on hover */}
-                <div className="absolute inset-0 rounded-3xl bg-white/0 group-hover:bg-white/10 transition-colors duration-500" />
-            </div>
-
-            {/* Technical labeling */}
-            <div className="text-center">
-                <h3 className="text-xs font-bold text-gray-800 uppercase tracking-[0.15em] group-hover:text-emerald-700 transition-colors">
-                    {mod.name}
-                </h3>
-                {mod.status === 'beta' && (
-                    <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-600/60 mt-1 block">
-                        Module Pre-Release
-                    </span>
-                )}
-            </div>
-        </motion.div>
-    );
-}
 
 export default function AppLauncher() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
-    const { signOut } = useAuth();
-    const { hasModule, isSuperAdmin } = usePermissions();
+    const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<ModuleCategory | 'all'>('all');
-    const [showAllModules, setShowAllModules] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [category, setCategory] = useState<CategoryFilter>("all");
+    const [installTarget, setInstallTarget] = useState<PlatformModule | null>(null);
+    const [installing, setInstalling] = useState(false);
 
-    const { installedModules, marketplaceModules } = useMemo(() => {
-        const filtered = PLATFORM_MODULES.filter(m => {
-            const matchesSearch = !search ||
-                m.name.toLowerCase().includes(search.toLowerCase()) ||
-                m.tagline?.toLowerCase().includes(search.toLowerCase());
-            const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
+    const modules = useMemo(() => {
+        return PLATFORM_MODULES.filter((m) => {
+            // Masters is always accessed via sidebar, never shown in the grid
+            if (m.id === "masters") return false;
+            // Hide planned modules
+            if (m.status === "planned") return false;
+
+            const q = search.toLowerCase();
+            const matchesSearch =
+                !q ||
+                m.name.toLowerCase().includes(q) ||
+                m.tagline.toLowerCase().includes(q) ||
+                m.description.toLowerCase().includes(q);
+            const matchesCategory = category === "all" || m.category === category;
             return matchesSearch && matchesCategory;
         });
+    }, [search, category]);
 
-        const installed = filtered.filter(m => isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id));
-        const marketplace = filtered.filter(m => !(isSuperAdmin || m.isCore || hasModule(m.name) || hasModule(m.id)));
+    const isInstalled = (mod: PlatformModule) =>
+        mod.isCore || isSuperAdmin || hasModule(mod.name) || hasModule(mod.id);
 
-        return { installedModules: installed, marketplaceModules: marketplace };
-    }, [search, selectedCategory, isSuperAdmin, hasModule]);
+    const handleInstall = async (mod: PlatformModule) => {
+        if (!activeCompany) {
+            toast.error("Please select a company first.");
+            return;
+        }
+        setInstalling(true);
+        try {
+            // Insert into company_modules
+            const { error: cmErr } = await supabase.from("company_modules").insert({
+                company_id: activeCompany.id,
+                module_slug: mod.id,
+                is_active: true,
+                installed_at: new Date().toISOString(),
+            });
+            if (cmErr) throw cmErr;
+
+            // Insert into user_modules (best-effort, table may not exist)
+            try {
+                const {
+                    data: { user },
+                } = await supabase.auth.getUser();
+                if (user) {
+                    await supabase.from("user_modules").insert({
+                        user_id: user.id,
+                        module_slug: mod.id,
+                        company_id: activeCompany.id,
+                    });
+                }
+            } catch {
+                // user_modules insert is optional
+            }
+
+            refreshPermissions();
+            toast.success(`${mod.name} installed successfully`);
+            setInstallTarget(null);
+        } catch (err: any) {
+            console.error("Install error:", err);
+            toast.error(err.message || "Failed to install module");
+        } finally {
+            setInstalling(false);
+        }
+    };
+
+    // Derive which category pills actually have modules (excluding masters)
+    const activeCategories = useMemo(() => {
+        const cats = new Set(
+            PLATFORM_MODULES.filter((m) => m.id !== "masters" && m.status !== "planned").map(
+                (m) => m.category
+            )
+        );
+        return CATEGORY_PILLS.filter((p) => p.key === "all" || cats.has(p.key as any));
+    }, []);
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 relative overflow-x-hidden font-sans selection:bg-emerald-100">
-            {/* Odoo-style background clean structure */}
-            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px]" />
-
-            {/* Full-screen top navigation */}
-            <nav className="relative z-50 flex items-center justify-between px-8 py-3 bg-white border-b border-gray-100 shadow-sm">
-                <div className="flex items-center gap-8">
-                    <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
-                        <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center text-lg shadow-2xl transition-all group-hover:scale-105 group-hover:bg-emerald-600">
-                            <LayoutGrid className="w-5 h-5 text-white" />
+        <div className="min-h-screen bg-gray-50/80">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex flex-col gap-5">
+                        <div>
+                            <h1 className="text-2xl font-semibold text-gray-900">
+                                App Marketplace
+                            </h1>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Install apps to extend {PLATFORM_CONFIG.name} for{" "}
+                                <span className="font-medium text-gray-700">
+                                    {activeCompany?.name || "your business"}
+                                </span>
+                            </p>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-emerald-600 transition-colors leading-none mb-1">Infrastructure</span>
-                            <span className="text-lg font-bold text-gray-900 tracking-tighter">{PLATFORM_CONFIG.name}</span>
+
+                        {/* Search */}
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search apps..."
+                                className="w-full h-10 bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
                         </div>
-                    </div>
-                </div>
 
-                {/* Centralized Technical Search */}
-                <div className="hidden lg:flex relative flex-1 max-w-2xl mx-20">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Search workspace nodes, apps, and registries..."
-                        className="w-full h-10 bg-gray-50 border border-gray-100 rounded-xl pl-12 pr-6 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:bg-white focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-600/20 transition-all uppercase tracking-widest text-[13px]"
-                    />
-                </div>
-
-                <div className="flex items-center gap-8">
-                    <div className="hidden sm:flex flex-col items-end">
-                        <span className="text-[13px] font-bold text-gray-300 uppercase tracking-widest leading-none mb-1">Current Node</span>
-                        <span className="text-[13px] font-bold text-gray-900 uppercase tracking-tighter ">{activeCompany?.name || 'Personal Cloud'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
-                        <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-lg transition-all" title="System Settings">
-                            <Settings className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={signOut} className="p-2 text-gray-400 hover:text-rose-600 hover:bg-white rounded-lg transition-all" title="Terminate Session">
-                            <LogOut className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            <main className="relative z-10 max-w-[1200px] mx-auto px-10 py-10">
-                {/* Categorization Matrix */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-10 border-b border-gray-100 pb-8">
-                    <div className="relative group">
-                        <button
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
-                            className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-800 hover:border-emerald-200 transition-all shadow-md group uppercase tracking-widest"
-                        >
-                            <Grid3X3 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>
-                                {selectedCategory === 'all' ? "Module Registry" : CATEGORY_LABELS[selectedCategory]}
-                            </span>
-                            <ChevronDown className={cn("w-4 h-4 transition-transform duration-500", isFilterOpen && "rotate-180")} />
-                        </button>
-
-                        <AnimatePresence>
-                            {isFilterOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                                        className="absolute top-full left-0 mt-4 w-72 bg-white border border-gray-100 rounded-[2rem] shadow-2xl z-50 py-4 overflow-hidden"
-                                    >
-                                        {(['all', ...CATEGORY_ORDER] as const).map(cat => (
-                                            <button
-                                                key={cat}
-                                                onClick={() => {
-                                                    setSelectedCategory(cat);
-                                                    setIsFilterOpen(false);
-                                                }}
-                                                className={cn(
-                                                    "w-full flex items-center px-8 py-4 text-xs font-bold uppercase tracking-widest transition-all",
-                                                    selectedCategory === cat
-                                                        ? "text-emerald-600 bg-emerald-50/50"
-                                                        : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
-                                                )}
-                                            >
-                                                {cat === 'all' ? "View All Modules" : CATEGORY_LABELS[cat]}
-                                            </button>
-                                        ))}
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    <div className="flex flex-col items-end">
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">Operational Density</span>
-                        <div className="flex gap-4">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span className="text-xs font-bold text-emerald-700 uppercase tracking-widest">{installedModules.length} Active</span>
-                            </div>
-                            {marketplaceModules.length > 0 && (
-                                <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => setShowAllModules(true)}>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                    <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">{marketplaceModules.length} Marketplace</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Primary Workspace Grid */}
-                <div className="mb-24">
-                    <div className="flex items-center gap-4 mb-8">
-                        <h2 className="text-[12px] font-bold uppercase tracking-widest text-gray-400">Primary Workspace Node</h2>
-                        <div className="h-[1px] flex-1 bg-gray-100" />
-                    </div>
-                    
-                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-8 gap-y-10">
-                        <AnimatePresence mode="popLayout">
-                            {installedModules.map(mod => (
-                                <ModuleCard
-                                    key={mod.id}
-                                    mod={mod}
-                                    isSubscribed={true}
-                                    onOpen={m => navigate(m.dashboardRoute)}
-                                />
+                        {/* Category pills */}
+                        <div className="flex flex-wrap gap-2">
+                            {activeCategories.map((pill) => (
+                                <button
+                                    key={pill.key}
+                                    onClick={() => setCategory(pill.key)}
+                                    className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                                        category === pill.key
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {pill.label}
+                                </button>
                             ))}
-                        </AnimatePresence>
-                    </motion.div>
-                    
-                    {installedModules.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-20 bg-gray-50/50 rounded-[3rem] border-2 border-dashed border-gray-100">
-                            <PlusCircle className="w-12 h-12 text-gray-200 mb-4" />
-                            <p className="text-xs font-bold uppercase tracking-widest text-gray-300">No active nodes in this sector</p>
                         </div>
-                    )}
-                </div>
-
-                {/* Marketplace - Collapsible Registry */}
-                {marketplaceModules.length > 0 && (
-                    <div className="pt-20 border-t border-gray-100">
-                        <button 
-                            onClick={() => setShowAllModules(!showAllModules)}
-                            className="flex items-center justify-between w-full group mb-12 hover:bg-gray-50 p-6 rounded-[2rem] transition-all"
-                        >
-                            <div className="flex items-center gap-6">
-                                <div className={cn("w-2 h-8 rounded-full transition-all duration-500", showAllModules ? "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]" : "bg-gray-200")} />
-                                <h2 className="text-[12px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-900 transition-colors">Marketplace Library</h2>
-                            </div>
-                            <ChevronDown className={cn("w-6 h-6 text-gray-300 transition-transform duration-700 ease-in-out", showAllModules && "rotate-180")} />
-                        </button>
-
-                        <motion.div 
-                            initial={false}
-                            animate={{ height: showAllModules ? 'auto' : 0, opacity: showAllModules ? 1 : 0 }}
-                            className="overflow-hidden"
-                        >
-                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-8 gap-y-10 pb-12">
-                                {marketplaceModules.map(mod => (
-                                    <ModuleCard
-                                        key={mod.id}
-                                        mod={mod}
-                                        isSubscribed={false}
-                                        onOpen={m => navigate(`/apps/ecommerce/billing?module=${m.id}`)}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        {!showAllModules && (
-                            <div className="flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border border-gray-100 shadow-sm cursor-pointer hover:shadow-xl transition-all duration-500 group" onClick={() => setShowAllModules(true)}>
-                                <div className="w-16 h-16 rounded-3xl bg-amber-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    <PlusCircle className="w-8 h-8 text-amber-500" />
-                                </div>
-                                <span className="text-[13px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-900 transition-colors">Expand Operational Capabilities</span>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </main>
-
-            {/* Technical Sub-bar (Breadcrumbs / Status) */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-10 py-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
-                <div className="max-w-[1400px] mx-auto flex items-center justify-between text-[13px] font-bold uppercase tracking-widest text-gray-300">
-                    <div className="flex gap-10">
-                        <span className="flex items-center gap-2 group cursor-help">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-ping" />
-                            <span className="text-gray-500">{installedModules.length} Nodes Synchronized</span>
-                        </span>
-                        <span className="hidden sm:flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
-                            <span className="text-gray-400">NATTU CORE ENGINE V4.2</span>
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-emerald-600/40">
-                        SECURE END-TO-END ENCRYPTION ACTIVE
                     </div>
                 </div>
             </div>
+
+            {/* Grid */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {modules.length === 0 ? (
+                    <div className="text-center py-20">
+                        <p className="text-gray-400 text-sm">No apps match your search.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        {modules.map((mod) => {
+                            const installed = isInstalled(mod);
+                            const isAvailable = mod.status === "live" || mod.status === "beta";
+
+                            return (
+                                <div
+                                    key={mod.id}
+                                    className={`relative bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
+                                        installed ? "border-l-4 border-l-blue-500 border-t border-r border-b border-t-gray-200 border-r-gray-200 border-b-gray-200" : "border-gray-200"
+                                    } ${!isAvailable ? "opacity-60" : ""}`}
+                                >
+                                    {/* Badges */}
+                                    {installed && (
+                                        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                                            <Check className="w-3 h-3" />
+                                            Installed
+                                        </span>
+                                    )}
+                                    {mod.status === "beta" && !installed && (
+                                        <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
+                                            Beta
+                                        </span>
+                                    )}
+                                    {mod.status === "coming-soon" && (
+                                        <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                            Coming soon
+                                        </span>
+                                    )}
+
+                                    <div className="p-5">
+                                        {/* Icon + Name + Tagline */}
+                                        <div className="flex items-start gap-3 mb-4">
+                                            <div
+                                                className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} shadow-sm`}
+                                            >
+                                                {mod.icon}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h3 className="text-sm font-semibold text-gray-900 leading-tight">
+                                                    {mod.name}
+                                                </h3>
+                                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                                                    {mod.tagline}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Features */}
+                                        <ul className="space-y-1 mb-5">
+                                            {mod.features.slice(0, 3).map((f, i) => (
+                                                <li
+                                                    key={i}
+                                                    className="text-xs text-gray-500 flex items-start gap-1.5"
+                                                >
+                                                    <span className="text-gray-300 mt-0.5 shrink-0">
+                                                        &#8226;
+                                                    </span>
+                                                    <span className="line-clamp-1">{f}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        {/* Price + Action */}
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                            <div>
+                                                {mod.isCore ? (
+                                                    <span className="text-xs font-medium text-gray-500">
+                                                        Included
+                                                    </span>
+                                                ) : mod.isFree ? (
+                                                    <span className="text-xs font-medium text-green-600">
+                                                        Free
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-sm font-semibold text-gray-900">
+                                                        ₹{mod.priceMonthly}
+                                                        <span className="text-xs font-normal text-gray-400">
+                                                            /mo
+                                                        </span>
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {isAvailable && installed ? (
+                                                <button
+                                                    onClick={() => navigate(mod.dashboardRoute)}
+                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                                >
+                                                    Open
+                                                    <ExternalLink className="w-3 h-3" />
+                                                </button>
+                                            ) : isAvailable ? (
+                                                <button
+                                                    onClick={() => setInstallTarget(mod)}
+                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                                                >
+                                                    Install
+                                                    <Download className="w-3 h-3" />
+                                                </button>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Install Confirmation Modal */}
+            {installTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                        onClick={() => !installing && setInstallTarget(null)}
+                    />
+                    <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                        <button
+                            onClick={() => !installing && setInstallTarget(null)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="flex items-center gap-3 mb-4">
+                            <div
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${installTarget.colorFrom} ${installTarget.colorTo}`}
+                            >
+                                {installTarget.icon}
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-900">
+                                    Install {installTarget.name}?
+                                </h2>
+                                <p className="text-sm text-gray-500">{installTarget.tagline}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-4 mb-5 space-y-2">
+                            {installTarget.isFree ? (
+                                <p className="text-sm text-gray-600">
+                                    This is a <span className="font-medium text-green-600">free</span> app.
+                                </p>
+                            ) : (
+                                <p className="text-sm text-gray-600">
+                                    This will add{" "}
+                                    <span className="font-semibold text-gray-900">
+                                        ₹{installTarget.priceMonthly}/mo
+                                    </span>{" "}
+                                    to your billing.
+                                </p>
+                            )}
+                            {installTarget.trialDays > 0 && (
+                                <p className="text-sm text-blue-600 font-medium">
+                                    {installTarget.trialDays}-day free trial included
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-3 justify-end">
+                            <button
+                                onClick={() => setInstallTarget(null)}
+                                disabled={installing}
+                                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleInstall(installTarget)}
+                                disabled={installing}
+                                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                            >
+                                {installing ? (
+                                    <>
+                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Installing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="w-4 h-4" />
+                                        Install
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

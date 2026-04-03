@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
     Mail, Lock, Eye, EyeOff, ArrowRight,
     Sparkles, ShieldCheck, ShoppingBag, User as UserIcon,
-    Chrome, Github, Twitter, Zap, Globe, Layers, X
+    Zap, Globe, Layers, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PLATFORM_CONFIG from "@/config/platform";
@@ -102,9 +102,9 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex bg-white font-sans selection:bg-primary-600/10">
+        <div className="min-h-screen flex bg-white font-sans selection:bg-primary-600/10 overflow-hidden">
             {/* Left Side: Visual/Branding */}
-            <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-slate-900">
+            <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-slate-900 h-screen">
                 <img
                     src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&q=80"
                     alt="Platform Infrastructure"
@@ -112,39 +112,39 @@ export default function Login() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
 
-                <div className="relative z-10 p-16 flex flex-col justify-between h-full">
+                <div className="relative z-10 p-12 lg:p-20 flex flex-col justify-between h-full">
                     <Link to="/" className="flex items-center gap-4">
-                        <img src="/logo.png" alt="Logo" className="h-16 w-auto brightness-0 invert" />
-                        <span className="text-2xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
+                        <img src="/logo.png" alt="Logo" className="h-12 w-auto brightness-0 invert" />
+                        <span className="text-xl lg:text-2xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
                     </Link>
 
-                    <div className="space-y-6">
-                        <h2 className="text-5xl font-bold text-white leading-tight tracking-tight">
+                    <div className="space-y-6 max-w-lg">
+                        <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
                             Powering the next generation of <br />
                             <span className="text-primary-400">digital enterprises.</span>
                         </h2>
-                        <p className="text-xl text-slate-300 max-w-lg leading-relaxed">
+                        <p className="text-lg lg:text-xl text-slate-300 leading-relaxed font-medium">
                             A unified ecosystem for modern businesses to build, manage, and scale their digital core with industrial precision.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-12 text-white">
                         <div className="space-y-1">
-                            <p className="text-3xl font-bold">99.9%</p>
-                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Global Uptime</p>
+                            <p className="text-2xl lg:text-3xl font-bold">99.9%</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Uptime</p>
                         </div>
                         <div className="w-px h-10 bg-slate-700" />
                         <div className="space-y-1">
-                            <p className="text-3xl font-bold">Secure</p>
-                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tier-1 Encryption</p>
+                            <p className="text-2xl lg:text-3xl font-bold">Secure</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tier-1 Encryption</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Right Side: Form */}
-            <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-24 bg-white relative">
-                <div className="w-full max-w-sm space-y-10">
+            <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 xl:p-24 bg-white relative h-screen overflow-y-auto">
+                <div className="w-full max-w-sm flex flex-col h-full justify-center">
                     <div className="lg:hidden mb-12">
                         <Link to="/" className="flex items-center gap-3">
                             <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
@@ -152,119 +152,121 @@ export default function Login() {
                         </Link>
                     </div>
 
-                    <div className="space-y-4">
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                            {mode === 'login' ? 'Continue to Platform' : 'Reset Password'}
-                        </h1>
-                        <p className="text-gray-500 font-medium">
-                            {mode === 'login'
-                                ? 'Enter your credentials to access your business dashboard.'
-                                : 'We will send a reset link to your registered email address.'}
-                        </p>
-                    </div>
+                    <div className="space-y-10 my-auto py-8">
+                        <div className="space-y-4">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                                {mode === 'login' ? 'Continue to Platform' : 'Reset Password'}
+                            </h1>
+                            <p className="text-gray-500 font-medium">
+                                {mode === 'login'
+                                    ? 'Enter your credentials to access your business dashboard.'
+                                    : 'We will send a reset link to your registered email address.'}
+                            </p>
+                        </div>
 
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={mode}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="space-y-8"
-                        >
-                            <form onSubmit={mode === 'login' ? handleLogin : handleForgotPassword} className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="email" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Business Email</Label>
-                                    <div className="relative group">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-primary-600 transition-colors" />
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            value={email}
-                                            onChange={e => setEmail(e.target.value)}
-                                            placeholder="name@company.com"
-                                            required
-                                            className="h-14 pl-12 rounded-xl border-gray-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
-                                        />
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={mode}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="space-y-8"
+                            >
+                                <form onSubmit={mode === 'login' ? handleLogin : handleForgotPassword} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Business Email</Label>
+                                        <div className="relative group">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-primary-600 transition-colors" />
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                value={email}
+                                                onChange={e => setEmail(e.target.value)}
+                                                placeholder="name@company.com"
+                                                required
+                                                className="h-14 pl-12 rounded-xl border-gray-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
+                                            />
+                                        </div>
                                     </div>
+
+                                    {mode === 'login' && (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between mx-1">
+                                                <Label htmlFor="password" className="text-xs font-bold text-gray-400 uppercase tracking-widest">Password</Label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMode('forgot-password')}
+                                                    className="text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline transition-all"
+                                                >
+                                                    Forgot?
+                                                </button>
+                                            </div>
+                                            <div className="relative group">
+                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-primary-600 transition-colors" />
+                                                <Input
+                                                    id="password"
+                                                    type={showPassword ? "text" : "password"}
+                                                    value={password}
+                                                    onChange={e => setPassword(e.target.value)}
+                                                    placeholder="••••••••••••"
+                                                    required
+                                                    className="h-14 pl-12 pr-12 rounded-xl border-gray-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors"
+                                                >
+                                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full h-14 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-md shadow-lg shadow-primary-600/10 transition-all flex items-center justify-center gap-3"
+                                    >
+                                        {loading ? (
+                                            <span className="animate-pulse">Authenticating...</span>
+                                        ) : (
+                                            <>
+                                                {mode === 'login' ? 'Login Now' : 'Send Reset Link'}
+                                                <ArrowRight className="w-5 h-5" />
+                                            </>
+                                        )}
+                                    </Button>
+                                </form>
+
+                                <div className="relative flex items-center py-2">
+                                    <div className="flex-1 h-px bg-gray-100" />
+                                    <span className="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Secure Enterprise Access</span>
+                                    <div className="flex-1 h-px bg-gray-100" />
                                 </div>
 
-                                {mode === 'login' && (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between mx-1">
-                                            <Label htmlFor="password" className="text-xs font-bold text-gray-400 uppercase tracking-widest">Password</Label>
-                                            <button
-                                                type="button"
-                                                onClick={() => setMode('forgot-password')}
-                                                className="text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline transition-all"
-                                            >
-                                                Forgot?
-                                            </button>
-                                        </div>
-                                        <div className="relative group">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-primary-600 transition-colors" />
-                                            <Input
-                                                id="password"
-                                                type={showPassword ? "text" : "password"}
-                                                value={password}
-                                                onChange={e => setPassword(e.target.value)}
-                                                placeholder="••••••••••••"
-                                                required
-                                                className="h-14 pl-12 pr-12 rounded-xl border-gray-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors"
-                                            >
-                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <Button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full h-14 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-md shadow-lg shadow-primary-600/10 transition-all flex items-center justify-center gap-3"
-                                >
-                                    {loading ? (
-                                        <span className="animate-pulse">Authenticating...</span>
+                                <div className="text-center space-y-4">
+                                    {mode === 'forgot-password' ? (
+                                        <button
+                                            onClick={() => setMode('login')}
+                                            className="text-sm font-bold text-gray-500 hover:text-primary-600 transition-colors"
+                                        >
+                                            Back to Login
+                                        </button>
                                     ) : (
-                                        <>
-                                            {mode === 'login' ? 'Login Now' : 'Send Reset Link'}
-                                            <ArrowRight className="w-5 h-5" />
-                                        </>
+                                        <Link
+                                            to={`/onboarding${window.location.search}`}
+                                            className="inline-flex items-center text-sm font-bold text-gray-700 hover:text-primary-600 transition-colors group"
+                                        >
+                                            No account yet? <span className="text-primary-600 ml-1.5 group-hover:underline">Start your project setup →</span>
+                                        </Link>
                                     )}
-                                </Button>
-                            </form>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
 
-                            <div className="relative flex items-center py-2">
-                                <div className="flex-1 h-px bg-gray-100" />
-                                <span className="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Secure Enterprise Access</span>
-                                <div className="flex-1 h-px bg-gray-100" />
-                            </div>
-
-                            <div className="text-center space-y-4">
-                                {mode === 'forgot-password' ? (
-                                    <button
-                                        onClick={() => setMode('login')}
-                                        className="text-sm font-bold text-gray-500 hover:text-primary-600 transition-colors"
-                                    >
-                                        Back to Login
-                                    </button>
-                                ) : (
-                                    <Link
-                                        to={`/onboarding${window.location.search}`}
-                                        className="inline-flex items-center text-sm font-bold text-gray-700 hover:text-primary-600 transition-colors group"
-                                    >
-                                        No account yet? <span className="text-primary-600 ml-1.5 group-hover:underline">Start your project setup →</span>
-                                    </Link>
-                                )}
-                            </div>
-                        </motion.div>
-                    </AnimatePresence>
-
-                    <div className="pt-20 border-t border-gray-100 flex justify-center gap-8 opacity-40 grayscale">
+                    <div className="mt-auto pt-10 border-t border-gray-100 flex justify-center gap-8 opacity-40 grayscale pb-8">
                         <div className="flex flex-col items-center">
                             <ShieldCheck className="w-6 h-6 mb-1" />
                             <span className="text-xs font-bold uppercase tracking-widest">Encrypted</span>
@@ -277,5 +279,6 @@ export default function Login() {
                 </div>
             </div>
         </div>
+
     );
 }

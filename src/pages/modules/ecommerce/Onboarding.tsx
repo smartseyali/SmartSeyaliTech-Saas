@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
-import { Check, ArrowRight, ArrowLeft, Loader2, Rocket, Eye, X, Mail, Lock, User as UserIcon, LogOut, Layers } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Loader2, Rocket, X, Mail, Lock, User as UserIcon, LogOut, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import PLATFORM_CONFIG from "@/config/platform";
@@ -14,21 +14,6 @@ import { cn } from "@/lib/utils";
 import { PlatformLoader } from "@/components/PlatformLoader";
 
 // ── Types ──────────────────────────────────────────────────
-interface TemplateEntry {
-    id: string;
-    name: string;
-    description: string;
-    industry?: string;
-    color?: string;
-    preview_image: string;
-    gallery_images: string[];
-    tags: string[];
-    folder: string;
-    version?: string;
-    component_count?: number;
-    is_active?: boolean;
-}
-
 interface PlanEntry {
     id: string;
     name: string;
@@ -38,54 +23,6 @@ interface PlanEntry {
 }
 
 // ── Local Fallbacks ────────────────────────────────────────
-const LOCAL_REGISTRY: TemplateEntry[] = [
-    {
-        id: 'amazon-style',
-        folder: 'amazon-style',
-        name: 'Amazon Style',
-        description: 'A robust, multi-category layout inspired by the world\'s largest e-commerce platform. Best for megastores.',
-        version: '1.0.1',
-        preview_image: 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?q=80&w=900',
-        gallery_images: [
-            'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?q=80&w=900',
-            'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=900',
-            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=900'
-        ],
-        color: '#f97316',
-        tags: ['megastore', 'retail', 'amazon'],
-    },
-    {
-        id: 'fruitables',
-        folder: 'fruitables',
-        name: 'Fruitables Organic',
-        description: 'Vibrant, fresh design perfect for organic groceries, fruit shops, and healthy food stores.',
-        version: '1.0.1',
-        preview_image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=900',
-        gallery_images: [
-            'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=900',
-            'https://images.unsplash.com/photo-1466632311177-a3d1433f95e8?q=80&w=900',
-            'https://images.unsplash.com/photo-1516594798947-e65505dbb29d?q=80&w=900'
-        ],
-        color: '#81c408',
-        tags: ['groceries', 'fresh', 'organic'],
-    },
-    {
-        id: 'modern-shop',
-        folder: 'modern-shop',
-        name: 'Modern Shop',
-        description: 'A sleek, minimalist design suitable for fashion, electronics, and dropshipping brands.',
-        version: '1.0.0',
-        preview_image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=900',
-        gallery_images: [
-            'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=900',
-            'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=900',
-            'https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=900'
-        ],
-        color: '#000000',
-        tags: ['fashion', 'electronics', 'modern'],
-    }
-];
-
 const LOCAL_PLANS: PlanEntry[] = [
     { id: '1', name: 'Standard', slug: 'standard', price_monthly: 29.00, features: ["Up to 5 Projects", "Basic Analytics", "Standard Templates", "Email Support"] },
     { id: '2', name: 'Professional', slug: 'professional', price_monthly: 99.00, features: ["Up to 20 Projects", "Advanced Analytics", "Premium Templates", "Priority Support", "Custom Domain"] },
@@ -93,10 +30,10 @@ const LOCAL_PLANS: PlanEntry[] = [
 ];
 
 const LOCAL_MODULE_REGISTRY = [
-    { id: 'ecommerce', slug: 'ecommerce', name: 'Ecommerce', category: 'commerce', tagline: 'Unified Online Selling Engine', icon: '🛒', is_core: true, needsTemplate: true },
-    { id: 'crm', slug: 'crm', name: 'CRM', category: 'commerce', tagline: 'Industrial Relationship Manager', icon: '🤝', is_core: false, needsTemplate: false },
-    { id: 'inventory', slug: 'inventory', name: 'Inventory', category: 'operations', tagline: 'Strategic Stock Controller', icon: '📦', is_core: false, needsTemplate: false },
-    { id: 'landing-page', slug: 'landing-page', name: 'Website Manager', category: 'commerce', tagline: 'Clinical Content Orchestrator', icon: '🌐', is_core: true, needsTemplate: true }
+    { id: 'ecommerce', slug: 'ecommerce', name: 'Ecommerce', category: 'commerce', tagline: 'Unified Online Selling Engine', icon: '🛒', is_core: true },
+    { id: 'crm', slug: 'crm', name: 'CRM', category: 'commerce', tagline: 'Industrial Relationship Manager', icon: '🤝', is_core: false },
+    { id: 'inventory', slug: 'inventory', name: 'Inventory', category: 'operations', tagline: 'Strategic Stock Controller', icon: '📦', is_core: false },
+    { id: 'landing-page', slug: 'landing-page', name: 'Website Manager', category: 'commerce', tagline: 'Clinical Content Orchestrator', icon: '🌐', is_core: true }
 ];
 
 // ─── Step Indicator ────────────────────────────────────────
@@ -168,11 +105,7 @@ export default function Onboarding() {
     const [storeName, setStoreName] = useState("");
     const [industryType, setIndustryType] = useState<'retail' | 'education' | 'services'>('retail');
     const [selectedPlan, setSelectedPlan] = useState<string>("");
-    const [selectedTemplate, setSelectedTemplate] = useState("");
     const [plans, setPlans] = useState<PlanEntry[]>([]);
-    const [templates, setTemplates] = useState<TemplateEntry[]>([]);
-    const [templatesLoading, setTemplatesLoading] = useState(true);
-    const [previewingTemplate, setPreviewingTemplate] = useState<TemplateEntry | null>(null);
 
     // Step 5 — Account creation fields
     const [fullName, setFullName] = useState("");
@@ -232,45 +165,12 @@ export default function Onboarding() {
         return () => clearInterval(interval);
     }, []);
 
-    // Determine if we need the theme step
-    const needsTheme = selectedModules.some(modId => {
-        const mod = availableSystemModules.find(m => m.id.toString() === modId);
-        // Fallback to true if 'ecommerce' or 'landing-page' slug is present
-        if (!mod) return false;
-        // Check new property if exists, else fallback to commerce/operations categories
-        return mod.needsTemplate !== undefined ? mod.needsTemplate : (mod.slug === 'ecommerce' || mod.slug === 'landing-page');
-    });
-
-    const dynamicSteps = needsTheme
-        ? ["Business", "Plan", "Theme", "Account", "Confirm"]
-        : ["Business", "Plan", "Account", "Confirm"];
+    const dynamicSteps = ["Business", "Plan", "Account", "Confirm"];
 
     // ── Data Fetching ─────────────────────────────────────────
     useEffect(() => {
         async function loadContent() {
-            setTemplatesLoading(true);
             try {
-                const { data: tData } = await supabase
-                    .from("system_templates")
-                    .select("*")
-                    .eq("is_active", true)
-                    .order("sort_order", { ascending: true });
-
-                const mapped: TemplateEntry[] = (tData || []).map(row => ({
-                    id: row.folder,
-                    folder: row.folder,
-                    name: row.name,
-                    description: row.description || "",
-                    industry: row.industry || "retail",
-                    version: row.version,
-                    preview_image: row.preview_image || "",
-                    gallery_images: row.gallery_images || [],
-                    color: row.color,
-                    tags: row.tags || [],
-                    component_count: row.component_count
-                }));
-                setTemplates(mapped.length > 0 ? mapped : LOCAL_REGISTRY);
-
                 const { data: pData } = await supabase
                     .from("system_plans")
                     .select("*")
@@ -315,13 +215,11 @@ export default function Onboarding() {
                 }
             } catch (err) {
                 console.warn("Database sync deficit detected. Operating under Clinical Autonomy Mode (Local Fallbacks).");
-                setTemplates(LOCAL_REGISTRY as any);
                 setPlans(LOCAL_PLANS);
                 setSelectedPlan(LOCAL_PLANS[0].id);
                 setAvailableSystemModules(LOCAL_MODULE_REGISTRY);
                 if (selectedModules.length === 0) setSelectedModules(['ecommerce']);
             } finally {
-                setTemplatesLoading(false);
                 setTimeout(() => setInitializing(false), 800);
             }
         }
@@ -334,16 +232,18 @@ export default function Onboarding() {
     // ── Helpers ───────────────────────────────────────────────
     const goNext = () => {
         setError("");
-        if (step === 2 && !needsTheme) {
-            setStep(4); // Skip Theme (Step 3)
+        // Skip step 3 (removed template step) — go from 2 to 4
+        if (step === 2) {
+            setStep(4);
         } else {
             setStep(s => s + 1);
         }
     };
     const goBack = () => {
         setError("");
-        if (step === 4 && !needsTheme) {
-            setStep(2); // Back to Plan (Skip Step 3)
+        // Skip step 3 (removed template step) — go from 4 back to 2
+        if (step === 4) {
+            setStep(2);
         } else {
             setStep(s => s - 1);
         }
@@ -447,22 +347,7 @@ export default function Onboarding() {
                 newCompany = fallbackCompany;
             }
 
-            await runProgress(60, needsTheme ? "Loading Your Theme..." : "Configuring Workspace...", 1200);
-
-            // 4. Provision template (ONLY if needed)
-            if (needsTheme && selectedTemplate) {
-                const selectedTmpl = templates.find(t => t.id === selectedTemplate);
-                const folderToUse = selectedTmpl?.folder || selectedTemplate;
-                try {
-                    await fetch("http://localhost:8000/api/provision", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ store_name: newSlug, company_id: newCompany.id, template: folderToUse })
-                    });
-                } catch {
-                    console.warn("Provisioning bypass (local simulation)");
-                }
-            }
+            await runProgress(60, "Configuring Workspace...", 1200);
 
             await runProgress(80, "Finalizing Smart Seyali...", 1000);
 
@@ -679,7 +564,7 @@ export default function Onboarding() {
                         (step === 2 || step === 3) ? "max-w-[1200px]" : "max-w-[900px]"
                     )}>
                         {/* Step indicator */}
-                        {step <= 5 && <StepDots current={step <= 2 ? step : (needsTheme ? step : step - 1)} steps={dynamicSteps} />}
+                        {step <= 5 && <StepDots current={step <= 2 ? step : step - 1} steps={dynamicSteps} />}
 
                         <AnimatePresence mode="wait">
 
@@ -809,72 +694,7 @@ export default function Onboarding() {
                                 </motion.div>
                             )}
 
-                            {/* ── STEP 3: Template ─────────────────────────────────── */}
-                            {step === 3 && (
-                                <motion.div key="s3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6">
-                                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                                        <div className="space-y-3">
-                                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Pick a visual identity</h1>
-                                            <p className="text-gray-500 font-medium">Choose a starting theme. You can fully customize everything later.</p>
-                                        </div>
-                                        <div className="flex bg-slate-100/50 p-1.5 rounded-xl border border-gray-100">
-                                            {['retail', 'education', 'services'].map(t => (
-                                                <button key={t} onClick={() => setIndustryType(t as any)}
-                                                    className={cn(
-                                                        "px-5 py-2 rounded-lg text-xs font-bold  tracking-widest transition-all",
-                                                        industryType === t ? "bg-white text-primary-600 shadow-sm border border-gray-100" : "text-slate-500 hover:text-slate-700"
-                                                    )}>
-                                                    {t === 'retail' ? 'Modern' : t === 'education' ? 'Corporate' : 'Creative'}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {templatesLoading ? (
-                                        <PlatformLoader fullScreen={false} message="Curating Architectures" subtext="Visual Identity Induction" />
-                                    ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                            {templates.filter(t => t.industry === industryType || !t.industry).slice(0, 6).map((tmpl) => (
-                                                <div key={tmpl.id}
-                                                    className={cn(
-                                                        "group flex flex-col rounded-3xl overflow-hidden transition-all duration-500 border bg-white",
-                                                        selectedTemplate === tmpl.id ? "border-primary-600 ring-1 ring-primary-600 shadow-2xl scale-[1.02]" : "border-gray-100 hover:border-gray-200"
-                                                    )}>
-                                                    <div className="aspect-[16/10] relative overflow-hidden">
-                                                        <img src={tmpl.preview_image} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-3">
-                                                            <Button onClick={() => setPreviewingTemplate(tmpl)} variant="outline" className="h-10 px-6 bg-white/10 backdrop-blur-md border-white/20 text-white font-bold text-xs  tracking-widest rounded-xl hover:bg-white/20">Preview</Button>
-                                                            <Button onClick={() => setSelectedTemplate(tmpl.id)} className="h-10 px-6 bg-primary-600 text-white font-bold text-xs  tracking-widest rounded-xl shadow-lg">
-                                                                {selectedTemplate === tmpl.id ? 'Selected' : 'Choose Theme'}
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="p-6 border-t border-gray-50">
-                                                        <h3 className="font-bold text-gray-900 text-sm tracking-tight">{tmpl.name}</h3>
-                                                        <div className="flex items-center gap-2 mt-2">
-                                                            <div className="w-2 h-2 rounded-full bg-primary-600" />
-                                                            <p className="text-xs font-bold text-gray-400  tracking-widest">{tmpl.tags?.[0] || 'Modern'} Layout</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-4 pt-4 border-t border-gray-50">
-                                        <button onClick={goBack} className={backBtnCls}>Back</button>
-                                        <Button
-                                            onClick={() => selectedTemplate ? goNext() : setError("Please select a theme.")}
-                                            disabled={!selectedTemplate}
-                                            className={nextBtnCls}
-                                        >
-                                            Next Step: Account <ArrowRight className="w-5 h-5 ml-2" />
-                                        </Button>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* ── STEP 5: Create Account ────────────────────────────── */}
+                            {/* ── STEP 3: Create Account ────────────────────────────── */}
                             {step === 4 && (
                                 <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
                                     <div className="space-y-3">
@@ -1007,73 +827,6 @@ export default function Onboarding() {
                 </div>
             </div>
 
-            {/* ── Template Preview Modal ─────────────────────────── */}
-            <AnimatePresence>
-                {previewingTemplate && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xl flex items-center justify-center p-6 md:p-10">
-                        <motion.div initial={{ scale: 0.9, y: 60 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 60 }}
-                            className="bg-white w-full max-w-6xl h-full max-h-[85vh] rounded-[40px] border border-slate-100 flex flex-col md:flex-row overflow-hidden shadow-2xl">
-
-                            {/* Image side */}
-                            <div className="flex-1 bg-slate-50 relative flex flex-col p-8 lg:p-12 gap-6">
-                                <div className="flex-1 rounded-3xl overflow-hidden shadow-xl border border-white">
-                                    <img src={previewingTemplate.preview_image} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x pb-2">
-                                    {(previewingTemplate.gallery_images || []).map((img, idx) => (
-                                        <div key={idx}
-                                            className={cn(
-                                                "min-w-[120px] aspect-video rounded-2xl overflow-hidden border-2 cursor-pointer snap-start transition-all hover:scale-105",
-                                                previewingTemplate.preview_image === img ? "border-primary-600" : "border-white hover:border-slate-200"
-                                            )}
-                                            onClick={() => setPreviewingTemplate({ ...previewingTemplate, preview_image: img })}>
-                                            <img src={img} className="w-full h-full object-cover" />
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="absolute top-12 left-12 text-slate-900 p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-100 shadow-xl">
-                                    <h3 className="text-2xl font-bold tracking-tighter   leading-none">{previewingTemplate.name}</h3>
-                                    <p className="text-primary-600 text-[13px] font-bold mt-1 tracking-widest ">Enterprise Theme</p>
-                                </div>
-                            </div>
-
-                            {/* Info side */}
-                            <div className="w-full md:w-[380px] bg-white p-12 flex flex-col border-l border-slate-50 relative">
-                                <button onClick={() => setPreviewingTemplate(null)} className="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-all hover:rotate-90">
-                                    <X className="w-5 h-5" />
-                                </button>
-
-                                <div className="mt-8 space-y-10 flex-1">
-                                    <div>
-                                        <h4 className="text-xs font-bold  tracking-widest text-primary-600 mb-4">About Theme</h4>
-                                        <p className="text-slate-500 font-bold text-xs leading-relaxed border-l-4 border-slate-100 pl-6  tracking-wide">{previewingTemplate.description}</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[13px] font-bold  tracking-widest text-slate-300 mb-1">Industry</p>
-                                            <p className="text-sm font-bold text-slate-800  tracking-tight">{previewingTemplate.industry}</p>
-                                        </div>
-                                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[13px] font-bold  tracking-widest text-slate-300 mb-1">Architecture</p>
-                                            <p className="text-sm font-bold text-slate-800  tracking-tight">{previewingTemplate.component_count || 12}+ Standard Modules</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-auto pt-8 border-t border-slate-50 space-y-4">
-                                    <Button onClick={() => { setSelectedTemplate(previewingTemplate.id); setPreviewingTemplate(null); }}
-                                        className="w-full h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold  tracking-widest text-xs shadow-xl shadow-primary-600/10 transition-all">
-                                        Use This Theme
-                                    </Button>
-                                    <p className="text-center text-[8px] font-bold text-slate-200  tracking-widest">{PLATFORM_CONFIG.name} Proprietary Design</p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

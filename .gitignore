@@ -134,3 +134,37 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Windows WSL Zone.Identifier files
+*:Zone.Identifier
+
+# Temporary Python/SQL scripts
+tmp_*.py
+tmp_*.sql
+
+# Backup/orig files
+*.orig
+*.orig.*
+*.bak
+
+# Build output
+dist/
+
+# Deploy zips
+*.zip
+
+# Separate projects (not part of main SaaS)
+sparkle/
+sparkledeploy/
+thandatti_foods/
+smartseyali-main/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

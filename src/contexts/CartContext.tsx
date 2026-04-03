@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface CartItem {
     id: string;
@@ -11,6 +12,7 @@ interface CartItem {
     quantity: number;
     variant_id?: string;
     variant_name?: string;
+    company_id?: number;
 }
 
 interface CartContextType {
@@ -26,24 +28,39 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+    const { activeCompany } = useTenant();
+    const companyId = activeCompany?.id;
+    const prevCompanyIdRef = useRef<number | undefined>(companyId);
     const [items, setItems] = useState<CartItem[]>([]);
 
-    // Load cart from localStorage
+    const cartKey = companyId ? `ecom_cart_${companyId}` : "ecom_cart";
+
+    // Clear cart when company changes
     useEffect(() => {
-        const saved = localStorage.getItem("ecom_cart");
+        if (prevCompanyIdRef.current !== undefined && prevCompanyIdRef.current !== companyId) {
+            setItems([]);
+        }
+        prevCompanyIdRef.current = companyId;
+    }, [companyId]);
+
+    // Load cart from localStorage (re-runs when company changes)
+    useEffect(() => {
+        const saved = localStorage.getItem(cartKey);
         if (saved) {
             try {
                 setItems(JSON.parse(saved));
             } catch (e) {
                 console.error("Failed to parse cart", e);
             }
+        } else {
+            setItems([]);
         }
-    }, []);
+    }, [cartKey]);
 
     // Save cart to localStorage
     useEffect(() => {
-        localStorage.setItem("ecom_cart", JSON.stringify(items));
-    }, [items]);
+        localStorage.setItem(cartKey, JSON.stringify(items));
+    }, [items, cartKey]);
 
     const addToCart = (product: Omit<CartItem, "quantity">, quantity = 1) => {
         setItems(prev => {
@@ -57,7 +74,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 return newItems;
             }
 
-            return [...prev, { ...product, quantity }];
+            return [...prev, { ...product, quantity, company_id: companyId }];
         });
 
         toast.success("Boutique Selection Added", {

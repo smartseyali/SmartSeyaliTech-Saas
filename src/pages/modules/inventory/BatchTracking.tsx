@@ -12,7 +12,7 @@ export default function BatchTracking() {
 
     const fields = [ 
       { key: 'name', label: 'Batch / Lot Code', required: true }, 
-      { key: 'expiry_date', label: 'Expiration Horizon', type: 'date' }
+      { key: 'expiry_date', label: 'Expiration Horizon', type: 'date' as const }
     ];
 
     const handleSave = async (header: any) => {

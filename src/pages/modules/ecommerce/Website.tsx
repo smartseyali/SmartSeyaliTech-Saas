@@ -113,7 +113,7 @@ export default function Website() {
                             <Globe className="w-4 h-4 text-blue-600" />
                             <span className="text-slate-500 font-bold  tracking-widest text-xs">Website Management</span>
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Storefront Builder</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Website Builder</h1>
                         <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-200 w-fit shadow-sm">
                             <Globe className="w-3.5 h-3.5 text-slate-300" />
                             <span className="text-xs font-semibold text-slate-500 tracking-tight">domain.com/{activeCompany?.subdomain}</span>

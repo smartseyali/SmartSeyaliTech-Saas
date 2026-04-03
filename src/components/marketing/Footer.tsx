@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Facebook, Instagram, Github, Activity, ShieldCheck, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Camera, Code, Activity, ShieldCheck, ArrowRight } from "lucide-react";
 import PLATFORM_CONFIG from "@/config/platform";
 
 export const Footer = () => {
@@ -21,7 +21,7 @@ export const Footer = () => {
               We engineer robust enterprise software solutions designed for global scalability and high-performance operational efficiency.
             </p>
             <div className="flex space-x-6 pt-4">
-              {[Facebook, Instagram, Github].map((Icon, i) => (
+              {[Globe, Camera, Code].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-primary-600 transition-all hover:-translate-y-1">
                   <Icon className="h-5 w-5 text-slate-500 hover:text-white transition-colors" />
                 </a>

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import db from "@/lib/db";
 
 // Sub-modules standardized with "Clean ERP"
 import Items from "./Items";
@@ -77,134 +78,165 @@ export default function MasterDashboard() {
 function MasterSummary() {
     const { activeCompany } = useTenant();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [stats] = useState({
-        totalItems: 4820,
-        totalContacts: 1450,
-        totalCategories: 24,
-        totalBrands: 18,
-        totalTaxRules: 12
+    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({
+        items: 0,
+        contacts: 0,
+        tax: 0,
+        categories: 0
     });
+
+    const [health, setHealth] = useState<any[]>([]);
+
+    const fetchStats = async () => {
+        if (!activeCompany) return;
+        setLoading(true);
+        try {
+            // Live counts from database
+            const [itemsRes, contactsRes, taxRes, catRes] = await Promise.all([
+                db.from('master_items').select('*', { count: 'exact', head: true }).eq('company_id', activeCompany.id),
+                db.from('master_contacts').select('*', { count: 'exact', head: true }).eq('company_id', activeCompany.id),
+                db.from('master_taxes').select('*', { count: 'exact', head: true }).eq('company_id', activeCompany.id),
+                db.from('master_categories').select('*', { count: 'exact', head: true }).eq('company_id', activeCompany.id)
+            ]);
+
+            const newStats = {
+                items: itemsRes.count || 0,
+                contacts: contactsRes.count || 0,
+                tax: taxRes.count || 0,
+                categories: catRes.count || 0
+            };
+            setStats(newStats);
+
+            setHealth([
+                { name: "Product Catalog", status: "Active", nodes: newStats.items, time: "Live", color: "bg-blue-600", icon: Package, path: "/apps/masters/items" },
+                { name: "Contact Directory", status: "Verified", nodes: newStats.contacts, time: "Live", color: "bg-slate-900", icon: UsersIcon, path: "/apps/masters/contacts" },
+                { name: "Category Mapping", status: "Syncing", nodes: newStats.categories, time: "Live", color: "bg-blue-600", icon: Network, path: "/apps/masters/mapping" },
+            ]);
+        } catch (err) {
+            console.error("Master stats fetch failed:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStats();
+    }, [activeCompany]);
 
     const fmt = (n: number) => n.toLocaleString();
 
     return (
-        <div className="p-10 space-y-12 animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto">
+        <div className="min-h-screen bg-slate-50/20 font-sans p-4 lg:p-6 space-y-6 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-slate-100">
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase">Master Data Hub</h1>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-                        <p className="text-[13px] font-bold tracking-[0.2em] text-slate-500 uppercase leading-none">Centralized record management • {activeCompany?.name}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 border-l-4 border-blue-600 pl-4 uppercase">Registry Intelligence</h1>
+                    <div className="flex items-center gap-2 pl-4">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase leading-none">Centralized Master Data Hub • {activeCompany?.name}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 1000); }}
-                        className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 transition-all hover:shadow-lg"
-                    >
-                        <RefreshCw className={cn("w-5 h-5", loading && "animate-spin")} />
-                    </button>
-                    <Button 
-                        onClick={() => navigate('/apps/masters/items')}
-                        className="h-12 px-8 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-[0.2em] uppercase transition-all shadow-xl shadow-slate-900/20 gap-3 border-0"
-                    >
-                        <Plus className="w-4 h-4" /> Global Create
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={fetchStats} className="h-8 w-8 text-slate-400 hover:text-blue-600 border border-slate-200 hover:border-blue-200 bg-white">
+                        <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+                    </Button>
+                    <Button size="sm" onClick={() => navigate('/apps/masters/items')} className="h-8 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black shadow-lg shadow-slate-900/10 uppercase tracking-widest rounded-lg">
+                        <Plus className="w-3.5 h-3.5 mr-2" /> Add Record
                     </Button>
                 </div>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* KPI Cards - Navigation Hub */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: "Products", value: fmt(stats.totalItems), sub: "Registered Catalog", icon: Package, color: "bg-blue-600", path: "/apps/masters/items" },
-                    { label: "Entities", value: fmt(stats.totalContacts), sub: "Contact Matrix", icon: UsersIcon, color: "bg-slate-900", path: "/apps/masters/contacts" },
-                    { label: "Tax Compliance", value: stats.totalTaxRules, sub: "Active Slabs", icon: Percent, color: "bg-blue-600", path: "/apps/masters/tax" },
-                    { label: "Classifications", value: stats.totalCategories, sub: "Domain Groups", icon: ListTree, color: "bg-slate-900", path: "/apps/masters/categories" },
+                    { label: "Product Items", value: fmt(stats.items), sub: "All time assets", icon: Package, color: "text-blue-600", bg: "bg-blue-50", path: "/apps/masters/items" },
+                    { label: "Contact Nodes", value: fmt(stats.contacts), sub: "Customers & Vendors", icon: UsersIcon, color: "text-slate-600", bg: "bg-slate-100", path: "/apps/masters/contacts" },
+                    { label: "Tax Standards", value: stats.tax, sub: "GST Policy Hub", icon: Percent, color: "text-emerald-600", bg: "bg-emerald-50", path: "/apps/masters/tax" },
+                    { label: "Categorization", value: stats.categories, sub: "Hierarchy Mapping", icon: ListTree, color: "text-indigo-600", bg: "bg-indigo-50", path: "/apps/masters/categories" },
                 ].map(k => (
                     <div 
                         key={k.label} 
                         onClick={() => navigate(k.path)}
-                        className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-2xl transition-all h-64 group cursor-pointer"
+                        className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group cursor-pointer"
                     >
-                        <div className="flex items-center justify-between mb-8">
-                            <div className={cn("w-14 h-14 rounded-3xl flex items-center justify-center text-white transition-transform group-hover:scale-110 duration-500", k.color)}>
-                                <k.icon className="w-6 h-6" />
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={cn("p-2 rounded-lg", k.bg, k.color)}>
+                                <k.icon className="w-4 h-4" />
                             </div>
-                            <span className="text-xs font-bold tracking-[0.2em] text-slate-400 uppercase leading-none">{k.label}</span>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{k.label}</span>
                         </div>
                         <div>
-                            <p className="text-5xl font-black tracking-tighter text-slate-900 mb-2 leading-none">{k.value}</p>
-                            <p className="text-[12px] font-bold text-slate-500 tracking-[0.1em] uppercase mt-4 leading-none">{k.sub}</p>
+                            <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{loading ? "..." : k.value}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{k.sub}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-                <div className="lg:col-span-8 bg-white rounded-[4rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                    <div className="px-12 py-10 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-                        <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase leading-none">Database Health</h2>
-                        <Button variant="ghost" className="h-10 px-6 rounded-xl text-[11px] font-bold tracking-[0.2em] text-blue-600 uppercase hover:bg-blue-50 transition-all">Audit Logs</Button>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Database Health List */}
+                <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-3.5 bg-slate-400 rounded-full" />
+                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Database Health</h2>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-50">View System Logs</Button>
                     </div>
-                    <div className="p-12 space-y-8">
-                        {[
-                            { name: "Product Catalog", status: "Active", nodes: 4820, time: "2m ago", color: "bg-blue-600", icon: Package, path: "/apps/masters/items" },
-                            { name: "Contact Directory", status: "Verified", nodes: 245, time: "15m ago", color: "bg-slate-900", icon: UsersIcon, path: "/apps/masters/contacts" },
-                            { name: "Category Mapping", status: "Syncing", nodes: 64, time: "Updating...", color: "bg-blue-600", icon: Network, path: "/apps/masters/mapping" },
-                        ].map(sync => (
+                    <div className="p-4 space-y-3">
+                        {health.map(sync => (
                             <div 
                                 key={sync.name} 
                                 onClick={() => navigate(sync.path)}
-                                className="flex items-center justify-between p-8 rounded-[3.5rem] border border-slate-50 hover:border-blue-100 hover:bg-slate-50/30 transition-all group cursor-pointer"
+                                className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-slate-50/50 transition-all group cursor-pointer shadow-sm"
                             >
-                                <div className="flex items-center gap-8">
-                                    <div className={cn("w-16 h-16 rounded-[2rem] flex items-center justify-center text-white shadow-2xl transition-all group-hover:rotate-6", sync.color)}>
-                                        <sync.icon className="w-7 h-7" />
+                                <div className="flex items-center gap-4">
+                                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center font-black text-[10px] shadow-sm transition-all", sync.color === 'bg-blue-600' ? "bg-blue-600 text-white" : "bg-slate-900 text-white")}>
+                                        <sync.icon className="w-4 h-4" />
                                     </div>
                                     <div>
-                                        <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-[14px] tracking-tight leading-none">{sync.name}</p>
-                                        <div className="flex items-center gap-4 mt-3 text-[12px] font-bold text-slate-400 uppercase tracking-[0.1em]">
-                                            <span>{sync.nodes} Records</span>
-                                            <span className="text-slate-200">•</span>
-                                            <span className="text-blue-600">{sync.status}</span>
+                                        <p className="text-[11px] font-black text-slate-900 uppercase leading-none mb-1 group-hover:text-blue-600">{sync.name}</p>
+                                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                            <span>{loading ? "..." : sync.nodes} Records</span>
+                                            <span>•</span>
+                                            <span className="text-emerald-500">{sync.status}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <span className="text-[11px] font-bold text-slate-300 uppercase leading-none">{sync.time}</span>
+                                <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{sync.time}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="lg:col-span-4 bg-slate-900 rounded-[4rem] p-12 shadow-2xl relative overflow-hidden group min-h-[500px]">
-                     <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-                        <Zap className="w-64 h-64 text-blue-500 -rotate-12 translate-x-24" />
-                    </div>
-                    <h2 className="text-xl font-black text-white uppercase tracking-[0.3em] mb-12 border-b border-white/5 pb-8">Quick Actions</h2>
-                    <div className="grid grid-cols-2 gap-6 relative z-10">
-                        {[
-                            { label: "New Item", icon: Plus, color: "bg-blue-600", path: "/apps/masters/items" },
-                            { label: "SKU Wizard", icon: Code, color: "bg-blue-600", path: "/apps/masters/sku" },
-                            { label: "Category", icon: ListTree, color: "bg-blue-600", path: "/apps/masters/categories" },
-                            { label: "UOM Matrix", icon: Hash, color: "bg-white/10", path: "/apps/masters/uoms" },
-                            { label: "Tax Layer", icon: ShieldCheck, color: "bg-white/10", path: "/apps/masters/tax" },
-                            { label: "Price Matrix", icon: DollarSign, color: "bg-white/10", path: "/apps/masters/pricing" },
-                            { label: "CoA Hub", icon: LayoutGrid, color: "bg-white/10", path: "/apps/masters/coa" },
-                            { label: "Fiscal Cycle", icon: Clock, color: "bg-white/10", path: "/apps/masters/fiscal-years" },
-                        ].map(sh => (
-                            <button 
-                                key={sh.label} 
-                                onClick={() => navigate(sh.path)}
-                                className="flex flex-col items-center justify-center p-8 rounded-[2.5rem] bg-white/5 hover:bg-white/10 transition-all border border-white/5 gap-5 group/sh"
-                            >
-                                <div className={cn("w-12 h-12 rounded-[1.25rem] flex items-center justify-center text-white transition-all group-hover/sh:scale-110 group-hover/sh:shadow-2xl group-hover/sh:shadow-blue-500/20", sh.color)}>
-                                    <sh.icon className="w-5 h-5" />
-                                </div>
-                                <span className="text-[11px] font-black tracking-[0.2em] text-slate-400 uppercase group-hover/sh:text-white transition-colors text-center leading-tight">{sh.label}</span>
-                            </button>
-                        ))}
+                {/* Dark Quick Actions Area */}
+                <div className="bg-slate-900 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+                    <div className="relative z-10">
+                        <h3 className="text-[9px] font-black tracking-widest text-blue-400 mb-5 uppercase leading-none">Quick Registry Access</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                            {[
+                                { label: "New Item", icon: Plus, color: "bg-blue-600", path: "/apps/masters/items" },
+                                { label: "SKU Tool", icon: Code, color: "bg-blue-600", path: "/apps/masters/sku" },
+                                { label: "Category", icon: ListTree, color: "bg-blue-600", path: "/apps/masters/categories" },
+                                { label: "UOM Hub", icon: Hash, color: "bg-slate-800", path: "/apps/masters/uoms" },
+                                { label: "Tax Ops", icon: ShieldCheck, color: "bg-slate-800", path: "/apps/masters/tax" },
+                                { label: "Pricing", icon: DollarSign, color: "bg-slate-800", path: "/apps/masters/pricing" },
+                                { label: "COA Grid", icon: LayoutGrid, color: "bg-slate-800", path: "/apps/masters/coa" },
+                                { label: "Fiscal", icon: Clock, color: "bg-slate-800", path: "/apps/masters/fiscal-years" },
+                            ].map(sh => (
+                                <button 
+                                    key={sh.label} 
+                                    onClick={() => navigate(sh.path)}
+                                    className="flex flex-col items-center justify-center p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-white/5 transition-all group/sh gap-2"
+                                >
+                                    <div className={cn("p-1.5 rounded-md transition-all group-hover/sh:scale-110", sh.color)}>
+                                        <sh.icon className="w-3.5 h-3.5 text-white" />
+                                    </div>
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest group-hover/sh:text-white text-center leading-none">{sh.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -13,7 +13,7 @@ export default function POSOrders() {
     const fields = [ 
       { key: 'name', label: 'Receipt Hash', required: true }, 
       { key: 'register_id', label: 'Register Sequence' }, 
-      { key: 'grand_total', label: 'Till Sum', type: 'number' } 
+      { key: 'grand_total', label: 'Till Sum', type: 'number' as const } 
     ];
 
     const handleSave = async (header: any) => {

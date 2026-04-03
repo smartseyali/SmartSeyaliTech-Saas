@@ -40,8 +40,8 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-slate-50/50">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
         </div>
       </div>
     );
@@ -51,45 +51,38 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-[#f8fafc]">
-          <div className="max-w-md w-full p-12 bg-white rounded-[40px] shadow-3xl text-center space-y-8 animate-in zoom-in-95 duration-500 border border-slate-100 relative overflow-hidden">
-            {/* Background design element */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16" />
-
-            <div className="relative mx-auto w-24 h-24 flex items-center justify-center bg-red-50 rounded-3xl">
-              <ShieldAlert className="w-12 h-12 text-red-500 animate-pulse" />
-              <Lock className="absolute -bottom-2 -right-2 w-8 h-8 text-slate-800 bg-white p-1.5 rounded-xl shadow-lg border border-slate-100" />
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden items-center justify-center bg-slate-50/50">
+          <div className="max-w-sm w-full p-8 bg-white rounded-2xl shadow-sm text-center space-y-6 border border-slate-200">
+            <div className="mx-auto w-16 h-16 flex items-center justify-center bg-red-50 rounded-xl">
+              <ShieldAlert className="w-8 h-8 text-red-500" />
             </div>
 
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 leading-tight">
-                {!hasModuleAccess ? "Module Not" : "Access"} <br />
-                <span className={cn(!hasModuleAccess ? "text-blue-600" : "text-red-500")}>
-                  {!hasModuleAccess ? "Subscribed" : "Restricted"}
-                </span>
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-slate-800">
+                {!hasModuleAccess ? "App Not Installed" : "Access Restricted"}
               </h2>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed px-4 ">
+              <p className="text-sm text-slate-500">
                 {!hasModuleAccess
-                  ? `Your enterprise ecosystem does not currently include the ${activeModule.toUpperCase()} infrastructure.`
-                  : `Your current operational tier does not have authorization to access the ${requiredResource?.toUpperCase()} module resources.`}
+                  ? `The ${activeModule} app is not installed for your workspace. Install it from the App Store.`
+                  : `You don't have permission to access this section. Contact your admin.`}
               </p>
             </div>
 
-            <div className="pt-4 flex flex-col gap-3">
-              {!hasModuleAccess ? (
+            <div className="flex flex-col gap-2">
+              {!hasModuleAccess && (
                 <Button
-                  onClick={() => navigate(`/apps/ecommerce/billing?module=${activeModule}`)}
-                  className="h-14 px-8 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-[13px] gap-3 active:scale-95 transition-all shadow-xl shadow-blue-100"
+                  onClick={() => navigate(`/apps`)}
+                  className="w-full h-10 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium gap-2"
                 >
-                  <Sparkles className="w-4 h-4" /> Activate {activeModule}
+                  <Sparkles className="w-4 h-4" /> Go to App Store
                 </Button>
-              ) : null}
+              )}
               <Button
                 onClick={() => navigate('/apps')}
                 variant="outline"
-                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-900 font-bold text-[13px] gap-3 active:scale-95 transition-all"
+                className="w-full h-10 rounded-lg text-sm font-medium gap-2"
               >
-                <Home className="w-4 h-4" /> Go to App Launcher
+                <Home className="w-4 h-4" /> Back to Dashboard
               </Button>
             </div>
           </div>
@@ -104,7 +97,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <AppHeader />
-        <main className="flex-1 overflow-y-auto scrollbar-hide bg-[#f8fafc]/50">
+        <main className="flex-1 overflow-y-auto scrollbar-hide bg-[#f8fafd]">
           <div className="content-zoom w-full h-full">
             {content}
           </div>

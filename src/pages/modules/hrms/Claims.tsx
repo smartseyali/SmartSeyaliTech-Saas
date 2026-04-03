@@ -13,7 +13,7 @@ export default function EmployeeClaims() {
     const fields = [ 
       { key: 'name', label: 'Reimbursement Request ID', required: true }, 
       { key: 'employee', label: 'Employee Name' }, 
-      { key: 'amount', label: 'Requested Value', type: 'number' } 
+      { key: 'amount', label: 'Requested Value', type: 'number' as const } 
     ];
 
     const handleSave = async (header: any) => {

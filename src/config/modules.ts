@@ -15,10 +15,15 @@ export interface PlatformModule {
     dashboardRoute: string;   // Default dashboard route
     category: ModuleCategory;
     status: 'live' | 'beta' | 'coming-soon' | 'planned';
-    includedInPlans: string[]; // Plan slugs that include this module
+    includedInPlans: string[]; // Legacy — kept for backward compatibility
     features: string[];       // Key feature bullet points
-    isCore: boolean;          // Core modules always shown
+    isCore: boolean;          // Core modules always shown (free)
     needsTemplate: boolean;   // Whether the onboarding needs a theme/template selection
+    // Per-app pricing (Odoo-style)
+    priceMonthly: number;     // Monthly price in INR (0 = free)
+    priceYearly?: number;     // Yearly price in INR (optional discount)
+    isFree: boolean;          // Free app (no charge)
+    trialDays: number;        // Trial period in days (0 = no trial)
 }
 
 export type ModuleCategory =
@@ -51,9 +56,12 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Order management',
             'Payment gateway integration',
             'Shipping zones & delivery',
-            'Website builder (templates)',
         ],
-        needsTemplate: true,
+        needsTemplate: false,
+        priceMonthly: 999,
+        priceYearly: 9990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'pos',
@@ -77,6 +85,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Day-end reports',
         ],
         needsTemplate: false,
+        priceMonthly: 499,
+        priceYearly: 4990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'crm',
@@ -100,6 +112,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Activity reminders',
         ],
         needsTemplate: false,
+        priceMonthly: 499,
+        priceYearly: 4990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'sales',
@@ -124,6 +140,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Customer Statement Matrix',
         ],
         needsTemplate: false,
+        priceMonthly: 799,
+        priceYearly: 7990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'inventory',
@@ -147,6 +167,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Stock transfers',
         ],
         needsTemplate: false,
+        priceMonthly: 599,
+        priceYearly: 5990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'purchase',
@@ -170,6 +194,10 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Integrated Vendor Billing',
         ],
         needsTemplate: false,
+        priceMonthly: 499,
+        priceYearly: 4990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'hrms',
@@ -193,6 +221,39 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Org hierarchy',
         ],
         needsTemplate: false,
+        priceMonthly: 699,
+        priceYearly: 6990,
+        isFree: false,
+        trialDays: 14,
+    },
+    {
+        id: 'finance',
+        name: 'Finance & Accounting',
+        tagline: 'Double-entry accounting and financial reporting',
+        description: 'Full-featured accounting module — journal entries, general ledger, trial balance, P&L, balance sheet, bank reconciliation, and tax configuration.',
+        icon: '💰',
+        color: '#0D9488',
+        colorFrom: 'from-teal-500',
+        colorTo: 'to-teal-700',
+        route: '/apps/finance',
+        dashboardRoute: '/apps/finance',
+        category: 'finance',
+        status: 'beta',
+        includedInPlans: ['professional', 'enterprise', 'custom'],
+        isCore: false,
+        features: [
+            'Double-entry journal entries',
+            'General Ledger & Chart of Accounts',
+            'Trial Balance & financial reports',
+            'Profit & Loss / Balance Sheet',
+            'Bank accounts & reconciliation',
+            'GST / Tax configuration',
+        ],
+        needsTemplate: false,
+        priceMonthly: 799,
+        priceYearly: 7990,
+        isFree: false,
+        trialDays: 14,
     },
     {
         id: 'whatsapp',
@@ -216,6 +277,72 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Chatbot integration',
         ],
         needsTemplate: false,
+        priceMonthly: 299,
+        priceYearly: 2990,
+        isFree: false,
+        trialDays: 14,
+    },
+    {
+        id: 'website',
+        name: 'Website',
+        tagline: 'CMS + Business Platform Engine',
+        description: 'Full CMS + Business Platform — page builder, media library, programs/courses, enrollments, payments, certificates, events, forms, SEO, and multi-language support.',
+        icon: '🌐',
+        color: '#0EA5E9',
+        colorFrom: 'from-sky-500',
+        colorTo: 'to-cyan-600',
+        route: '/apps/website',
+        dashboardRoute: '/apps/website',
+        category: 'commerce',
+        status: 'live',
+        includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
+        isCore: false,
+        features: [
+            'Page builder with templates & components',
+            'Program / Course / Service catalog',
+            'Batch management & scheduling',
+            'Enrollments, fees & payment collection',
+            'Certificates & verification',
+            'Blog, media library & gallery',
+            'Custom form builder & submissions',
+            'Events & registrations',
+            'SEO manager & content versioning',
+            'Multi-language translations',
+            'Automation rules & API keys',
+        ],
+        needsTemplate: false,
+        priceMonthly: 599,
+        priceYearly: 5990,
+        isFree: false,
+        trialDays: 14,
+    },
+    {
+        id: 'masters',
+        name: 'Master Data Hub',
+        tagline: 'Centralized Registry Management',
+        description: 'Manage global identifiers for products, entities, units, and taxation rules across your entire enterprise cloud.',
+        icon: '🗄️',
+        color: '#334155',
+        colorFrom: 'from-slate-700',
+        colorTo: 'to-slate-900',
+        route: '/apps/masters',
+        dashboardRoute: '/apps/masters',
+        category: 'operations',
+        status: 'live',
+        includedInPlans: ['standard', 'professional', 'enterprise', 'custom'],
+        isCore: true,
+        features: [
+            'Unified Item Registry',
+            'Contact/Party Master Hub',
+            'Tax & Compliance Slabs',
+            'Hierarchy & Category Matrix',
+            'Financial Chart of Accounts',
+        ],
+        needsTemplate: false,
+        priceMonthly: 0,
+        priceYearly: 0,
+        isFree: true,
+        trialDays: 0,
     },
 ];
 

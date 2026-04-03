@@ -23,7 +23,10 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
     const { isAdmin, isSuperAdmin } = usePermissions();
 
     const fetchItems = async () => {
-        if (!activeCompany) return;
+        if (!activeCompany) {
+            setLoading(false);
+            return;
+        }
         setLoading(true);
 
         let query = supabase
@@ -55,34 +58,35 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
         }
     }, [tableName, activeCompany]);
 
+    // Clean payload to prevent joined relations from breaking inserts/updates
+    const cleanPayload = (data: any) => {
+        const cleaned = { ...data };
+        const jsonColumns = ['shipping_address', 'config', 'content', 'mapping_config', 'features', 'tags', 'gallery_images', 'screenshots', 'use_cases', 'technologies', 'included_in_plans'];
+
+        for (const key in cleaned) {
+            const val = cleaned[key];
+            if (val === "") {
+                cleaned[key] = null;
+                continue;
+            }
+            if (val !== null && typeof val === 'object' && !(val instanceof Date) && !jsonColumns.includes(key)) {
+                delete cleaned[key];
+            }
+        }
+
+        const matches = selectQuery.match(/(\w+)\s*\(/g);
+        if (matches) {
+            matches.forEach(m => {
+                const relationKey = m.replace('(', '').trim();
+                delete cleaned[relationKey];
+            });
+        }
+
+        return cleaned;
+    };
+
     const createItem = async (payload: any) => {
         if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
-
-        // Clean payload to prevent joined relations from breaking the insert
-        const cleanPayload = (data: any) => {
-            const cleaned = { ...data };
-            const jsonColumns = ['shipping_address', 'config', 'content', 'mapping_config'];
-
-            // 1. Remove objects/arrays that are not json columns
-            for (const key in cleaned) {
-                const val = cleaned[key];
-                if (val !== null && typeof val === 'object' && !(val instanceof Date) && !jsonColumns.includes(key)) {
-                    delete cleaned[key];
-                }
-            }
-
-            // 2. Extract implicitly joined relations from the selectQuery and strip them out
-            // e.g. "*, ecom_categories(id, name)" -> extracts "ecom_categories"
-            const matches = selectQuery.match(/(\w+)\s*\(/g);
-            if (matches) {
-                matches.forEach(m => {
-                    const relationKey = m.replace('(', '').trim();
-                    delete cleaned[relationKey];
-                });
-            }
-
-            return cleaned;
-        };
 
         // Always stamp company_id and created_by on creation — the SaaS foundation
         const payloadWithCompany = cleanPayload({
@@ -109,31 +113,6 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
     const updateItem = async (id: number | string, payload: any) => {
         if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
-        // Clean payload to prevent joined relations from breaking the update
-        const cleanPayload = (data: any) => {
-            const cleaned = { ...data };
-            const jsonColumns = ['shipping_address', 'config', 'content', 'mapping_config'];
-
-            // 1. Remove objects/arrays that are not json columns
-            for (const key in cleaned) {
-                const val = cleaned[key];
-                if (val !== null && typeof val === 'object' && !(val instanceof Date) && !jsonColumns.includes(key)) {
-                    delete cleaned[key];
-                }
-            }
-
-            // 2. Extract implicitly joined relations from the selectQuery and strip them out
-            const matches = selectQuery.match(/(\w+)\s*\(/g);
-            if (matches) {
-                matches.forEach(m => {
-                    const relationKey = m.replace('(', '').trim();
-                    delete cleaned[relationKey];
-                });
-            }
-
-            return cleaned;
-        };
-
         const cleanedPayload = cleanPayload(payload);
 
         const query = supabase
@@ -158,27 +137,32 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
     };
 
     const deleteItem = async (id: number | string) => {
+        await deleteItems([id]);
+    };
+
+    const deleteItems = async (ids: (number | string)[]) => {
         if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
-        const query = supabase
+        let query = supabase
             .from(tableName)
             .delete()
-            .eq("id", id);
+            .in("id", ids);
 
         if (activeCompany && !options.isGlobal) {
-            query.eq("company_id", activeCompany.id);
+            query = query.eq("company_id", activeCompany.id);
         }
 
         const { error } = await query;
 
         if (error) {
-            toast({ variant: "destructive", title: "Delete Error", description: error.message });
+            toast({ variant: "destructive", title: "Bulk Delete Error", description: error.message });
             throw error;
         } else {
-            toast({ title: "Deleted successfully" });
-            setData(prev => prev.filter(item => item.id !== id));
+            toast({ title: ids.length === 1 ? "Deleted successfully" : `Successfully deleted ${ids.length} records` });
+            const idSet = new Set(ids);
+            setData(prev => prev.filter(item => !idSet.has(item.id)));
         }
     };
 
-    return { data, loading, fetchItems, createItem, updateItem, deleteItem };
+    return { data, loading, fetchItems, createItem, updateItem, deleteItem, deleteItems };
 }

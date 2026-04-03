@@ -16,7 +16,7 @@ export const PLATFORM_CONFIG = {
 
     // 2. Core Administration
     // This email bypasses standard tenant checks and provides full access to the platform.
-    superAdminEmail: "nateshraja1999@gmail.com",
+    superAdminEmail: import.meta.env.VITE_SUPER_ADMIN_EMAIL || "nateshraja1999@gmail.com",
 
     // 3. Database & Connection Knowledge
     // This helps the application know how it's communicating with the backend.

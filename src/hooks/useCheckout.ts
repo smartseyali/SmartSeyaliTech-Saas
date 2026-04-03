@@ -65,7 +65,7 @@ export function useCheckout() {
                         line1: formData.address,
                         line2: formData.city,
                         pincode: formData.pincode,
-                        state: "Check State"
+                        state: formData.state || ""
                     },
                     subtotal: cartTotal,
                     grand_total: cartTotal,
