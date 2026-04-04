@@ -291,8 +291,17 @@ export default function DocPage({
       }
 
       toast.success(`${def.name} saved successfully`);
-      handleAbort();
-      fetchItems();
+
+      // Stay on the form with the saved record
+      await fetchItems();
+      if (savedHeader) {
+        const updated = unpackCustomFields(savedHeader);
+        setEditing(updated);
+        if (def.itemTableName && def.itemForeignKey) {
+          const freshItems = await loadItems(savedHeader.id);
+          setEditingItems(freshItems.length > 0 ? freshItems : [{}]);
+        }
+      }
     } catch (err: any) {
       toast.error(`Save failed: ${err.message}`);
     }
