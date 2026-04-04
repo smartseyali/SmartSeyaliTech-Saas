@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import db from "@/lib/db";
 import {
-  Plus, Trash2, Save, X, ChevronDown, ChevronRight, ArrowLeft,
+  Plus, Trash2, Save, X, ChevronDown, ChevronRight, ChevronLeft, ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,10 @@ interface DocFormProps {
   initialData?: any;
   initialItems?: any[];
   customActions?: React.ReactNode;
+  /** Navigate between records */
+  onNavigate?: (direction: "prev" | "next") => void;
+  currentIndex?: number;
+  totalRecords?: number;
 }
 
 /* ── Section labels for tabs ───────────────────────────────────────────────── */
@@ -62,12 +66,22 @@ export default function DocForm({
   title, subtitle, headerFields, tabFields, itemFields,
   onSave, onAbort, onDelete, initialData, initialItems,
   showItems = true, itemTitle = "Items", customActions,
+  onNavigate, currentIndex = -1, totalRecords = 0,
 }: DocFormProps) {
   const [header, setHeader] = useState<Record<string, any>>(initialData || {});
   const [items, setItems] = useState<any[]>(initialItems || [{}]);
   const [lookupData, setLookupData] = useState<Record<string, any[]>>({});
   const [saving, setSaving] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
+  // Sync form state when navigating between records
+  useEffect(() => {
+    setHeader(initialData || {});
+  }, [initialData]);
+
+  useEffect(() => {
+    setItems(initialItems || [{}]);
+  }, [initialItems]);
 
   // For headerFields mode, determine which fields go in top vs body
   const isTabMode = !!tabFields;
@@ -305,6 +319,30 @@ export default function DocForm({
               <h1 className="text-[14px] font-semibold text-slate-900 truncate">{title}</h1>
               {header.status && <StatusBadge status={header.status} className="ml-1" />}
             </div>
+            {/* Record navigation */}
+            {onNavigate && totalRecords > 0 && (
+              <div className="flex items-center gap-1 ml-2 border-l border-slate-200 pl-3">
+                <button
+                  onClick={() => onNavigate("prev")}
+                  disabled={currentIndex <= 0}
+                  className="p-1 rounded hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-slate-500 hover:text-slate-700"
+                  title="Previous record"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-[11px] text-slate-400 font-medium tabular-nums min-w-[3ch] text-center">
+                  {currentIndex + 1} / {totalRecords}
+                </span>
+                <button
+                  onClick={() => onNavigate("next")}
+                  disabled={currentIndex >= totalRecords - 1}
+                  className="p-1 rounded hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-slate-500 hover:text-slate-700"
+                  title="Next record"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 shrink-0">

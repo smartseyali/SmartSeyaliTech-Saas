@@ -383,6 +383,19 @@ export default function DocPage({
     ...(extraColumns || []),
   ];
 
+  /* ── Record navigation (next / previous) ────────────────────────────── */
+
+  const currentIndex = editing?.id
+    ? filteredData.findIndex((r) => r.id === editing.id)
+    : -1;
+
+  const handleNavigate = async (direction: "prev" | "next") => {
+    if (currentIndex < 0) return;
+    const newIndex = direction === "prev" ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= filteredData.length) return;
+    await handleOpenEdit(filteredData[newIndex]);
+  };
+
   /* ── Render ────────────────────────────────────────────────────────────── */
 
   if (view === "form") {
@@ -401,6 +414,9 @@ export default function DocPage({
         initialData={editing}
         initialItems={editingItems}
         customActions={customFormActions?.(editing, navigate)}
+        onNavigate={editing?.id ? handleNavigate : undefined}
+        currentIndex={currentIndex}
+        totalRecords={filteredData.length}
       />
     );
   }
