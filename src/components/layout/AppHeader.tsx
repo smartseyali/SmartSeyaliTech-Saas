@@ -122,7 +122,7 @@ export function AppHeader() {
                         <DropdownMenuTrigger asChild>
                             <button className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-50 transition-colors">
                                 <Avatar className="h-7 w-7 rounded-full">
-                                    <AvatarImage src={`https://avatar.vercel.sh/${userEmail}.png`} className="rounded-full" />
+                                    <AvatarImage src="" className="rounded-full hidden" />
                                     <AvatarFallback className="bg-blue-600 text-white text-[11px] font-semibold rounded-full">
                                         {userInitial}
                                     </AvatarFallback>

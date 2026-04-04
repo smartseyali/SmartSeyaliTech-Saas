@@ -1,15 +1,40 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Check, Download, ExternalLink, X } from "lucide-react";
-import { PLATFORM_MODULES, CATEGORY_LABELS } from "@/config/modules";
-import type { PlatformModule } from "@/config/modules";
+import { CATEGORY_LABELS } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import PLATFORM_CONFIG from "@/config/platform";
 
-type CategoryFilter = "all" | PlatformModule["category"];
+interface SystemModule {
+    id: string;
+    slug: string;
+    name: string;
+    tagline: string;
+    description: string;
+    icon: string;
+    color: string;
+    color_from: string;
+    color_to: string;
+    route: string;
+    dashboard_route: string;
+    category: string;
+    status: string;
+    features: string[];
+    included_in_plans: string[];
+    is_core: boolean;
+    is_active: boolean;
+    needs_template: boolean;
+    is_free: boolean;
+    price_monthly: number;
+    price_yearly: number;
+    trial_days: number;
+    sort_order: number;
+}
+
+type CategoryFilter = "all" | string;
 
 const CATEGORY_PILLS: { key: CategoryFilter; label: string }[] = [
     { key: "all", label: "All" },
@@ -28,47 +53,63 @@ export default function AppLauncher() {
     const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<CategoryFilter>("all");
-    const [installTarget, setInstallTarget] = useState<PlatformModule | null>(null);
+    const [installTarget, setInstallTarget] = useState<SystemModule | null>(null);
     const [installing, setInstalling] = useState(false);
+    const [dbModules, setDbModules] = useState<SystemModule[]>([]);
+    const [loadingModules, setLoadingModules] = useState(true);
+
+    // Fetch modules from database
+    useEffect(() => {
+        const fetchModules = async () => {
+            setLoadingModules(true);
+            const { data, error } = await supabase
+                .from("system_modules")
+                .select("*")
+                .eq("is_active", true)
+                .order("sort_order", { ascending: true });
+
+            if (!error && data) {
+                setDbModules(data as SystemModule[]);
+            }
+            setLoadingModules(false);
+        };
+        fetchModules();
+    }, []);
 
     const modules = useMemo(() => {
-        return PLATFORM_MODULES.filter((m) => {
-            // Masters is always accessed via sidebar, never shown in the grid
-            if (m.id === "masters") return false;
-            // Hide planned modules
+        return dbModules.filter((m) => {
+            if (m.slug === "masters") return false;
             if (m.status === "planned") return false;
 
             const q = search.toLowerCase();
             const matchesSearch =
                 !q ||
                 m.name.toLowerCase().includes(q) ||
-                m.tagline.toLowerCase().includes(q) ||
-                m.description.toLowerCase().includes(q);
+                (m.tagline || "").toLowerCase().includes(q) ||
+                (m.description || "").toLowerCase().includes(q);
             const matchesCategory = category === "all" || m.category === category;
             return matchesSearch && matchesCategory;
         });
-    }, [search, category]);
+    }, [search, category, dbModules]);
 
-    const isInstalled = (mod: PlatformModule) =>
-        mod.isCore || isSuperAdmin || hasModule(mod.name) || hasModule(mod.id);
+    const isInstalled = (mod: SystemModule) =>
+        mod.is_core || isSuperAdmin || hasModule(mod.name) || hasModule(mod.slug);
 
-    const handleInstall = async (mod: PlatformModule) => {
+    const handleInstall = async (mod: SystemModule) => {
         if (!activeCompany) {
             toast.error("Please select a company first.");
             return;
         }
         setInstalling(true);
         try {
-            // Insert into company_modules
             const { error: cmErr } = await supabase.from("company_modules").insert({
                 company_id: activeCompany.id,
-                module_slug: mod.id,
+                module_slug: mod.slug,
                 is_active: true,
                 installed_at: new Date().toISOString(),
             });
             if (cmErr) throw cmErr;
 
-            // Insert into user_modules (best-effort, table may not exist)
             try {
                 const {
                     data: { user },
@@ -76,7 +117,7 @@ export default function AppLauncher() {
                 if (user) {
                     await supabase.from("user_modules").insert({
                         user_id: user.id,
-                        module_slug: mod.id,
+                        module_slug: mod.slug,
                         company_id: activeCompany.id,
                     });
                 }
@@ -95,15 +136,22 @@ export default function AppLauncher() {
         }
     };
 
-    // Derive which category pills actually have modules (excluding masters)
     const activeCategories = useMemo(() => {
         const cats = new Set(
-            PLATFORM_MODULES.filter((m) => m.id !== "masters" && m.status !== "planned").map(
+            dbModules.filter((m) => m.slug !== "masters" && m.status !== "planned").map(
                 (m) => m.category
             )
         );
-        return CATEGORY_PILLS.filter((p) => p.key === "all" || cats.has(p.key as any));
-    }, []);
+        return CATEGORY_PILLS.filter((p) => p.key === "all" || cats.has(p.key));
+    }, [dbModules]);
+
+    if (loadingModules) {
+        return (
+            <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50/80">
@@ -169,7 +217,7 @@ export default function AppLauncher() {
 
                             return (
                                 <div
-                                    key={mod.id}
+                                    key={mod.slug}
                                     className={`relative bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
                                         installed ? "border-l-4 border-l-blue-500 border-t border-r border-b border-t-gray-200 border-r-gray-200 border-b-gray-200" : "border-gray-200"
                                     } ${!isAvailable ? "opacity-60" : ""}`}
@@ -196,7 +244,7 @@ export default function AppLauncher() {
                                         {/* Icon + Name + Tagline */}
                                         <div className="flex items-start gap-3 mb-4">
                                             <div
-                                                className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} shadow-sm`}
+                                                className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 bg-gradient-to-br ${mod.color_from || "from-blue-500"} ${mod.color_to || "to-blue-600"} shadow-sm`}
                                             >
                                                 {mod.icon}
                                             </div>
@@ -212,7 +260,7 @@ export default function AppLauncher() {
 
                                         {/* Features */}
                                         <ul className="space-y-1 mb-5">
-                                            {mod.features.slice(0, 3).map((f, i) => (
+                                            {(mod.features || []).slice(0, 3).map((f, i) => (
                                                 <li
                                                     key={i}
                                                     className="text-xs text-gray-500 flex items-start gap-1.5"
@@ -228,27 +276,31 @@ export default function AppLauncher() {
                                         {/* Price + Action */}
                                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                                             <div>
-                                                {mod.isCore ? (
+                                                {mod.is_core ? (
                                                     <span className="text-xs font-medium text-gray-500">
                                                         Included
                                                     </span>
-                                                ) : mod.isFree ? (
+                                                ) : mod.is_free ? (
                                                     <span className="text-xs font-medium text-green-600">
                                                         Free
                                                     </span>
-                                                ) : (
+                                                ) : mod.price_monthly ? (
                                                     <span className="text-sm font-semibold text-gray-900">
-                                                        ₹{mod.priceMonthly}
+                                                        ₹{mod.price_monthly}
                                                         <span className="text-xs font-normal text-gray-400">
                                                             /mo
                                                         </span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs font-medium text-green-600">
+                                                        Free
                                                     </span>
                                                 )}
                                             </div>
 
                                             {isAvailable && installed ? (
                                                 <button
-                                                    onClick={() => navigate(mod.dashboardRoute)}
+                                                    onClick={() => navigate(mod.dashboard_route || mod.route || "/")}
                                                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                                                 >
                                                     Open
@@ -289,7 +341,7 @@ export default function AppLauncher() {
 
                         <div className="flex items-center gap-3 mb-4">
                             <div
-                                className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${installTarget.colorFrom} ${installTarget.colorTo}`}
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${installTarget.color_from || "from-blue-500"} ${installTarget.color_to || "to-blue-600"}`}
                             >
                                 {installTarget.icon}
                             </div>
@@ -302,7 +354,7 @@ export default function AppLauncher() {
                         </div>
 
                         <div className="bg-gray-50 rounded-lg p-4 mb-5 space-y-2">
-                            {installTarget.isFree ? (
+                            {installTarget.is_free || !installTarget.price_monthly ? (
                                 <p className="text-sm text-gray-600">
                                     This is a <span className="font-medium text-green-600">free</span> app.
                                 </p>
@@ -310,14 +362,14 @@ export default function AppLauncher() {
                                 <p className="text-sm text-gray-600">
                                     This will add{" "}
                                     <span className="font-semibold text-gray-900">
-                                        ₹{installTarget.priceMonthly}/mo
+                                        ₹{installTarget.price_monthly}/mo
                                     </span>{" "}
                                     to your billing.
                                 </p>
                             )}
-                            {installTarget.trialDays > 0 && (
+                            {installTarget.trial_days > 0 && (
                                 <p className="text-sm text-blue-600 font-medium">
-                                    {installTarget.trialDays}-day free trial included
+                                    {installTarget.trial_days}-day free trial included
                                 </p>
                             )}
                         </div>

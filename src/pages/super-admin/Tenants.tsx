@@ -94,7 +94,7 @@ export default function Tenants() {
             // Fetch company users with user details
             const { data: companyUsers, error: cuErr } = await supabase
                 .from("company_users")
-                .select("company_id, role, users(full_name, email)");
+                .select("company_id, role, users(full_name, username)");
 
             if (cuErr) throw cuErr;
 
@@ -114,7 +114,7 @@ export default function Tenants() {
                 if (cu.users) {
                     adminsByCompany[cu.company_id].push({
                         full_name: cu.users.full_name || "",
-                        email: cu.users.email || "",
+                        email: cu.users.username || "",
                     });
                 }
             });
