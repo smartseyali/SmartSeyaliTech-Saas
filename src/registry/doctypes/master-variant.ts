@@ -21,7 +21,9 @@ export const masterVariant: DocTypeDef = {
       { key: "description", label: "Description", type: "text" },
     ],
     config: [
-      { key: "price_adjustment", label: "Price Adjustment", type: "currency", placeholder: "0.00" },
+      { key: "selling_price", label: "Selling Price", type: "currency", placeholder: "Variant selling price" },
+      { key: "mrp", label: "MRP", type: "currency", placeholder: "Variant MRP (strikethrough price)" },
+      { key: "price_adjustment", label: "Price Adjustment (legacy)", type: "currency", placeholder: "0.00" },
       {
         key: "is_active", label: "Status", type: "select",
         options: [
