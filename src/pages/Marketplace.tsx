@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Check, Download, ExternalLink, X, ArrowLeft, Star, Shield, Clock, Zap, ChevronRight, Tag, Package, Globe } from "lucide-react";
+import { Search, Check, Download, ExternalLink, X, ArrowLeft, Star, Shield, Clock, Zap, ChevronRight, Tag, Package, Globe, Trash2 } from "lucide-react";
 import { CATEGORY_LABELS } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
@@ -65,6 +65,7 @@ export default function Marketplace() {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<CategoryFilter>("all");
     const [installing, setInstalling] = useState(false);
+    const [uninstalling, setUninstalling] = useState(false);
     const [dbModules, setDbModules] = useState<SystemModule[]>([]);
     const [loadingModules, setLoadingModules] = useState(true);
 
@@ -150,6 +151,52 @@ export default function Marketplace() {
             toast.error(err.message || "Failed to install module");
         } finally {
             setInstalling(false);
+        }
+    };
+
+    const handleUninstall = async (mod: SystemModule) => {
+        if (!activeCompany) {
+            toast.error("Please select a company first.");
+            return;
+        }
+        if (mod.is_core) {
+            toast.error("Core modules cannot be uninstalled.");
+            return;
+        }
+        if (!confirm(`Uninstall "${mod.name}" from ${activeCompany.name}? This will remove access to this app.`)) return;
+
+        setUninstalling(true);
+        try {
+            // Remove from company_modules
+            const { error: cmErr } = await supabase
+                .from("company_modules")
+                .delete()
+                .eq("company_id", activeCompany.id)
+                .eq("module_slug", mod.slug);
+            if (cmErr) throw cmErr;
+
+            // Remove from user_modules
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    await supabase
+                        .from("user_modules")
+                        .delete()
+                        .eq("company_id", activeCompany.id)
+                        .eq("module_slug", mod.slug);
+                }
+            } catch {
+                // user_modules delete is optional
+            }
+
+            refreshPermissions();
+            toast.success(`${mod.name} has been uninstalled.`);
+            setSelectedApp(null);
+        } catch (err: any) {
+            console.error("Uninstall error:", err);
+            toast.error(err.message || "Failed to uninstall module");
+        } finally {
+            setUninstalling(false);
         }
     };
 
@@ -346,6 +393,25 @@ export default function Marketplace() {
                                         <p className="text-xs text-center text-green-600 font-medium flex items-center justify-center gap-1">
                                             <Check className="w-3.5 h-3.5" /> Already installed
                                         </p>
+                                        {!selectedApp.is_core && (
+                                            <button
+                                                onClick={() => handleUninstall(selectedApp)}
+                                                disabled={uninstalling}
+                                                className="w-full py-2 rounded-xl text-xs font-medium border border-red-200 text-red-600 hover:bg-red-50 transition-colors inline-flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                            >
+                                                {uninstalling ? (
+                                                    <>
+                                                        <span className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                                                        Uninstalling...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                        Uninstall App
+                                                    </>
+                                                )}
+                                            </button>
+                                        )}
                                     </div>
                                 ) : isAvailable ? (
                                     <div className="space-y-3">

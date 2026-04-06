@@ -1,11 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus } from "lucide-react";
+import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X } from "lucide-react";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
 import PLATFORM_CONFIG from "@/config/platform";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface InstalledModule {
     id: string;
@@ -25,10 +26,12 @@ interface InstalledModule {
 export default function AppLauncher() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
-    const { hasModule, isSuperAdmin } = usePermissions();
+    const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
     const [dbModules, setDbModules] = useState<InstalledModule[]>([]);
     const [loading, setLoading] = useState(true);
+    const [menuOpen, setMenuOpen] = useState<string | null>(null);
+    const [uninstalling, setUninstalling] = useState(false);
 
     useEffect(() => {
         const fetchModules = async () => {
@@ -46,6 +49,51 @@ export default function AppLauncher() {
         };
         fetchModules();
     }, []);
+
+    // Close menu on outside click
+    useEffect(() => {
+        if (!menuOpen) return;
+        const handler = () => setMenuOpen(null);
+        document.addEventListener("click", handler);
+        return () => document.removeEventListener("click", handler);
+    }, [menuOpen]);
+
+    const handleUninstall = async (mod: InstalledModule) => {
+        if (!activeCompany) return;
+        if (mod.is_core) {
+            toast.error("Core modules cannot be uninstalled.");
+            return;
+        }
+        if (!confirm(`Uninstall "${mod.name}" from ${activeCompany.name}?`)) return;
+
+        setUninstalling(true);
+        try {
+            const { error } = await supabase
+                .from("company_modules")
+                .delete()
+                .eq("company_id", activeCompany.id)
+                .eq("module_slug", mod.slug);
+            if (error) throw error;
+
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    await supabase.from("user_modules").delete()
+                        .eq("company_id", activeCompany.id)
+                        .eq("module_slug", mod.slug);
+                }
+            } catch { /* optional */ }
+
+            refreshPermissions();
+            setDbModules(prev => prev); // trigger re-filter
+            toast.success(`${mod.name} has been uninstalled.`);
+        } catch (err: any) {
+            toast.error(err.message || "Failed to uninstall");
+        } finally {
+            setUninstalling(false);
+            setMenuOpen(null);
+        }
+    };
 
     const installedModules = useMemo(() => {
         return dbModules.filter((m) => {
@@ -146,23 +194,55 @@ export default function AppLauncher() {
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         {installedModules.map((mod) => (
-                            <button
-                                key={mod.slug}
-                                onClick={() => navigate(mod.dashboard_route || mod.route || "/")}
-                                className="group bg-white rounded-2xl border border-gray-200 p-5 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                            >
-                                <div className={cn(
-                                    "w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform",
-                                    mod.color_from || "from-blue-500",
-                                    mod.color_to || "to-blue-600"
-                                )}>
-                                    {mod.icon}
-                                </div>
-                                <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                    {mod.name}
-                                </h3>
-                                <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{mod.tagline}</p>
-                            </button>
+                            <div key={mod.slug} className="relative group">
+                                <button
+                                    onClick={() => navigate(mod.dashboard_route || mod.route || "/")}
+                                    className="w-full bg-white rounded-2xl border border-gray-200 p-5 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                >
+                                    <div className={cn(
+                                        "w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform",
+                                        mod.color_from || "from-blue-500",
+                                        mod.color_to || "to-blue-600"
+                                    )}>
+                                        {mod.icon}
+                                    </div>
+                                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                        {mod.name}
+                                    </h3>
+                                    <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{mod.tagline}</p>
+                                </button>
+
+                                {/* Uninstall menu - only for non-core modules */}
+                                {!mod.is_core && (
+                                    <div className="absolute top-2 right-2 z-10">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === mod.slug ? null : mod.slug); }}
+                                            className="p-1 rounded-lg bg-white/80 border border-gray-200 opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-all"
+                                        >
+                                            <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
+                                        </button>
+                                        {menuOpen === mod.slug && (
+                                            <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); navigate(`/marketplace`); }}
+                                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                    View in Marketplace
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleUninstall(mod); }}
+                                                    disabled={uninstalling}
+                                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    {uninstalling ? "Uninstalling..." : "Uninstall"}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         ))}
 
                         {/* Add more apps tile */}

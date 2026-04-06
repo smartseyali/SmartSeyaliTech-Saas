@@ -5,7 +5,7 @@ import { PLATFORM_MODULES } from "@/config/modules";
 import { toast } from "sonner";
 import {
     Building2, Users, CreditCard, LayoutGrid,
-    Eye, Pause, Loader2
+    Eye, Pause, Loader2, AlertTriangle, Clock, ArrowRight
 } from "lucide-react";
 
 interface DashboardStats {
@@ -14,6 +14,13 @@ interface DashboardStats {
     activeUsers: number;
     monthlyRevenue: number;
     appsInstalled: number;
+}
+
+interface ExpiringSubscription {
+    company_id: number;
+    company_name: string;
+    days_remaining: number;
+    period_end: string;
 }
 
 interface RecentTenant {
@@ -36,6 +43,7 @@ export default function SuperAdminDashboard() {
         appsInstalled: 0,
     });
     const [recentTenants, setRecentTenants] = useState<RecentTenant[]>([]);
+    const [expiringSubs, setExpiringSubs] = useState<ExpiringSubscription[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -95,6 +103,30 @@ export default function SuperAdminDashboard() {
                 created_at: c.created_at,
                 apps_count: appsByCompany[c.id] || 0,
             }));
+
+            // Fetch expiring subscriptions
+            const { data: subs } = await supabase
+                .from("subscriptions")
+                .select("company_id, current_period_end, companies(name)")
+                .not("current_period_end", "is", null);
+
+            const nowTs = now.getTime();
+            const WARNING_DAYS = 14;
+            const expiring: ExpiringSubscription[] = (subs || [])
+                .map((s: any) => {
+                    const endDate = new Date(s.current_period_end);
+                    const daysLeft = Math.ceil((endDate.getTime() - nowTs) / (1000 * 60 * 60 * 24));
+                    return {
+                        company_id: s.company_id,
+                        company_name: s.companies?.name || "Unknown",
+                        days_remaining: daysLeft,
+                        period_end: s.current_period_end,
+                    };
+                })
+                .filter((s: ExpiringSubscription) => s.days_remaining <= WARNING_DAYS)
+                .sort((a: ExpiringSubscription, b: ExpiringSubscription) => a.days_remaining - b.days_remaining);
+
+            setExpiringSubs(expiring);
 
             setStats({
                 totalTenants: companies?.length || 0,
@@ -204,6 +236,72 @@ export default function SuperAdminDashboard() {
                     </div>
                 ))}
             </div>
+
+            {/* Subscription Expiry Alerts */}
+            {expiringSubs.length > 0 && (
+                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                            <h2 className="text-sm font-medium text-slate-900">
+                                Subscription Alerts
+                            </h2>
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
+                                {expiringSubs.length}
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => navigate("/super-admin/subscriptions")}
+                            className="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1"
+                        >
+                            Manage all
+                            <ArrowRight className="w-3 h-3" />
+                        </button>
+                    </div>
+                    <div className="divide-y divide-slate-50">
+                        {expiringSubs.slice(0, 5).map((sub) => (
+                            <div
+                                key={sub.company_id}
+                                className={`px-5 py-3 flex items-center justify-between ${
+                                    sub.days_remaining <= 0 ? "bg-red-50/50" : sub.days_remaining <= 3 ? "bg-amber-50/50" : ""
+                                }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                                        {sub.company_name[0]}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-slate-900">{sub.company_name}</p>
+                                        <p className="text-xs text-slate-400">
+                                            Ends {new Date(sub.period_end).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {sub.days_remaining <= 0 ? (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                            Expired
+                                        </span>
+                                    ) : (
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                                            sub.days_remaining <= 3 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                                        }`}>
+                                            <Clock className="w-3 h-3" />
+                                            {sub.days_remaining}d left
+                                        </span>
+                                    )}
+                                    <button
+                                        onClick={() => navigate(`/super-admin/subscriptions`)}
+                                        className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                                    >
+                                        <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Middle row: Revenue chart + Recent tenants */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
