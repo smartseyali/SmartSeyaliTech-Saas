@@ -43,18 +43,45 @@ export default function PlatformUsers() {
 
     const loadUsers = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from("users")
-            .select(`
-                id, full_name, username, avatar_url, is_super_admin, last_login, status,
-                company_users ( id, role, companies ( name ) )
-            `)
-            .order("created_at", { ascending: false });
+        try {
+            // Fetch users first (always succeeds with RLS)
+            const { data: usersData, error: usersErr } = await supabase
+                .from("users")
+                .select("id, full_name, username, avatar_url, is_super_admin, last_login, status")
+                .order("created_at", { ascending: false });
 
-        if (error) {
+            if (usersErr) throw usersErr;
+
+            // Fetch company_users separately (may fail if RLS blocks)
+            let companyUsersMap: Record<string, { id: string; role: string; companies: { name: string } | null }[]> = {};
+            try {
+                const { data: cuData } = await supabase
+                    .from("company_users")
+                    .select("id, role, user_id, companies ( name )");
+
+                (cuData || []).forEach((cu: any) => {
+                    if (!companyUsersMap[cu.user_id]) companyUsersMap[cu.user_id] = [];
+                    companyUsersMap[cu.user_id].push({
+                        id: cu.id,
+                        role: cu.role,
+                        companies: cu.companies,
+                    });
+                });
+            } catch {
+                // company_users fetch failed (RLS) — proceed without it
+                console.warn("Could not load company_users — RLS may be blocking. Run fix_rls_v4_super_admin.sql");
+            }
+
+            // Merge
+            const merged: UserRecord[] = (usersData || []).map((u: any) => ({
+                ...u,
+                company_users: companyUsersMap[u.id] || [],
+            }));
+
+            setUsers(merged);
+        } catch (err) {
+            console.error("Failed to load users:", err);
             toast.error("Failed to load users");
-        } else {
-            setUsers((data as UserRecord[]) || []);
         }
         setLoading(false);
     };

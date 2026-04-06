@@ -68,17 +68,25 @@ export default function SuperAdminDashboard() {
 
             if (userErr) throw userErr;
 
-            // Fetch active company modules with system_modules for pricing
+            // Fetch system modules for pricing lookup by slug
+            const { data: sysModules } = await supabase
+                .from("system_modules")
+                .select("slug, price_monthly");
+
+            const priceBySlug: Record<string, number> = {};
+            (sysModules || []).forEach((sm: any) => { priceBySlug[sm.slug] = sm.price_monthly || 0; });
+
+            // Fetch active company modules
             const { data: companyModules, error: modErr } = await supabase
                 .from("company_modules")
-                .select("id, company_id, is_active, system_modules(price_monthly)")
+                .select("id, company_id, module_slug, is_active")
                 .eq("is_active", true);
 
             if (modErr) throw modErr;
 
             // Calculate monthly revenue from active module prices
             const monthlyRevenue = (companyModules || []).reduce((sum: number, cm: any) => {
-                return sum + (cm.system_modules?.price_monthly || 0);
+                return sum + (priceBySlug[cm.module_slug] || 0);
             }, 0);
 
             // Count tenants created this month
