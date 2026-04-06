@@ -9,8 +9,7 @@ type UserRecord = {
     username: string | null;
     avatar_url: string | null;
     is_super_admin: boolean;
-    last_login: string | null;
-    status: string | null;
+    created_at: string | null;
     company_users: {
         id: string;
         role: string;
@@ -47,7 +46,7 @@ export default function PlatformUsers() {
             // Fetch users first (always succeeds with RLS)
             const { data: usersData, error: usersErr } = await supabase
                 .from("users")
-                .select("id, full_name, username, avatar_url, is_super_admin, last_login, status")
+                .select("id, full_name, username, avatar_url, is_super_admin, created_at")
                 .order("created_at", { ascending: false });
 
             if (usersErr) throw usersErr;
@@ -220,8 +219,7 @@ export default function PlatformUsers() {
                                     <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
                                     <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
                                     <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Companies</th>
-                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Last Login</th>
-                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
                                     <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider w-16">Actions</th>
                                 </tr>
                             </thead>
@@ -230,8 +228,6 @@ export default function PlatformUsers() {
                                     const companies = (u.company_users || [])
                                         .map((cu) => cu.companies?.name)
                                         .filter(Boolean);
-                                    const isActive = u.status !== "inactive";
-
                                     return (
                                         <tr key={u.id} className="hover:bg-slate-50/60 transition-colors">
                                             {/* User */}
@@ -292,22 +288,9 @@ export default function PlatformUsers() {
                                                 )}
                                             </td>
 
-                                            {/* Last Login */}
+                                            {/* Joined */}
                                             <td className="px-4 py-3 text-slate-500 text-xs">
-                                                {formatDate(u.last_login)}
-                                            </td>
-
-                                            {/* Status */}
-                                            <td className="px-4 py-3">
-                                                <span
-                                                    className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${
-                                                        isActive
-                                                            ? "bg-green-50 text-green-700"
-                                                            : "bg-red-50 text-red-600"
-                                                    }`}
-                                                >
-                                                    {isActive ? "Active" : "Inactive"}
-                                                </span>
+                                                {formatDate(u.created_at)}
                                             </td>
 
                                             {/* Actions */}
@@ -369,7 +352,7 @@ export default function PlatformUsers() {
 
                                 {filtered.length === 0 && (
                                     <tr>
-                                        <td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400">
+                                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-400">
                                             No users found.
                                         </td>
                                     </tr>
