@@ -124,15 +124,20 @@ export default function Marketplace() {
             toast.error("Please select a company first.");
             return;
         }
+        // Prevent double-install
+        if (isInstalled(mod)) {
+            toast.info(`${mod.name} is already installed.`);
+            return;
+        }
         setInstalling(true);
         try {
-            const { error: cmErr } = await supabase.from("company_modules").insert({
+            const { error: cmErr } = await supabase.from("company_modules").upsert({
                 company_id: activeCompany.id,
                 module_id: mod.id,
                 module_slug: mod.slug,
                 is_active: true,
                 installed_at: new Date().toISOString(),
-            });
+            }, { onConflict: "company_id,module_slug" });
             if (cmErr) throw cmErr;
 
             try {

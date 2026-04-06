@@ -20,6 +20,7 @@ import type { ERPField, FieldType } from "@/types/erp";
 import { formatINR } from "@/lib/services/calculationService";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { MediaUpload } from "@/components/common/MediaUpload";
+import { useTenant } from "@/contexts/TenantContext";
 
 /* ── Props ─────────────────────────────────────────────────────────────────── */
 
@@ -68,6 +69,7 @@ export default function DocForm({
   showItems = true, itemTitle = "Items", customActions,
   onNavigate, currentIndex = -1, totalRecords = 0,
 }: DocFormProps) {
+  const { activeCompany } = useTenant();
   const [header, setHeader] = useState<Record<string, any>>(initialData || {});
   const [items, setItems] = useState<any[]>(initialItems || [{}]);
   const [lookupData, setLookupData] = useState<Record<string, any[]>>({});
@@ -111,9 +113,16 @@ export default function DocForm({
     const lookupsNeeded = allFields.filter(f => f.type === "select" && f.lookupTable);
 
     const fetchLookups = async () => {
+      // System/global tables that don't need company_id
+      const globalTables = new Set(['system_modules', 'subscription_plans', 'users', 'companies']);
+
       for (const field of lookupsNeeded) {
         try {
           let query = db.from(field.lookupTable!).select(`${field.lookupValue || "id"}, ${field.lookupLabel || "name"}`);
+          // Scope to active company unless it's a global table
+          if (activeCompany && !globalTables.has(field.lookupTable!)) {
+            query = query.eq('company_id', activeCompany.id);
+          }
           if (field.lookupFilter) {
             Object.entries(field.lookupFilter).forEach(([key, val]) => { query = query.eq(key, val); });
           }

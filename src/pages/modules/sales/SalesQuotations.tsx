@@ -16,11 +16,13 @@ export default function SalesQuotations() {
     const [view, setView] = useState<"list" | "form">("list");
 
     const fetchQuotations = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         try {
             const { data, error } = await db
                 .from('sales_quotations')
                 .select('*, items:sales_quotation_items(*)')
+                .eq('company_id', activeCompany.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -79,7 +81,7 @@ export default function SalesQuotations() {
             toast.loading("Recording Proforma Invoice...");
             const { data: quote, error } = await db.from('sales_quotations').insert({
                 ...header,
-                tenant_id: activeCompany?.id,
+                company_id: activeCompany?.id,
                 grand_total: items.reduce((acc, i) => acc + (i.quantity * i.unit_price * (1 + (i.tax_rate || 0)/100)), 0)
             }).select().single();
 
@@ -89,7 +91,7 @@ export default function SalesQuotations() {
                 items.map(item => ({
                     ...item,
                     quotation_id: quote.id,
-                    tenant_id: activeCompany?.id
+                    company_id: activeCompany?.id
                 }))
             );
 

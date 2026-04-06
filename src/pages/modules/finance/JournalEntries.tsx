@@ -44,10 +44,12 @@ export default function JournalEntries() {
     ];
 
     const loadLines = async (journalId: string) => {
-        const { data } = await supabase
+        let query = supabase
             .from("finance_journal_lines")
             .select("*")
             .eq("journal_entry_id", journalId);
+        if (activeCompany) query = query.eq("company_id", activeCompany.id);
+        const { data } = await query;
         return data || [];
     };
 
@@ -86,6 +88,7 @@ export default function JournalEntries() {
                 .filter(l => l.account_id)
                 .map(l => ({
                     journal_entry_id: savedHeader.id,
+                    company_id: activeCompany?.id,
                     account_id: l.account_id,
                     description: l.description,
                     debit: Number(l.debit || 0),
