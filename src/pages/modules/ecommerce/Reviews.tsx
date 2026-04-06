@@ -30,14 +30,14 @@ export default function Reviews() {
     const load = async () => {
         if (!activeCompany) return;
         setLoading(true);
-        const { data } = await supabase.from("product_reviews").select("*")
+        const { data } = await supabase.from("ecom_product_reviews").select("*")
             .eq("company_id", activeCompany.id).order("created_at", { ascending: false });
         setReviews(data || []);
         setLoading(false);
     };
 
     const updateStatus = async (id: number, status: "approved" | "rejected") => {
-        await supabase.from("product_reviews").update({ status }).eq("id", id);
+        await supabase.from("ecom_product_reviews").update({ status }).eq("id", id);
         toast({ title: status === "approved" ? "Review approved ✅" : "Review rejected" });
         load();
     };
