@@ -68,6 +68,7 @@ export default function Marketplace() {
     const [uninstalling, setUninstalling] = useState(false);
     const [dbModules, setDbModules] = useState<SystemModule[]>([]);
     const [loadingModules, setLoadingModules] = useState(true);
+    const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
 
     // Detail view state
     const [selectedApp, setSelectedApp] = useState<SystemModule | null>(null);
@@ -84,10 +85,21 @@ export default function Marketplace() {
             if (!error && data) {
                 setDbModules(data as SystemModule[]);
             }
+
+            // Fetch this company's installed modules
+            if (activeCompany) {
+                const { data: cmData } = await supabase
+                    .from("company_modules")
+                    .select("module_slug")
+                    .eq("company_id", activeCompany.id)
+                    .eq("is_active", true);
+                setCompanySlugs(new Set((cmData || []).map((cm: any) => cm.module_slug)));
+            }
+
             setLoadingModules(false);
         };
         fetchModules();
-    }, []);
+    }, [activeCompany?.id]);
 
     const modules = useMemo(() => {
         return dbModules.filter((m) => {
@@ -105,7 +117,7 @@ export default function Marketplace() {
     }, [search, category, dbModules]);
 
     const isInstalled = (mod: SystemModule) =>
-        mod.is_core || isSuperAdmin || hasModule(mod.name) || hasModule(mod.slug);
+        mod.is_core || companySlugs.has(mod.slug) || hasModule(mod.name) || hasModule(mod.slug);
 
     const handleInstall = async (mod: SystemModule) => {
         if (!activeCompany) {
@@ -145,6 +157,7 @@ export default function Marketplace() {
             }
 
             refreshPermissions();
+            setCompanySlugs(prev => new Set([...prev, mod.slug]));
             toast.success(`${mod.name} installed successfully!`);
         } catch (err: any) {
             console.error("Install error:", err);
@@ -190,6 +203,7 @@ export default function Marketplace() {
             }
 
             refreshPermissions();
+            setCompanySlugs(prev => { const next = new Set(prev); next.delete(mod.slug); return next; });
             toast.success(`${mod.name} has been uninstalled.`);
             setSelectedApp(null);
         } catch (err: any) {

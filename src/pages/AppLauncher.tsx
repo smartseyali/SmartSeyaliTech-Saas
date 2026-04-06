@@ -29,13 +29,16 @@ export default function AppLauncher() {
     const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
     const [dbModules, setDbModules] = useState<InstalledModule[]>([]);
+    const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
     const [uninstalling, setUninstalling] = useState(false);
 
+    // Fetch all system modules + this company's installed module slugs
     useEffect(() => {
         const fetchModules = async () => {
             setLoading(true);
+
             const { data, error } = await supabase
                 .from("system_modules")
                 .select("id, slug, name, tagline, icon, color_from, color_to, route, dashboard_route, category, status, is_core")
@@ -45,10 +48,23 @@ export default function AppLauncher() {
             if (!error && data) {
                 setDbModules(data as InstalledModule[]);
             }
+
+            // Fetch this company's installed modules
+            if (activeCompany) {
+                const { data: cmData } = await supabase
+                    .from("company_modules")
+                    .select("module_slug")
+                    .eq("company_id", activeCompany.id)
+                    .eq("is_active", true);
+                setCompanySlugs(new Set((cmData || []).map((cm: any) => cm.module_slug)));
+            } else {
+                setCompanySlugs(new Set());
+            }
+
             setLoading(false);
         };
         fetchModules();
-    }, []);
+    }, [activeCompany?.id]);
 
     // Close menu on outside click
     useEffect(() => {
@@ -98,14 +114,14 @@ export default function AppLauncher() {
     const installedModules = useMemo(() => {
         return dbModules.filter((m) => {
             if (m.slug === "masters") return false;
-            // Only show installed modules
-            const installed = m.is_core || isSuperAdmin || hasModule(m.name) || hasModule(m.slug);
+            // Show only core modules + modules actually installed for this company
+            const installed = m.is_core || companySlugs.has(m.slug) || hasModule(m.name) || hasModule(m.slug);
             if (!installed) return false;
             // Search filter
             const q = search.toLowerCase();
             return !q || m.name.toLowerCase().includes(q) || (m.tagline || "").toLowerCase().includes(q);
         });
-    }, [search, dbModules, isSuperAdmin]);
+    }, [search, dbModules, companySlugs, hasModule]);
 
     if (loading) {
         return (
