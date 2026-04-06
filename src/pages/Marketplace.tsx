@@ -128,6 +128,7 @@ export default function Marketplace() {
         try {
             const { error: cmErr } = await supabase.from("company_modules").insert({
                 company_id: activeCompany.id,
+                module_id: mod.id,
                 module_slug: mod.slug,
                 is_active: true,
                 installed_at: new Date().toISOString(),
