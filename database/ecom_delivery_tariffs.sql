@@ -1,98 +1,88 @@
 -- ========================================================================================
--- SHIPPING ENGINE — Modular, rule-based delivery charge system
--- Tables: delivery_tariffs, delivery_states, shipping_rules, shipping_extra_charges
--- Function: calculate_shipping_charge() — full pipeline
+-- SHIPPING ENGINE V3 — Universal tariff-based shipping for multi-tenant SaaS
+-- No hardcoded zones. Everything dynamic per company.
 -- ========================================================================================
 
+-- 0. Drop ALL old shipping tables (old + new) so we start clean
+DROP TABLE IF EXISTS public.shipping_extra_charges CASCADE;
+DROP TABLE IF EXISTS public.shipping_slabs CASCADE;
+DROP TABLE IF EXISTS public.shipping_zones_v2 CASCADE;
+DROP TABLE IF EXISTS public.shipping_tariffs CASCADE;
+DROP TABLE IF EXISTS public.delivery_tariffs CASCADE;
+DROP TABLE IF EXISTS public.delivery_states CASCADE;
+DROP TABLE IF EXISTS public.shipping_rules CASCADE;
 
--- ========================================================================================
--- 1. DELIVERY TARIFF SLABS (weight/volume/value/qty based pricing per zone)
--- ========================================================================================
-
-CREATE TABLE IF NOT EXISTS public.delivery_tariffs (
+-- 1. SHIPPING TARIFFS — Named tariff configs per company
+CREATE TABLE public.shipping_tariffs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    slab_type VARCHAR(20) NOT NULL DEFAULT 'WEIGHT',  -- WEIGHT | VOLUME | VALUE | QTY
-    max_value INT NOT NULL,  -- max grams / ml / ₹ / qty depending on slab_type
-    prices JSONB NOT NULL DEFAULT '{}',  -- {"TN": 40, "SOUTH": 70, "NE": 130, "REST": 120}
+    tariff_name VARCHAR(255) NOT NULL DEFAULT 'Standard Shipping',
+    shipping_type VARCHAR(20) NOT NULL DEFAULT 'WEIGHT',  -- WEIGHT | QTY | VALUE | VOLUME
+    primary_uom VARCHAR(20) NOT NULL DEFAULT 'kg',  -- kg | units | ₹ | cm3
+    priority INT NOT NULL DEFAULT 1,
+    is_active BOOLEAN DEFAULT true,
+    free_shipping_enabled BOOLEAN DEFAULT false,
+    free_shipping_condition VARCHAR(20) DEFAULT 'VALUE',  -- VALUE | WEIGHT | QTY
+    free_shipping_min DECIMAL(10,2) DEFAULT 0,
+    free_shipping_zones UUID[] DEFAULT ARRAY[]::UUID[],  -- empty = all zones
+    rounding_rule VARCHAR(20) DEFAULT 'ROUND_UP',  -- ROUND_UP | ROUND_DOWN | ROUND_NEAREST
+    conflict_resolution VARCHAR(20) DEFAULT 'HIGHEST_PRIORITY',
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_delivery_tariffs_lookup
-    ON delivery_tariffs(company_id, slab_type, max_value);
-
-
--- ========================================================================================
--- 2. DELIVERY STATE-ZONE MAPPING
--- ========================================================================================
-
-CREATE TABLE IF NOT EXISTS public.delivery_states (
+-- 2. SHIPPING ZONES — Company-defined zones (Local, Regional, National, International etc.)
+CREATE TABLE public.shipping_zones_v2 (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    name VARCHAR(100) NOT NULL,
-    zone VARCHAR(50) NOT NULL DEFAULT 'REST',
-    UNIQUE(company_id, name)
-);
-
-CREATE INDEX IF NOT EXISTS idx_delivery_states_lookup
-    ON delivery_states(company_id, LOWER(name));
-
-
--- ========================================================================================
--- 3. SHIPPING RULES — Priority-based rule engine config per merchant
--- ========================================================================================
-
-CREATE TABLE IF NOT EXISTS public.shipping_rules (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    rule_name VARCHAR(100) NOT NULL,
-    slab_basis VARCHAR(20) NOT NULL DEFAULT 'WEIGHT',  -- WEIGHT | VOLUME | VALUE | QTY
-    priority INT NOT NULL DEFAULT 1,  -- Lower = higher priority
-    is_active BOOLEAN DEFAULT true,
-    free_shipping_above DECIMAL(10,2) DEFAULT 0,  -- Free shipping threshold for this rule
-    conditions JSONB DEFAULT '{}',  -- Future: {"min_weight": 0, "max_weight": 99999, "categories": [...]}
-    created_at TIMESTAMPTZ DEFAULT now(),
-    UNIQUE(company_id, slab_basis)
-);
-
-
--- ========================================================================================
--- 4. SHIPPING EXTRA CHARGES — COD fee, express, handling, packaging etc.
--- ========================================================================================
-
-CREATE TABLE IF NOT EXISTS public.shipping_extra_charges (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    charge_type VARCHAR(50) NOT NULL,  -- COD | EXPRESS | HANDLING | PACKAGING | INSURANCE
-    charge_name VARCHAR(100) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL DEFAULT 0,
-    is_percentage BOOLEAN DEFAULT false,  -- true = % of order value, false = flat ₹
-    is_active BOOLEAN DEFAULT true,
-    applies_to VARCHAR(20) DEFAULT 'ALL',  -- ALL | COD_ONLY | PREPAID_ONLY
-    min_order_value DECIMAL(10,2) DEFAULT 0,  -- Only apply if order > this
-    max_order_value DECIMAL(10,2) DEFAULT 0,  -- Only apply if order < this (0 = no limit)
+    tariff_id UUID REFERENCES public.shipping_tariffs(id) ON DELETE CASCADE,
+    zone_name VARCHAR(100) NOT NULL,
+    country VARCHAR(100) DEFAULT 'India',
+    states TEXT[] DEFAULT ARRAY[]::TEXT[],
+    pincode_from VARCHAR(10),
+    pincode_to VARCHAR(10),
+    charge_type VARCHAR(20) DEFAULT 'VARIABLE',  -- FLAT | VARIABLE
+    flat_charge DECIMAL(10,2) DEFAULT 0,  -- if charge_type = FLAT
+    display_order INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 3. SHIPPING SLABS — Range-based pricing per tariff (optionally per zone)
+CREATE TABLE public.shipping_slabs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+    tariff_id UUID NOT NULL REFERENCES public.shipping_tariffs(id) ON DELETE CASCADE,
+    zone_id UUID REFERENCES public.shipping_zones_v2(id) ON DELETE SET NULL,  -- NULL = applies to all zones
+    range_from DECIMAL(10,2) NOT NULL DEFAULT 0,
+    range_to DECIMAL(10,2),  -- NULL = unlimited (∞)
+    base_charge DECIMAL(10,2) NOT NULL DEFAULT 0,
+    extra_charge_per_unit DECIMAL(10,2) DEFAULT 0,  -- per kg/unit/₹ beyond range_from
+    has_per_unit BOOLEAN DEFAULT false,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
 
--- ========================================================================================
--- 5. ECOM_SETTINGS — delivery preferences
--- ========================================================================================
+-- 4. SHIPPING EXTRA CHARGES — COD, Express, Handling, Packaging etc.
+CREATE TABLE public.shipping_extra_charges (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+    tariff_id UUID REFERENCES public.shipping_tariffs(id) ON DELETE CASCADE,
+    charge_type VARCHAR(50) NOT NULL,  -- COD | EXPRESS | HANDLING | PACKAGING | INSURANCE
+    charge_name VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    is_percentage BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    applies_to VARCHAR(20) DEFAULT 'ALL',  -- ALL | COD_ONLY | PREPAID_ONLY
+    min_order_value DECIMAL(10,2) DEFAULT 0,
+    max_order_value DECIMAL(10,2) DEFAULT 0,  -- 0 = no limit
+    created_at TIMESTAMPTZ DEFAULT now()
+);
 
-ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS free_delivery_above DECIMAL(10,2) DEFAULT 0;
-ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS default_item_weight INT DEFAULT 500;
-ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS shipping_priority VARCHAR(20) DEFAULT 'WEIGHT';
-
-
--- ========================================================================================
--- 6. RLS — All tables
--- ========================================================================================
-
+-- 5. RLS
 DO $$
 DECLARE tbl TEXT;
 BEGIN
-    FOR tbl IN SELECT unnest(ARRAY['delivery_tariffs', 'delivery_states', 'shipping_rules', 'shipping_extra_charges']) LOOP
+    FOR tbl IN SELECT unnest(ARRAY['shipping_tariffs', 'shipping_zones_v2', 'shipping_slabs', 'shipping_extra_charges']) LOOP
         IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = tbl) THEN
             EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', tbl);
             EXECUTE format('DROP POLICY IF EXISTS "tenant_isolation" ON public.%I', tbl);
@@ -106,169 +96,169 @@ BEGIN
     END LOOP;
 END $$;
 
+-- 6. Indexes
+CREATE INDEX IF NOT EXISTS idx_shipping_tariffs_company ON shipping_tariffs(company_id);
+CREATE INDEX IF NOT EXISTS idx_shipping_zones_v2_tariff ON shipping_zones_v2(tariff_id);
+CREATE INDEX IF NOT EXISTS idx_shipping_slabs_tariff ON shipping_slabs(tariff_id, range_from);
+CREATE INDEX IF NOT EXISTS idx_shipping_extras_tariff ON shipping_extra_charges(tariff_id);
 
--- ========================================================================================
--- 7. CALCULATE SHIPPING — Full pipeline function
--- ========================================================================================
-
-CREATE OR REPLACE FUNCTION public.calculate_shipping_charge(
+-- 7. CALCULATE SHIPPING — Full pipeline
+CREATE OR REPLACE FUNCTION public.calc_shipping(
     p_company_id BIGINT,
-    p_state TEXT,
-    p_total_grams INT DEFAULT 0,
-    p_total_ml INT DEFAULT 0,
-    p_total_qty INT DEFAULT 1,
+    p_state TEXT DEFAULT '',
+    p_pincode TEXT DEFAULT '',
+    p_weight_kg DECIMAL DEFAULT 0,
+    p_qty INT DEFAULT 1,
     p_order_value DECIMAL DEFAULT 0,
+    p_volume_cm3 DECIMAL DEFAULT 0,
     p_payment_method TEXT DEFAULT 'prepaid'
 )
 RETURNS JSONB AS $$
 DECLARE
-    v_zone TEXT;
-    v_base_charge DECIMAL(10,2) := 0;
-    v_weight_charge DECIMAL(10,2) := 0;
-    v_volume_charge DECIMAL(10,2) := 0;
-    v_value_charge DECIMAL(10,2) := 0;
-    v_qty_charge DECIMAL(10,2) := 0;
-    v_extra_total DECIMAL(10,2) := 0;
-    v_free_above DECIMAL(10,2) := 0;
-    v_priority TEXT;
-    v_prices JSONB;
-    v_rule RECORD;
-    v_extra RECORD;
+    v_tariff RECORD;
+    v_zone RECORD;
+    v_slab RECORD;
+    v_calc_value DECIMAL;
+    v_base DECIMAL := 0;
+    v_zone_charge DECIMAL := 0;
+    v_extra_total DECIMAL := 0;
     v_extras JSONB := '[]'::JSONB;
-    v_method TEXT;
+    v_extra RECORD;
+    v_zone_name TEXT := 'Default';
+    v_method TEXT := 'slab';
 BEGIN
-    -- 1. RESOLVE ZONE
-    SELECT zone INTO v_zone
-    FROM public.delivery_states
-    WHERE company_id = p_company_id AND LOWER(name) = LOWER(p_state);
-    IF v_zone IS NULL THEN v_zone := 'REST'; END IF;
+    -- 1. Get highest priority active tariff
+    SELECT * INTO v_tariff FROM public.shipping_tariffs
+    WHERE company_id = p_company_id AND is_active = true
+    ORDER BY priority ASC LIMIT 1;
 
-    -- 2. CHECK FREE SHIPPING (global threshold)
-    SELECT free_delivery_above, shipping_priority INTO v_free_above, v_priority
-    FROM public.ecom_settings WHERE company_id = p_company_id;
-
-    IF v_free_above > 0 AND p_order_value >= v_free_above THEN
-        RETURN jsonb_build_object(
-            'shipping_charge', 0, 'zone', v_zone, 'method', 'free_shipping',
-            'breakdown', jsonb_build_object('base', 0, 'extras', 0),
-            'free_shipping', true, 'free_threshold', v_free_above
-        );
+    IF v_tariff IS NULL THEN
+        RETURN jsonb_build_object('shipping_charge', 0, 'method', 'no_tariff', 'zone', 'none', 'breakdown', '{}'::JSONB);
     END IF;
 
-    -- 3. CALCULATE BY EACH ACTIVE RULE (slab matching)
-
-    -- Weight slabs
-    SELECT prices INTO v_prices FROM public.delivery_tariffs
-    WHERE company_id = p_company_id AND slab_type = 'WEIGHT' AND max_value >= p_total_grams
-    ORDER BY max_value ASC LIMIT 1;
-    IF v_prices IS NULL THEN
-        SELECT prices INTO v_prices FROM public.delivery_tariffs
-        WHERE company_id = p_company_id AND slab_type = 'WEIGHT' ORDER BY max_value DESC LIMIT 1;
-    END IF;
-    IF v_prices IS NOT NULL THEN
-        v_weight_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
-    END IF;
-
-    -- Volume slabs
-    IF p_total_ml > 0 THEN
-        v_prices := NULL;
-        SELECT prices INTO v_prices FROM public.delivery_tariffs
-        WHERE company_id = p_company_id AND slab_type = 'VOLUME' AND max_value >= p_total_ml
-        ORDER BY max_value ASC LIMIT 1;
-        IF v_prices IS NULL THEN
-            SELECT prices INTO v_prices FROM public.delivery_tariffs
-            WHERE company_id = p_company_id AND slab_type = 'VOLUME' ORDER BY max_value DESC LIMIT 1;
-        END IF;
-        IF v_prices IS NOT NULL THEN
-            v_volume_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
+    -- 2. Free shipping check
+    IF v_tariff.free_shipping_enabled THEN
+        IF (v_tariff.free_shipping_condition = 'VALUE' AND p_order_value >= v_tariff.free_shipping_min)
+        OR (v_tariff.free_shipping_condition = 'WEIGHT' AND p_weight_kg >= v_tariff.free_shipping_min)
+        OR (v_tariff.free_shipping_condition = 'QTY' AND p_qty >= v_tariff.free_shipping_min) THEN
+            RETURN jsonb_build_object(
+                'shipping_charge', 0, 'method', 'free_shipping', 'free_shipping', true,
+                'zone', 'all', 'tariff', v_tariff.tariff_name,
+                'breakdown', jsonb_build_object('base', 0, 'zone_charge', 0, 'extras', 0)
+            );
         END IF;
     END IF;
 
-    -- Value-based slabs
-    v_prices := NULL;
-    SELECT prices INTO v_prices FROM public.delivery_tariffs
-    WHERE company_id = p_company_id AND slab_type = 'VALUE' AND max_value >= p_order_value
-    ORDER BY max_value ASC LIMIT 1;
-    IF v_prices IS NOT NULL THEN
-        v_value_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
+    -- 3. Resolve zone (by pincode first, then state)
+    SELECT * INTO v_zone FROM public.shipping_zones_v2
+    WHERE tariff_id = v_tariff.id
+    AND (
+        (p_pincode != '' AND p_pincode >= COALESCE(pincode_from, '') AND p_pincode <= COALESCE(pincode_to, 'ZZZZZZ'))
+        OR (p_state != '' AND p_state = ANY(states))
+    )
+    ORDER BY
+        CASE WHEN p_pincode != '' AND pincode_from IS NOT NULL THEN 0 ELSE 1 END,
+        display_order ASC
+    LIMIT 1;
+
+    -- Fallback: first zone with no state/pincode restriction
+    IF v_zone IS NULL THEN
+        SELECT * INTO v_zone FROM public.shipping_zones_v2
+        WHERE tariff_id = v_tariff.id AND states = ARRAY[]::TEXT[] AND pincode_from IS NULL
+        ORDER BY display_order LIMIT 1;
     END IF;
 
-    -- Qty-based slabs
-    v_prices := NULL;
-    SELECT prices INTO v_prices FROM public.delivery_tariffs
-    WHERE company_id = p_company_id AND slab_type = 'QTY' AND max_value >= p_total_qty
-    ORDER BY max_value ASC LIMIT 1;
-    IF v_prices IS NOT NULL THEN
-        v_qty_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
+    IF v_zone IS NOT NULL THEN
+        v_zone_name := v_zone.zone_name;
+        -- Flat zone charge
+        IF v_zone.charge_type = 'FLAT' THEN
+            RETURN jsonb_build_object(
+                'shipping_charge', CEIL(v_zone.flat_charge), 'method', 'flat_zone',
+                'zone', v_zone.zone_name, 'tariff', v_tariff.tariff_name, 'free_shipping', false,
+                'breakdown', jsonb_build_object('base', v_zone.flat_charge, 'zone_charge', 0, 'extras', 0)
+            );
+        END IF;
     END IF;
 
-    -- 4. DETERMINE BASE CHARGE BY PRIORITY
-    v_priority := COALESCE(v_priority, 'WEIGHT');
-    v_method := 'slab_' || LOWER(v_priority);
-
-    CASE v_priority
-        WHEN 'WEIGHT' THEN v_base_charge := GREATEST(v_weight_charge, v_volume_charge);
-        WHEN 'VOLUME' THEN v_base_charge := GREATEST(v_volume_charge, v_weight_charge);
-        WHEN 'VALUE' THEN v_base_charge := v_value_charge;
-        WHEN 'QTY' THEN v_base_charge := v_qty_charge;
-        ELSE v_base_charge := GREATEST(v_weight_charge, v_volume_charge);
+    -- 4. Determine calculation value based on shipping_type
+    CASE v_tariff.shipping_type
+        WHEN 'WEIGHT' THEN v_calc_value := p_weight_kg;
+        WHEN 'QTY'    THEN v_calc_value := p_qty;
+        WHEN 'VALUE'  THEN v_calc_value := p_order_value;
+        WHEN 'VOLUME' THEN v_calc_value := p_volume_cm3;
+        ELSE v_calc_value := p_weight_kg;
     END CASE;
 
-    -- Fallback: if primary has 0, use the highest from any method
-    IF v_base_charge = 0 THEN
-        v_base_charge := GREATEST(v_weight_charge, v_volume_charge, v_value_charge, v_qty_charge);
-        IF v_base_charge > 0 THEN v_method := 'fallback_highest'; END IF;
+    -- Round
+    IF v_tariff.rounding_rule = 'ROUND_UP' THEN v_calc_value := CEIL(v_calc_value);
+    ELSIF v_tariff.rounding_rule = 'ROUND_DOWN' THEN v_calc_value := FLOOR(v_calc_value);
+    ELSE v_calc_value := ROUND(v_calc_value);
     END IF;
 
-    -- 5. ADD EXTRA CHARGES (COD, express, handling etc.)
+    -- 5. Match slab (zone-specific first, then global)
+    SELECT * INTO v_slab FROM public.shipping_slabs
+    WHERE tariff_id = v_tariff.id
+    AND range_from <= v_calc_value
+    AND (range_to IS NULL OR range_to >= v_calc_value)
+    AND (zone_id = v_zone.id OR zone_id IS NULL)
+    ORDER BY
+        CASE WHEN zone_id IS NOT NULL THEN 0 ELSE 1 END,
+        range_from DESC
+    LIMIT 1;
+
+    IF v_slab IS NULL THEN
+        -- Fallback: highest slab
+        SELECT * INTO v_slab FROM public.shipping_slabs
+        WHERE tariff_id = v_tariff.id AND (zone_id = v_zone.id OR zone_id IS NULL)
+        ORDER BY range_from DESC LIMIT 1;
+    END IF;
+
+    IF v_slab IS NOT NULL THEN
+        v_base := v_slab.base_charge;
+        IF v_slab.has_per_unit AND v_slab.extra_charge_per_unit > 0 AND v_calc_value > v_slab.range_from THEN
+            v_base := v_base + ((v_calc_value - v_slab.range_from) * v_slab.extra_charge_per_unit);
+        END IF;
+    END IF;
+
+    -- 6. Extra charges
     FOR v_extra IN
         SELECT * FROM public.shipping_extra_charges
         WHERE company_id = p_company_id AND is_active = true
+        AND (tariff_id = v_tariff.id OR tariff_id IS NULL)
         AND (applies_to = 'ALL'
             OR (applies_to = 'COD_ONLY' AND p_payment_method = 'cod')
             OR (applies_to = 'PREPAID_ONLY' AND p_payment_method != 'cod'))
         AND (min_order_value = 0 OR p_order_value >= min_order_value)
         AND (max_order_value = 0 OR p_order_value <= max_order_value)
     LOOP
-        IF v_extra.is_percentage THEN
-            v_extra_total := v_extra_total + (p_order_value * v_extra.amount / 100);
-        ELSE
-            v_extra_total := v_extra_total + v_extra.amount;
-        END IF;
-        v_extras := v_extras || jsonb_build_object(
-            'type', v_extra.charge_type,
-            'name', v_extra.charge_name,
-            'amount', CASE WHEN v_extra.is_percentage THEN ROUND(p_order_value * v_extra.amount / 100, 2) ELSE v_extra.amount END
-        );
+        DECLARE v_amt DECIMAL;
+        BEGIN
+            IF v_extra.is_percentage THEN v_amt := ROUND(p_order_value * v_extra.amount / 100, 2);
+            ELSE v_amt := v_extra.amount; END IF;
+            v_extra_total := v_extra_total + v_amt;
+            v_extras := v_extras || jsonb_build_object('type', v_extra.charge_type, 'name', v_extra.charge_name, 'amount', v_amt);
+        END;
     END LOOP;
 
-    -- 6. RETURN FULL BREAKDOWN
     RETURN jsonb_build_object(
-        'shipping_charge', CEIL(v_base_charge + v_extra_total),
-        'zone', v_zone,
+        'shipping_charge', CEIL(v_base + v_extra_total),
         'method', v_method,
+        'zone', v_zone_name,
+        'tariff', v_tariff.tariff_name,
         'free_shipping', false,
         'breakdown', jsonb_build_object(
-            'base', CEIL(v_base_charge),
-            'weight_charge', v_weight_charge,
-            'volume_charge', v_volume_charge,
-            'value_charge', v_value_charge,
-            'qty_charge', v_qty_charge,
+            'base', CEIL(v_base),
+            'zone_charge', v_zone_charge,
             'extras', v_extra_total,
-            'extra_items', v_extras
+            'extra_items', v_extras,
+            'calc_value', v_calc_value,
+            'shipping_type', v_tariff.shipping_type,
+            'slab_from', v_slab.range_from,
+            'slab_to', v_slab.range_to
         )
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public;
 
-GRANT EXECUTE ON FUNCTION public.calculate_shipping_charge(BIGINT, TEXT, INT, INT, INT, DECIMAL, TEXT) TO anon;
-GRANT EXECUTE ON FUNCTION public.calculate_shipping_charge(BIGINT, TEXT, INT, INT, INT, DECIMAL, TEXT) TO authenticated;
-
-
--- ========================================================================================
--- 8. CLEANUP old tables from previous version
--- ========================================================================================
-
-DROP TABLE IF EXISTS public.delivery_zones CASCADE;
-DROP TABLE IF EXISTS public.delivery_state_zones CASCADE;
-DROP TABLE IF EXISTS public.delivery_tariff_slabs CASCADE;
+GRANT EXECUTE ON FUNCTION public.calc_shipping(BIGINT, TEXT, TEXT, DECIMAL, INT, DECIMAL, DECIMAL, TEXT) TO anon;
+GRANT EXECUTE ON FUNCTION public.calc_shipping(BIGINT, TEXT, TEXT, DECIMAL, INT, DECIMAL, DECIMAL, TEXT) TO authenticated;

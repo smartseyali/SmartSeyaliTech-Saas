@@ -87,10 +87,6 @@ export interface ShippingResult {
     freeShipping: boolean;
     breakdown: {
         base: number;
-        weightCharge: number;
-        volumeCharge: number;
-        valueCharge: number;
-        qtyCharge: number;
         extras: number;
         extraItems: Array<{ type: string; name: string; amount: number }>;
     };
@@ -100,39 +96,39 @@ export async function calculateShippingCharge(
     companyId: number,
     state: string,
     items: CartItemForShipping[],
-    paymentMethod: string = "prepaid"
+    paymentMethod: string = "prepaid",
+    pincode: string = ""
 ): Promise<ShippingResult> {
     const agg = aggregateCart(items);
+    const weightKg = agg.totalGrams / 1000;
+    const volumeCm3 = agg.totalMl; // ml ≈ cm³
 
-    const { data, error } = await supabase.rpc("calculate_shipping_charge", {
+    const { data, error } = await supabase.rpc("calc_shipping", {
         p_company_id: companyId,
         p_state: state,
-        p_total_grams: agg.totalGrams,
-        p_total_ml: agg.totalMl,
-        p_total_qty: agg.totalQty,
+        p_pincode: pincode,
+        p_weight_kg: weightKg,
+        p_qty: agg.totalQty,
         p_order_value: agg.orderValue,
+        p_volume_cm3: volumeCm3,
         p_payment_method: paymentMethod,
     });
 
     if (error || !data) {
         console.error("Shipping calc error:", error);
         return {
-            shippingCharge: 0, zone: "REST", method: "error", freeShipping: false,
-            breakdown: { base: 0, weightCharge: 0, volumeCharge: 0, valueCharge: 0, qtyCharge: 0, extras: 0, extraItems: [] },
+            shippingCharge: 0, zone: "Default", method: "error", freeShipping: false,
+            breakdown: { base: 0, extras: 0, extraItems: [] },
         };
     }
 
     return {
         shippingCharge: Number(data.shipping_charge) || 0,
-        zone: data.zone || "REST",
+        zone: data.zone || "Default",
         method: data.method || "unknown",
         freeShipping: data.free_shipping || false,
         breakdown: {
             base: Number(data.breakdown?.base) || 0,
-            weightCharge: Number(data.breakdown?.weight_charge) || 0,
-            volumeCharge: Number(data.breakdown?.volume_charge) || 0,
-            valueCharge: Number(data.breakdown?.value_charge) || 0,
-            qtyCharge: Number(data.breakdown?.qty_charge) || 0,
             extras: Number(data.breakdown?.extras) || 0,
             extraItems: data.breakdown?.extra_items || [],
         },
