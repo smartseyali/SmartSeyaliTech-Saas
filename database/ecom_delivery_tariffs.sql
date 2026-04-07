@@ -1,118 +1,140 @@
 -- ========================================================================================
--- DELIVERY TARIFF SYSTEM — Dynamic weight/volume slabs + state zones
+-- DELIVERY TARIFF SYSTEM — Weight/Volume slabs + State-Zone mapping
+-- Replicates thandatti delivery logic in Supabase
 -- ========================================================================================
 
--- 1. Delivery Zones — merchant defines custom zones (TN, SOUTH, NE, REST etc.)
-CREATE TABLE IF NOT EXISTS public.delivery_zones (
+-- 1. Delivery Tariff Slabs
+CREATE TABLE IF NOT EXISTS public.delivery_tariffs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    zone_code VARCHAR(20) NOT NULL,
-    zone_name VARCHAR(100) NOT NULL,
-    display_order INT DEFAULT 0,
+    max_weight INT NOT NULL,
+    tariff_type VARCHAR(20) NOT NULL DEFAULT 'WEIGHT',
+    prices JSONB NOT NULL DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT now(),
-    UNIQUE(company_id, zone_code)
+    updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 2. State-Zone Mapping — which state belongs to which zone
-CREATE TABLE IF NOT EXISTS public.delivery_state_zones (
+CREATE INDEX IF NOT EXISTS idx_delivery_tariffs_lookup
+    ON delivery_tariffs(company_id, tariff_type, max_weight);
+
+-- 2. Delivery State Zones
+CREATE TABLE IF NOT EXISTS public.delivery_states (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    state_name VARCHAR(100) NOT NULL,
-    zone_code VARCHAR(20) NOT NULL,
-    UNIQUE(company_id, state_name)
+    name VARCHAR(100) NOT NULL,
+    zone VARCHAR(50) NOT NULL DEFAULT 'REST',
+    UNIQUE(company_id, name)
 );
 
--- 3. Delivery Tariff Slabs — weight/volume based pricing per zone
-CREATE TABLE IF NOT EXISTS public.delivery_tariff_slabs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id BIGINT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-    tariff_type VARCHAR(20) NOT NULL DEFAULT 'weight',  -- 'weight' or 'volume'
-    max_value INT NOT NULL,  -- max grams or max ml
-    zone_prices JSONB NOT NULL DEFAULT '{}',  -- {"TN": 10, "SOUTH": 70, "NE": 130, "REST": 120}
-    display_order INT DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
+CREATE INDEX IF NOT EXISTS idx_delivery_states_lookup
+    ON delivery_states(company_id, LOWER(name));
 
--- 4. Delivery Settings (per company)
+-- 3. Delivery settings on ecom_settings
 ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS free_delivery_above DECIMAL(10,2) DEFAULT 0;
 ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS default_item_weight INT DEFAULT 500;
-ALTER TABLE ecom_settings ADD COLUMN IF NOT EXISTS unserviceable_pincodes TEXT[] DEFAULT ARRAY[]::TEXT[];
 
--- 5. RLS
-ALTER TABLE public.delivery_zones ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.delivery_state_zones ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.delivery_tariff_slabs ENABLE ROW LEVEL SECURITY;
+-- 4. RLS
+ALTER TABLE public.delivery_tariffs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.delivery_states ENABLE ROW LEVEL SECURITY;
 
--- Admin: tenant isolation
-CREATE POLICY "tenant_isolation" ON public.delivery_zones FOR ALL TO authenticated
+-- Admin
+DROP POLICY IF EXISTS "tenant_isolation" ON public.delivery_tariffs;
+CREATE POLICY "tenant_isolation" ON public.delivery_tariffs FOR ALL TO authenticated
     USING (public.user_has_company_access(company_id)) WITH CHECK (public.user_has_company_access(company_id));
-CREATE POLICY "tenant_isolation" ON public.delivery_state_zones FOR ALL TO authenticated
-    USING (public.user_has_company_access(company_id)) WITH CHECK (public.user_has_company_access(company_id));
-CREATE POLICY "tenant_isolation" ON public.delivery_tariff_slabs FOR ALL TO authenticated
+DROP POLICY IF EXISTS "tenant_isolation" ON public.delivery_states;
+CREATE POLICY "tenant_isolation" ON public.delivery_states FOR ALL TO authenticated
     USING (public.user_has_company_access(company_id)) WITH CHECK (public.user_has_company_access(company_id));
 
 -- Service role
-CREATE POLICY "service_role_bypass" ON public.delivery_zones FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY "service_role_bypass" ON public.delivery_state_zones FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY "service_role_bypass" ON public.delivery_tariff_slabs FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "service_role_bypass" ON public.delivery_tariffs;
+CREATE POLICY "service_role_bypass" ON public.delivery_tariffs FOR ALL USING (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "service_role_bypass" ON public.delivery_states;
+CREATE POLICY "service_role_bypass" ON public.delivery_states FOR ALL USING (auth.role() = 'service_role');
 
--- Anon: storefront read (for delivery charge calculation)
-CREATE POLICY "anon_read" ON public.delivery_zones FOR SELECT TO anon USING (true);
-CREATE POLICY "anon_read" ON public.delivery_state_zones FOR SELECT TO anon USING (true);
-CREATE POLICY "anon_read" ON public.delivery_tariff_slabs FOR SELECT TO anon USING (true);
+-- Anon (storefront checkout needs to calculate delivery)
+DROP POLICY IF EXISTS "anon_read" ON public.delivery_tariffs;
+CREATE POLICY "anon_read" ON public.delivery_tariffs FOR SELECT TO anon USING (true);
+DROP POLICY IF EXISTS "anon_read" ON public.delivery_states;
+CREATE POLICY "anon_read" ON public.delivery_states FOR SELECT TO anon USING (true);
 
-GRANT SELECT ON public.delivery_zones TO anon;
-GRANT SELECT ON public.delivery_state_zones TO anon;
-GRANT SELECT ON public.delivery_tariff_slabs TO anon;
+GRANT SELECT ON public.delivery_tariffs TO anon;
+GRANT SELECT ON public.delivery_states TO anon;
 
--- 6. Indexes
-CREATE INDEX IF NOT EXISTS idx_delivery_zones_company ON delivery_zones(company_id);
-CREATE INDEX IF NOT EXISTS idx_delivery_state_zones_company ON delivery_state_zones(company_id);
-CREATE INDEX IF NOT EXISTS idx_delivery_tariff_slabs_company ON delivery_tariff_slabs(company_id);
-
--- 7. Calculate delivery charge function
+-- 5. Calculate delivery charge (weight + volume mixed)
 CREATE OR REPLACE FUNCTION public.calculate_delivery_charge(
     p_company_id BIGINT,
     p_state TEXT,
-    p_weight_grams INT,
-    p_volume_ml INT DEFAULT 0
+    p_total_grams INT,
+    p_total_ml INT DEFAULT 0
 )
-RETURNS DECIMAL(10,2) AS $$
+RETURNS JSONB AS $$
 DECLARE
     v_zone TEXT;
-    v_weight_price DECIMAL(10,2) := 0;
-    v_volume_price DECIMAL(10,2) := 0;
-    v_free_above DECIMAL(10,2);
+    v_weight_charge DECIMAL(10,2) := 0;
+    v_volume_charge DECIMAL(10,2) := 0;
+    v_free_above DECIMAL(10,2) := 0;
+    v_prices JSONB;
 BEGIN
-    -- Find the zone for this state
-    SELECT zone_code INTO v_zone
-    FROM public.delivery_state_zones
-    WHERE company_id = p_company_id AND LOWER(state_name) = LOWER(p_state);
+    -- Resolve zone from state
+    SELECT zone INTO v_zone
+    FROM public.delivery_states
+    WHERE company_id = p_company_id AND LOWER(name) = LOWER(p_state);
+    IF v_zone IS NULL THEN v_zone := 'REST'; END IF;
 
-    IF v_zone IS NULL THEN
-        v_zone := 'REST';  -- fallback
+    -- Weight-based charge
+    IF p_total_grams > 0 THEN
+        SELECT prices INTO v_prices
+        FROM public.delivery_tariffs
+        WHERE company_id = p_company_id AND tariff_type = 'WEIGHT' AND max_weight >= p_total_grams
+        ORDER BY max_weight ASC LIMIT 1;
+
+        -- Fallback to highest slab if weight exceeds all
+        IF v_prices IS NULL THEN
+            SELECT prices INTO v_prices
+            FROM public.delivery_tariffs
+            WHERE company_id = p_company_id AND tariff_type = 'WEIGHT'
+            ORDER BY max_weight DESC LIMIT 1;
+        END IF;
+
+        IF v_prices IS NOT NULL THEN
+            v_weight_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
+        END IF;
     END IF;
 
-    -- Find weight-based price
-    SELECT (zone_prices->>v_zone)::DECIMAL INTO v_weight_price
-    FROM public.delivery_tariff_slabs
-    WHERE company_id = p_company_id AND tariff_type = 'weight' AND max_value >= p_weight_grams
-    ORDER BY max_value ASC
-    LIMIT 1;
+    -- Volume-based charge
+    IF p_total_ml > 0 THEN
+        SELECT prices INTO v_prices
+        FROM public.delivery_tariffs
+        WHERE company_id = p_company_id AND tariff_type = 'VOLUME' AND max_weight >= p_total_ml
+        ORDER BY max_weight ASC LIMIT 1;
 
-    -- Find volume-based price (if applicable)
-    IF p_volume_ml > 0 THEN
-        SELECT (zone_prices->>v_zone)::DECIMAL INTO v_volume_price
-        FROM public.delivery_tariff_slabs
-        WHERE company_id = p_company_id AND tariff_type = 'volume' AND max_value >= p_volume_ml
-        ORDER BY max_value ASC
-        LIMIT 1;
+        IF v_prices IS NULL THEN
+            SELECT prices INTO v_prices
+            FROM public.delivery_tariffs
+            WHERE company_id = p_company_id AND tariff_type = 'VOLUME'
+            ORDER BY max_weight DESC LIMIT 1;
+        END IF;
+
+        IF v_prices IS NOT NULL THEN
+            v_volume_charge := COALESCE((v_prices->>v_zone)::DECIMAL, (v_prices->>'REST')::DECIMAL, 0);
+        END IF;
     END IF;
 
-    -- Return the higher of weight/volume price
-    RETURN GREATEST(COALESCE(v_weight_price, 0), COALESCE(v_volume_price, 0));
+    RETURN jsonb_build_object(
+        'delivery_charge', CEIL(v_weight_charge + v_volume_charge),
+        'zone', v_zone,
+        'weight_charge', v_weight_charge,
+        'volume_charge', v_volume_charge,
+        'total_grams', p_total_grams,
+        'total_ml', p_total_ml
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION public.calculate_delivery_charge(BIGINT, TEXT, INT, INT) TO anon;
 GRANT EXECUTE ON FUNCTION public.calculate_delivery_charge(BIGINT, TEXT, INT, INT) TO authenticated;
+
+-- Drop old tables if they conflict (from previous version)
+DROP TABLE IF EXISTS public.delivery_zones CASCADE;
+DROP TABLE IF EXISTS public.delivery_state_zones CASCADE;
+DROP TABLE IF EXISTS public.delivery_tariff_slabs CASCADE;
