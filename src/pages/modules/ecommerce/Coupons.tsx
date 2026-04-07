@@ -236,7 +236,7 @@ export default function Coupons() {
                                         )}
                                         <div className="flex justify-between items-center">
                                             <span className="font-bold text-slate-500 tracking-widest text-[13px]">USAGE</span>
-                                            <span className="font-bold text-slate-800">{c.used_count || 0} / {c.usage_limit || "∞"}</span>
+                                            <span className="font-bold text-slate-800">{c.usage_count || 0} / {c.usage_limit || "∞"}</span>
                                         </div>
                                         {c.valid_until && (
                                             <div className="flex justify-between items-center">

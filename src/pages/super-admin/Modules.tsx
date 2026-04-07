@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +20,11 @@ export default function PlatformModules() {
 
   const { data, loading, fetchItems, createItem, updateItem, deleteItem, deleteItems } =
     useCrud(def.tableName, "*", { isGlobal: true });
+
+  // Auto-sync modules from config on page load
+  useEffect(() => {
+    handleSyncFromConfig(true);
+  }, []);
 
   /* ── Array ↔ string helpers ─────────────────────────────────────────────── */
 
@@ -62,39 +67,50 @@ export default function PlatformModules() {
 
   /* ── Sync from config ───────────────────────────────────────────────────── */
 
-  const handleSyncFromConfig = async () => {
-    if (!confirm("This will import all modules from config/modules.ts into the database. Existing records with same IDs will be updated. Continue?")) return;
+  const handleSyncFromConfig = async (silent = false) => {
+    if (!silent && !confirm("This will import all modules from config/modules.ts into the database. Existing records with same IDs will be updated. Continue?")) return;
 
     setSyncing(true);
     try {
-      for (const mod of PLATFORM_MODULES) {
-        const payload = {
-          slug: mod.id,
-          name: mod.name,
-          tagline: mod.tagline,
-          description: mod.description,
-          icon: mod.icon,
-          color: mod.color,
-          color_from: mod.colorFrom,
-          color_to: mod.colorTo,
-          route: mod.route,
-          dashboard_route: mod.dashboardRoute,
-          category: mod.category,
-          status: mod.status,
-          features: mod.features,
-          included_in_plans: mod.includedInPlans,
-          needs_template: mod.needsTemplate,
-          is_core: mod.isCore,
-          is_active: true,
-          sort_order: PLATFORM_MODULES.indexOf(mod),
-        };
-        const { error } = await supabase.from("system_modules").upsert([payload], { onConflict: "slug" });
-        if (error) console.error(`Error syncing ${mod.name}:`, error);
+      const payloads = PLATFORM_MODULES.map((mod, index) => ({
+        slug: mod.id,
+        name: mod.name,
+        tagline: mod.tagline,
+        description: mod.description,
+        icon: mod.icon,
+        color: mod.color,
+        color_from: mod.colorFrom,
+        color_to: mod.colorTo,
+        route: mod.route,
+        dashboard_route: mod.dashboardRoute,
+        category: mod.category,
+        status: mod.status,
+        features: mod.features,
+        included_in_plans: mod.includedInPlans,
+        needs_template: mod.needsTemplate,
+        is_core: mod.isCore,
+        is_active: true,
+        is_free: mod.isFree,
+        price_monthly: mod.priceMonthly,
+        price_yearly: mod.priceYearly || null,
+        trial_days: mod.trialDays,
+        sort_order: index,
+      }));
+
+      const { error } = await supabase
+        .from("system_modules")
+        .upsert(payloads, { onConflict: "slug" });
+
+      if (error) console.error("Module sync error:", error);
+
+      if (!silent) {
+        toast({ title: "Synchronization Complete", description: "Platform modules imported from local config." });
       }
-      toast({ title: "Synchronization Complete", description: "Platform modules imported from local config." });
       fetchItems();
     } catch (err: any) {
-      toast({ title: "Sync Failed", description: err.message, variant: "destructive" });
+      if (!silent) {
+        toast({ title: "Sync Failed", description: err.message, variant: "destructive" });
+      }
     } finally {
       setSyncing(false);
     }

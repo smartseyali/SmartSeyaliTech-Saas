@@ -2,10 +2,99 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { ArrowRight, Code, Smartphone, Monitor, Zap, Users, Award, CheckCircle } from "lucide-react";
+import { ArrowRight, Code, Smartphone, Monitor, Zap, Users, Award, CheckCircle, ShoppingCart, DollarSign, Settings, UserCheck, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import PLATFORM_CONFIG from "@/config/platform";
+
+/* ── Categories Section ─────────────────────────────────────────────────── */
+
+const CATEGORY_CONFIG: Record<string, { icon: any; color: string; bg: string; description: string }> = {
+  commerce: { icon: ShoppingCart, color: "text-blue-600", bg: "bg-blue-50", description: "E-commerce, POS & inventory management" },
+  finance: { icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50", description: "Accounting, billing & financial reporting" },
+  operations: { icon: Settings, color: "text-orange-600", bg: "bg-orange-50", description: "Supply chain, logistics & workflows" },
+  people: { icon: Users, color: "text-violet-600", bg: "bg-violet-50", description: "HR, payroll & employee management" },
+  customer: { icon: UserCheck, color: "text-pink-600", bg: "bg-pink-50", description: "CRM, support & customer engagement" },
+  analytics: { icon: BarChart3, color: "text-cyan-600", bg: "bg-cyan-50", description: "Dashboards, reports & data insights" },
+};
+
+const CategoriesSection = () => {
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const { data } = await supabase
+          .from("system_modules")
+          .select("category")
+          .eq("is_active", true);
+        if (data) {
+          const counts: Record<string, number> = {};
+          data.forEach((m) => {
+            if (m.category) counts[m.category] = (counts[m.category] || 0) + 1;
+          });
+          setCategoryCounts(counts);
+        }
+      } catch {}
+    };
+    fetchCounts();
+  }, []);
+
+  return (
+    <section className="py-24 bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Browse by Category
+          </h2>
+          <div className="h-1.5 w-20 bg-primary-600 mx-auto rounded-full mb-6"></div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explore our modules organized by business function to find the perfect solution
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
+          {Object.entries(CATEGORY_CONFIG).map(([key, config]) => {
+            const Icon = config.icon;
+            const count = categoryCounts[key] || 0;
+            return (
+              <Link
+                key={key}
+                to={`/products?category=${key}`}
+                className="group flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`${config.bg} p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className={`w-7 h-7 ${config.color}`} />
+                </div>
+                <h3 className="text-sm font-bold text-gray-900 capitalize mb-1 group-hover:text-primary-600 transition-colors">
+                  {key}
+                </h3>
+                <p className="text-[11px] text-gray-500 leading-tight mb-2 hidden md:block">
+                  {config.description}
+                </p>
+                {count > 0 && (
+                  <span className="text-[10px] font-semibold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                    {count} {count === 1 ? "module" : "modules"}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="text-center mt-12">
+          <Button asChild variant="outline" size="lg" className="rounded-xl h-12 px-8 font-semibold border-gray-200 hover:bg-gray-50">
+            <Link to="/products">
+              View All Products <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
 
 const Index = () => {
   const [services, setServices] = useState<any[]>([]);
@@ -132,6 +221,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Categories Section */}
+      <CategoriesSection />
 
       {/* Features Section */}
       <section className="py-24 bg-slate-50">

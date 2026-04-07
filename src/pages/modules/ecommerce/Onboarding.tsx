@@ -208,17 +208,14 @@ export default function Onboarding() {
                         else if (mod.category === 'operations') setIndustryType('services');
                         else if (mod.category.includes('people') || mod.category === 'education') setIndustryType('education');
                     }
-                } else if (selectedModules.length === 0) {
-                    // Default to ecommerce if nothing selected
-                    const ecom = modulesToUse.find(m => m.slug === 'ecommerce');
-                    if (ecom) setSelectedModules([ecom.id.toString()]);
                 }
+                // No auto-selection — user must explicitly choose modules
             } catch (err) {
                 console.warn("Database sync deficit detected. Operating under Clinical Autonomy Mode (Local Fallbacks).");
                 setPlans(LOCAL_PLANS);
                 setSelectedPlan(LOCAL_PLANS[0].id);
                 setAvailableSystemModules(LOCAL_MODULE_REGISTRY);
-                if (selectedModules.length === 0) setSelectedModules(['ecommerce']);
+                // No auto-selection in fallback mode either
             } finally {
                 setTimeout(() => setInitializing(false), 800);
             }
@@ -295,15 +292,29 @@ export default function Onboarding() {
             setStep(5); // Go to deployment screen immediately (was 6)
 
             await runProgress(10, "Creating Your Account...", 800);
+
+            // Wait for auth session to be fully established
+            let retries = 0;
+            while (retries < 10) {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) break;
+                await new Promise(r => setTimeout(r, 500));
+                retries++;
+            }
+
             await runProgress(25, "Saving Your Profile...", 800);
 
-            // 2. Create user profile record
-            await supabase.from('users').upsert({
-                id: activeUser.id,
-                username: activeUser.email || email,
-                full_name: fullName || activeUser.user_metadata?.full_name || email.split('@')[0],
-                is_super_admin: false
-            });
+            // 2. Create user profile record (trigger may have already created it)
+            try {
+                await supabase.from('users').upsert({
+                    id: activeUser.id,
+                    username: activeUser.email || email,
+                    full_name: fullName || activeUser.user_metadata?.full_name || email.split('@')[0],
+                    is_super_admin: false
+                });
+            } catch {
+                // Trigger handle_new_user may have already created the row — safe to ignore
+            }
 
             await runProgress(40, "Setting up Your Business...", 1000);
 
@@ -396,29 +407,16 @@ export default function Onboarding() {
                     // Legacy fallback: some systems might use a different mapping, but if it doesn't exist, we move on
                 }
             } else {
-                // If nothing selected, enable ecommerce by default
-                const ecommerceMod = availableSystemModules.find(m => m.slug === 'ecommerce');
-                const defaultModId = ecommerceMod?.id || 'ecommerce';
-                const defaultModSlug = ecommerceMod?.slug || 'ecommerce';
-
-                const { error: mErr } = await supabase.from("company_modules").insert([{
+                // No modules selected — only install the "masters" core module
+                await supabase.from("company_modules").insert([{
                     company_id: newCompany.id,
-                    module_slug: defaultModSlug,
+                    module_slug: 'masters',
                     is_active: true
                 }]);
-
-                if (mErr) {
-                    await supabase.from("company_modules").insert([{
-                        company_id: newCompany.id,
-                        module_id: parseInt(defaultModId.toString()) || defaultModId,
-                        is_active: true
-                    }]);
-                }
-
                 await supabase.from("user_modules").insert([{
                     company_id: newCompany.id,
                     user_id: activeUser.id,
-                    module_slug: defaultModSlug,
+                    module_slug: 'masters',
                     is_active: true
                 }]);
             }

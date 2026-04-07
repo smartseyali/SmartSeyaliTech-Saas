@@ -21,7 +21,14 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AppLauncher = lazy(() => import("./pages/AppLauncher"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+
+// ── Storefront Customer Pages (public, not behind ProtectedRoute) ──
+const StorefrontLogin = lazy(() => import("./pages/StorefrontLogin"));
+const OrderTracking = lazy(() => import("./pages/modules/ecommerce/OrderTracking"));
+const MyOrders = lazy(() => import("./pages/modules/ecommerce/MyOrders"));
+const VerifyEmail = lazy(() => import("./pages/modules/ecommerce/VerifyEmail"));
 
 // ── Lazy-loaded marketing pages ──
 const MarketingIndex = lazy(() => import("./pages/marketing/Index"));
@@ -140,8 +147,18 @@ const App = () => (
                                                 Account is created at the END of the onboarding flow. */}
                                             <Route path="/onboarding" element={<Onboarding />} />
 
-                                            {/* ── Platform App Launcher ── */}
+                                            {/* ── Platform App Launcher (installed apps) ── */}
                                             <Route path="/apps" element={<ProtectedRoute><AppLauncher /></ProtectedRoute>} />
+
+                                            {/* ── Marketplace (browse & install new apps) ── */}
+                                            <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+
+                                            {/* ── Storefront Customer Pages (public) ── */}
+                                            <Route path="/store/login" element={<StorefrontLogin />} />
+                                            <Route path="/store/track" element={<OrderTracking />} />
+                                            <Route path="/store/track/:orderNumber" element={<OrderTracking />} />
+                                            <Route path="/store/my-orders" element={<MyOrders />} />
+                                            <Route path="/store/verify" element={<VerifyEmail />} />
 
                                             {/* Backward compat: /ecommerce → /apps/ecommerce */}
                                             <Route path="/ecommerce" element={<Navigate to="/apps/ecommerce" replace />} />

@@ -1,356 +1,281 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, Check, Download, ExternalLink, X } from "lucide-react";
-import { PLATFORM_MODULES, CATEGORY_LABELS } from "@/config/modules";
-import type { PlatformModule } from "@/config/modules";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X } from "lucide-react";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
 import PLATFORM_CONFIG from "@/config/platform";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-type CategoryFilter = "all" | PlatformModule["category"];
-
-const CATEGORY_PILLS: { key: CategoryFilter; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "commerce", label: "Commerce" },
-    { key: "operations", label: "Operations" },
-    { key: "customer", label: "Customer" },
-    { key: "people", label: "People" },
-    { key: "finance", label: "Finance" },
-    { key: "analytics", label: "Analytics" },
-    { key: "collaboration", label: "Collaboration" },
-];
+interface InstalledModule {
+    id: string;
+    slug: string;
+    name: string;
+    tagline: string;
+    icon: string;
+    color_from: string;
+    color_to: string;
+    route: string;
+    dashboard_route: string;
+    category: string;
+    status: string;
+    is_core: boolean;
+}
 
 export default function AppLauncher() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
     const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
-    const [category, setCategory] = useState<CategoryFilter>("all");
-    const [installTarget, setInstallTarget] = useState<PlatformModule | null>(null);
-    const [installing, setInstalling] = useState(false);
+    const [dbModules, setDbModules] = useState<InstalledModule[]>([]);
+    const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
+    const [loading, setLoading] = useState(true);
+    const [menuOpen, setMenuOpen] = useState<string | null>(null);
+    const [uninstalling, setUninstalling] = useState(false);
 
-    const modules = useMemo(() => {
-        return PLATFORM_MODULES.filter((m) => {
-            // Masters is always accessed via sidebar, never shown in the grid
-            if (m.id === "masters") return false;
-            // Hide planned modules
-            if (m.status === "planned") return false;
+    // Fetch all system modules + this company's installed module slugs
+    useEffect(() => {
+        const fetchModules = async () => {
+            setLoading(true);
 
-            const q = search.toLowerCase();
-            const matchesSearch =
-                !q ||
-                m.name.toLowerCase().includes(q) ||
-                m.tagline.toLowerCase().includes(q) ||
-                m.description.toLowerCase().includes(q);
-            const matchesCategory = category === "all" || m.category === category;
-            return matchesSearch && matchesCategory;
-        });
-    }, [search, category]);
+            const { data, error } = await supabase
+                .from("system_modules")
+                .select("id, slug, name, tagline, icon, color_from, color_to, route, dashboard_route, category, status, is_core")
+                .eq("is_active", true)
+                .order("sort_order", { ascending: true });
 
-    const isInstalled = (mod: PlatformModule) =>
-        mod.isCore || isSuperAdmin || hasModule(mod.name) || hasModule(mod.id);
-
-    const handleInstall = async (mod: PlatformModule) => {
-        if (!activeCompany) {
-            toast.error("Please select a company first.");
-            return;
-        }
-        setInstalling(true);
-        try {
-            // Insert into company_modules
-            const { error: cmErr } = await supabase.from("company_modules").insert({
-                company_id: activeCompany.id,
-                module_slug: mod.id,
-                is_active: true,
-                installed_at: new Date().toISOString(),
-            });
-            if (cmErr) throw cmErr;
-
-            // Insert into user_modules (best-effort, table may not exist)
-            try {
-                const {
-                    data: { user },
-                } = await supabase.auth.getUser();
-                if (user) {
-                    await supabase.from("user_modules").insert({
-                        user_id: user.id,
-                        module_slug: mod.id,
-                        company_id: activeCompany.id,
-                    });
-                }
-            } catch {
-                // user_modules insert is optional
+            if (!error && data) {
+                setDbModules(data as InstalledModule[]);
             }
 
+            // Fetch this company's installed modules
+            if (activeCompany) {
+                const { data: cmData } = await supabase
+                    .from("company_modules")
+                    .select("module_slug")
+                    .eq("company_id", activeCompany.id)
+                    .eq("is_active", true);
+                setCompanySlugs(new Set((cmData || []).map((cm: any) => cm.module_slug)));
+            } else {
+                setCompanySlugs(new Set());
+            }
+
+            setLoading(false);
+        };
+        fetchModules();
+    }, [activeCompany?.id]);
+
+    // Close menu on outside click
+    useEffect(() => {
+        if (!menuOpen) return;
+        const handler = () => setMenuOpen(null);
+        document.addEventListener("click", handler);
+        return () => document.removeEventListener("click", handler);
+    }, [menuOpen]);
+
+    const handleUninstall = async (mod: InstalledModule) => {
+        if (!activeCompany) return;
+        if (mod.is_core) {
+            toast.error("Core modules cannot be uninstalled.");
+            return;
+        }
+        if (!confirm(`Uninstall "${mod.name}" from ${activeCompany.name}?`)) return;
+
+        setUninstalling(true);
+        try {
+            const { error } = await supabase
+                .from("company_modules")
+                .delete()
+                .eq("company_id", activeCompany.id)
+                .eq("module_slug", mod.slug);
+            if (error) throw error;
+
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    await supabase.from("user_modules").delete()
+                        .eq("company_id", activeCompany.id)
+                        .eq("module_slug", mod.slug);
+                }
+            } catch { /* optional */ }
+
             refreshPermissions();
-            toast.success(`${mod.name} installed successfully`);
-            setInstallTarget(null);
+            setDbModules(prev => prev); // trigger re-filter
+            toast.success(`${mod.name} has been uninstalled.`);
         } catch (err: any) {
-            console.error("Install error:", err);
-            toast.error(err.message || "Failed to install module");
+            toast.error(err.message || "Failed to uninstall");
         } finally {
-            setInstalling(false);
+            setUninstalling(false);
+            setMenuOpen(null);
         }
     };
 
-    // Derive which category pills actually have modules (excluding masters)
-    const activeCategories = useMemo(() => {
-        const cats = new Set(
-            PLATFORM_MODULES.filter((m) => m.id !== "masters" && m.status !== "planned").map(
-                (m) => m.category
-            )
+    const installedModules = useMemo(() => {
+        return dbModules.filter((m) => {
+            if (m.slug === "masters") return false;
+            // Show only core modules + modules actually installed for this company
+            const installed = m.is_core || companySlugs.has(m.slug) || hasModule(m.name) || hasModule(m.slug);
+            if (!installed) return false;
+            // Search filter
+            const q = search.toLowerCase();
+            return !q || m.name.toLowerCase().includes(q) || (m.tagline || "").toLowerCase().includes(q);
+        });
+    }, [search, dbModules, companySlugs, hasModule]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 font-medium">Loading apps...</p>
+                </div>
+            </div>
         );
-        return CATEGORY_PILLS.filter((p) => p.key === "all" || cats.has(p.key as any));
-    }, []);
+    }
+
+    // No installed modules → direct to marketplace
+    if (installedModules.length === 0 && !search) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center max-w-md mx-auto px-4">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <ShoppingBag className="w-10 h-10 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">No apps installed yet</h2>
+                    <p className="text-gray-500 mb-8">
+                        Visit the Marketplace to browse and install apps for{" "}
+                        <span className="font-semibold text-gray-700">{activeCompany?.name || "your business"}</span>
+                    </p>
+                    <Link
+                        to="/marketplace"
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
+                    >
+                        <ShoppingBag className="w-4 h-4" />
+                        Go to Marketplace
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gray-50/80">
+        <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <div className="bg-white border-b border-gray-200">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex flex-col gap-5">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex items-center justify-between mb-5">
                         <div>
-                            <h1 className="text-2xl font-semibold text-gray-900">
-                                App Marketplace
+                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                                Your Apps
                             </h1>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Install apps to extend {PLATFORM_CONFIG.name} for{" "}
-                                <span className="font-medium text-gray-700">
-                                    {activeCompany?.name || "your business"}
-                                </span>
+                            <p className="text-sm text-gray-500 mt-0.5">
+                                {installedModules.length} app{installedModules.length !== 1 ? "s" : ""} installed for{" "}
+                                <span className="font-medium text-gray-700">{activeCompany?.name || "your business"}</span>
                             </p>
                         </div>
+                        <Link
+                            to="/marketplace"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span className="hidden sm:inline">Get More Apps</span>
+                            <span className="sm:hidden">More</span>
+                        </Link>
+                    </div>
 
-                        {/* Search */}
-                        <div className="relative max-w-md">
+                    {/* Search */}
+                    {installedModules.length > 4 && (
+                        <div className="relative max-w-sm">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search apps..."
-                                className="w-full h-10 bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                placeholder="Search your apps..."
+                                className="w-full h-10 bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                             />
                         </div>
-
-                        {/* Category pills */}
-                        <div className="flex flex-wrap gap-2">
-                            {activeCategories.map((pill) => (
-                                <button
-                                    key={pill.key}
-                                    onClick={() => setCategory(pill.key)}
-                                    className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                                        category === pill.key
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                    }`}
-                                >
-                                    {pill.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
-            {/* Grid */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {modules.length === 0 ? (
-                    <div className="text-center py-20">
-                        <p className="text-gray-400 text-sm">No apps match your search.</p>
+            {/* App Grid */}
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {search && installedModules.length === 0 ? (
+                    <div className="text-center py-16">
+                        <Search className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 text-sm">No installed apps match "{search}"</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                        {modules.map((mod) => {
-                            const installed = isInstalled(mod);
-                            const isAvailable = mod.status === "live" || mod.status === "beta";
-
-                            return (
-                                <div
-                                    key={mod.id}
-                                    className={`relative bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
-                                        installed ? "border-l-4 border-l-blue-500 border-t border-r border-b border-t-gray-200 border-r-gray-200 border-b-gray-200" : "border-gray-200"
-                                    } ${!isAvailable ? "opacity-60" : ""}`}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {installedModules.map((mod) => (
+                            <div key={mod.slug} className="relative group">
+                                <button
+                                    onClick={() => navigate(mod.dashboard_route || mod.route || "/")}
+                                    className="w-full bg-white rounded-2xl border border-gray-200 p-5 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                 >
-                                    {/* Badges */}
-                                    {installed && (
-                                        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                                            <Check className="w-3 h-3" />
-                                            Installed
-                                        </span>
-                                    )}
-                                    {mod.status === "beta" && !installed && (
-                                        <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
-                                            Beta
-                                        </span>
-                                    )}
-                                    {mod.status === "coming-soon" && (
-                                        <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
-                                            Coming soon
-                                        </span>
-                                    )}
-
-                                    <div className="p-5">
-                                        {/* Icon + Name + Tagline */}
-                                        <div className="flex items-start gap-3 mb-4">
-                                            <div
-                                                className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} shadow-sm`}
-                                            >
-                                                {mod.icon}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="text-sm font-semibold text-gray-900 leading-tight">
-                                                    {mod.name}
-                                                </h3>
-                                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                                                    {mod.tagline}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Features */}
-                                        <ul className="space-y-1 mb-5">
-                                            {mod.features.slice(0, 3).map((f, i) => (
-                                                <li
-                                                    key={i}
-                                                    className="text-xs text-gray-500 flex items-start gap-1.5"
-                                                >
-                                                    <span className="text-gray-300 mt-0.5 shrink-0">
-                                                        &#8226;
-                                                    </span>
-                                                    <span className="line-clamp-1">{f}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-
-                                        {/* Price + Action */}
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div>
-                                                {mod.isCore ? (
-                                                    <span className="text-xs font-medium text-gray-500">
-                                                        Included
-                                                    </span>
-                                                ) : mod.isFree ? (
-                                                    <span className="text-xs font-medium text-green-600">
-                                                        Free
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-sm font-semibold text-gray-900">
-                                                        ₹{mod.priceMonthly}
-                                                        <span className="text-xs font-normal text-gray-400">
-                                                            /mo
-                                                        </span>
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {isAvailable && installed ? (
-                                                <button
-                                                    onClick={() => navigate(mod.dashboardRoute)}
-                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                                                >
-                                                    Open
-                                                    <ExternalLink className="w-3 h-3" />
-                                                </button>
-                                            ) : isAvailable ? (
-                                                <button
-                                                    onClick={() => setInstallTarget(mod)}
-                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
-                                                >
-                                                    Install
-                                                    <Download className="w-3 h-3" />
-                                                </button>
-                                            ) : null}
-                                        </div>
+                                    <div className={cn(
+                                        "w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform",
+                                        mod.color_from || "from-blue-500",
+                                        mod.color_to || "to-blue-600"
+                                    )}>
+                                        {mod.icon}
                                     </div>
-                                </div>
-                            );
-                        })}
+                                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                        {mod.name}
+                                    </h3>
+                                    <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{mod.tagline}</p>
+                                </button>
+
+                                {/* Uninstall menu - only for non-core modules */}
+                                {!mod.is_core && (
+                                    <div className="absolute top-2 right-2 z-10">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setMenuOpen(menuOpen === mod.slug ? null : mod.slug); }}
+                                            className="p-1 rounded-lg bg-white/80 border border-gray-200 opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-all"
+                                        >
+                                            <MoreVertical className="w-3.5 h-3.5 text-gray-500" />
+                                        </button>
+                                        {menuOpen === mod.slug && (
+                                            <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); navigate(`/marketplace`); }}
+                                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                    View in Marketplace
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleUninstall(mod); }}
+                                                    disabled={uninstalling}
+                                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    {uninstalling ? "Uninstalling..." : "Uninstall"}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+
+                        {/* Add more apps tile */}
+                        <Link
+                            to="/marketplace"
+                            className="group bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-5 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-200 flex flex-col items-center justify-center"
+                        >
+                            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-white border border-gray-200 mx-auto mb-3 group-hover:border-blue-300 transition-colors">
+                                <Plus className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                            </div>
+                            <h3 className="text-sm font-medium text-gray-500 group-hover:text-blue-600 transition-colors">
+                                Get More Apps
+                            </h3>
+                        </Link>
                     </div>
                 )}
             </div>
-
-            {/* Install Confirmation Modal */}
-            {installTarget && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                        onClick={() => !installing && setInstallTarget(null)}
-                    />
-                    <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-                        <button
-                            onClick={() => !installing && setInstallTarget(null)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-
-                        <div className="flex items-center gap-3 mb-4">
-                            <div
-                                className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${installTarget.colorFrom} ${installTarget.colorTo}`}
-                            >
-                                {installTarget.icon}
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-semibold text-gray-900">
-                                    Install {installTarget.name}?
-                                </h2>
-                                <p className="text-sm text-gray-500">{installTarget.tagline}</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg p-4 mb-5 space-y-2">
-                            {installTarget.isFree ? (
-                                <p className="text-sm text-gray-600">
-                                    This is a <span className="font-medium text-green-600">free</span> app.
-                                </p>
-                            ) : (
-                                <p className="text-sm text-gray-600">
-                                    This will add{" "}
-                                    <span className="font-semibold text-gray-900">
-                                        ₹{installTarget.priceMonthly}/mo
-                                    </span>{" "}
-                                    to your billing.
-                                </p>
-                            )}
-                            {installTarget.trialDays > 0 && (
-                                <p className="text-sm text-blue-600 font-medium">
-                                    {installTarget.trialDays}-day free trial included
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-3 justify-end">
-                            <button
-                                onClick={() => setInstallTarget(null)}
-                                disabled={installing}
-                                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => handleInstall(installTarget)}
-                                disabled={installing}
-                                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
-                            >
-                                {installing ? (
-                                    <>
-                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Installing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Download className="w-4 h-4" />
-                                        Install
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

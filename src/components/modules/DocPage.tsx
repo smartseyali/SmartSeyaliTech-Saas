@@ -291,8 +291,17 @@ export default function DocPage({
       }
 
       toast.success(`${def.name} saved successfully`);
-      handleAbort();
-      fetchItems();
+
+      // Stay on the form with the saved record
+      await fetchItems();
+      if (savedHeader) {
+        const updated = unpackCustomFields(savedHeader);
+        setEditing(updated);
+        if (def.itemTableName && def.itemForeignKey) {
+          const freshItems = await loadItems(savedHeader.id);
+          setEditingItems(freshItems.length > 0 ? freshItems : [{}]);
+        }
+      }
     } catch (err: any) {
       toast.error(`Save failed: ${err.message}`);
     }
@@ -383,6 +392,19 @@ export default function DocPage({
     ...(extraColumns || []),
   ];
 
+  /* ── Record navigation (next / previous) ────────────────────────────── */
+
+  const currentIndex = editing?.id
+    ? filteredData.findIndex((r) => r.id === editing.id)
+    : -1;
+
+  const handleNavigate = async (direction: "prev" | "next") => {
+    if (currentIndex < 0) return;
+    const newIndex = direction === "prev" ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= filteredData.length) return;
+    await handleOpenEdit(filteredData[newIndex]);
+  };
+
   /* ── Render ────────────────────────────────────────────────────────────── */
 
   if (view === "form") {
@@ -401,6 +423,9 @@ export default function DocPage({
         initialData={editing}
         initialItems={editingItems}
         customActions={customFormActions?.(editing, navigate)}
+        onNavigate={editing?.id ? handleNavigate : undefined}
+        currentIndex={currentIndex}
+        totalRecords={filteredData.length}
       />
     );
   }

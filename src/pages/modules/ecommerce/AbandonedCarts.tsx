@@ -18,7 +18,7 @@ export default function AbandonedCarts() {
     const load = async () => {
         if (!activeCompany) return;
         setLoading(true);
-        const { data } = await supabase.from("abandoned_carts").select("*")
+        const { data } = await supabase.from("ecom_abandoned_carts").select("*")
             .eq("company_id", activeCompany.id).order("updated_at", { ascending: false });
         setCarts(data || []);
         setLoading(false);
@@ -27,7 +27,7 @@ export default function AbandonedCarts() {
     const sendRecoveryEmail = async (cart: any) => {
         setSending(cart.id);
         // Mark email sent (actual email logic would be via backend)
-        await supabase.from("abandoned_carts").update({ recovery_email_sent: true }).eq("id", cart.id);
+        await supabase.from("ecom_abandoned_carts").update({ recovery_email_sent: true }).eq("id", cart.id);
         toast({ title: "Recovery Email Sent 📧", description: `Email sent to ${cart.customer_email}` });
         load();
         setSending(null);
@@ -42,8 +42,8 @@ export default function AbandonedCarts() {
         return `${Math.floor(hours / 24)}d ago`;
     };
 
-    const totalValue = carts.filter(c => !c.recovered).reduce((s, c) => s + Number(c.cart_total), 0);
-    const recovered = carts.filter(c => c.recovered);
+    const totalValue = carts.filter(c => !c.is_recovered).reduce((s, c) => s + Number(c.cart_value), 0);
+    const recovered = carts.filter(c => c.is_recovered);
 
     return (
         <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
@@ -55,7 +55,7 @@ export default function AbandonedCarts() {
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Abandoned Carts</h1>
                     <p className="text-sm font-medium text-slate-500">
-                        {carts.filter(c => !c.recovered).length} pending recoveries · {fmt(totalValue)} revenue at risk
+                        {carts.filter(c => !c.is_recovered).length} pending recoveries · {fmt(totalValue)} revenue at risk
                     </p>
                 </div>
                 <Button variant="outline" className="h-11 px-6 rounded-lg bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all gap-2 shadow-sm" onClick={load}>
@@ -66,7 +66,7 @@ export default function AbandonedCarts() {
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                    { label: "Abandoned", value: carts.filter(c => !c.recovered).length, color: "text-rose-600 bg-rose-50 border-rose-100", icon: AlertTriangle },
+                    { label: "Abandoned", value: carts.filter(c => !c.is_recovered).length, color: "text-rose-600 bg-rose-50 border-rose-100", icon: AlertTriangle },
                     { label: "Recovered", value: recovered.length, color: "text-emerald-600 bg-emerald-50 border-emerald-100", icon: CheckCircle2 },
                     { label: "Emails Sent", value: carts.filter(c => c.recovery_email_sent).length, color: "text-blue-600 bg-blue-50 border-blue-100", icon: Send },
                     { label: "Value at Risk", value: fmt(totalValue), color: "text-amber-600 bg-amber-50 border-amber-100", icon: ShoppingCart },
@@ -116,7 +116,7 @@ export default function AbandonedCarts() {
                             {carts.map(cart => (
                                 <tr key={cart.id} className={cn(
                                     "hover:bg-slate-50/50 transition-colors group",
-                                    cart.recovered && "bg-emerald-50/20 opacity-80"
+                                    cart.is_recovered && "bg-emerald-50/20 opacity-80"
                                 )}>
                                     <td className="px-6 py-4">
                                         <p className="text-sm font-bold text-slate-900">{cart.customer_name || "Guest Checkout"}</p>
@@ -124,7 +124,7 @@ export default function AbandonedCarts() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
-                                            {Array.isArray(cart.items) ? `${cart.items.length} Product(s)` : "—"}
+                                            {Array.isArray(cart.cart_items) ? `${cart.cart_items.length} Product(s)` : "—"}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 font-bold text-slate-900">{fmt(cart.cart_total)}</td>
@@ -135,7 +135,7 @@ export default function AbandonedCarts() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {cart.recovered ? (
+                                        {cart.is_recovered ? (
                                             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  border bg-emerald-50 text-emerald-700 border-emerald-100">Recovered</span>
                                         ) : cart.recovery_email_sent ? (
                                             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  border bg-blue-50 text-blue-700 border-blue-100">Email Sent</span>
@@ -144,7 +144,7 @@ export default function AbandonedCarts() {
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        {!cart.recovered && !cart.recovery_email_sent && (
+                                        {!cart.is_recovered && !cart.recovery_email_sent && (
                                             <Button className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/10 text-xs gap-2 transition-all opacity-0 group-hover:opacity-100"
                                                 disabled={sending === cart.id} onClick={() => sendRecoveryEmail(cart)}>
                                                 <Mail className="w-3.5 h-3.5" />

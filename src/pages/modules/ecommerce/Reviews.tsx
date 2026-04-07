@@ -30,14 +30,14 @@ export default function Reviews() {
     const load = async () => {
         if (!activeCompany) return;
         setLoading(true);
-        const { data } = await supabase.from("product_reviews").select("*")
+        const { data } = await supabase.from("ecom_product_reviews").select("*")
             .eq("company_id", activeCompany.id).order("created_at", { ascending: false });
         setReviews(data || []);
         setLoading(false);
     };
 
     const updateStatus = async (id: number, status: "approved" | "rejected") => {
-        await supabase.from("product_reviews").update({ status }).eq("id", id);
+        await supabase.from("ecom_product_reviews").update({ status }).eq("id", id);
         toast({ title: status === "approved" ? "Review approved ✅" : "Review rejected" });
         load();
     };
@@ -158,7 +158,7 @@ export default function Reviews() {
                                             <p className="text-base font-bold text-slate-900">{r.customer_name}</p>
                                             <div className="flex items-center gap-3">
                                                 <StarRating rating={r.rating} />
-                                                {r.is_verified_purchase && (
+                                                {r.is_verified && (
                                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold  tracking-tight gap-1">
                                                         <Check className="w-3 h-3" /> Verified Buyer
                                                     </span>
@@ -188,7 +188,7 @@ export default function Reviews() {
                                     </div>
                                     <div className="space-y-2">
                                         {r.title && <h4 className="text-lg font-bold text-slate-900 leading-tight">{r.title}</h4>}
-                                        {r.body && <p className="text-sm font-medium text-slate-500 leading-relaxed max-w-4xl">{r.body}</p>}
+                                        {r.review && <p className="text-sm font-medium text-slate-500 leading-relaxed max-w-4xl">{r.review}</p>}
                                     </div>
                                     <div className="pt-4 border-t border-slate-50 flex items-center gap-6">
                                         {r.product_id && (

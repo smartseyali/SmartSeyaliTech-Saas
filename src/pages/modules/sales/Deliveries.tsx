@@ -5,10 +5,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useTenant } from "@/contexts/TenantContext";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
 export default function Deliveries() {
+    const { activeCompany } = useTenant();
     const [view, setView] = useState<"list" | "form">("list");
     const [searchTerm, setSearchTerm] = useState("");
     const [deliveries, setDeliveries] = useState<any[]>([]);
@@ -16,14 +18,16 @@ export default function Deliveries() {
     const [editingDelivery, setEditingDelivery] = useState<any>(null);
 
     useEffect(() => {
-        loadDeliveries();
-    }, []);
+        if (activeCompany) loadDeliveries();
+    }, [activeCompany?.id]);
 
     const loadDeliveries = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('sales_deliveries')
             .select('*')
+            .eq('company_id', activeCompany.id)
             .order('created_at', { ascending: false });
 
         if (!error && data) setDeliveries(data);
@@ -52,6 +56,7 @@ export default function Deliveries() {
 
             const payload = {
                 ...header,
+                company_id: activeCompany?.id,
                 total_qty: totalQty
             };
 

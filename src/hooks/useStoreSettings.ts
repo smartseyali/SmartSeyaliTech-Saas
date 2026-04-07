@@ -18,6 +18,11 @@ export interface StoreSettings {
     twitter_url?: string;
     whatsapp_number?: string;
     footer_text: string;
+    order_prefix?: string;
+    next_order_number?: number;
+    auto_confirm_paid_orders?: boolean;
+    tax_rate?: number;
+    return_policy?: string;
 }
 
 const defaultSettings: Partial<StoreSettings> = {

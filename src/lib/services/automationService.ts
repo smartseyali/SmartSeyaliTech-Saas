@@ -19,7 +19,7 @@ export class AutomationService {
             .from('automations')
             .select('*')
             .eq('trigger_event', event)
-            .eq('tenant_id', tenantId)
+            .eq('company_id', tenantId)
             .eq('is_active', true);
 
         if (error || !automations) return;
@@ -39,7 +39,7 @@ export class AutomationService {
 
         switch (action_type) {
             case 'send_notification':
-                await this.sendNotification(automation.tenant_id, config_json, data);
+                await this.sendNotification(automation.company_id, config_json, data);
                 break;
             case 'send_whatsapp':
                 // Placeholder for WhatsApp API integration
@@ -47,7 +47,7 @@ export class AutomationService {
                 break;
             case 'create_audit':
                 await db.from('audit_logs').insert({
-                    tenant_id: automation.tenant_id,
+                    company_id: automation.company_id,
                     entity_type: 'automation',
                     entity_id: data.id,
                     action: 'triggered',
@@ -62,7 +62,7 @@ export class AutomationService {
     private static async sendNotification(tenantId: number, config: any, data: any) {
         // Simple internal notification
         await db.from('notifications').insert({
-            tenant_id: tenantId,
+            company_id: tenantId,
             user_id: data.user_id, // If resource has a user_id
             title: config.title || "Platform Automation",
             message: config.message || `An event '${data.reference_no}' was processed.`,
@@ -75,7 +75,7 @@ export class AutomationService {
      */
     static async scheduleJob(automationId: number, tenantId: number, runAt: Date) {
         const { error } = await db.from('jobs').insert({
-            tenant_id: tenantId,
+            company_id: tenantId,
             automation_id: automationId,
             run_at: runAt.toISOString(),
             status: 'pending'

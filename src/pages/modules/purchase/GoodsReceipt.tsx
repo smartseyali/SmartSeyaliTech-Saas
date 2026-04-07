@@ -16,11 +16,13 @@ export default function GoodsReceipt() {
     const [view, setView] = useState<"list" | "form">("list");
 
     const fetchReceipts = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         try {
             const { data, error } = await db
                 .from('stock_moves')
                 .select('*')
+                .eq('company_id', activeCompany.id)
                 .eq('type', 'purchase')
                 .order('created_at', { ascending: false });
 
@@ -34,8 +36,8 @@ export default function GoodsReceipt() {
     };
 
     useEffect(() => {
-        fetchReceipts();
-    }, []);
+        if (activeCompany) fetchReceipts();
+    }, [activeCompany?.id]);
 
     const columns = [
         { key: 'reference_id', label: 'GRN Number', className: 'font-mono uppercase font-bold text-blue-600' },
@@ -80,7 +82,7 @@ export default function GoodsReceipt() {
                     ...header,
                     ...item,
                     type: 'purchase',
-                    tenant_id: activeCompany?.id
+                    company_id: activeCompany?.id
                 });
             }
             toast.success("Purchase GRN recorded and Stock updated.");

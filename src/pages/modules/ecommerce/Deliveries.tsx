@@ -18,7 +18,7 @@ export default function Deliveries() {
         const { data } = await supabase.from("ecom_orders")
             .select("*")
             .eq("company_id", activeCompany.id)
-            .in("status", ["packed", "shipped", "out_for_delivery", "delivered"])
+            .in("status", ["packed", "shipped", "out_for_delivery", "delivered", "returned"])
             .order("updated_at", { ascending: false });
 
         setDeliveries(data || []);

@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { useTenant } from "./TenantContext";
 import { useAuth } from "./AuthContext";
 import PLATFORM_CONFIG from "@/config/platform";
+import { syncModulesToDB } from "@/lib/syncModules";
 
 export interface Permission {
     resource: string;
@@ -56,17 +57,8 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     .from("system_modules")
                     .select("id, name, slug, is_core");
 
-                const allModuleIdentifiers = systemModules?.flatMap(sm => [sm.name, sm.slug]) || [];
-
                 // 2. HARDCORE BYPASS for the Primary Super Admin
-                if (user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase()) {
-                    setIsAdmin(true);
-                    setIsSuperAdmin(true);
-                    setAvailableModules(allModuleIdentifiers.filter(Boolean) as string[]);
-                    setPermissions([]);
-                    setLoading(false);
-                    return;
-                }
+                const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
 
                 // 3. Look up the user in public.users — check for super admin flag
                 let localUser = null;
@@ -81,11 +73,18 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     console.warn("User lookup failed, ignoring:", e);
                 }
 
-                // 4. SUPER ADMIN: is_super_admin = true → sees everything with no restrictions
-                if (localUser?.is_super_admin) {
+                // 4. SUPER ADMIN: Auto-sync modules from config to DB (Odoo-style)
+                if (isSuperAdminByEmail || localUser?.is_super_admin) {
+                    // Sync config → DB, then re-fetch so new modules are immediately visible
+                    await syncModulesToDB();
+                    const { data: refreshedModules } = await supabase
+                        .from("system_modules")
+                        .select("id, name, slug, is_core");
+                    const refreshedIdentifiers = refreshedModules?.flatMap(sm => [sm.name, sm.slug]) || [];
+
                     setIsAdmin(true);
                     setIsSuperAdmin(true);
-                    setAvailableModules(allModuleIdentifiers.filter(Boolean) as string[]);
+                    setAvailableModules(refreshedIdentifiers.filter(Boolean) as string[]);
                     setPermissions([]);
                     setLoading(false);
                     return;

@@ -17,6 +17,7 @@ const STATUSES = [
     { key: "out_for_delivery", label: "Out for Delivery", color: "bg-orange-100 text-orange-700" },
     { key: "delivered", label: "Delivered", color: "bg-emerald-100 text-emerald-700" },
     { key: "cancelled", label: "Cancelled", color: "bg-rose-100 text-rose-700" },
+    { key: "returned", label: "Returned", color: "bg-slate-100 text-slate-700" },
 ];
 
 const NEXT_STATUS: Record<string, string> = {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
-import { Settings as SettingsIcon, Save, Palette, MessageCircle, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, Save, Palette, MessageCircle, Loader2, ShoppingBag, RotateCcw, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -131,6 +131,66 @@ export default function Settings() {
                     <Field label="GST Number">
                         <input value={formData.gst_number || ""} onChange={e => set("gst_number", e.target.value)}
                             className={inputCls} placeholder="22AAAAA0000A1Z5" />
+                    </Field>
+                </Section>
+
+                <Section icon={ShoppingBag} title="Order Configuration">
+                    <Field label="Order Prefix">
+                        <input value={formData.order_prefix || "ORD"} onChange={e => set("order_prefix", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                            className={inputCls} placeholder="e.g. ORD, SPARK, TH" maxLength={10} />
+                        <p className="text-[11px] text-slate-400 mt-1">Orders will be numbered as {formData.order_prefix || "ORD"}-{formData.next_order_number || 1001}</p>
+                    </Field>
+                    <Field label="Next Order Number">
+                        <input type="number" value={formData.next_order_number || 1001} onChange={e => set("next_order_number", parseInt(e.target.value) || 1001)}
+                            className={inputCls} min={1} />
+                    </Field>
+                    <Field label="Tax Rate (%)">
+                        <input type="number" value={formData.tax_rate || 0} onChange={e => set("tax_rate", parseFloat(e.target.value) || 0)}
+                            className={inputCls} placeholder="e.g. 18" step="0.01" min={0} max={100} />
+                    </Field>
+                    <Field label="Auto-confirm Paid Orders">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" checked={formData.auto_confirm_paid_orders !== false}
+                                onChange={e => set("auto_confirm_paid_orders", e.target.checked)}
+                                className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500" />
+                            <span className="text-sm text-slate-600">Automatically confirm orders when payment is received</span>
+                        </label>
+                    </Field>
+                </Section>
+
+                <Section icon={RotateCcw} title="Return & Refund Policy">
+                    <Field label="Return Policy">
+                        <textarea value={formData.return_policy || ""} onChange={e => set("return_policy", e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium placeholder:text-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/8 outline-none transition-all resize-none h-28"
+                            placeholder="Describe your return and refund policy for customers..." />
+                    </Field>
+                </Section>
+
+                <Section icon={Mail} title="Email / SMTP (Gmail)">
+                    <p className="text-xs text-slate-400 -mt-2 mb-4">Configure your Gmail SMTP for customer verification & order emails. Use a <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" className="text-blue-600 underline">Google App Password</a>.</p>
+                    <Field label="SMTP Host">
+                        <input value={formData.smtp_host || "smtp.gmail.com"} onChange={e => set("smtp_host", e.target.value)}
+                            className={inputCls} placeholder="smtp.gmail.com" />
+                    </Field>
+                    <Field label="SMTP Port">
+                        <input type="number" value={formData.smtp_port || 587} onChange={e => set("smtp_port", parseInt(e.target.value) || 587)}
+                            className={inputCls} placeholder="587" />
+                    </Field>
+                    <Field label="Gmail Address">
+                        <input value={formData.smtp_user || ""} onChange={e => set("smtp_user", e.target.value)}
+                            className={inputCls} placeholder="yourstore@gmail.com" type="email" />
+                    </Field>
+                    <Field label="App Password">
+                        <input value={formData.smtp_pass || ""} onChange={e => set("smtp_pass", e.target.value)}
+                            className={inputCls} placeholder="xxxx xxxx xxxx xxxx" type="password" />
+                    </Field>
+                    <Field label="Sender Name">
+                        <input value={formData.smtp_from_name || ""} onChange={e => set("smtp_from_name", e.target.value)}
+                            className={inputCls} placeholder="Your Store Name" />
+                    </Field>
+                    <Field label="Storefront URL">
+                        <input value={formData.storefront_url || ""} onChange={e => set("storefront_url", e.target.value)}
+                            className={inputCls} placeholder="https://yourstore.com" />
                     </Field>
                 </Section>
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, CheckCircle2, XCircle, Clock, Search, Link as LinkIcon, RefreshCw, Undo2, AlertCircle, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { logPaymentTransaction } from "@/lib/services/paymentService";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
     pending: { label: "Pending", color: "bg-amber-50 text-amber-700 border-amber-100", icon: Clock },
@@ -22,7 +23,7 @@ export default function Refunds() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all");
-    const [processing, setProcessing] = useState<number | null>(null);
+    const [processing, setProcessing] = useState<string | null>(null);
 
     useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
 
@@ -35,17 +36,23 @@ export default function Refunds() {
         setLoading(false);
     };
 
-    const updateStatus = async (id: number, status: string) => {
+    const updateStatus = async (id: string, status: string) => {
+        if (!activeCompany) return;
         setProcessing(id);
         const updates: any = { status };
         if (status === "completed") updates.processed_at = new Date().toISOString();
         await supabase.from("refunds").update(updates).eq("id", id);
 
-        // If completed, also update the order payment status
+        // If completed, update order payment status + log transaction
         if (status === "completed") {
-            const { data: refund } = await supabase.from("refunds").select("order_id, amount").eq("id", id).maybeSingle();
+            const { data: refund } = await supabase.from("refunds").select("order_id, amount, payment_method").eq("id", id).maybeSingle();
             if (refund?.order_id) {
                 await supabase.from("ecom_orders").update({ payment_status: "refunded" }).eq("id", refund.order_id);
+                await logPaymentTransaction(
+                    activeCompany.id, refund.order_id,
+                    refund.payment_method || "manual", Number(refund.amount),
+                    "refunded", undefined, { refund_id: id }
+                );
             }
         }
 
@@ -72,7 +79,7 @@ export default function Refunds() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Undo2 className="w-6 h-6 text-blue-600" />
-                        <span className="text-xs font-bold  tracking-widest text-slate-500">Post-Purchase Operations</span>
+                        <span className="text-xs font-bold tracking-widest text-slate-500">Post-Purchase Operations</span>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Refund Requests</h1>
                     <p className="text-sm font-medium text-slate-500">
@@ -94,7 +101,7 @@ export default function Refunds() {
                 ].map(s => (
                     <div key={s.label} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-xs font-bold  tracking-widest text-slate-500">{s.label}</span>
+                            <span className="text-xs font-bold tracking-widest text-slate-500">{s.label}</span>
                             <div className={cn("p-2 rounded-lg border", s.color)}>
                                 <s.icon className="w-4 h-4" />
                             </div>
@@ -104,24 +111,13 @@ export default function Refunds() {
                 ))}
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex gap-2 flex-wrap">
-                {["all", ...Object.keys(STATUS_CONFIG)].map(f => (
-                    <button key={f} onClick={() => setFilter(f)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all capitalize ${filter === f ? "bg-primary text-primary-foreground border-primary" : "border-border bg-card"
-                            }`}>
-                        {f === "all" ? `All (${refunds.length})` : `${STATUS_CONFIG[f]?.label} (${refunds.filter(r => r.status === f).length})`}
-                    </button>
-                ))}
-            </div>
-
             {/* Filter + Search */}
             <div className="flex flex-col lg:flex-row gap-6">
                 <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto shrink-0">
                     {["all", ...Object.keys(STATUS_CONFIG)].map(f => (
                         <button key={f} onClick={() => setFilter(f)}
                             className={cn(
-                                "px-5 py-2 rounded-lg text-xs font-bold  tracking-widest whitespace-nowrap transition-all",
+                                "px-5 py-2 rounded-lg text-xs font-bold tracking-widest whitespace-nowrap transition-all",
                                 filter === f ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-slate-500 hover:text-slate-600 hover:bg-slate-50"
                             )}>
                             {f === "all" ? `All (${refunds.length})` : `${STATUS_CONFIG[f]?.label} (${refunds.filter(r => r.status === f).length})`}
@@ -141,7 +137,7 @@ export default function Refunds() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <RefreshCw className="w-8 h-8 text-blue-600 animate-spin opacity-40" />
-                        <p className="text-xs font-bold  tracking-widest text-slate-500">Verifying requests...</p>
+                        <p className="text-xs font-bold tracking-widest text-slate-500">Loading refunds...</p>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
@@ -150,19 +146,20 @@ export default function Refunds() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-lg font-bold text-slate-900">No refunds found</p>
-                            <p className="text-sm font-medium text-slate-500 max-w-sm">No refund requests match your current search criteria.</p>
+                            <p className="text-sm font-medium text-slate-500 max-w-sm">No refund requests match your current filter.</p>
                         </div>
                     </div>
                 ) : (
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50 text-xs font-bold  tracking-widest text-slate-500 border-b border-slate-100">
-                                <th className="px-6 py-4 text-left">Order Details</th>
+                            <tr className="bg-slate-50 text-xs font-bold tracking-widest text-slate-500 border-b border-slate-100">
+                                <th className="px-6 py-4 text-left">Order</th>
                                 <th className="px-6 py-4 text-left">Customer</th>
-                                <th className="px-6 py-4 text-left">Refund Amount</th>
-                                <th className="px-6 py-4 text-left">Condition</th>
+                                <th className="px-6 py-4 text-left">Amount</th>
+                                <th className="px-6 py-4 text-left">Type</th>
+                                <th className="px-6 py-4 text-left">Reason</th>
                                 <th className="px-6 py-4 text-left">Status</th>
-                                <th className="px-6 py-4 text-left">Requested On</th>
+                                <th className="px-6 py-4 text-left">Date</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -175,44 +172,48 @@ export default function Refunds() {
                                             {r.order_id ? (
                                                 <Link to={`/apps/ecommerce/orders/${r.order_id}`}
                                                     className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
-                                                    {r.order_number} <LinkIcon className="w-3.5 h-3.5" />
+                                                    {r.order_number || "View"} <LinkIcon className="w-3.5 h-3.5" />
                                                 </Link>
                                             ) : <span className="text-slate-500">—</span>}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="text-sm font-bold text-slate-900">{r.customer_name}</p>
+                                            <p className="text-sm font-bold text-slate-900">{r.customer_name || "—"}</p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <p className="text-sm font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded inline-block">-{fmt(r.amount)}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="text-xs font-medium text-slate-500 max-w-[200px] line-clamp-2" title={r.reason || r.description}>
-                                                {r.reason || r.description || "No reason provided"}
+                                            <span className={cn("text-xs font-bold px-2 py-1 rounded-lg border",
+                                                r.refund_type === "partial" ? "bg-amber-50 text-amber-700 border-amber-100" : "bg-slate-50 text-slate-700 border-slate-100"
+                                            )}>
+                                                {r.refund_type || "full"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <p className="text-xs font-medium text-slate-500 max-w-[200px] line-clamp-2" title={r.reason || r.notes}>
+                                                {r.reason || r.notes || "No reason provided"}
                                             </p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={cn(
-                                                "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold  tracking-tight border",
-                                                sc.color
-                                            )}>
+                                            <span className={cn("inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold tracking-tight border", sc.color)}>
                                                 {sc.label}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-xs font-bold  tracking-widest text-slate-500">
+                                            <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-slate-500">
                                                 <Clock className="w-3.5 h-3.5" />
-                                                {new Date(r.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}
+                                                {new Date(r.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 {r.status === "pending" && (
                                                     <>
-                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs  gap-1 shadow-md shadow-emerald-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1 shadow-md shadow-emerald-600/10 transition-all opacity-0 group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "approved")}>
                                                             <CheckCircle2 className="w-3 h-3" /> Approve
                                                         </Button>
-                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs  gap-1 shadow-md shadow-rose-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs gap-1 shadow-md shadow-rose-600/10 transition-all opacity-0 group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "rejected")}>
                                                             <XCircle className="w-3 h-3" /> Reject
                                                         </Button>
@@ -242,4 +243,3 @@ export default function Refunds() {
         </div>
     );
 }
-

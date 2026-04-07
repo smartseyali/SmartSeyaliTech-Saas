@@ -23,7 +23,7 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
     const { isAdmin, isSuperAdmin } = usePermissions();
 
     const fetchItems = async () => {
-        if (!activeCompany) {
+        if (!activeCompany && !options.isGlobal) {
             setLoading(false);
             return;
         }

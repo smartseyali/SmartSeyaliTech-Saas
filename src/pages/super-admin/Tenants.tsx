@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { PLATFORM_MODULES } from "@/config/modules";
 import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "sonner";
 import {
@@ -9,6 +8,13 @@ import {
     Building2, Users, CreditCard, LayoutGrid, ChevronDown,
     X, Loader2, ChevronRight
 } from "lucide-react";
+
+interface CompanyApp {
+    module_slug: string;
+    module_name: string;
+    module_icon: string;
+    installed_at: string;
+}
 
 interface Company {
     id: number;
@@ -24,7 +30,7 @@ interface Company {
     is_active: boolean;
     created_at: string;
     apps_count: number;
-    modules: { module_id: string; installed_at: string }[];
+    modules: CompanyApp[];
     admins: { full_name: string; email: string }[];
 }
 
@@ -83,10 +89,20 @@ export default function Tenants() {
 
             if (compErr) throw compErr;
 
+            // Fetch system modules for name/icon lookup
+            const { data: sysModules } = await supabase
+                .from("system_modules")
+                .select("slug, name, icon");
+
+            const sysModuleBySlug: Record<string, { name: string; icon: string }> = {};
+            (sysModules || []).forEach((sm: any) => {
+                sysModuleBySlug[sm.slug] = { name: sm.name, icon: sm.icon || "📦" };
+            });
+
             // Fetch all active company modules
             const { data: modules, error: modErr } = await supabase
                 .from("company_modules")
-                .select("company_id, module_id, is_active, created_at")
+                .select("company_id, module_slug, is_active, installed_at, created_at")
                 .eq("is_active", true);
 
             if (modErr) throw modErr;
@@ -94,17 +110,20 @@ export default function Tenants() {
             // Fetch company users with user details
             const { data: companyUsers, error: cuErr } = await supabase
                 .from("company_users")
-                .select("company_id, role, users(full_name, email)");
+                .select("company_id, role, users(full_name, username)");
 
             if (cuErr) throw cuErr;
 
             // Build lookup maps
-            const modulesByCompany: Record<number, { module_id: string; installed_at: string }[]> = {};
+            const modulesByCompany: Record<number, CompanyApp[]> = {};
             (modules || []).forEach((m: any) => {
                 if (!modulesByCompany[m.company_id]) modulesByCompany[m.company_id] = [];
+                const sm = sysModuleBySlug[m.module_slug] || { name: m.module_slug, icon: "📦" };
                 modulesByCompany[m.company_id].push({
-                    module_id: m.module_id,
-                    installed_at: m.created_at,
+                    module_slug: m.module_slug,
+                    module_name: sm.name,
+                    module_icon: sm.icon,
+                    installed_at: m.installed_at || m.created_at,
                 });
             });
 
@@ -114,7 +133,7 @@ export default function Tenants() {
                 if (cu.users) {
                     adminsByCompany[cu.company_id].push({
                         full_name: cu.users.full_name || "",
-                        email: cu.users.email || "",
+                        email: cu.users.username || "",
                     });
                 }
             });
@@ -292,11 +311,6 @@ export default function Tenants() {
         setEditingId(null);
         setForm({ ...EMPTY_FORM });
         setShowModal(true);
-    };
-
-    const getModuleName = (moduleId: string) => {
-        const m = PLATFORM_MODULES.find((pm) => pm.id === moduleId);
-        return m ? m.name : moduleId;
     };
 
     const filterPills: { label: string; value: FilterStatus }[] = [
@@ -621,9 +635,12 @@ export default function Tenants() {
                                                                         key={i}
                                                                         className="flex items-center justify-between bg-white border border-slate-200 rounded-md px-3 py-2"
                                                                     >
-                                                                        <span className="text-sm text-slate-700">
-                                                                            {getModuleName(mod.module_id)}
-                                                                        </span>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-base">{mod.module_icon}</span>
+                                                                            <span className="text-sm font-medium text-slate-700">
+                                                                                {mod.module_name}
+                                                                            </span>
+                                                                        </div>
                                                                         <span className="text-xs text-slate-400">
                                                                             {new Date(
                                                                                 mod.installed_at

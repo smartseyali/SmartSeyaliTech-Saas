@@ -16,10 +16,13 @@ export default function UnifiedContacts() {
     const [activeTab, setActiveTab] = useState("all");
 
     const fetchContacts = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         try {
-            let query = db.from('contacts').select('*').order('created_at', { ascending: false });
-            
+            let query = db.from('contacts').select('*')
+                .eq('company_id', activeCompany.id)
+                .order('created_at', { ascending: false });
+
             if (activeTab !== "all") {
                 query = query.eq('type', activeTab);
             }

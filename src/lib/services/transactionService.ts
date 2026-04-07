@@ -16,6 +16,7 @@ export class TransactionService {
             .from('sales_quotations')
             .select('*, items:sales_quotation_items(*)')
             .eq('id', quotationId)
+            .eq('company_id', tenantId)
             .single();
 
         if (quoError || !quotation) throw new Error("Quotation not found");
@@ -47,6 +48,7 @@ export class TransactionService {
         // 3. Insert items
         const newItems = (quotation.items || []).map((item: any) => ({
             order_id: orderId,
+            company_id: tenantId,
             product_id: item.product_id,
             variant_id: item.variant_id,
             qty: item.qty,
@@ -58,7 +60,7 @@ export class TransactionService {
         if (itemsError) throw itemsError;
 
         // 4. Update Quotation Status
-        await db.from('sales_quotations').update({ status: 'converted' }).eq('id', quotationId);
+        await db.from('sales_quotations').update({ status: 'converted' }).eq('id', quotationId).eq('company_id', tenantId);
 
         // 5. Audit Log
         await db.from('audit_logs').insert({
@@ -82,6 +84,7 @@ export class TransactionService {
             .from('sales_orders')
             .select('*, items:sales_order_items(*)')
             .eq('id', orderId)
+            .eq('company_id', tenantId)
             .single();
 
         if (orderError || !order) throw new Error("Order not found");
@@ -132,6 +135,7 @@ export class TransactionService {
             .from('purchase_orders')
             .select('*, items:purchase_order_items(*)')
             .eq('id', purchaseOrderId)
+            .eq('company_id', tenantId)
             .single();
 
         if (poError || !po) throw new Error("Purchase Order not found");
@@ -161,9 +165,10 @@ export class TransactionService {
         // 3. Insert items
         const newItems = (po.items || []).map((item: any) => ({
             grn_id: grnId,
+            company_id: tenantId,
             product_id: item.product_id,
             quantity_ordered: item.quantity,
-            quantity_received: item.quantity, // Default to full receipt
+            quantity_received: item.quantity,
             unit_price: item.unit_price,
             status: 'Pending'
         }));
@@ -172,7 +177,7 @@ export class TransactionService {
         if (itemsError) throw itemsError;
 
         // 4. Update PO Status
-        await db.from('purchase_orders').update({ status: 'received' }).eq('id', purchaseOrderId);
+        await db.from('purchase_orders').update({ status: 'received' }).eq('id', purchaseOrderId).eq('company_id', tenantId);
 
         return { grnId };
     }
@@ -186,6 +191,7 @@ export class TransactionService {
             .from('purchase_orders')
             .select('*, items:purchase_order_items(*)')
             .eq('id', purchaseOrderId)
+            .eq('company_id', tenantId)
             .single();
 
         if (poError || !po) throw new Error("Purchase Order not found");
@@ -217,6 +223,7 @@ export class TransactionService {
         // 3. Insert items
         const newItems = (po.items || []).map((item: any) => ({
             bill_id: billId,
+            company_id: tenantId,
             product_id: item.product_id,
             quantity: item.quantity,
             unit_price: item.unit_price,
@@ -228,7 +235,7 @@ export class TransactionService {
         if (itemsError) throw itemsError;
 
         // 4. Update PO Status
-        await db.from('purchase_orders').update({ status: 'billed' }).eq('id', purchaseOrderId);
+        await db.from('purchase_orders').update({ status: 'billed' }).eq('id', purchaseOrderId).eq('company_id', tenantId);
 
         return { billId };
     }

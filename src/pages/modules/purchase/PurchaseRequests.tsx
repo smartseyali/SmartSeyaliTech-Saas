@@ -6,10 +6,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useTenant } from "@/contexts/TenantContext";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 
 export default function PurchaseRequests() {
+    const { activeCompany } = useTenant();
     const [view, setView] = useState<"list" | "form">("list");
     const [searchTerm, setSearchTerm] = useState("");
     const [requests, setRequests] = useState<any[]>([]);
@@ -17,14 +19,16 @@ export default function PurchaseRequests() {
     const [editingRequest, setEditingRequest] = useState<any>(null);
 
     useEffect(() => {
-        loadRequests();
-    }, []);
+        if (activeCompany) loadRequests();
+    }, [activeCompany?.id]);
 
     const loadRequests = async () => {
+        if (!activeCompany) return;
         setLoading(true);
         const { data, error } = await supabase
             .from('purchase_requests')
             .select('*')
+            .eq('company_id', activeCompany.id)
             .order('created_at', { ascending: false });
 
         if (!error && data) setRequests(data);
@@ -52,6 +56,7 @@ export default function PurchaseRequests() {
 
             const payload = {
                 ...header,
+                company_id: activeCompany?.id,
                 total_qty: totalQty
             };
 
