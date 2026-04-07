@@ -131,7 +131,7 @@ export default function StorefrontLogin() {
                 </div>
 
                 {/* Form */}
-                <form onSubmit={mode === "login" ? handleLogin : handleSignup} className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-5">
+                <form onSubmit={mode === "login" ? handleLogin : handleSignup} className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm space-y-5">
                     {mode === "signup" && (
                         <>
                             <div className="space-y-2">

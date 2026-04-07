@@ -101,15 +101,15 @@ export default function AbandonedCarts() {
                         </div>
                     </div>
                 ) : (
-                    <table className="w-full">
+                    <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
                         <thead>
                             <tr className="bg-slate-50 text-xs font-bold  tracking-widest text-slate-500 border-b border-slate-100">
-                                <th className="px-6 py-4 text-left">Customer</th>
-                                <th className="px-6 py-4 text-left">Items</th>
-                                <th className="px-6 py-4 text-left">Value</th>
-                                <th className="px-6 py-4 text-left">Timeline</th>
-                                <th className="px-6 py-4 text-left">Status</th>
-                                <th className="px-6 py-4 text-right">Action</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Customer</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Items</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Value</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Timeline</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Status</th>
+                                <th className="px-4 sm:px-6 py-3 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -145,7 +145,7 @@ export default function AbandonedCarts() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         {!cart.is_recovered && !cart.recovery_email_sent && (
-                                            <Button className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/10 text-xs gap-2 transition-all opacity-0 group-hover:opacity-100"
+                                            <Button className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold shadow-md shadow-blue-600/10 text-xs gap-2 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                                                 disabled={sending === cart.id} onClick={() => sendRecoveryEmail(cart)}>
                                                 <Mail className="w-3.5 h-3.5" />
                                                 {sending === cart.id ? "Sending..." : "Recover"}
@@ -155,7 +155,7 @@ export default function AbandonedCarts() {
                                 </tr>
                             ))}
                         </tbody>
-                    </table>
+                    </table></div>
                 )}
             </div>
         </div>

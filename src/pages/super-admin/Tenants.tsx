@@ -756,7 +756,7 @@ export default function Tenants() {
                                 onChange={(v) => setForm({ ...form, industry_type: v })}
                                 placeholder="e.g. retail, education, services"
                             />
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <FormField
                                     label="Contact email"
                                     value={form.contact_email}
@@ -774,7 +774,7 @@ export default function Tenants() {
                                 value={form.address}
                                 onChange={(v) => setForm({ ...form, address: v })}
                             />
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <FormField
                                     label="City"
                                     value={form.city}

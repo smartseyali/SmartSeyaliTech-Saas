@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, User, LogOut, Settings as SettingsIcon, ChevronDown, Grid3X3, ExternalLink, Building2, Check } from "lucide-react";
+import { Bell, Search, User, LogOut, Settings as SettingsIcon, ChevronDown, Grid3X3, ExternalLink, Building2, Check, Menu } from "lucide-react";
 import { GlobalSearch } from "../GlobalSearch";
 import {
     DropdownMenu,
@@ -20,7 +20,7 @@ import { PLATFORM_MODULES } from "@/config/modules";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import PLATFORM_CONFIG from "@/config/platform";
 
-export function AppHeader() {
+export function AppHeader({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void }) {
     const { user, signOut } = useAuth();
     const { isAdmin, isSuperAdmin, hasModule } = usePermissions();
     const { activeCompany, companies, setCompany } = useTenant();
@@ -45,9 +45,19 @@ export function AppHeader() {
         <header className="h-12 border-b border-slate-200/80 bg-white sticky top-0 z-40 w-full">
             <div className="h-full px-4 flex items-center justify-between gap-3">
 
-                {/* Left — Search */}
-                <div className="flex-1 max-w-md">
-                    <GlobalSearch />
+                {/* Left — Hamburger (mobile) + Search */}
+                <div className="flex items-center gap-2 flex-1 max-w-md">
+                    {onMobileMenuToggle && (
+                        <button
+                            onClick={onMobileMenuToggle}
+                            className="md:hidden p-2 -ml-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 transition-colors"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                    )}
+                    <div className="flex-1">
+                        <GlobalSearch />
+                    </div>
                 </div>
 
                 {/* Right — Actions */}

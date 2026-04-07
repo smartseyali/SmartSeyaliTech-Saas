@@ -321,7 +321,7 @@ export default function EcomOrderDetail() {
         <>
             {/* Status Banners */}
             {order.status === "cancelled" && order.cancellation_reason && (
-                <div className="mx-8 mt-4 bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-start gap-3">
+                <div className="mx-3 sm:mx-8 mt-4 bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-start gap-3">
                     <AlertTriangle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
                     <div>
                         <p className="text-sm font-bold text-rose-700">Cancelled</p>
@@ -330,7 +330,7 @@ export default function EcomOrderDetail() {
                 </div>
             )}
             {order.return_status && (
-                <div className="mx-8 mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
+                <div className="mx-3 sm:mx-8 mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
                     <Undo2 className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
                     <div>
                         <p className="text-sm font-bold text-orange-700">Return: {order.return_status}</p>
@@ -340,16 +340,16 @@ export default function EcomOrderDetail() {
             )}
 
             {/* Totals Summary Bar */}
-            <div className="mx-8 mt-4 bg-slate-900 rounded-xl p-4 flex items-center justify-between text-white">
-                <div className="flex items-center gap-6 text-xs font-bold tracking-widest">
-                    <span className="text-slate-400">Subtotal <span className="text-white ml-2">{fmt(order.subtotal || 0)}</span></span>
-                    {Number(order.coupon_discount) > 0 && <span className="text-emerald-400">Discount <span className="text-emerald-300 ml-2">-{fmt(order.coupon_discount)}</span></span>}
-                    <span className="text-slate-400">Tax <span className="text-white ml-2">{fmt(order.tax_amount || 0)}</span></span>
-                    <span className="text-slate-400">Shipping <span className="text-blue-400 ml-2">{Number(order.shipping_amount) === 0 ? "FREE" : fmt(order.shipping_amount)}</span></span>
+            <div className="mx-3 sm:mx-8 mt-4 bg-slate-900 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs font-bold tracking-widest">
+                    <span className="text-slate-400">Subtotal <span className="text-white ml-1 sm:ml-2">{fmt(order.subtotal || 0)}</span></span>
+                    {Number(order.coupon_discount) > 0 && <span className="text-emerald-400">Discount <span className="text-emerald-300 ml-1">-{fmt(order.coupon_discount)}</span></span>}
+                    <span className="text-slate-400">Tax <span className="text-white ml-1 sm:ml-2">{fmt(order.tax_amount || 0)}</span></span>
+                    <span className="text-slate-400">Shipping <span className="text-blue-400 ml-1 sm:ml-2">{Number(order.shipping_amount) === 0 ? "FREE" : fmt(order.shipping_amount)}</span></span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t border-white/10 sm:border-0">
                     <span className="text-xs font-bold tracking-widest text-blue-400">GRAND TOTAL</span>
-                    <span className="text-2xl font-bold tracking-tighter">{fmt(order.grand_total || 0)}</span>
+                    <span className="text-xl sm:text-2xl font-bold tracking-tighter">{fmt(order.grand_total || 0)}</span>
                 </div>
             </div>
 
@@ -416,7 +416,7 @@ export default function EcomOrderDetail() {
             {/* ═══ Cancel Modal ═══ */}
             {showCancelModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowCancelModal(false)}>
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md mx-3 sm:mx-0 shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500"><Ban className="w-5 h-5" /></div>
                             <h3 className="text-lg font-bold text-slate-900">Cancel Order</h3>
@@ -442,7 +442,7 @@ export default function EcomOrderDetail() {
             {/* ═══ Return Modal ═══ */}
             {showReturnModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowReturnModal(false)}>
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md mx-3 sm:mx-0 shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500"><Undo2 className="w-5 h-5" /></div>
                             <h3 className="text-lg font-bold text-slate-900">Process Return</h3>
@@ -467,7 +467,7 @@ export default function EcomOrderDetail() {
             {/* ═══ Refund Modal ═══ */}
             {showRefundModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowRefundModal(false)}>
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md mx-3 sm:mx-0 shadow-2xl space-y-5 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500"><RotateCcw className="w-5 h-5" /></div>
                             <h3 className="text-lg font-bold text-slate-900">Initiate Refund</h3>

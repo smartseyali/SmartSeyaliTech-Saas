@@ -179,15 +179,15 @@ export default function EcomDashboard() {
                             ))}
                         </div>
 
-                        <div className="rounded-xl border border-slate-100 overflow-hidden bg-white">
-                            <table className="w-full">
+                        <div className="rounded-xl border border-slate-100 overflow-hidden bg-white overflow-x-auto">
+                            <table className="w-full min-w-[540px]">
                                 <thead>
                                     <tr className="bg-slate-50/50 text-[10px] font-bold tracking-widest text-slate-400 uppercase border-b border-slate-100">
-                                        <th className="px-6 py-3 text-left">Ref No</th>
-                                        <th className="px-6 py-3 text-left">Customer</th>
-                                        <th className="px-6 py-3 text-right">Amount</th>
-                                        <th className="px-6 py-3 text-center">Status</th>
-                                        <th className="px-6 py-3 text-right">Date</th>
+                                        <th className="px-3 sm:px-6 py-3 text-left">Ref No</th>
+                                        <th className="px-3 sm:px-6 py-3 text-left">Customer</th>
+                                        <th className="px-3 sm:px-6 py-3 text-right">Amount</th>
+                                        <th className="px-3 sm:px-6 py-3 text-center">Status</th>
+                                        <th className="px-3 sm:px-6 py-3 text-right">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">

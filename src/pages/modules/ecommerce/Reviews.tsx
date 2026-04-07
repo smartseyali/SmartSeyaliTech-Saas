@@ -53,7 +53,7 @@ export default function Reviews() {
     reviews.filter(r => r.status === "approved").forEach(r => { ratingDist[r.rating] = (ratingDist[r.rating] || 0) + 1; });
 
     return (
-        <div className="p-8 space-y-10 animate-in fade-in duration-500 pb-20">
+        <div className="p-4 sm:p-8 space-y-8 sm:space-y-10 animate-in fade-in duration-500 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-slate-100">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -72,9 +72,9 @@ export default function Reviews() {
 
             {/* Rating Summary */}
             {reviews.filter(r => r.status === "approved").length > 0 && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-                    <div className="flex flex-col md:flex-row gap-12 items-center">
-                        <div className="text-center shrink-0 p-8 rounded-2xl bg-slate-50 border border-slate-100 min-w-[180px]">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-8 shadow-sm">
+                    <div className="flex flex-col md:flex-row gap-8 sm:gap-12 items-center">
+                        <div className="text-center shrink-0 p-6 sm:p-8 rounded-2xl bg-slate-50 border border-slate-100 min-w-[160px] sm:min-w-[180px]">
                             <p className="text-6xl font-bold tracking-tight text-slate-900 mb-2">{avgRating.toFixed(1)}</p>
                             <div className="flex justify-center mb-3">
                                 <StarRating rating={Math.round(avgRating)} />

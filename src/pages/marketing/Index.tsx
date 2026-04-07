@@ -250,7 +250,7 @@ const Index = () => {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
               <div className="space-y-8">
                 <Card className="border border-gray-100 shadow-md rounded-2xl p-8 hover:shadow-lg transition-shadow bg-white text-center">
                   <Zap className="h-10 w-10 text-primary-600 mx-auto mb-4" />

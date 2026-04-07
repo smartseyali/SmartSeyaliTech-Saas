@@ -435,8 +435,8 @@ export default function ShippingZones() {
         setTesting(false);
     };
 
-    const inputCls = "w-full h-10 px-3 rounded-lg border border-slate-200 text-[13px] font-medium focus:border-blue-500 outline-none transition-all";
-    const labelCls = "text-[11px] font-semibold uppercase tracking-wider text-slate-500";
+    const inputCls = "w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-slate-900 text-[13px] font-medium placeholder:text-slate-400 outline-none transition-all duration-150 hover:border-blue-400 hover:bg-blue-50/30 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white";
+    const labelCls = "text-[12px] font-semibold text-slate-600";
 
     // ════════════════════════════════════════════════════════════
     // CONFIG PER SECTION
@@ -524,15 +524,15 @@ export default function ShippingZones() {
     return (
         <div className="space-y-0 animate-in fade-in duration-300">
             {/* Section Tabs */}
-            <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+            <div className="px-3 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-3 mb-4">
                     <Truck className="w-5 h-5 text-blue-600" />
                     <div>
-                        <h1 className="text-lg font-semibold tracking-tight text-slate-900">Shipping & Delivery</h1>
+                        <h1 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">Shipping & Delivery</h1>
                         <p className="text-[11px] text-slate-400 font-medium">Configure tariffs, zones, slabs and charges for your company</p>
                     </div>
                 </div>
-                <div className="flex gap-1 flex-wrap">
+                <div className="flex gap-1 flex-wrap overflow-x-auto pb-1 -mb-1">
                     {sections.map(s => (
                         <button
                             key={s.key}
@@ -561,14 +561,14 @@ export default function ShippingZones() {
 
             {/* Test Simulation Panel */}
             {section === "test" && (
-                <div className="p-6 space-y-6">
-                    <div className="max-w-2xl space-y-6">
+                <div className="p-3 sm:p-6 space-y-6">
+                    <div className="max-w-2xl space-y-6 mx-auto sm:mx-0">
                         <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
                             <h3 className="text-[13px] font-semibold text-slate-900 flex items-center gap-2">
                                 <FlaskConical className="w-4 h-4 text-blue-600" /> Test Shipping Calculation
                             </h3>
                             <p className="text-[11px] text-slate-400">Enter test values to simulate the shipping charge calculation pipeline for your company.</p>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5"><label className={labelCls}>State</label><input value={testForm.state} onChange={e => setTestForm(f => ({ ...f, state: e.target.value }))} className={inputCls} placeholder="e.g. Tamil Nadu" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Pincode</label><input value={testForm.pincode} onChange={e => setTestForm(f => ({ ...f, pincode: e.target.value }))} className={inputCls} placeholder="e.g. 641001" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Weight (kg)</label><input type="number" value={testForm.weight} onChange={e => setTestForm(f => ({ ...f, weight: e.target.value }))} className={inputCls} step="0.1" placeholder="2.5" /></div>

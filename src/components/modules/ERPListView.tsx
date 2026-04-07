@@ -112,26 +112,26 @@ export default function ERPListView({
             {/* Toolbar Area */}
             <div className="sticky top-0 z-40 bg-white border-b border-slate-200">
                 <header className="bg-white flex flex-col">
-                    <div className="flex items-center justify-between h-12 px-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 min-h-[48px] px-3 sm:px-4 py-2 sm:py-0">
                         <div className="flex items-center gap-3">
                             <h1 className="text-[11px] font-black tracking-tight text-slate-950 uppercase leading-none border-l-2 border-blue-600 pl-3">{title}</h1>
-                            <div className="h-3 w-px bg-slate-200" />
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{data.length} RECORDS</span>
+                            <div className="h-3 w-px bg-slate-200 hidden sm:block" />
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] hidden sm:inline">{data.length} RECORDS</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                             {selectedIds.size > 0 && onDeleteIds && (
-                                <motion.div 
-                                    initial={{ x: 20, opacity: 0 }} 
+                                <motion.div
+                                    initial={{ x: 20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     className="flex items-center gap-2 pr-2 mr-2 border-r border-slate-100"
                                 >
                                     <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{selectedIds.size} SELECTED</span>
-                                    <Button 
-                                        variant="destructive" 
-                                        size="sm" 
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
                                         onClick={handleDeleteSelected}
-                                        className="h-7 rounded-md text-[9px] font-black uppercase tracking-widest px-3 bg-rose-600 hover:bg-rose-700"
+                                        className="h-8 rounded-md text-[9px] font-black uppercase tracking-widest px-3 bg-rose-600 hover:bg-rose-700 active:bg-rose-800"
                                     >
                                         <Trash2 className="w-3 h-3 mr-1.5" />
                                         Batch Delete
@@ -146,39 +146,39 @@ export default function ERPListView({
                             )}
 
                             <div className="flex items-center gap-1.5">
-                                <Button variant="ghost" size="sm" className="h-7.5 px-3 text-slate-500 font-bold text-[9px] tracking-widest uppercase border border-slate-200 hover:bg-slate-50">
+                                <Button variant="ghost" size="sm" className="h-8 px-3 text-slate-500 font-bold text-[9px] tracking-widest uppercase border border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 transition-all hidden sm:flex">
                                     <FileDown className="w-3.5 h-3.5 mr-1" /> EXPORT
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={onRefresh} className="h-7.5 w-7.5 text-slate-400 border border-slate-200 hover:border-blue-400 hover:text-blue-600 transition-all">
+                                <Button variant="ghost" size="sm" onClick={onRefresh} className="h-8 w-8 text-slate-400 border border-slate-200 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-all">
                                     <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
                                 </Button>
-                                <Button onClick={onNew} className="h-7.5 px-4 bg-slate-900 hover:bg-black text-white text-[10px] font-black shadow-md shadow-slate-900/10 uppercase tracking-[0.15em] transition-all rounded-md">
-                                    <Plus className="w-3.5 h-3.5 mr-1" /> NEW ENTRY
+                                <Button onClick={onNew} className="h-8 px-4 bg-slate-900 hover:bg-black active:bg-slate-800 text-white text-[10px] font-black shadow-md shadow-slate-900/10 uppercase tracking-[0.15em] transition-all rounded-md">
+                                    <Plus className="w-3.5 h-3.5 mr-1" /> <span className="hidden xs:inline">NEW ENTRY</span><span className="xs:hidden">NEW</span>
                                 </Button>
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <div className="w-full px-4 py-1.5 flex items-center gap-3 bg-slate-50/80 border-t border-slate-100">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+                <div className="w-full px-3 sm:px-4 py-1.5 flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-50/80 border-t border-slate-100">
+                    <div className="relative flex-1 min-w-[180px] max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder={`Quick find...`}
-                            className="w-full h-8 pl-10 pr-4 bg-white border border-slate-200 rounded-lg text-[11px] font-medium focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none"
+                            className="w-full h-9 pl-10 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-900 font-medium placeholder:text-slate-400 hover:border-blue-400 focus:ring-2 focus:ring-blue-500/15 focus:border-blue-600 transition-all duration-150 outline-none"
                         />
                     </div>
-                    <Button variant="ghost" className="h-8 px-4 rounded-lg border border-slate-200 bg-white text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50">
+                    <Button variant="ghost" className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 transition-all hidden sm:flex">
                         <Filter className="w-3 h-3 mr-2" /> SMART FILTERS
                     </Button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="w-full p-3 overflow-x-auto">
+            <div className="w-full p-2 sm:p-3 overflow-x-auto">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <Table>
                         <TableHeader className="bg-slate-50/50">
@@ -216,7 +216,7 @@ export default function ERPListView({
                                             animate={{ opacity: 1 }}
                                             onClick={() => onRowClick && onRowClick(item)}
                                             className={cn(
-                                                "h-11 border-b border-slate-100 transition-all cursor-pointer group hover:bg-blue-50/30",
+                                                "h-12 border-b border-slate-100 transition-all duration-150 cursor-pointer group hover:bg-blue-50/60 active:bg-blue-100/40",
                                                 selectedIds.has(item[primaryKey]) ? "bg-blue-50/50" : ""
                                             )}
                                         >
@@ -228,14 +228,14 @@ export default function ERPListView({
                                                 />
                                             </TableCell>
                                             {columns.map((col) => (
-                                                <TableCell key={col.key} className={cn("text-[12px] font-semibold text-slate-700 leading-none", col.className)}>
+                                                <TableCell key={col.key} className={cn("text-[12px] font-semibold text-slate-800 leading-snug", col.className)}>
                                                     {col.render ? col.render(item) : col.key === statusField ? <StatusBadge status={item[col.key]} /> : item[col.key] || "—"}
                                                 </TableCell>
                                             ))}
                                             <TableCell className="pr-3 text-right" onClick={(e) => e.stopPropagation()}>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-900 hover:bg-white border border-transparent shadow-none transition-all">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-900 hover:bg-slate-100 border border-transparent shadow-none transition-all duration-150">
                                                             <MoreHorizontal className="w-4 h-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AppSidebar, getRequiredResource, getCurrentModule } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
@@ -13,12 +13,16 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { can, hasModule, loading: pLoading } = usePermissions();
   const isAuthPage = ["/login", "/reset-password"].includes(location.pathname);
 
   const content = children || <Outlet />;
+
+  // Close mobile sidebar on route change
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   if (isAuthPage) {
     return <div className="min-h-screen bg-background">{content}</div>;
@@ -93,10 +97,24 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
-      <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
-      
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — hidden on mobile unless mobileOpen, always visible on md+ */}
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-50 md:relative md:z-0 transition-transform duration-300 ease-in-out",
+        mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      )}>
+        <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+      </div>
+
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <AppHeader />
+        <AppHeader onMobileMenuToggle={() => setMobileOpen(!mobileOpen)} />
         <main className="flex-1 overflow-y-auto scrollbar-hide bg-[#f8fafd]">
           <div className="content-zoom w-full h-full">
             {content}

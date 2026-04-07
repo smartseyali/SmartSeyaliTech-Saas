@@ -150,17 +150,17 @@ export default function Refunds() {
                         </div>
                     </div>
                 ) : (
-                    <table className="w-full">
+                    <div className="overflow-x-auto"><table className="w-full min-w-[800px]">
                         <thead>
                             <tr className="bg-slate-50 text-xs font-bold tracking-widest text-slate-500 border-b border-slate-100">
-                                <th className="px-6 py-4 text-left">Order</th>
-                                <th className="px-6 py-4 text-left">Customer</th>
-                                <th className="px-6 py-4 text-left">Amount</th>
-                                <th className="px-6 py-4 text-left">Type</th>
-                                <th className="px-6 py-4 text-left">Reason</th>
-                                <th className="px-6 py-4 text-left">Status</th>
-                                <th className="px-6 py-4 text-left">Date</th>
-                                <th className="px-6 py-4 text-right">Actions</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Order</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Customer</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Amount</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Type</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Reason</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Status</th>
+                                <th className="px-4 sm:px-6 py-3 text-left">Date</th>
+                                <th className="px-4 sm:px-6 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -209,11 +209,11 @@ export default function Refunds() {
                                             <div className="flex justify-end gap-2">
                                                 {r.status === "pending" && (
                                                     <>
-                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1 shadow-md shadow-emerald-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1 shadow-md shadow-emerald-600/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "approved")}>
                                                             <CheckCircle2 className="w-3 h-3" /> Approve
                                                         </Button>
-                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs gap-1 shadow-md shadow-rose-600/10 transition-all opacity-0 group-hover:opacity-100"
+                                                        <Button className="h-8 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs gap-1 shadow-md shadow-rose-600/10 transition-all sm:opacity-0 sm:group-hover:opacity-100"
                                                             disabled={processing === r.id} onClick={() => updateStatus(r.id, "rejected")}>
                                                             <XCircle className="w-3 h-3" /> Reject
                                                         </Button>
@@ -237,7 +237,7 @@ export default function Refunds() {
                                 );
                             })}
                         </tbody>
-                    </table>
+                    </table></div>
                 )}
             </div>
         </div>

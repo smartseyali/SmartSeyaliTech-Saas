@@ -177,15 +177,16 @@ export default function DocForm({
 
   const renderField = (field: ERPField, value: any, onChange: (val: any) => void, compact = false) => {
     const baseClass = cn(
-      "w-full border border-slate-300 bg-white text-[13px] rounded",
-      "outline-none transition-all",
-      "focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30",
+      "w-full border border-slate-300 bg-white text-slate-900 rounded",
+      "outline-none transition-all duration-150",
+      "hover:border-blue-400 hover:bg-blue-50/30",
+      "focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white",
       "placeholder:text-slate-400",
-      compact ? "h-[30px] px-2 text-xs" : "h-[34px] px-3"
+      compact ? "h-[32px] px-2 text-[12px]" : "h-[36px] px-3 text-[13px]"
     );
 
     if (field.readOnly || field.type === "readonly") {
-      return <div className={cn(baseClass, "bg-slate-50 text-slate-500 flex items-center")}>{field.type === "currency" ? formatINR(value) : value || "—"}</div>;
+      return <div className={cn(baseClass, "bg-slate-50 text-slate-600 flex items-center cursor-default hover:bg-slate-50 hover:border-slate-300")}>{field.type === "currency" ? formatINR(value) : value || "—"}</div>;
     }
 
     if (field.type === "select") {
@@ -194,7 +195,7 @@ export default function DocForm({
         : field.options || [];
       return (
         <div className="relative">
-          <select className={cn(baseClass, "pr-7 appearance-none cursor-pointer")} value={value ?? ""} onChange={e => onChange(e.target.value)}>
+          <select className={cn(baseClass, "pr-7 appearance-none cursor-pointer hover:border-blue-400")} value={value ?? ""} onChange={e => onChange(e.target.value)}>
             <option value=""></option>
             {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
@@ -205,10 +206,10 @@ export default function DocForm({
 
     if (field.type === "checkbox") {
       return (
-        <label className="inline-flex items-center gap-2 cursor-pointer h-[34px]">
+        <label className="inline-flex items-center gap-2.5 cursor-pointer h-[36px] group">
           <input type="checkbox" checked={!!value} onChange={e => onChange(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30" />
-          <span className="text-[13px] text-slate-600">{value ? "Yes" : "No"}</span>
+            className="w-[18px] h-[18px] rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all" />
+          <span className={cn("text-[13px] font-medium transition-colors", value ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700")}>{value ? "Yes" : "No"}</span>
         </label>
       );
     }
@@ -229,7 +230,7 @@ export default function DocForm({
     if (field.type === "textarea") {
       return (
         <textarea placeholder={field.placeholder || ""} value={value || ""} onChange={e => onChange(e.target.value)} rows={3}
-          className="w-full border border-slate-300 bg-white text-[13px] rounded px-3 py-2 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 placeholder:text-slate-400 resize-y" />
+          className="w-full border border-slate-300 bg-white text-slate-900 text-[13px] rounded px-3 py-2 outline-none transition-all duration-150 hover:border-blue-400 hover:bg-blue-50/30 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white placeholder:text-slate-400 resize-y" />
       );
     }
 
@@ -266,18 +267,18 @@ export default function DocForm({
   const renderFieldGrid = (fields: ERPField[]) => {
     const visible = fields.filter(f => !f.hidden);
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 px-4 py-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 px-3 sm:px-4 py-4">
         {visible.map((f) => {
           const isFullWidth = f.type === "textarea" || f.width === "full" || f.colSpan === 2;
           return (
             <div key={f.key}
               className={cn(
-                "flex flex-col gap-1",
+                "flex flex-col gap-1.5",
                 isFullWidth && "md:col-span-2",
               )}>
-              <label className="text-[12px] font-medium text-slate-500">
+              <label className="text-[12px] font-semibold text-slate-600">
                 {f.label.replace(" *", "")}
-                {f.required && <span className="text-red-400 ml-0.5">*</span>}
+                {f.required && <span className="text-red-500 ml-0.5">*</span>}
               </label>
               <div>
                 {renderField(f, header[f.key], val => setHeader({ ...header, [f.key]: val }))}
@@ -313,19 +314,19 @@ export default function DocForm({
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* ── Sticky Header Bar ─────────────────────────────────────────────── */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between h-12 px-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <button onClick={onAbort} className="p-1 hover:bg-slate-100 rounded transition-colors text-slate-400 hover:text-slate-700">
+        <div className="max-w-[1200px] mx-auto flex flex-wrap items-center justify-between gap-2 min-h-[48px] px-3 sm:px-4 py-2 sm:py-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button onClick={onAbort} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-900 active:bg-slate-200">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="flex items-center gap-2 min-w-0">
               {subtitle && (
                 <>
-                  <span className="text-[12px] text-slate-400 font-medium whitespace-nowrap">{subtitle}</span>
-                  <span className="text-slate-300">/</span>
+                  <span className="text-[12px] text-slate-400 font-medium whitespace-nowrap hidden sm:inline">{subtitle}</span>
+                  <span className="text-slate-300 hidden sm:inline">/</span>
                 </>
               )}
-              <h1 className="text-[14px] font-semibold text-slate-900 truncate">{title}</h1>
+              <h1 className="text-[13px] sm:text-[14px] font-semibold text-slate-900 truncate">{title}</h1>
               {header.status && <StatusBadge status={header.status} className="ml-1" />}
             </div>
             {/* Record navigation */}
@@ -354,19 +355,19 @@ export default function DocForm({
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap">
             {customActions}
             {onDelete && initialData?.id && (
               <Button variant="ghost" size="sm" onClick={async () => { if (window.confirm("Delete this record permanently?")) { await onDelete(initialData.id); onAbort(); } }}
-                className="h-7 px-2.5 text-[12px] font-medium text-red-500 hover:text-red-600 hover:bg-red-50">
-                <Trash2 className="w-3 h-3 mr-1" /> Delete
+                className="h-8 px-2.5 text-[12px] font-medium text-red-500 hover:text-red-600 hover:bg-red-50 active:bg-red-100">
+                <Trash2 className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Delete</span>
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={onAbort} className="h-7 px-3 text-[12px] font-medium">
+            <Button variant="outline" size="sm" onClick={onAbort} className="h-8 px-3 text-[12px] font-medium hover:bg-slate-50 active:bg-slate-100">
               Cancel
             </Button>
             <Button size="sm" onClick={handleSave} disabled={saving}
-              className="h-7 px-4 text-[12px] font-semibold bg-blue-600 hover:bg-blue-700 text-white">
+              className="h-8 px-4 text-[12px] font-semibold bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm">
               <Save className="w-3 h-3 mr-1.5" />
               {saving ? "Saving..." : "Save"}
             </Button>
@@ -441,7 +442,7 @@ export default function DocForm({
                 </thead>
                 <tbody>
                   {items.map((row, idx) => (
-                    <tr key={idx} className="border-b border-slate-100 hover:bg-blue-50/20 transition-colors group">
+                    <tr key={idx} className="border-b border-slate-100 hover:bg-blue-50/40 transition-colors group">
                       <td className="px-2 py-1 text-center text-[11px] font-medium text-slate-400">{idx + 1}</td>
                       {itemFields.map(f => (
                         <td key={f.key} className="px-1 py-1">
@@ -503,7 +504,7 @@ export default function DocForm({
               <div className="flex gap-3">
                 <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-[11px] font-bold text-blue-600">U</div>
                 <textarea placeholder="Type a comment..." rows={2}
-                  className="flex-1 border border-slate-200 rounded text-[13px] px-3 py-2 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 resize-none" />
+                  className="flex-1 border border-slate-300 rounded text-[13px] text-slate-900 px-3 py-2 placeholder:text-slate-400 outline-none transition-all duration-150 hover:border-blue-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 resize-none" />
               </div>
             </div>
           </div>
