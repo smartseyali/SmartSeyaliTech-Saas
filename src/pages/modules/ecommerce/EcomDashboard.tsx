@@ -67,7 +67,7 @@ export default function EcomDashboard() {
             const [{ data: orders }, { data: refunds }, { data: coupons }, { data: reviews }, { data: customers }] = await Promise.all([
                 supabase.from("ecom_orders").select("*").eq("company_id", activeCompany.id),
                 supabase.from("refunds").select("id, status").eq("company_id", activeCompany.id).eq("status", "pending"),
-                supabase.from("ecom_coupons").select("id").eq("company_id", activeCompany.id).eq("is_active", true),
+                supabase.from("coupons").select("id").eq("company_id", activeCompany.id).eq("is_active", true),
                 supabase.from("ecom_product_reviews").select("id").eq("company_id", activeCompany.id).eq("status", "pending"),
                 supabase.from("ecom_customers").select("id").eq("company_id", activeCompany.id),
             ]);
