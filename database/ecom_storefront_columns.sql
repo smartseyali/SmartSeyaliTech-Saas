@@ -19,6 +19,13 @@ COMMENT ON COLUMN master_items.total_sold IS 'Total units sold (for bestselling 
 COMMENT ON COLUMN master_items.web_slug IS 'URL-friendly slug for SEO';
 COMMENT ON COLUMN master_items.barcode IS 'EAN/UPC barcode';
 
+-- ─── master_product_variants: Own selling_price & mrp ──────
+ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS selling_price DECIMAL(15,2);
+ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS mrp DECIMAL(15,2);
+
+COMMENT ON COLUMN master_product_variants.selling_price IS 'Variant selling price (overrides parent item price when set)';
+COMMENT ON COLUMN master_product_variants.mrp IS 'Variant MRP (overrides parent item MRP when set)';
+
 -- ─── ecom_banners: Mobile image + link URL alias ────────────
 ALTER TABLE ecom_banners ADD COLUMN IF NOT EXISTS mobile_image_url TEXT;
 ALTER TABLE ecom_banners ADD COLUMN IF NOT EXISTS link_url TEXT;
