@@ -1,60 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
+import ERPListView from "@/components/modules/ERPListView";
+import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { cn } from "@/lib/utils";
 import {
-    Scale, MapPin, Plus, Trash2, Save, RefreshCw, Settings, Pencil, X,
-    Truck, DollarSign, Zap, Package, FlaskConical, Globe, ChevronDown
+    Settings, Globe, Scale, DollarSign, FlaskConical, RefreshCw, Zap,
+    Package, ArrowLeft, Truck
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const SHIPPING_TYPES = [
-    { value: "WEIGHT", label: "Weight-Based", uom: "kg" },
-    { value: "QTY", label: "Quantity-Based", uom: "units" },
-    { value: "VALUE", label: "Value-Based", uom: "₹" },
-    { value: "VOLUME", label: "Volume-Based", uom: "cm³" },
-];
-const ROUNDING_RULES = [{ value: "ROUND_UP", label: "Round Up" }, { value: "ROUND_DOWN", label: "Round Down" }, { value: "ROUND_NEAREST", label: "Round Nearest" }];
-const FREE_CONDITIONS = [{ value: "VALUE", label: "Order Value (₹)" }, { value: "WEIGHT", label: "Weight" }, { value: "QTY", label: "Quantity" }];
-const CHARGE_TYPES_LIST = ["COD", "EXPRESS", "HANDLING", "PACKAGING", "INSURANCE"];
-const APPLIES_OPTS = [{ value: "ALL", label: "All Orders" }, { value: "COD_ONLY", label: "COD Only" }, { value: "PREPAID_ONLY", label: "Prepaid Only" }];
+// ────────────────────────────────────────────────────────────────
+// SECTION VIEWS — 4 entity sections + 1 test panel
+// ────────────────────────────────────────────────────────────────
 
-const inputCls = "w-full h-10 px-3 rounded-lg border border-slate-200 text-[13px] font-medium focus:border-blue-500 outline-none transition-all";
-const labelCls = "text-[11px] font-semibold uppercase tracking-wider text-slate-500";
+type Section = "tariffs" | "zones" | "slabs" | "extras" | "test";
 
 export default function ShippingZones() {
     const { activeCompany } = useTenant();
     const { toast } = useToast();
-    const [tab, setTab] = useState<"tariff" | "zones" | "slabs" | "extras" | "free" | "test">("tariff");
+    const [section, setSection] = useState<Section>("tariffs");
+
+    // ── entity states
+    const [tariffs, setTariffs] = useState<any[]>([]);
+    const [zones, setZones] = useState<any[]>([]);
+    const [slabs, setSlabs] = useState<any[]>([]);
+    const [extras, setExtras] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Tariff
-    const [tariff, setTariff] = useState<any>(null);
-    const [tariffForm, setTariffForm] = useState({ tariff_name: "Standard Shipping", shipping_type: "WEIGHT", primary_uom: "kg", priority: 1, is_active: true, rounding_rule: "ROUND_UP", conflict_resolution: "HIGHEST_PRIORITY", free_shipping_enabled: false, free_shipping_condition: "VALUE", free_shipping_min: 0 });
+    // ── form view toggle
+    const [view, setView] = useState<"list" | "form">("list");
+    const [editingItem, setEditingItem] = useState<any>(null);
 
-    // Zones
-    const [zones, setZones] = useState<any[]>([]);
-    const [showZoneModal, setShowZoneModal] = useState(false);
-    const [editingZone, setEditingZone] = useState<any>(null);
-    const [zoneForm, setZoneForm] = useState({ zone_name: "", country: "India", states: "", pincode_from: "", pincode_to: "", charge_type: "VARIABLE", flat_charge: 0 });
-
-    // Slabs
-    const [slabs, setSlabs] = useState<any[]>([]);
-    const [showSlabModal, setShowSlabModal] = useState(false);
-    const [editingSlab, setEditingSlab] = useState<any>(null);
-    const [slabForm, setSlabForm] = useState({ range_from: "", range_to: "", base_charge: "", extra_charge_per_unit: "", has_per_unit: false, zone_id: "" });
-
-    // Extras
-    const [extras, setExtras] = useState<any[]>([]);
-    const [showExtraModal, setShowExtraModal] = useState(false);
-    const [editingExtra, setEditingExtra] = useState<any>(null);
-    const [extraForm, setExtraForm] = useState({ charge_type: "COD", charge_name: "", amount: "", is_percentage: false, applies_to: "ALL", min_order_value: "", max_order_value: "" });
-
-    // Test
-    const [testForm, setTestForm] = useState({ state: "", pincode: "", weight: "2.5", qty: "1", value: "750", volume: "0", payment: "prepaid" });
+    // ── test
+    const [testForm, setTestForm] = useState({ state: "", pincode: "", weight: "", qty: "", value: "", volume: "", payment: "prepaid" });
     const [testResult, setTestResult] = useState<any>(null);
     const [testing, setTesting] = useState(false);
+
+    // ── search
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => { if (activeCompany) loadAll(); }, [activeCompany]);
 
@@ -62,79 +47,380 @@ export default function ShippingZones() {
         if (!activeCompany) return;
         setLoading(true);
         const [{ data: t }, { data: z }, { data: s }, { data: e }] = await Promise.all([
-            supabase.from("shipping_tariffs").select("*").eq("company_id", activeCompany.id).order("priority").limit(1).maybeSingle(),
+            supabase.from("shipping_tariffs").select("*").eq("company_id", activeCompany.id).order("priority"),
             supabase.from("shipping_zones_v2").select("*").eq("company_id", activeCompany.id).order("display_order"),
             supabase.from("shipping_slabs").select("*").eq("company_id", activeCompany.id).order("range_from"),
             supabase.from("shipping_extra_charges").select("*").eq("company_id", activeCompany.id).order("charge_type"),
         ]);
-        if (t) {
-            setTariff(t);
-            setTariffForm({ tariff_name: t.tariff_name, shipping_type: t.shipping_type, primary_uom: t.primary_uom, priority: t.priority, is_active: t.is_active, rounding_rule: t.rounding_rule, conflict_resolution: t.conflict_resolution, free_shipping_enabled: t.free_shipping_enabled, free_shipping_condition: t.free_shipping_condition, free_shipping_min: Number(t.free_shipping_min) || 0 });
-        }
+        setTariffs(t || []);
         setZones(z || []);
         setSlabs(s || []);
         setExtras(e || []);
         setLoading(false);
     };
 
-    // ─── Tariff Save ────────────────────────────────────────────────────
-    const saveTariff = async () => {
+    const openNew = () => { setEditingItem(null); setView("form"); };
+    const openEdit = (item: any) => { setEditingItem(item); setView("form"); };
+    const backToList = () => { setView("list"); setEditingItem(null); setSearchTerm(""); };
+
+    // ════════════════════════════════════════════════════════════
+    // TARIFFS
+    // ════════════════════════════════════════════════════════════
+
+    const tariffFields = {
+        basic: [
+            { key: "tariff_name", label: "Tariff Name", type: "text" as const, required: true, ph: "e.g. Standard Shipping" },
+            { key: "shipping_type", label: "Shipping Type", type: "select" as const, required: true, options: [
+                { value: "WEIGHT", label: "Weight-Based (kg)" },
+                { value: "QTY", label: "Quantity-Based (units)" },
+                { value: "VALUE", label: "Value-Based (₹)" },
+                { value: "VOLUME", label: "Volume-Based (cm³)" },
+            ]},
+            { key: "primary_uom", label: "Primary UoM", type: "text" as const, ph: "kg / units / ₹ / cm³" },
+            { key: "priority", label: "Priority", type: "number" as const, ph: "1 = highest" },
+            { key: "is_active", label: "Active", type: "checkbox" as const },
+            { key: "rounding_rule", label: "Rounding Rule", type: "select" as const, options: [
+                { value: "ROUND_UP", label: "Round Up" },
+                { value: "ROUND_DOWN", label: "Round Down" },
+                { value: "ROUND_NEAREST", label: "Round Nearest" },
+            ]},
+        ],
+        config: [
+            { key: "free_shipping_enabled", label: "Enable Free Shipping", type: "checkbox" as const },
+            { key: "free_shipping_condition", label: "Free Shipping Condition", type: "select" as const, options: [
+                { value: "VALUE", label: "Order Value (₹)" },
+                { value: "WEIGHT", label: "Weight (kg)" },
+                { value: "QTY", label: "Quantity" },
+            ]},
+            { key: "free_shipping_min", label: "Minimum for Free Shipping", type: "number" as const, ph: "0" },
+            { key: "conflict_resolution", label: "Conflict Resolution", type: "select" as const, options: [
+                { value: "HIGHEST_PRIORITY", label: "Highest Priority Wins" },
+                { value: "LOWEST_CHARGE", label: "Lowest Charge Wins" },
+                { value: "HIGHEST_CHARGE", label: "Highest Charge Wins" },
+            ]},
+        ],
+    };
+
+    const saveTariff = async (header: any) => {
         if (!activeCompany) return;
-        const payload = { ...tariffForm, company_id: activeCompany.id, updated_at: new Date().toISOString() };
-        if (tariff?.id) {
-            await supabase.from("shipping_tariffs").update(payload).eq("id", tariff.id);
+        const payload = {
+            company_id: activeCompany.id,
+            tariff_name: header.tariff_name || "Standard Shipping",
+            shipping_type: header.shipping_type || "WEIGHT",
+            primary_uom: header.primary_uom || "kg",
+            priority: Number(header.priority) || 1,
+            is_active: header.is_active ?? true,
+            rounding_rule: header.rounding_rule || "ROUND_UP",
+            free_shipping_enabled: header.free_shipping_enabled || false,
+            free_shipping_condition: header.free_shipping_condition || "VALUE",
+            free_shipping_min: Number(header.free_shipping_min) || 0,
+            conflict_resolution: header.conflict_resolution || "HIGHEST_PRIORITY",
+            updated_at: new Date().toISOString(),
+        };
+        if (editingItem?.id) {
+            const { error } = await supabase.from("shipping_tariffs").update(payload).eq("id", editingItem.id);
+            if (error) throw error;
         } else {
-            const { data } = await supabase.from("shipping_tariffs").insert([payload]).select().single();
-            setTariff(data);
+            const { error } = await supabase.from("shipping_tariffs").insert([payload]);
+            if (error) throw error;
         }
-        toast({ title: "Tariff saved" });
+        toast({ title: editingItem ? "Tariff updated" : "Tariff created" });
+        backToList();
         loadAll();
     };
 
-    // ─── Zone CRUD ──────────────────────────────────────────────────────
-    const openAddZone = () => { setEditingZone(null); setZoneForm({ zone_name: "", country: "India", states: "", pincode_from: "", pincode_to: "", charge_type: "VARIABLE", flat_charge: 0 }); setShowZoneModal(true); };
-    const openEditZone = (z: any) => { setEditingZone(z); setZoneForm({ zone_name: z.zone_name, country: z.country, states: (z.states || []).join(", "), pincode_from: z.pincode_from || "", pincode_to: z.pincode_to || "", charge_type: z.charge_type, flat_charge: Number(z.flat_charge) || 0 }); setShowZoneModal(true); };
-    const saveZone = async () => {
-        if (!activeCompany || !tariff?.id || !zoneForm.zone_name) return;
-        const payload = { company_id: activeCompany.id, tariff_id: tariff.id, zone_name: zoneForm.zone_name, country: zoneForm.country, states: zoneForm.states ? zoneForm.states.split(",").map((s: string) => s.trim()).filter(Boolean) : [], pincode_from: zoneForm.pincode_from || null, pincode_to: zoneForm.pincode_to || null, charge_type: zoneForm.charge_type, flat_charge: zoneForm.flat_charge, display_order: zones.length };
-        if (editingZone) { await supabase.from("shipping_zones_v2").update(payload).eq("id", editingZone.id); }
-        else { await supabase.from("shipping_zones_v2").insert([payload]); }
-        toast({ title: editingZone ? "Zone updated" : "Zone added" });
-        setShowZoneModal(false); loadAll();
+    const deleteTariff = async (id: string) => {
+        await supabase.from("shipping_tariffs").delete().eq("id", id);
+        toast({ title: "Tariff deleted" });
+        backToList();
+        loadAll();
     };
-    const deleteZone = async (id: string) => { if (!confirm("Delete zone?")) return; await supabase.from("shipping_zones_v2").delete().eq("id", id); loadAll(); };
 
-    // ─── Slab CRUD ──────────────────────────────────────────────────────
-    const openAddSlab = () => { setEditingSlab(null); setSlabForm({ range_from: "", range_to: "", base_charge: "", extra_charge_per_unit: "", has_per_unit: false, zone_id: "" }); setShowSlabModal(true); };
-    const openEditSlab = (s: any) => { setEditingSlab(s); setSlabForm({ range_from: String(s.range_from), range_to: s.range_to ? String(s.range_to) : "", base_charge: String(s.base_charge), extra_charge_per_unit: String(s.extra_charge_per_unit || ""), has_per_unit: s.has_per_unit, zone_id: s.zone_id || "" }); setShowSlabModal(true); };
-    const saveSlab = async () => {
-        if (!activeCompany || !tariff?.id) return;
-        const payload = { company_id: activeCompany.id, tariff_id: tariff.id, range_from: Number(slabForm.range_from) || 0, range_to: slabForm.range_to ? Number(slabForm.range_to) : null, base_charge: Number(slabForm.base_charge) || 0, extra_charge_per_unit: Number(slabForm.extra_charge_per_unit) || 0, has_per_unit: slabForm.has_per_unit, zone_id: slabForm.zone_id || null, display_order: slabs.length };
-        if (editingSlab) { await supabase.from("shipping_slabs").update(payload).eq("id", editingSlab.id); }
-        else { await supabase.from("shipping_slabs").insert([payload]); }
-        toast({ title: editingSlab ? "Slab updated" : "Slab added" });
-        setShowSlabModal(false); loadAll();
+    const tariffColumns = [
+        { key: "tariff_name", label: "Tariff Name", render: (r: any) => (
+            <div className="flex flex-col">
+                <span className="font-semibold text-slate-900 text-[13px]">{r.tariff_name}</span>
+                <span className="text-[11px] text-slate-400 mt-0.5">Priority: {r.priority}</span>
+            </div>
+        )},
+        { key: "shipping_type", label: "Type", render: (r: any) => (
+            <span className="text-[11px] font-semibold px-2 py-1 rounded bg-blue-50 text-blue-700">{r.shipping_type} ({r.primary_uom})</span>
+        )},
+        { key: "rounding_rule", label: "Rounding", render: (r: any) => (
+            <span className="text-[12px] text-slate-600">{r.rounding_rule?.replace("ROUND_", "")}</span>
+        )},
+        { key: "free_shipping_enabled", label: "Free Shipping", render: (r: any) => (
+            r.free_shipping_enabled
+                ? <span className="text-[11px] font-semibold px-2 py-1 rounded bg-emerald-50 text-emerald-700">Yes — {r.free_shipping_condition} ≥ {r.free_shipping_min}</span>
+                : <span className="text-[11px] text-slate-400">Off</span>
+        )},
+        { key: "is_active", label: "Status", render: (r: any) => (
+            <span className={cn("text-[11px] font-semibold px-2 py-1 rounded", r.is_active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500")}>{r.is_active ? "Active" : "Inactive"}</span>
+        )},
+    ];
+
+    // ════════════════════════════════════════════════════════════
+    // ZONES
+    // ════════════════════════════════════════════════════════════
+
+    const tariffOptions = useMemo(() => tariffs.map(t => ({ value: t.id, label: t.tariff_name })), [tariffs]);
+
+    const zoneFields = {
+        basic: [
+            { key: "tariff_id", label: "Tariff", type: "select" as const, required: true, options: tariffOptions },
+            { key: "zone_name", label: "Zone Name", type: "text" as const, required: true, ph: "e.g. Local, Regional, National, International" },
+            { key: "country", label: "Country", type: "text" as const, ph: "India" },
+            { key: "states", label: "States (comma separated)", type: "text" as const, ph: "Tamil Nadu, Karnataka, Kerala" },
+            { key: "charge_type", label: "Charge Type", type: "select" as const, options: [
+                { value: "VARIABLE", label: "Variable (Slab-based)" },
+                { value: "FLAT", label: "Flat Rate" },
+            ]},
+            { key: "flat_charge", label: "Flat Charge (₹)", type: "number" as const, ph: "0" },
+        ],
+        config: [
+            { key: "pincode_from", label: "Pincode From", type: "text" as const, ph: "600000" },
+            { key: "pincode_to", label: "Pincode To", type: "text" as const, ph: "699999" },
+            { key: "display_order", label: "Display Order", type: "number" as const, ph: "0" },
+        ],
     };
-    const deleteSlab = async (id: string) => { await supabase.from("shipping_slabs").delete().eq("id", id); loadAll(); };
 
-    // ─── Extra CRUD ─────────────────────────────────────────────────────
-    const openAddExtra = () => { setEditingExtra(null); setExtraForm({ charge_type: "COD", charge_name: "", amount: "", is_percentage: false, applies_to: "ALL", min_order_value: "", max_order_value: "" }); setShowExtraModal(true); };
-    const openEditExtra = (e: any) => { setEditingExtra(e); setExtraForm({ charge_type: e.charge_type, charge_name: e.charge_name, amount: String(e.amount), is_percentage: e.is_percentage, applies_to: e.applies_to, min_order_value: String(e.min_order_value || ""), max_order_value: String(e.max_order_value || "") }); setShowExtraModal(true); };
-    const saveExtra = async () => {
+    const saveZone = async (header: any) => {
         if (!activeCompany) return;
-        const payload = { company_id: activeCompany.id, tariff_id: tariff?.id, charge_type: extraForm.charge_type, charge_name: extraForm.charge_name, amount: Number(extraForm.amount) || 0, is_percentage: extraForm.is_percentage, applies_to: extraForm.applies_to, min_order_value: Number(extraForm.min_order_value) || 0, max_order_value: Number(extraForm.max_order_value) || 0, is_active: true };
-        if (editingExtra) { await supabase.from("shipping_extra_charges").update(payload).eq("id", editingExtra.id); }
-        else { await supabase.from("shipping_extra_charges").insert([payload]); }
-        toast({ title: editingExtra ? "Updated" : "Added" });
-        setShowExtraModal(false); loadAll();
+        const statesArr = header.states ? String(header.states).split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+        const payload = {
+            company_id: activeCompany.id,
+            tariff_id: header.tariff_id || null,
+            zone_name: header.zone_name,
+            country: header.country || "India",
+            states: statesArr,
+            pincode_from: header.pincode_from || null,
+            pincode_to: header.pincode_to || null,
+            charge_type: header.charge_type || "VARIABLE",
+            flat_charge: Number(header.flat_charge) || 0,
+            display_order: Number(header.display_order) || 0,
+        };
+        if (editingItem?.id) {
+            const { error } = await supabase.from("shipping_zones_v2").update(payload).eq("id", editingItem.id);
+            if (error) throw error;
+        } else {
+            const { error } = await supabase.from("shipping_zones_v2").insert([payload]);
+            if (error) throw error;
+        }
+        toast({ title: editingItem ? "Zone updated" : "Zone created" });
+        backToList();
+        loadAll();
     };
-    const deleteExtra = async (id: string) => { await supabase.from("shipping_extra_charges").delete().eq("id", id); loadAll(); };
-    const toggleExtra = async (e: any) => { await supabase.from("shipping_extra_charges").update({ is_active: !e.is_active }).eq("id", e.id); loadAll(); };
 
-    // ─── Test Simulation ────────────────────────────────────────────────
+    const deleteZone = async (id: string) => {
+        await supabase.from("shipping_zones_v2").delete().eq("id", id);
+        toast({ title: "Zone deleted" });
+        backToList();
+        loadAll();
+    };
+
+    const zoneColumns = [
+        { key: "zone_name", label: "Zone", render: (r: any) => (
+            <div className="flex flex-col">
+                <span className="font-semibold text-slate-900 text-[13px]">{r.zone_name}</span>
+                <span className="text-[11px] text-slate-400 mt-0.5">{r.country || "India"}</span>
+            </div>
+        )},
+        { key: "tariff_id", label: "Tariff", render: (r: any) => (
+            <span className="text-[12px] text-slate-600">{tariffs.find(t => t.id === r.tariff_id)?.tariff_name || "—"}</span>
+        )},
+        { key: "states", label: "States", render: (r: any) => (
+            <span className="text-[12px] text-slate-500 max-w-[200px] truncate block">{(r.states || []).join(", ") || "All States"}</span>
+        )},
+        { key: "pincode_from", label: "Pincode Range", render: (r: any) => (
+            <span className="text-[12px] font-mono text-slate-500">{r.pincode_from && r.pincode_to ? `${r.pincode_from} – ${r.pincode_to}` : "—"}</span>
+        )},
+        { key: "charge_type", label: "Type", render: (r: any) => (
+            <span className={cn("text-[11px] font-semibold px-2 py-1 rounded", r.charge_type === "FLAT" ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700")}>
+                {r.charge_type}{r.charge_type === "FLAT" ? ` ₹${r.flat_charge}` : ""}
+            </span>
+        )},
+    ];
+
+    // Prepare zone data for editing — convert states array to comma string
+    const prepareZoneForEdit = (z: any) => ({
+        ...z,
+        states: (z.states || []).join(", "),
+    });
+
+    // ════════════════════════════════════════════════════════════
+    // SLABS
+    // ════════════════════════════════════════════════════════════
+
+    const zoneOptions = useMemo(() => [
+        { value: "", label: "All Zones (Global)" },
+        ...zones.map(z => ({ value: z.id, label: z.zone_name }))
+    ], [zones]);
+
+    const slabFields = {
+        basic: [
+            { key: "tariff_id", label: "Tariff", type: "select" as const, required: true, options: tariffOptions },
+            { key: "zone_id", label: "Zone (optional)", type: "select" as const, options: zoneOptions },
+            { key: "range_from", label: "Range From", type: "number" as const, required: true, ph: "0" },
+            { key: "range_to", label: "Range To (empty = unlimited)", type: "number" as const, ph: "∞" },
+            { key: "base_charge", label: "Base Charge (₹)", type: "number" as const, required: true, ph: "50" },
+            { key: "has_per_unit", label: "Enable Per-Unit Extra Charge", type: "checkbox" as const },
+        ],
+        config: [
+            { key: "extra_charge_per_unit", label: "Extra Charge Per Unit (₹)", type: "number" as const, ph: "e.g. 20 per kg beyond threshold" },
+            { key: "display_order", label: "Display Order", type: "number" as const, ph: "0" },
+        ],
+    };
+
+    const saveSlab = async (header: any) => {
+        if (!activeCompany) return;
+        const payload = {
+            company_id: activeCompany.id,
+            tariff_id: header.tariff_id,
+            zone_id: header.zone_id || null,
+            range_from: Number(header.range_from) || 0,
+            range_to: header.range_to ? Number(header.range_to) : null,
+            base_charge: Number(header.base_charge) || 0,
+            extra_charge_per_unit: Number(header.extra_charge_per_unit) || 0,
+            has_per_unit: header.has_per_unit || false,
+            display_order: Number(header.display_order) || 0,
+        };
+        if (editingItem?.id) {
+            const { error } = await supabase.from("shipping_slabs").update(payload).eq("id", editingItem.id);
+            if (error) throw error;
+        } else {
+            const { error } = await supabase.from("shipping_slabs").insert([payload]);
+            if (error) throw error;
+        }
+        toast({ title: editingItem ? "Slab updated" : "Slab created" });
+        backToList();
+        loadAll();
+    };
+
+    const deleteSlab = async (id: string) => {
+        await supabase.from("shipping_slabs").delete().eq("id", id);
+        toast({ title: "Slab deleted" });
+        backToList();
+        loadAll();
+    };
+
+    const getUom = (tariffId: string) => {
+        const t = tariffs.find(x => x.id === tariffId);
+        return t?.primary_uom || "kg";
+    };
+
+    const slabColumns = [
+        { key: "tariff_id", label: "Tariff", render: (r: any) => (
+            <span className="text-[12px] font-medium text-slate-700">{tariffs.find(t => t.id === r.tariff_id)?.tariff_name || "—"}</span>
+        )},
+        { key: "range_from", label: "Range", render: (r: any) => {
+            const uom = getUom(r.tariff_id);
+            return <span className="text-[13px] font-mono font-medium text-slate-900">{r.range_from} – {r.range_to ?? "∞"} {uom}</span>;
+        }},
+        { key: "base_charge", label: "Base Charge", render: (r: any) => (
+            <span className="text-[13px] font-semibold text-slate-900">₹{r.base_charge}</span>
+        )},
+        { key: "extra_charge_per_unit", label: "Extra/Unit", render: (r: any) => (
+            r.has_per_unit
+                ? <span className="text-[12px] font-medium text-blue-700">₹{r.extra_charge_per_unit}/{getUom(r.tariff_id)}</span>
+                : <span className="text-[12px] text-slate-400">—</span>
+        )},
+        { key: "zone_id", label: "Zone", render: (r: any) => (
+            <span className="text-[12px] text-slate-500">{zones.find(z => z.id === r.zone_id)?.zone_name || "All Zones"}</span>
+        )},
+    ];
+
+    // ════════════════════════════════════════════════════════════
+    // EXTRA CHARGES
+    // ════════════════════════════════════════════════════════════
+
+    const extraFields = {
+        basic: [
+            { key: "tariff_id", label: "Tariff (optional)", type: "select" as const, options: [{ value: "", label: "All Tariffs" }, ...tariffOptions] },
+            { key: "charge_type", label: "Charge Type", type: "select" as const, required: true, options: [
+                { value: "COD", label: "COD" },
+                { value: "EXPRESS", label: "Express" },
+                { value: "HANDLING", label: "Handling" },
+                { value: "PACKAGING", label: "Packaging" },
+                { value: "INSURANCE", label: "Insurance" },
+            ]},
+            { key: "charge_name", label: "Charge Name", type: "text" as const, required: true, ph: "e.g. COD Fee, Express Surcharge" },
+            { key: "amount", label: "Amount", type: "number" as const, required: true, ph: "50" },
+            { key: "is_percentage", label: "Amount is Percentage (%)", type: "checkbox" as const },
+            { key: "is_active", label: "Active", type: "checkbox" as const },
+        ],
+        config: [
+            { key: "applies_to", label: "Applies To", type: "select" as const, options: [
+                { value: "ALL", label: "All Orders" },
+                { value: "COD_ONLY", label: "COD Orders Only" },
+                { value: "PREPAID_ONLY", label: "Prepaid Orders Only" },
+            ]},
+            { key: "min_order_value", label: "Min Order Value (₹)", type: "number" as const, ph: "0" },
+            { key: "max_order_value", label: "Max Order Value (₹)", type: "number" as const, ph: "0 = no limit" },
+        ],
+    };
+
+    const saveExtra = async (header: any) => {
+        if (!activeCompany) return;
+        const payload = {
+            company_id: activeCompany.id,
+            tariff_id: header.tariff_id || null,
+            charge_type: header.charge_type || "COD",
+            charge_name: header.charge_name,
+            amount: Number(header.amount) || 0,
+            is_percentage: header.is_percentage || false,
+            is_active: header.is_active ?? true,
+            applies_to: header.applies_to || "ALL",
+            min_order_value: Number(header.min_order_value) || 0,
+            max_order_value: Number(header.max_order_value) || 0,
+        };
+        if (editingItem?.id) {
+            const { error } = await supabase.from("shipping_extra_charges").update(payload).eq("id", editingItem.id);
+            if (error) throw error;
+        } else {
+            const { error } = await supabase.from("shipping_extra_charges").insert([payload]);
+            if (error) throw error;
+        }
+        toast({ title: editingItem ? "Extra charge updated" : "Extra charge created" });
+        backToList();
+        loadAll();
+    };
+
+    const deleteExtra = async (id: string) => {
+        await supabase.from("shipping_extra_charges").delete().eq("id", id);
+        toast({ title: "Charge deleted" });
+        backToList();
+        loadAll();
+    };
+
+    const extraColumns = [
+        { key: "charge_type", label: "Type", render: (r: any) => (
+            <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-1 rounded bg-slate-100 text-slate-600">{r.charge_type}</span>
+        )},
+        { key: "charge_name", label: "Name", render: (r: any) => (
+            <span className="text-[13px] font-medium text-slate-800">{r.charge_name}</span>
+        )},
+        { key: "amount", label: "Amount", render: (r: any) => (
+            <span className="text-[13px] font-semibold text-slate-900">{r.is_percentage ? `${r.amount}%` : `₹${r.amount}`}</span>
+        )},
+        { key: "applies_to", label: "Applies To", render: (r: any) => (
+            <span className="text-[12px] text-slate-500">{r.applies_to === "ALL" ? "All Orders" : r.applies_to === "COD_ONLY" ? "COD Only" : "Prepaid Only"}</span>
+        )},
+        { key: "tariff_id", label: "Tariff", render: (r: any) => (
+            <span className="text-[12px] text-slate-500">{tariffs.find(t => t.id === r.tariff_id)?.tariff_name || "All"}</span>
+        )},
+        { key: "is_active", label: "Status", render: (r: any) => (
+            <span className={cn("text-[11px] font-semibold px-2 py-1 rounded", r.is_active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500")}>{r.is_active ? "Active" : "Inactive"}</span>
+        )},
+    ];
+
+    // ════════════════════════════════════════════════════════════
+    // TEST SIMULATION
+    // ════════════════════════════════════════════════════════════
+
     const runTest = async () => {
         if (!activeCompany) return;
         setTesting(true);
+        setTestResult(null);
         const { data, error } = await supabase.rpc("calc_shipping", {
             p_company_id: activeCompany.id,
             p_state: testForm.state,
@@ -149,256 +435,226 @@ export default function ShippingZones() {
         setTesting(false);
     };
 
-    const uom = SHIPPING_TYPES.find(t => t.value === tariffForm.shipping_type)?.uom || "kg";
+    const inputCls = "w-full h-10 px-3 rounded-lg border border-slate-200 text-[13px] font-medium focus:border-blue-500 outline-none transition-all";
+    const labelCls = "text-[11px] font-semibold uppercase tracking-wider text-slate-500";
 
-    if (loading) return (<div className="flex items-center justify-center h-[400px] gap-3"><RefreshCw className="w-5 h-5 animate-spin text-blue-600 opacity-40" /><span className="text-[13px] text-slate-500">Loading...</span></div>);
+    // ════════════════════════════════════════════════════════════
+    // CONFIG PER SECTION
+    // ════════════════════════════════════════════════════════════
+
+    const sectionConfig: Record<Section, {
+        label: string; icon: any; data: any[]; columns: any[];
+        fields: any; onSave: (h: any, i: any[]) => Promise<void>;
+        onDelete?: (id: string) => Promise<void>;
+        prepareEdit?: (item: any) => any;
+        formTitle: string; formSubtitle: string;
+    } | null> = {
+        tariffs: {
+            label: "Shipping Tariffs", icon: Settings,
+            data: tariffs, columns: tariffColumns, fields: tariffFields,
+            onSave: saveTariff, onDelete: deleteTariff,
+            formTitle: editingItem ? "Edit Tariff" : "New Shipping Tariff",
+            formSubtitle: "Tariff Configuration",
+        },
+        zones: {
+            label: "Shipping Zones", icon: Globe,
+            data: zones, columns: zoneColumns, fields: zoneFields,
+            onSave: saveZone, onDelete: deleteZone,
+            prepareEdit: prepareZoneForEdit,
+            formTitle: editingItem ? "Edit Zone" : "New Shipping Zone",
+            formSubtitle: "Zone Configuration",
+        },
+        slabs: {
+            label: "Shipping Slabs", icon: Scale,
+            data: slabs, columns: slabColumns, fields: slabFields,
+            onSave: saveSlab, onDelete: deleteSlab,
+            formTitle: editingItem ? "Edit Slab" : "New Shipping Slab",
+            formSubtitle: "Range-based Pricing",
+        },
+        extras: {
+            label: "Extra Charges", icon: DollarSign,
+            data: extras, columns: extraColumns, fields: extraFields,
+            onSave: saveExtra, onDelete: deleteExtra,
+            formTitle: editingItem ? "Edit Extra Charge" : "New Extra Charge",
+            formSubtitle: "Additional Shipping Charges",
+        },
+        test: null,
+    };
+
+    const cfg = sectionConfig[section];
+
+    // ════════════════════════════════════════════════════════════
+    // RENDER — FORM VIEW
+    // ════════════════════════════════════════════════════════════
+
+    if (view === "form" && cfg) {
+        const editData = editingItem ? (cfg.prepareEdit ? cfg.prepareEdit(editingItem) : editingItem) : undefined;
+        return (
+            <ERPEntryForm
+                title={cfg.formTitle}
+                subtitle={cfg.formSubtitle}
+                tabFields={cfg.fields}
+                onSave={(header) => cfg.onSave(header, [])}
+                onAbort={backToList}
+                onDelete={editingItem?.id && cfg.onDelete ? () => cfg.onDelete!(editingItem.id) : undefined}
+                initialData={editData}
+                showItems={false}
+            />
+        );
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // RENDER — LIST VIEW + TEST
+    // ════════════════════════════════════════════════════════════
+
+    const filteredData = cfg ? cfg.data.filter((item: any) => {
+        if (!searchTerm) return true;
+        const s = searchTerm.toLowerCase();
+        return JSON.stringify(item).toLowerCase().includes(s);
+    }) : [];
+
+    const sections: { key: Section; label: string; icon: any; count: number }[] = [
+        { key: "tariffs", label: "Tariffs", icon: Settings, count: tariffs.length },
+        { key: "zones", label: "Zones", icon: Globe, count: zones.length },
+        { key: "slabs", label: "Slabs", icon: Scale, count: slabs.length },
+        { key: "extras", label: "Extras", icon: DollarSign, count: extras.length },
+        { key: "test", label: "Test", icon: FlaskConical, count: 0 },
+    ];
 
     return (
-        <div className="p-6 lg:p-8 space-y-6 pb-20 animate-in fade-in duration-300">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Logistics Engine</p>
-                    <h1 className="text-xl font-semibold tracking-tight text-slate-900">Shipping Configuration</h1>
-                </div>
-                <Button variant="outline" className="h-9 px-4 rounded-lg text-[13px] font-medium gap-2" onClick={loadAll}><RefreshCw className="w-3.5 h-3.5" /> Refresh</Button>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex bg-slate-100 p-1 rounded-lg w-fit flex-wrap gap-0.5">
-                {([
-                    { key: "tariff", label: "Tariff Config", icon: Settings },
-                    { key: "zones", label: "Zones", icon: Globe },
-                    { key: "slabs", label: "Slabs", icon: Scale },
-                    { key: "extras", label: "Extra Charges", icon: DollarSign },
-                    { key: "test", label: "Test Simulation", icon: FlaskConical },
-                ] as const).map(t => (
-                    <button key={t.key} onClick={() => setTab(t.key)} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-md text-[12px] font-medium transition-all", tab === t.key ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}>
-                        <t.icon className="w-3.5 h-3.5" /> {t.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* ═══ TARIFF CONFIG ═══ */}
-            {tab === "tariff" && (
-                <div className="max-w-2xl space-y-6">
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
-                        <h3 className="text-[13px] font-semibold text-slate-900">Basic Info</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="col-span-2 space-y-1.5"><label className={labelCls}>Tariff Name</label><input value={tariffForm.tariff_name} onChange={e => setTariffForm(f => ({ ...f, tariff_name: e.target.value }))} className={inputCls} /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Shipping Type</label><select value={tariffForm.shipping_type} onChange={e => { const t = SHIPPING_TYPES.find(s => s.value === e.target.value); setTariffForm(f => ({ ...f, shipping_type: e.target.value, primary_uom: t?.uom || "kg" })); }} className={inputCls}>{SHIPPING_TYPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Primary UoM</label><input value={tariffForm.primary_uom} onChange={e => setTariffForm(f => ({ ...f, primary_uom: e.target.value }))} className={inputCls} /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Priority</label><input type="number" value={tariffForm.priority} onChange={e => setTariffForm(f => ({ ...f, priority: Number(e.target.value) }))} className={inputCls} min={1} /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Rounding</label><select value={tariffForm.rounding_rule} onChange={e => setTariffForm(f => ({ ...f, rounding_rule: e.target.value }))} className={inputCls}>{ROUNDING_RULES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select></div>
-                            <div className="col-span-2 flex items-center gap-3"><input type="checkbox" checked={tariffForm.is_active} onChange={e => setTariffForm(f => ({ ...f, is_active: e.target.checked }))} className="w-4 h-4 rounded border-slate-300 text-blue-600" /><span className="text-[13px] font-medium text-slate-700">Active</span></div>
-                        </div>
+        <div className="space-y-0 animate-in fade-in duration-300">
+            {/* Section Tabs */}
+            <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                    <Truck className="w-5 h-5 text-blue-600" />
+                    <div>
+                        <h1 className="text-lg font-semibold tracking-tight text-slate-900">Shipping & Delivery</h1>
+                        <p className="text-[11px] text-slate-400 font-medium">Configure tariffs, zones, slabs and charges for your company</p>
                     </div>
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
-                        <h3 className="text-[13px] font-semibold text-slate-900">Free Shipping Rules</h3>
-                        <div className="flex items-center gap-3 mb-2"><input type="checkbox" checked={tariffForm.free_shipping_enabled} onChange={e => setTariffForm(f => ({ ...f, free_shipping_enabled: e.target.checked }))} className="w-4 h-4 rounded border-slate-300 text-blue-600" /><span className="text-[13px] font-medium text-slate-700">Enable Free Shipping</span></div>
-                        {tariffForm.free_shipping_enabled && (
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                    {sections.map(s => (
+                        <button
+                            key={s.key}
+                            onClick={() => { setSection(s.key); setView("list"); setSearchTerm(""); }}
+                            className={cn(
+                                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold tracking-wide transition-all",
+                                section === s.key
+                                    ? "bg-slate-900 text-white shadow-sm"
+                                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                            )}
+                        >
+                            <s.icon className="w-3.5 h-3.5" />
+                            {s.label}
+                            {s.count > 0 && (
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded text-[9px] font-mono",
+                                    section === s.key ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                                )}>
+                                    {s.count}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Test Simulation Panel */}
+            {section === "test" && (
+                <div className="p-6 space-y-6">
+                    <div className="max-w-2xl space-y-6">
+                        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
+                            <h3 className="text-[13px] font-semibold text-slate-900 flex items-center gap-2">
+                                <FlaskConical className="w-4 h-4 text-blue-600" /> Test Shipping Calculation
+                            </h3>
+                            <p className="text-[11px] text-slate-400">Enter test values to simulate the shipping charge calculation pipeline for your company.</p>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1.5"><label className={labelCls}>Condition</label><select value={tariffForm.free_shipping_condition} onChange={e => setTariffForm(f => ({ ...f, free_shipping_condition: e.target.value }))} className={inputCls}>{FREE_CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Minimum Value</label><input type="number" value={tariffForm.free_shipping_min} onChange={e => setTariffForm(f => ({ ...f, free_shipping_min: Number(e.target.value) }))} className={inputCls} min={0} /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>State</label><input value={testForm.state} onChange={e => setTestForm(f => ({ ...f, state: e.target.value }))} className={inputCls} placeholder="e.g. Tamil Nadu" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Pincode</label><input value={testForm.pincode} onChange={e => setTestForm(f => ({ ...f, pincode: e.target.value }))} className={inputCls} placeholder="e.g. 641001" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Weight (kg)</label><input type="number" value={testForm.weight} onChange={e => setTestForm(f => ({ ...f, weight: e.target.value }))} className={inputCls} step="0.1" placeholder="2.5" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Quantity</label><input type="number" value={testForm.qty} onChange={e => setTestForm(f => ({ ...f, qty: e.target.value }))} className={inputCls} placeholder="1" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Order Value (₹)</label><input type="number" value={testForm.value} onChange={e => setTestForm(f => ({ ...f, value: e.target.value }))} className={inputCls} placeholder="750" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Volume (cm³)</label><input type="number" value={testForm.volume} onChange={e => setTestForm(f => ({ ...f, volume: e.target.value }))} className={inputCls} placeholder="0" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Payment Method</label>
+                                    <select value={testForm.payment} onChange={e => setTestForm(f => ({ ...f, payment: e.target.value }))} className={inputCls}>
+                                        <option value="prepaid">Prepaid</option>
+                                        <option value="cod">Cash on Delivery</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <Button
+                                className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-medium gap-2"
+                                onClick={runTest}
+                                disabled={testing}
+                            >
+                                {testing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                                Calculate
+                            </Button>
+                        </div>
+
+                        {testResult && !testResult.error && (
+                            <div className="bg-white rounded-xl border border-blue-200 p-6 space-y-3">
+                                <h3 className="text-[13px] font-semibold text-blue-700 flex items-center gap-2"><Package className="w-4 h-4" /> Result</h3>
+                                <div className="space-y-0 text-[13px]">
+                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Tariff</span><span className="font-medium text-slate-900">{testResult.tariff || "—"}</span></div>
+                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Zone Matched</span><span className="font-medium text-slate-900">{testResult.zone}</span></div>
+                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Method</span><span className="font-medium text-slate-900">{testResult.method}</span></div>
+                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Base Charge</span><span className="font-medium text-slate-900">₹{testResult.breakdown?.base || 0}</span></div>
+                                    {testResult.breakdown?.calc_value != null && (
+                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Calc Value ({testResult.breakdown?.shipping_type})</span><span className="font-medium text-slate-900">{testResult.breakdown.calc_value}</span></div>
+                                    )}
+                                    {testResult.breakdown?.slab_from != null && (
+                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Slab Range</span><span className="font-medium text-slate-900">{testResult.breakdown.slab_from} – {testResult.breakdown.slab_to ?? "∞"}</span></div>
+                                    )}
+                                    {(testResult.breakdown?.extra_items || []).map((ex: any, i: number) => (
+                                        <div key={i} className="flex justify-between py-2 border-b border-slate-50">
+                                            <span className="text-slate-500">{ex.name} <span className="text-[10px] text-slate-400">({ex.type})</span></span>
+                                            <span className="font-medium text-slate-900">₹{ex.amount}</span>
+                                        </div>
+                                    ))}
+                                    {testResult.free_shipping && (
+                                        <div className="flex justify-between py-2 bg-emerald-50 px-3 rounded-lg border border-emerald-100 mt-2">
+                                            <span className="text-emerald-700 font-semibold">FREE SHIPPING</span>
+                                            <span className="font-bold text-emerald-700">₹0</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between py-3 bg-slate-900 text-white px-4 rounded-lg mt-3">
+                                        <span className="font-semibold">Total Shipping Charge</span>
+                                        <span className="text-xl font-bold">₹{testResult.shipping_charge}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {testResult?.error && (
+                            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-[13px] text-rose-700">{testResult.error}</div>
+                        )}
+
+                        {!testResult && !testing && (
+                            <div className="text-center py-8">
+                                <FlaskConical className="w-8 h-8 mx-auto mb-3 text-slate-200" />
+                                <p className="text-[13px] text-slate-400">Enter values and click Calculate to test your shipping configuration</p>
                             </div>
                         )}
                     </div>
-                    <Button className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-medium gap-2" onClick={saveTariff}><Save className="w-3.5 h-3.5" /> Save Tariff</Button>
                 </div>
             )}
 
-            {/* ═══ ZONES ═══ */}
-            {tab === "zones" && (
-                <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                        <div><p className="text-[13px] font-semibold text-slate-700">Zone Configuration</p><p className="text-[11px] text-slate-400">Define delivery regions by state or pincode range</p></div>
-                        <Button className="h-9 px-4 rounded-lg bg-blue-600 text-white text-[13px] font-medium gap-2" onClick={openAddZone} disabled={!tariff}><Plus className="w-3.5 h-3.5" /> Add Zone</Button>
-                    </div>
-                    {!tariff && <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-[13px] text-amber-700">Save a tariff config first before adding zones.</div>}
-                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                        <table className="w-full">
-                            <thead><tr className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-100"><th className="px-5 py-3 text-left">Zone</th><th className="px-5 py-3 text-left">Country</th><th className="px-5 py-3 text-left">States</th><th className="px-5 py-3 text-left">Pincode Range</th><th className="px-5 py-3 text-left">Type</th><th className="px-5 py-3 text-right w-24">Actions</th></tr></thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {zones.map(z => (
-                                    <tr key={z.id} className="hover:bg-slate-50/50">
-                                        <td className="px-5 py-3 text-[13px] font-semibold text-slate-900">{z.zone_name}</td>
-                                        <td className="px-5 py-3 text-[13px] text-slate-600">{z.country}</td>
-                                        <td className="px-5 py-3 text-[12px] text-slate-500 max-w-[200px] truncate">{(z.states || []).join(", ") || "All"}</td>
-                                        <td className="px-5 py-3 text-[12px] font-mono text-slate-500">{z.pincode_from && z.pincode_to ? `${z.pincode_from}–${z.pincode_to}` : "—"}</td>
-                                        <td className="px-5 py-3"><span className={cn("text-[11px] font-semibold px-2 py-1 rounded", z.charge_type === "FLAT" ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700")}>{z.charge_type}{z.charge_type === "FLAT" ? ` ₹${z.flat_charge}` : ""}</span></td>
-                                        <td className="px-5 py-3 text-right"><div className="flex items-center gap-1 justify-end"><button onClick={() => openEditZone(z)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50"><Pencil className="w-3.5 h-3.5" /></button><button onClick={() => deleteZone(z.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50"><Trash2 className="w-3.5 h-3.5" /></button></div></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {zones.length === 0 && <div className="text-center py-16"><Globe className="w-8 h-8 mx-auto mb-3 text-slate-200" /><p className="text-[13px] text-slate-400">No zones. Add zones like Local, Regional, National.</p></div>}
-                    </div>
-                </div>
-            )}
-
-            {/* ═══ SLABS ═══ */}
-            {tab === "slabs" && (
-                <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                        <div><p className="text-[13px] font-semibold text-slate-700">Slab Configuration</p><p className="text-[11px] text-slate-400">Range-based pricing — {tariffForm.shipping_type.toLowerCase()} in {uom}</p></div>
-                        <Button className="h-9 px-4 rounded-lg bg-blue-600 text-white text-[13px] font-medium gap-2" onClick={openAddSlab} disabled={!tariff}><Plus className="w-3.5 h-3.5" /> Add Slab</Button>
-                    </div>
-                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                        <table className="w-full">
-                            <thead><tr className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-100"><th className="px-5 py-3 text-left">From</th><th className="px-5 py-3 text-left">To</th><th className="px-5 py-3 text-right">Base Charge</th><th className="px-5 py-3 text-right">Extra/Unit</th><th className="px-5 py-3 text-left">Per Unit</th><th className="px-5 py-3 text-left">Zone</th><th className="px-5 py-3 text-right w-24">Actions</th></tr></thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {slabs.map(s => (
-                                    <tr key={s.id} className="hover:bg-slate-50/50">
-                                        <td className="px-5 py-3 text-[13px] font-medium text-slate-900">{s.range_from} {uom}</td>
-                                        <td className="px-5 py-3 text-[13px] font-medium text-slate-900">{s.range_to ? `${s.range_to} ${uom}` : "∞"}</td>
-                                        <td className="px-5 py-3 text-right text-[13px] font-semibold text-slate-900">₹{s.base_charge}</td>
-                                        <td className="px-5 py-3 text-right text-[13px] text-slate-600">{s.has_per_unit ? `₹${s.extra_charge_per_unit}/${uom}` : "—"}</td>
-                                        <td className="px-5 py-3">{s.has_per_unit ? <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700">Yes</span> : <span className="text-[11px] text-slate-400">No</span>}</td>
-                                        <td className="px-5 py-3 text-[12px] text-slate-500">{zones.find(z => z.id === s.zone_id)?.zone_name || "All Zones"}</td>
-                                        <td className="px-5 py-3 text-right"><div className="flex items-center gap-1 justify-end"><button onClick={() => openEditSlab(s)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50"><Pencil className="w-3.5 h-3.5" /></button><button onClick={() => deleteSlab(s.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50"><Trash2 className="w-3.5 h-3.5" /></button></div></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {slabs.length === 0 && <div className="text-center py-16"><Scale className="w-8 h-8 mx-auto mb-3 text-slate-200" /><p className="text-[13px] text-slate-400">No slabs configured yet</p></div>}
-                    </div>
-                </div>
-            )}
-
-            {/* ═══ EXTRA CHARGES ═══ */}
-            {tab === "extras" && (
-                <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                        <div><p className="text-[13px] font-semibold text-slate-700">Additional Charges</p><p className="text-[11px] text-slate-400">COD fees, express delivery, handling, packaging</p></div>
-                        <Button className="h-9 px-4 rounded-lg bg-blue-600 text-white text-[13px] font-medium gap-2" onClick={openAddExtra}><Plus className="w-3.5 h-3.5" /> Add Charge</Button>
-                    </div>
-                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                        <table className="w-full">
-                            <thead><tr className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-100"><th className="px-5 py-3 text-left">Type</th><th className="px-5 py-3 text-left">Name</th><th className="px-5 py-3 text-right">Amount</th><th className="px-5 py-3 text-left">Applies To</th><th className="px-5 py-3 text-center">Active</th><th className="px-5 py-3 text-right w-24">Actions</th></tr></thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {extras.map(e => (
-                                    <tr key={e.id} className={cn("hover:bg-slate-50/50", !e.is_active && "opacity-50")}>
-                                        <td className="px-5 py-3"><span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-1 rounded bg-slate-100 text-slate-600">{e.charge_type}</span></td>
-                                        <td className="px-5 py-3 text-[13px] font-medium text-slate-800">{e.charge_name}</td>
-                                        <td className="px-5 py-3 text-right text-[13px] font-semibold text-slate-900">{e.is_percentage ? `${e.amount}%` : `₹${e.amount}`}</td>
-                                        <td className="px-5 py-3 text-[12px] text-slate-500">{APPLIES_OPTS.find(a => a.value === e.applies_to)?.label}</td>
-                                        <td className="px-5 py-3 text-center"><button onClick={() => toggleExtra(e)} className={cn("w-10 h-5 rounded-full transition-all relative", e.is_active ? "bg-blue-600" : "bg-slate-200")}><div className={cn("w-4 h-4 rounded-full bg-white absolute top-0.5 shadow transition-all", e.is_active ? "left-5" : "left-0.5")} /></button></td>
-                                        <td className="px-5 py-3 text-right"><div className="flex items-center gap-1 justify-end"><button onClick={() => openEditExtra(e)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50"><Pencil className="w-3.5 h-3.5" /></button><button onClick={() => deleteExtra(e.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50"><Trash2 className="w-3.5 h-3.5" /></button></div></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {extras.length === 0 && <div className="text-center py-16"><DollarSign className="w-8 h-8 mx-auto mb-3 text-slate-200" /><p className="text-[13px] text-slate-400">No extra charges configured</p></div>}
-                    </div>
-                </div>
-            )}
-
-            {/* ═══ TEST SIMULATION ═══ */}
-            {tab === "test" && (
-                <div className="max-w-2xl space-y-6">
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
-                        <h3 className="text-[13px] font-semibold text-slate-900 flex items-center gap-2"><FlaskConical className="w-4 h-4 text-blue-600" /> Test Shipping Calculation</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5"><label className={labelCls}>State</label><input value={testForm.state} onChange={e => setTestForm(f => ({ ...f, state: e.target.value }))} className={inputCls} placeholder="e.g. Tamil Nadu" /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Pincode</label><input value={testForm.pincode} onChange={e => setTestForm(f => ({ ...f, pincode: e.target.value }))} className={inputCls} placeholder="e.g. 641001" /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Weight (kg)</label><input type="number" value={testForm.weight} onChange={e => setTestForm(f => ({ ...f, weight: e.target.value }))} className={inputCls} step="0.1" /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Quantity</label><input type="number" value={testForm.qty} onChange={e => setTestForm(f => ({ ...f, qty: e.target.value }))} className={inputCls} /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Order Value (₹)</label><input type="number" value={testForm.value} onChange={e => setTestForm(f => ({ ...f, value: e.target.value }))} className={inputCls} /></div>
-                            <div className="space-y-1.5"><label className={labelCls}>Payment</label><select value={testForm.payment} onChange={e => setTestForm(f => ({ ...f, payment: e.target.value }))} className={inputCls}><option value="prepaid">Prepaid</option><option value="cod">COD</option></select></div>
-                        </div>
-                        <Button className="h-10 px-6 rounded-lg bg-blue-600 text-white text-[13px] font-medium gap-2" onClick={runTest} disabled={testing}>
-                            {testing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />} Calculate
-                        </Button>
-                    </div>
-
-                    {testResult && !testResult.error && (
-                        <div className="bg-white rounded-xl border border-blue-200 p-6 space-y-4">
-                            <h3 className="text-[13px] font-semibold text-blue-700 flex items-center gap-2"><Package className="w-4 h-4" /> Result</h3>
-                            <div className="space-y-2 text-[13px]">
-                                <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Tariff</span><span className="font-medium text-slate-900">{testResult.tariff}</span></div>
-                                <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Zone</span><span className="font-medium text-slate-900">{testResult.zone}</span></div>
-                                <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Method</span><span className="font-medium text-slate-900">{testResult.method}</span></div>
-                                <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Base Charge</span><span className="font-medium text-slate-900">₹{testResult.breakdown?.base || 0}</span></div>
-                                {(testResult.breakdown?.extra_items || []).map((ex: any, i: number) => (
-                                    <div key={i} className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">{ex.name}</span><span className="font-medium text-slate-900">₹{ex.amount}</span></div>
-                                ))}
-                                {testResult.free_shipping && <div className="flex justify-between py-2 border-b border-emerald-100 bg-emerald-50 px-3 rounded-lg"><span className="text-emerald-700 font-semibold">FREE SHIPPING</span><span className="font-bold text-emerald-700">₹0</span></div>}
-                                <div className="flex justify-between py-3 bg-slate-900 text-white px-4 rounded-lg mt-2"><span className="font-semibold">Final Shipping</span><span className="text-xl font-bold">₹{testResult.shipping_charge}</span></div>
-                            </div>
-                        </div>
-                    )}
-                    {testResult?.error && (
-                        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-[13px] text-rose-700">{testResult.error}</div>
-                    )}
-                </div>
-            )}
-
-            {/* ═══ Zone Modal ═══ */}
-            {showZoneModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowZoneModal(false)}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between"><h3 className="text-base font-semibold">{editingZone ? "Edit" : "Add"} Zone</h3><button onClick={() => setShowZoneModal(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100"><X className="w-4 h-4" /></button></div>
-                        <div className="space-y-3">
-                            <div className="space-y-1.5"><label className={labelCls}>Zone Name</label><input value={zoneForm.zone_name} onChange={e => setZoneForm(f => ({ ...f, zone_name: e.target.value }))} className={inputCls} placeholder="e.g. Local, Regional, National" /></div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>Country</label><input value={zoneForm.country} onChange={e => setZoneForm(f => ({ ...f, country: e.target.value }))} className={inputCls} /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Charge Type</label><select value={zoneForm.charge_type} onChange={e => setZoneForm(f => ({ ...f, charge_type: e.target.value }))} className={inputCls}><option value="VARIABLE">Variable (Slab)</option><option value="FLAT">Flat Rate</option></select></div>
-                            </div>
-                            <div className="space-y-1.5"><label className={labelCls}>States (comma separated)</label><input value={zoneForm.states} onChange={e => setZoneForm(f => ({ ...f, states: e.target.value }))} className={inputCls} placeholder="Tamil Nadu, Karnataka, Kerala" /></div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>Pincode From</label><input value={zoneForm.pincode_from} onChange={e => setZoneForm(f => ({ ...f, pincode_from: e.target.value }))} className={inputCls} placeholder="600000" /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Pincode To</label><input value={zoneForm.pincode_to} onChange={e => setZoneForm(f => ({ ...f, pincode_to: e.target.value }))} className={inputCls} placeholder="699999" /></div>
-                            </div>
-                            {zoneForm.charge_type === "FLAT" && <div className="space-y-1.5"><label className={labelCls}>Flat Charge (₹)</label><input type="number" value={zoneForm.flat_charge} onChange={e => setZoneForm(f => ({ ...f, flat_charge: Number(e.target.value) }))} className={inputCls} /></div>}
-                        </div>
-                        <div className="flex gap-3"><Button variant="outline" className="flex-1 h-10 rounded-lg text-[13px] font-medium" onClick={() => setShowZoneModal(false)}>Cancel</Button><Button className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-[13px] font-medium" onClick={saveZone}>{editingZone ? "Update" : "Add"}</Button></div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══ Slab Modal ═══ */}
-            {showSlabModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowSlabModal(false)}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between"><h3 className="text-base font-semibold">{editingSlab ? "Edit" : "Add"} Slab</h3><button onClick={() => setShowSlabModal(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100"><X className="w-4 h-4" /></button></div>
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>From ({uom})</label><input type="number" value={slabForm.range_from} onChange={e => setSlabForm(f => ({ ...f, range_from: e.target.value }))} className={inputCls} placeholder="0" min={0} /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>To ({uom}) — empty = ∞</label><input type="number" value={slabForm.range_to} onChange={e => setSlabForm(f => ({ ...f, range_to: e.target.value }))} className={inputCls} placeholder="∞" /></div>
-                            </div>
-                            <div className="space-y-1.5"><label className={labelCls}>Base Charge (₹)</label><input type="number" value={slabForm.base_charge} onChange={e => setSlabForm(f => ({ ...f, base_charge: e.target.value }))} className={inputCls} placeholder="50" min={0} /></div>
-                            <div className="flex items-center gap-3"><input type="checkbox" checked={slabForm.has_per_unit} onChange={e => setSlabForm(f => ({ ...f, has_per_unit: e.target.checked }))} className="w-4 h-4 rounded border-slate-300 text-blue-600" /><span className="text-[13px] font-medium text-slate-700">Enable per-unit extra charge (e.g. ₹20/kg beyond threshold)</span></div>
-                            {slabForm.has_per_unit && <div className="space-y-1.5"><label className={labelCls}>Extra Charge Per {uom}</label><input type="number" value={slabForm.extra_charge_per_unit} onChange={e => setSlabForm(f => ({ ...f, extra_charge_per_unit: e.target.value }))} className={inputCls} placeholder="20" min={0} step="0.01" /></div>}
-                            <div className="space-y-1.5"><label className={labelCls}>Zone (optional — empty = all zones)</label><select value={slabForm.zone_id} onChange={e => setSlabForm(f => ({ ...f, zone_id: e.target.value }))} className={inputCls}><option value="">All Zones</option>{zones.map(z => <option key={z.id} value={z.id}>{z.zone_name}</option>)}</select></div>
-                        </div>
-                        <div className="flex gap-3"><Button variant="outline" className="flex-1 h-10 rounded-lg text-[13px] font-medium" onClick={() => setShowSlabModal(false)}>Cancel</Button><Button className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-[13px] font-medium" onClick={saveSlab}>{editingSlab ? "Update" : "Add"}</Button></div>
-                    </div>
-                </div>
-            )}
-
-            {/* ═══ Extra Modal ═══ */}
-            {showExtraModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowExtraModal(false)}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between"><h3 className="text-base font-semibold">{editingExtra ? "Edit" : "Add"} Extra Charge</h3><button onClick={() => setShowExtraModal(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100"><X className="w-4 h-4" /></button></div>
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>Type</label><select value={extraForm.charge_type} onChange={e => setExtraForm(f => ({ ...f, charge_type: e.target.value }))} className={inputCls}>{CHARGE_TYPES_LIST.map(c => <option key={c}>{c}</option>)}</select></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Name</label><input value={extraForm.charge_name} onChange={e => setExtraForm(f => ({ ...f, charge_name: e.target.value }))} className={inputCls} placeholder="COD Fee" /></div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>Amount</label><input type="number" value={extraForm.amount} onChange={e => setExtraForm(f => ({ ...f, amount: e.target.value }))} className={inputCls} min={0} /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Amount Type</label><select value={extraForm.is_percentage ? "pct" : "flat"} onChange={e => setExtraForm(f => ({ ...f, is_percentage: e.target.value === "pct" }))} className={inputCls}><option value="flat">Flat (₹)</option><option value="pct">Percentage (%)</option></select></div>
-                            </div>
-                            <div className="space-y-1.5"><label className={labelCls}>Applies To</label><select value={extraForm.applies_to} onChange={e => setExtraForm(f => ({ ...f, applies_to: e.target.value }))} className={inputCls}>{APPLIES_OPTS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}</select></div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1.5"><label className={labelCls}>Min Order (₹)</label><input type="number" value={extraForm.min_order_value} onChange={e => setExtraForm(f => ({ ...f, min_order_value: e.target.value }))} className={inputCls} placeholder="0" /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Max Order (₹)</label><input type="number" value={extraForm.max_order_value} onChange={e => setExtraForm(f => ({ ...f, max_order_value: e.target.value }))} className={inputCls} placeholder="0 = no limit" /></div>
-                            </div>
-                        </div>
-                        <div className="flex gap-3"><Button variant="outline" className="flex-1 h-10 rounded-lg text-[13px] font-medium" onClick={() => setShowExtraModal(false)}>Cancel</Button><Button className="flex-1 h-10 rounded-lg bg-blue-600 text-white text-[13px] font-medium" onClick={saveExtra}>{editingExtra ? "Update" : "Add"}</Button></div>
-                    </div>
-                </div>
+            {/* Entity List Views */}
+            {section !== "test" && cfg && (
+                <ERPListView
+                    title={cfg.label}
+                    data={filteredData}
+                    columns={cfg.columns}
+                    onNew={openNew}
+                    onRefresh={loadAll}
+                    isLoading={loading}
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    primaryKey="id"
+                    onRowClick={openEdit}
+                    onDeleteItem={(id) => cfg.onDelete?.(id)}
+                />
             )}
         </div>
     );
