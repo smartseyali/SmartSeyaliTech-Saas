@@ -3,11 +3,14 @@ import type { DocTypeDef } from "../types";
 export const ecomCustomer: DocTypeDef = {
   name: "Customer",
   tableName: "ecom_customers",
+  itemTableName: "ecom_customer_addresses",
+  itemForeignKey: "customer_id",
   module: "ecommerce",
   icon: "Users",
   listTitle: "Ecommerce Customers",
   formTitle: "Customer",
-  showItems: false,
+  showItems: true,
+  itemTitle: "Delivery Addresses",
 
   defaults: {
     status: "active",
@@ -28,13 +31,13 @@ export const ecomCustomer: DocTypeDef = {
       {
         key: "email_verified", label: "Email Verified", type: "select",
         options: [
-          { value: true, label: "Yes" },
-          { value: false, label: "No" },
+          { value: "true", label: "Yes" },
+          { value: "false", label: "No" },
         ],
       },
     ],
     config: [
-      { key: "address", label: "Address", type: "textarea", placeholder: "Street address" },
+      { key: "address", label: "Primary Address", type: "textarea", placeholder: "Street address" },
       { key: "city", label: "City", type: "text", placeholder: "City" },
       { key: "state", label: "State", type: "text", placeholder: "State" },
       { key: "pincode", label: "Pincode", type: "text", placeholder: "600001" },
@@ -45,6 +48,22 @@ export const ecomCustomer: DocTypeDef = {
       { key: "created_at", label: "Registered On", type: "date" },
     ],
   },
+
+  itemFields: [
+    { key: "label", label: "Label", type: "text", placeholder: "e.g. Home, Office, Warehouse" },
+    { key: "full_name", label: "Recipient Name", type: "text", placeholder: "Full name" },
+    { key: "phone", label: "Phone", type: "text", placeholder: "+91 98765 43210" },
+    { key: "address_line1", label: "Address Line 1", type: "text", placeholder: "Building, street" },
+    { key: "address_line2", label: "Address Line 2", type: "text", placeholder: "Area, landmark" },
+    { key: "city", label: "City", type: "text", placeholder: "City" },
+    { key: "state", label: "State", type: "text", placeholder: "State" },
+    { key: "pincode", label: "Pincode", type: "text", placeholder: "600001" },
+    { key: "country", label: "Country", type: "text", placeholder: "India" },
+    { key: "is_default", label: "Default?", type: "select", options: [
+      { value: "true", label: "Yes" },
+      { value: "false", label: "No" },
+    ]},
+  ],
 
   columns: [
     { key: "full_name", label: "Customer Name" },
