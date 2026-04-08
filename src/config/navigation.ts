@@ -49,16 +49,10 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
       icon: ShoppingBag,
       items: [
         { title: "E-comm Orders", url: "/apps/ecommerce/orders", icon: EcomCart, resource: "orders" },
+        { title: "Customers", url: "/apps/ecommerce/customers", icon: Users, resource: "orders" },
         { title: "Delivery Challans", url: "/apps/ecommerce/deliveries", icon: Truck, resource: "orders" },
         { title: "Sales Returns", url: "/apps/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
         { title: "Abandoned Carts", url: "/apps/ecommerce/abandoned-carts", icon: ShoppingBag, resource: "orders" },
-      ],
-    },
-    {
-      label: "Customers",
-      icon: Users,
-      items: [
-        { title: "All Customers", url: "/apps/ecommerce/customers", icon: Users, resource: "orders" },
       ],
     },
     {
