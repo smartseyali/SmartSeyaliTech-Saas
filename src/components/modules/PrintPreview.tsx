@@ -9,7 +9,7 @@
  * - {{company_name}}, {{company_email}} etc. for company context
  * - {{today}}, {{now}} for dates
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { Printer, Download, X, ChevronDown } from "lucide-react";
@@ -64,7 +64,6 @@ function renderTemplate(template: string, data: any, items: any[], company: any)
     return items
       .map((item, idx) => {
         let row = loopBody;
-        // Replace {{item.field}} and {{item.index}}
         row = row.replace(/\{\{item\.index\}\}/g, String(idx + 1));
         row = row.replace(/\{\{item\.(\w+)\}\}/g, (_: string, field: string) => {
           const val = item[field];
@@ -140,7 +139,7 @@ function generateDefaultTemplate(record: any, items: any[]): string {
 
 export default function PrintPreview({ doctype, record, items = [], onClose }: PrintPreviewProps) {
   const { activeCompany } = useTenant();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
   const [formats, setFormats] = useState<PrintFormat[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<PrintFormat | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -170,14 +169,23 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
     fetchFormats();
   }, [activeCompany?.id, doctype]);
 
-  // Render the template into the iframe
-  useEffect(() => {
-    if (!iframeRef.current) return;
+  // Build the rendered HTML
+  const renderedHtml = useMemo(() => {
     const template = selectedFormat?.html_template || generateDefaultTemplate(record, items);
     const rendered = renderTemplate(template, record, items, activeCompany);
     const customCss = selectedFormat?.css || "";
     const headerHtml = selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, activeCompany) : "";
     const footerHtml = selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, activeCompany) : "";
+
+    return `
+      <style>${customCss}</style>
+      ${headerHtml}
+      ${rendered}
+      ${footerHtml}
+    `;
+  }, [selectedFormat, record, items, activeCompany]);
+
+  const handlePrint = () => {
     const paperSize = selectedFormat?.paper_size || "A4";
     const orientation = selectedFormat?.orientation || "portrait";
     const mt = selectedFormat?.margin_top ?? 20;
@@ -185,47 +193,43 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
     const ml = selectedFormat?.margin_left ?? 15;
     const mr = selectedFormat?.margin_right ?? 15;
 
-    const fullHtml = `<!DOCTYPE html>
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Print</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2937; line-height: 1.5; padding: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2937; line-height: 1.5; margin: 0; padding: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
   table { border-collapse: collapse; }
   @media print {
     @page { size: ${paperSize} ${orientation}; margin: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
     body { padding: 0; }
-    .no-print { display: none !important; }
   }
-  ${customCss}
+  ${selectedFormat?.css || ""}
 </style>
 </head><body>
-${headerHtml}
-${rendered}
-${footerHtml}
-</body></html>`;
-
-    const doc = iframeRef.current.contentDocument;
-    if (doc) {
-      doc.open();
-      doc.write(fullHtml);
-      doc.close();
-    }
-  }, [selectedFormat, record, items, activeCompany]);
-
-  const handlePrint = () => {
-    iframeRef.current?.contentWindow?.print();
+${selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, activeCompany) : ""}
+${renderTemplate(selectedFormat?.html_template || generateDefaultTemplate(record, items), record, items, activeCompany)}
+${selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, activeCompany) : ""}
+</body></html>`);
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.print();
+    }, 300);
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
             <h3 className="text-sm font-bold text-slate-800">Print Preview</h3>
 
-            {/* Template selector */}
             {formats.length > 0 && (
               <div className="relative">
                 <button
@@ -273,16 +277,21 @@ ${footerHtml}
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Preview — direct HTML render instead of iframe */}
         <div className="flex-1 overflow-auto bg-slate-100 p-6">
-          <div className="bg-white shadow-lg mx-auto" style={{ maxWidth: "210mm", minHeight: "297mm" }}>
-            <iframe
-              ref={iframeRef}
-              className="w-full h-full border-0"
-              style={{ minHeight: "297mm" }}
-              title="Print Preview"
-            />
-          </div>
+          <div
+            ref={printRef}
+            className="bg-white shadow-lg mx-auto"
+            style={{
+              maxWidth: "210mm",
+              minHeight: "297mm",
+              padding: `${selectedFormat?.margin_top ?? 20}mm ${selectedFormat?.margin_right ?? 15}mm ${selectedFormat?.margin_bottom ?? 20}mm ${selectedFormat?.margin_left ?? 15}mm`,
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              color: "#1f2937",
+              lineHeight: 1.5,
+            }}
+            dangerouslySetInnerHTML={{ __html: renderedHtml }}
+          />
         </div>
       </div>
     </div>

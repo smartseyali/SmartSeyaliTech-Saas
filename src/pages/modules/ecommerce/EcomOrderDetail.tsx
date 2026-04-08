@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
 import { logPaymentTransaction } from "@/lib/services/paymentService";
+
+const PrintPreview = lazy(() => import("@/components/modules/PrintPreview"));
 
 const STAGE_LABELS: Record<string, string> = {
     pending: "Order Placed", confirmed: "Confirmed", packed: "Packed",
@@ -55,6 +57,7 @@ export default function EcomOrderDetail() {
     const [transactions, setTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [showPrint, setShowPrint] = useState(false);
 
     // Modal states
     const [showCancelModal, setShowCancelModal] = useState(false);
@@ -311,7 +314,7 @@ export default function EcomOrderDetail() {
                     {updating ? "..." : `→ ${STAGE_LABELS[nextStatus]}`}
                 </Button>
             )}
-            <Button variant="outline" className="h-9 px-4 rounded-lg font-bold text-xs tracking-widest gap-2" onClick={() => window.print()}>
+            <Button variant="outline" className="h-9 px-4 rounded-lg font-bold text-xs tracking-widest gap-2" onClick={() => setShowPrint(true)}>
                 <Printer className="w-3.5 h-3.5" /> Print
             </Button>
         </div>
@@ -502,6 +505,25 @@ export default function EcomOrderDetail() {
                         </div>
                     </div>
                 </div>
+            )}
+            {showPrint && order && (
+                <Suspense fallback={null}>
+                    <PrintPreview
+                        doctype="ecomOrder"
+                        record={{
+                            ...order,
+                            shipping_address_line: typeof order.shipping_address === 'object'
+                                ? [order.shipping_address?.address, order.shipping_address?.city, order.shipping_address?.state, order.shipping_address?.pincode].filter(Boolean).join(", ")
+                                : (order.shipping_address || ""),
+                            billing_address_line: typeof order.billing_address === 'object'
+                                ? [order.billing_address?.address, order.billing_address?.city, order.billing_address?.state, order.billing_address?.pincode].filter(Boolean).join(", ")
+                                : (order.billing_address || ""),
+                            status_label: STAGE_LABELS[order.status] || order.status,
+                        }}
+                        items={items}
+                        onClose={() => setShowPrint(false)}
+                    />
+                </Suspense>
             )}
         </>
     );
