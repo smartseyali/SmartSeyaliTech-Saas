@@ -1,15 +1,10 @@
 /**
  * PrintPreview — ERPNext-style print template renderer
  *
- * Renders an HTML template with {{field}} placeholders replaced by actual document data.
- * Supports:
- * - {{field_name}} for header fields
- * - {% for item in items %}...{% endfor %} for line items
- * - {{item.field_name}} inside loops
- * - {{company_name}}, {{company_email}} etc. for company context
- * - {{today}}, {{now}} for dates
+ * Uses an iframe with srcdoc for full HTML/CSS isolation.
+ * Supports {{field_name}}, {% for item in items %}, and {{company_*}} placeholders.
  */
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { Printer, Download, X, ChevronDown } from "lucide-react";
@@ -38,11 +33,9 @@ interface PrintPreviewProps {
   onClose: () => void;
 }
 
-/** Render template by replacing {{placeholders}} with data */
 function renderTemplate(template: string, data: any, items: any[], company: any): string {
   let html = template;
 
-  // Replace {{company_*}} placeholders
   if (company) {
     html = html.replace(/\{\{company_name\}\}/g, company.name || "");
     html = html.replace(/\{\{company_email\}\}/g, company.contact_email || "");
@@ -51,13 +44,14 @@ function renderTemplate(template: string, data: any, items: any[], company: any)
     html = html.replace(/\{\{company_city\}\}/g, company.city || "");
     html = html.replace(/\{\{company_state\}\}/g, company.state || "");
     html = html.replace(/\{\{company_gst\}\}/g, company.gst_no || "");
+    html = html.replace(/\{\{company_logo\}\}/g, company.logo_url || "");
+    html = html.replace(/\{\{company_pincode\}\}/g, company.pincode || "");
+    html = html.replace(/\{\{company_country\}\}/g, company.country || "");
   }
 
-  // Replace {{today}} and {{now}}
   html = html.replace(/\{\{today\}\}/g, new Date().toLocaleDateString("en-IN"));
   html = html.replace(/\{\{now\}\}/g, new Date().toLocaleString("en-IN"));
 
-  // Handle {% for item in items %}...{% endfor %} loops
   const loopRegex = /\{%\s*for\s+item\s+in\s+items\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g;
   html = html.replace(loopRegex, (_match, loopBody) => {
     if (!items || items.length === 0) return "";
@@ -76,7 +70,6 @@ function renderTemplate(template: string, data: any, items: any[], company: any)
       .join("");
   });
 
-  // Replace {{field_name}} for header fields
   html = html.replace(/\{\{(\w+)\}\}/g, (_match, field) => {
     const val = data[field];
     if (val === null || val === undefined) return "";
@@ -89,17 +82,15 @@ function renderTemplate(template: string, data: any, items: any[], company: any)
   return html;
 }
 
-/** Default template when no print format exists */
 function generateDefaultTemplate(record: any, items: any[]): string {
   const headerRows = Object.entries(record)
     .filter(([k]) => !["id", "company_id", "created_at", "updated_at", "custom_fields"].includes(k))
+    .filter(([, v]) => v !== null && v !== undefined && v !== "")
     .map(([k, v]) => {
-      if (v === null || v === undefined || v === "") return "";
       const label = k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
       const val = typeof v === "object" ? JSON.stringify(v) : String(v);
       return `<tr><td style="padding:6px 12px;font-weight:600;color:#374151;width:35%;border-bottom:1px solid #f1f5f9;">${label}</td><td style="padding:6px 12px;color:#1f2937;border-bottom:1px solid #f1f5f9;">${val}</td></tr>`;
     })
-    .filter(Boolean)
     .join("");
 
   let itemsHtml = "";
@@ -115,37 +106,78 @@ function generateDefaultTemplate(record: any, items: any[]): string {
       }).join("");
       return `<tr>${tds}</tr>`;
     }).join("");
-    itemsHtml = `
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #2563eb;">Line Items</h3>
-      <table style="width:100%;border-collapse:collapse;"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>
-    `;
+    itemsHtml = `<h3 style="font-size:14px;font-weight:700;color:#111827;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #2563eb;">Line Items</h3><table style="width:100%;border-collapse:collapse;"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  return `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:0 auto;color:#1f2937;">
-      <div style="text-align:center;padding:20px 0;border-bottom:3px solid #2563eb;margin-bottom:24px;">
-        <h1 style="font-size:22px;font-weight:800;color:#111827;margin:0;">{{company_name}}</h1>
-        <p style="font-size:12px;color:#6b7280;margin:4px 0 0;">{{company_address}} {{company_city}} {{company_state}}</p>
-        <p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Phone: {{company_phone}} | Email: {{company_email}}</p>
-      </div>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">${headerRows}</table>
-      ${itemsHtml}
-      <div style="text-align:center;padding:16px 0;margin-top:32px;border-top:1px solid #e5e7eb;">
-        <p style="font-size:10px;color:#9ca3af;">Printed on {{today}}</p>
-      </div>
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:0 auto;color:#1f2937;">
+    <div style="text-align:center;padding:20px 0;border-bottom:3px solid #2563eb;margin-bottom:24px;">
+      <h1 style="font-size:22px;font-weight:800;color:#111827;margin:0;">{{company_name}}</h1>
+      <p style="font-size:12px;color:#6b7280;margin:4px 0 0;">{{company_address}} {{company_city}} {{company_state}}</p>
+      <p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Phone: {{company_phone}} | Email: {{company_email}}</p>
     </div>
-  `;
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">${headerRows}</table>
+    ${itemsHtml}
+    <div style="text-align:center;padding:16px 0;margin-top:32px;border-top:1px solid #e5e7eb;">
+      <p style="font-size:10px;color:#9ca3af;">Printed on {{today}}</p>
+    </div>
+  </div>`;
+}
+
+function buildFullHtml(
+  selectedFormat: PrintFormat | null,
+  record: any,
+  items: any[],
+  company: any
+): string {
+  const template = selectedFormat?.html_template || generateDefaultTemplate(record, items);
+  const rendered = renderTemplate(template, record, items, company);
+  const customCss = selectedFormat?.css || "";
+  const headerHtml = selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, company) : "";
+  const footerHtml = selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, company) : "";
+  const mt = selectedFormat?.margin_top ?? 20;
+  const mb = selectedFormat?.margin_bottom ?? 20;
+  const ml = selectedFormat?.margin_left ?? 15;
+  const mr = selectedFormat?.margin_right ?? 15;
+  const paperSize = selectedFormat?.paper_size || "A4";
+  const orientation = selectedFormat?.orientation || "portrait";
+
+  return `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #1f2937;
+    line-height: 1.5;
+    padding: ${mt}mm ${mr}mm ${mb}mm ${ml}mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  table { border-collapse: collapse; }
+  img { max-width: 100%; }
+  @media print {
+    @page { size: ${paperSize} ${orientation}; margin: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
+    body { padding: 0; }
+  }
+  ${customCss}
+</style>
+</head><body>
+${headerHtml}
+${rendered}
+${footerHtml}
+</body></html>`;
 }
 
 export default function PrintPreview({ doctype, record, items = [], onClose }: PrintPreviewProps) {
   const { activeCompany } = useTenant();
-  const printRef = useRef<HTMLDivElement>(null);
   const [formats, setFormats] = useState<PrintFormat[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<PrintFormat | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch available print formats for this doctype
   useEffect(() => {
     const fetchFormats = async () => {
       if (!activeCompany) return;
@@ -169,62 +201,22 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
     fetchFormats();
   }, [activeCompany?.id, doctype]);
 
-  // Build the rendered HTML
-  const renderedHtml = useMemo(() => {
-    const template = selectedFormat?.html_template || generateDefaultTemplate(record, items);
-    const rendered = renderTemplate(template, record, items, activeCompany);
-    const customCss = selectedFormat?.css || "";
-    const headerHtml = selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, activeCompany) : "";
-    const footerHtml = selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, activeCompany) : "";
-
-    return `
-      <style>${customCss}</style>
-      ${headerHtml}
-      ${rendered}
-      ${footerHtml}
-    `;
-  }, [selectedFormat, record, items, activeCompany]);
+  const fullHtml = useMemo(
+    () => buildFullHtml(selectedFormat, record, items, activeCompany),
+    [selectedFormat, record, items, activeCompany]
+  );
 
   const handlePrint = () => {
-    const paperSize = selectedFormat?.paper_size || "A4";
-    const orientation = selectedFormat?.orientation || "portrait";
-    const mt = selectedFormat?.margin_top ?? 20;
-    const mb = selectedFormat?.margin_bottom ?? 20;
-    const ml = selectedFormat?.margin_left ?? 15;
-    const mr = selectedFormat?.margin_right ?? 15;
-
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-
-    printWindow.document.write(`<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Print</title>
-<style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2937; line-height: 1.5; margin: 0; padding: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
-  table { border-collapse: collapse; }
-  @media print {
-    @page { size: ${paperSize} ${orientation}; margin: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
-    body { padding: 0; }
-  }
-  ${selectedFormat?.css || ""}
-</style>
-</head><body>
-${selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, activeCompany) : ""}
-${renderTemplate(selectedFormat?.html_template || generateDefaultTemplate(record, items), record, items, activeCompany)}
-${selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, activeCompany) : ""}
-</body></html>`);
+    printWindow.document.write(fullHtml);
     printWindow.document.close();
-    setTimeout(() => {
-      printWindow.print();
-    }, 300);
+    printWindow.onload = () => printWindow.print();
   };
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[92vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
@@ -277,21 +269,16 @@ ${selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, recor
           </div>
         </div>
 
-        {/* Preview — direct HTML render instead of iframe */}
-        <div className="flex-1 overflow-auto bg-slate-100 p-6">
-          <div
-            ref={printRef}
-            className="bg-white shadow-lg mx-auto"
-            style={{
-              maxWidth: "210mm",
-              minHeight: "297mm",
-              padding: `${selectedFormat?.margin_top ?? 20}mm ${selectedFormat?.margin_right ?? 15}mm ${selectedFormat?.margin_bottom ?? 20}mm ${selectedFormat?.margin_left ?? 15}mm`,
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-              color: "#1f2937",
-              lineHeight: 1.5,
-            }}
-            dangerouslySetInnerHTML={{ __html: renderedHtml }}
-          />
+        {/* Preview — iframe with srcdoc for full HTML/CSS isolation */}
+        <div className="flex-1 overflow-auto bg-slate-200 p-6 flex justify-center">
+          <div className="bg-white shadow-xl" style={{ width: "210mm", minHeight: "297mm" }}>
+            <iframe
+              srcDoc={fullHtml}
+              className="w-full border-0"
+              style={{ width: "210mm", minHeight: "297mm", height: "100%" }}
+              title="Print Preview"
+            />
+          </div>
         </div>
       </div>
     </div>
