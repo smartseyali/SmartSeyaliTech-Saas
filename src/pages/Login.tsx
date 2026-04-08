@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-    Mail, Lock, Eye, EyeOff, ArrowRight,
+    Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft,
     Sparkles, ShieldCheck, ShoppingBag, User as UserIcon,
     Zap, Globe, Layers, X
 } from "lucide-react";
@@ -145,6 +145,15 @@ export default function Login() {
             {/* Right Side: Form */}
             <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 xl:p-24 bg-white relative h-screen overflow-y-auto">
                 <div className="w-full max-w-sm flex flex-col h-full justify-center">
+                    <div className="mb-8">
+                        <Link
+                            to="/"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-600 transition-colors group"
+                        >
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                            Back to Home
+                        </Link>
+                    </div>
                     <div className="lg:hidden mb-12">
                         <Link to="/" className="flex items-center gap-3">
                             <img src="/logo.png" alt="Logo" className="h-10 w-auto" />

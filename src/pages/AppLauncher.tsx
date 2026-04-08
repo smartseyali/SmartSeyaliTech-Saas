@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X } from "lucide-react";
+import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X, LogOut } from "lucide-react";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import PLATFORM_CONFIG from "@/config/platform";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ export default function AppLauncher() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
     const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
+    const { signOut } = useAuth();
     const [search, setSearch] = useState("");
     const [dbModules, setDbModules] = useState<InstalledModule[]>([]);
     const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
@@ -174,14 +176,23 @@ export default function AppLauncher() {
                                 <span className="font-medium text-gray-700">{activeCompany?.name || "your business"}</span>
                             </p>
                         </div>
-                        <Link
-                            to="/marketplace"
-                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span className="hidden sm:inline">Get More Apps</span>
-                            <span className="sm:hidden">More</span>
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            <Link
+                                to="/marketplace"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span className="hidden sm:inline">Get More Apps</span>
+                                <span className="sm:hidden">More</span>
+                            </Link>
+                            <button
+                                onClick={async () => { await signOut(); navigate("/login"); }}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                <span className="hidden sm:inline">Logout</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Search */}
