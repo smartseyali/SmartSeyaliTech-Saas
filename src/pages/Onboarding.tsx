@@ -358,6 +358,10 @@ export default function Onboarding() {
   }, []);
 
   // ── Polling for email verification (Step 2) ─────────────────
+  // The challenge: user verifies on mobile/another device, but this tab
+  // has no session. getSession() only returns the locally cached session.
+  // Solution: Try signing in with saved credentials. If email is confirmed,
+  // Supabase will return a valid session. If not confirmed, it will fail.
   useEffect(() => {
     if (step !== 2) {
       if (pollRef.current) {
@@ -369,15 +373,35 @@ export default function Onboarding() {
 
     pollRef.current = setInterval(async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
+        // First check if we already have a session (e.g. user clicked link in same browser)
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData.session) {
           clearInterval(pollRef.current!);
           pollRef.current = null;
           toast.success("Email verified successfully!");
           setStep(3);
+          return;
+        }
+
+        // No local session — try signing in with the credentials.
+        // If the email is verified, Supabase will return a session.
+        // If not verified yet, it will return an error.
+        if (loginEmail && password) {
+          const { data: signInData, error: signInErr } =
+            await supabase.auth.signInWithPassword({
+              email: loginEmail,
+              password,
+            });
+
+          if (!signInErr && signInData.session) {
+            clearInterval(pollRef.current!);
+            pollRef.current = null;
+            toast.success("Email verified successfully!");
+            setStep(3);
+          }
         }
       } catch {}
-    }, 4000);
+    }, 5000);
 
     return () => {
       if (pollRef.current) {
@@ -385,6 +409,22 @@ export default function Onboarding() {
         pollRef.current = null;
       }
     };
+  }, [step, loginEmail, password]);
+
+  // ── Listen for auth state changes (same-browser verification) ─
+  useEffect(() => {
+    if (step !== 2) return;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+          toast.success("Email verified successfully!");
+          setStep(3);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [step]);
 
   // ── Resend cooldown timer ───────────────────────────────────
