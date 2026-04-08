@@ -93,6 +93,9 @@ import { webAutomationRule } from "./doctypes/web-automation-rule";
 import { webApiKey } from "./doctypes/web-api-key";
 import { webTranslation } from "./doctypes/web-translation";
 
+// ── Ecommerce ─────────────────────────────────────────────────────────────
+import { ecomCustomer } from "./doctypes/ecom-customer";
+
 // ── Platform (Super Admin) ────────────────────────────────────────────────
 import { platformPlan } from "./doctypes/platform-plan";
 import { platformModule } from "./doctypes/platform-module";
@@ -144,6 +147,9 @@ export const REGISTRY: Record<string, DocTypeDef> = {
 
   // HRMS
   hrmsEmployee,
+
+  // Ecommerce
+  ecomCustomer,
 
   // WhatsApp
   whatsappTemplate,
