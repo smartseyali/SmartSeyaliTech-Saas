@@ -49,7 +49,7 @@ export const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               src="/logo.png"
               alt="Smartseyali Tech Logo"
-              className="h-20 w-auto object-contain"
+              className="h-28 w-auto object-contain"
             />
           </Link>
 
