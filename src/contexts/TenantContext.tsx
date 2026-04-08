@@ -15,6 +15,10 @@ interface Company {
     address?: string;
     city?: string;
     state?: string;
+    country?: string;
+    pincode?: string;
+    gst_no?: string;
+    logo_url?: string;
     user_id?: string;
 }
 
@@ -48,7 +52,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (potentialSlug && !RESERVED_ROUTES.includes(potentialSlug as any)) {
             const { data: companyBySlug } = await supabase
                 .from('companies')
-                .select('id, name, subdomain, user_id')
+                .select('id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url')
                 .eq('subdomain', potentialSlug)
                 .maybeSingle();
 
@@ -65,7 +69,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             } else {
                 const { data: defaultComp } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, user_id')
+                    .select('id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url')
                     .limit(1)
                     .maybeSingle();
 
@@ -107,7 +111,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             if (localUser?.is_super_admin || isSuperAdminByEmail) {
                 const { data: allCompanies } = await supabase
                     .from('companies')
-                    .select('id, name, subdomain, user_id')
+                    .select('id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url')
                     .order('name');
 
                 const companiesData = (allCompanies || []) as Company[];
@@ -126,13 +130,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             // 3. Regular user: load only companies they belong to via company_users
             const { data: mappings } = await supabase
                 .from('company_users')
-                .select('company_id, companies(id, name, subdomain, user_id)')
+                .select('company_id, companies(id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url)')
                 .eq('user_id', user.id);
 
             // FALLBACK: Also check if they are the direct owner of any company
             const { data: ownedCompanies } = await supabase
                 .from('companies')
-                .select('id, name, subdomain, user_id')
+                .select('id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url')
                 .eq('user_id', user.id);
 
             let companiesData = (mappings || [])
@@ -160,7 +164,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 if (detectedCompany) {
                     setActiveCompany(detectedCompany);
                 } else {
-                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, user_id').limit(1).maybeSingle();
+                    const { data: defaultComp } = await supabase.from('companies').select('id, name, subdomain, user_id, industry_type, contact_phone, contact_email, address, city, state, country, pincode, gst_no, logo_url').limit(1).maybeSingle();
                     if (defaultComp) setActiveCompany(defaultComp as Company);
                 }
             }
