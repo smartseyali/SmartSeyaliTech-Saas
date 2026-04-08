@@ -17,6 +17,7 @@ import {
   Mail,
   RefreshCw,
   AlertCircle,
+  LogOut,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -256,8 +257,8 @@ function ModuleCard({
 //  MAIN COMPONENT
 // ══════════════════════════════════════════════════════════════
 export default function Onboarding() {
-  const { user } = useAuth();
-  const { refreshTenant } = useTenant();
+  const { user, signOut } = useAuth();
+  const { refreshTenant, needsOnboarding, companies, loading: tenantLoading } = useTenant();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -300,13 +301,26 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Pre-fill if user is already logged in
+  // ── Redirect logic for logged-in users ───────────────────────
   useEffect(() => {
-    if (user) {
-      setLoginEmail(user.email || "");
-      setFullName(user.user_metadata?.full_name || "");
+    if (!user || tenantLoading) return;
+
+    // Pre-fill fields from user profile
+    setLoginEmail(user.email || "");
+    setFullName(user.user_metadata?.full_name || "");
+
+    // If user already has a company → redirect to installed apps
+    if (!needsOnboarding && companies.length > 0) {
+      navigate("/apps", { replace: true });
+      return;
     }
-  }, [user]);
+
+    // User is logged in but has no company → skip to app store (Step 3)
+    // Only auto-advance if we're still on Step 1 (don't interfere with other steps)
+    if (step === 1 && searchParams.get("step") !== "verified") {
+      setStep(3);
+    }
+  }, [user?.id, tenantLoading, needsOnboarding, companies.length]);
 
   // ── Detect redirect from email verification link ────────────
   useEffect(() => {
@@ -773,9 +787,23 @@ export default function Onboarding() {
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+          <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
         </div>
-        {step <= 4 && <StepIndicator current={step} />}
+        <div className="flex items-center gap-4">
+          {step <= 4 && <StepIndicator current={step} />}
+          <button
+            onClick={async () => {
+              clearDraft();
+              await signOut();
+              navigate("/login", { replace: true });
+            }}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </div>
       </header>
 
       {/* ─── Step 1: Company Registration ─────────────────────── */}

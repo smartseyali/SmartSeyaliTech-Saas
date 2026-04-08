@@ -475,7 +475,7 @@ export default function Onboarding() {
 
                 <div className="relative z-10 p-8 lg:p-12 flex flex-col justify-between h-full">
                     <Link to="/" className="flex items-center gap-4">
-                        <img src="/logo.png" alt="Logo" className="h-10 lg:h-12 w-auto brightness-0 invert" />
+                        <img src="/logo.png" alt="Logo" className="h-16 lg:h-20 w-auto brightness-0 invert" />
                         <span className="text-lg lg:text-xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
                     </Link>
 
@@ -534,7 +534,7 @@ export default function Onboarding() {
                 <div className="p-2 lg:px-4 lg:py-2 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-50/50">
                     <div className="lg:hidden">
                         <Link to="/" className="flex items-center gap-3">
-                            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+                            <img src="/logo.png" alt="Logo" className="h-14 w-auto" />
                             <span className="text-lg font-bold text-gray-900">{PLATFORM_CONFIG.name}</span>
                         </Link>
                     </div>

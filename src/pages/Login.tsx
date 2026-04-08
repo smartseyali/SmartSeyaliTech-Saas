@@ -114,7 +114,7 @@ export default function Login() {
 
                 <div className="relative z-10 p-12 lg:p-20 flex flex-col justify-between h-full">
                     <Link to="/" className="flex items-center gap-4">
-                        <img src="/logo.png" alt="Logo" className="h-12 w-auto brightness-0 invert" />
+                        <img src="/logo.png" alt="Logo" className="h-20 w-auto brightness-0 invert" />
                         <span className="text-xl lg:text-2xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
                     </Link>
 
@@ -156,7 +156,7 @@ export default function Login() {
                     </div>
                     <div className="lg:hidden mb-12">
                         <Link to="/" className="flex items-center gap-3">
-                            <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+                            <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
                             <span className="text-xl font-bold text-gray-900">{PLATFORM_CONFIG.name}</span>
                         </Link>
                     </div>
