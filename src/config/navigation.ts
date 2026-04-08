@@ -55,6 +55,13 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
       ],
     },
     {
+      label: "Customers",
+      icon: Users,
+      items: [
+        { title: "All Customers", url: "/apps/ecommerce/customers", icon: Users, resource: "orders" },
+      ],
+    },
+    {
       label: "Marketing",
       icon: Zap,
       items: [
