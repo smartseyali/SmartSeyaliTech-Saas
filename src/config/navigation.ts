@@ -13,6 +13,7 @@ import {
   Clock, Layers, ListTree, Ruler, DollarSign, Percent, Share2,
   Landmark, BookOpen, PieChart, ArrowLeftRight, Receipt, TrendingUp,
   UserPlus, Award, Palette, CalendarDays, Languages, GraduationCap,
+  FileText,
 } from "lucide-react";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
@@ -320,6 +321,7 @@ export const CORE_NAV: NavGroup[] = [
       },
       { title: "Users", url: "/apps/masters/users", icon: Users, resource: "users" },
       { title: "Roles", url: "/apps/masters/roles", icon: ShieldCheck, resource: "users" },
+      { title: "Print Formats", url: "/apps/masters/print-formats", icon: FileText, resource: "settings" },
     ],
   },
 ];

@@ -28,6 +28,7 @@ import Users from "./Users";
 import Roles from "./Roles";
 import ChartOfAccounts from "./ChartOfAccounts";
 import FiscalYears from "./FiscalYears";
+import PrintFormats from "./PrintFormats";
 
 export default function MasterDashboard() {
     const { activeCompany } = useTenant();
@@ -64,7 +65,10 @@ export default function MasterDashboard() {
         // Financial Governance
         if (pathname.includes("/coa")) return <ChartOfAccounts />;
         if (pathname.includes("/fiscal-years")) return <FiscalYears />;
-        
+
+        // Print & Templates
+        if (pathname.includes("/print-formats")) return <PrintFormats />;
+
         return <MasterSummary />;
     };
 

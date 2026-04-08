@@ -96,6 +96,9 @@ import { webTranslation } from "./doctypes/web-translation";
 // ── Ecommerce ─────────────────────────────────────────────────────────────
 import { ecomCustomer } from "./doctypes/ecom-customer";
 
+// ── Print Formats ─────────────────────────────────────────────────────────
+import { printFormat } from "./doctypes/print-format";
+
 // ── Platform (Super Admin) ────────────────────────────────────────────────
 import { platformPlan } from "./doctypes/platform-plan";
 import { platformModule } from "./doctypes/platform-module";
@@ -150,6 +153,9 @@ export const REGISTRY: Record<string, DocTypeDef> = {
 
   // Ecommerce
   ecomCustomer,
+
+  // Print Formats
+  printFormat,
 
   // WhatsApp
   whatsappTemplate,

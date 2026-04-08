@@ -26,6 +26,11 @@ import {
 } from "@/lib/services/calculationService";
 import type { DocTypeDef, ERPField, TabFields } from "@/types/erp";
 import { useCustomFields } from "@/hooks/useCustomFields";
+import { Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { lazy, Suspense } from "react";
+
+const PrintPreview = lazy(() => import("./PrintPreview"));
 
 /* ── Props ─────────────────────────────────────────────────────────────────── */
 
@@ -55,6 +60,7 @@ export default function DocPage({
   const [editingItems, setEditingItems] = useState<any[] | undefined>(
     undefined
   );
+  const [showPrint, setShowPrint] = useState(false);
 
   const { activeCompany } = useTenant();
   const location = useLocation();
@@ -409,6 +415,7 @@ export default function DocPage({
 
   if (view === "form") {
     return (
+      <>
       <DocForm
         title={editing?.id ? `Edit ${def.name}` : `New ${def.name}`}
         subtitle={def.name}
@@ -422,11 +429,31 @@ export default function DocPage({
         onDelete={editing?.id ? handleDelete : undefined}
         initialData={editing}
         initialItems={editingItems}
-        customActions={customFormActions?.(editing, navigate)}
+        customActions={
+          <>
+            {editing?.id && (
+              <Button variant="outline" size="sm" onClick={() => setShowPrint(true)} className="h-8 px-2.5 text-[12px] font-medium hover:bg-slate-50">
+                <Printer className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Print</span>
+              </Button>
+            )}
+            {customFormActions?.(editing, navigate)}
+          </>
+        }
         onNavigate={editing?.id ? handleNavigate : undefined}
         currentIndex={currentIndex}
         totalRecords={filteredData.length}
       />
+      {showPrint && editing && (
+        <Suspense fallback={null}>
+          <PrintPreview
+            doctype={doctype}
+            record={editing}
+            items={editingItems}
+            onClose={() => setShowPrint(false)}
+          />
+        </Suspense>
+      )}
+    </>
     );
   }
 
