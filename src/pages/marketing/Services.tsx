@@ -290,7 +290,7 @@ const Services = () => {
                       Start Your Project <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-white/20 text-white hover:bg-white/10 font-semibold backdrop-blur-sm transition-all">
+                  <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-white/40 bg-white/5 text-white hover:bg-white/10 font-semibold backdrop-blur-sm transition-all">
                     <Link to="/login">Sign In</Link>
                   </Button>
                 </div>

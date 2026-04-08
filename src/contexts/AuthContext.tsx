@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
+    const userIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         // Get initial session
@@ -27,14 +28,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (error) {
                 console.error("Error fetching session:", error.message);
             }
-            setSession(data?.session ?? null);
-            setUser(data?.session?.user ?? null);
+            const s = data?.session ?? null;
+            const u = s?.user ?? null;
+            setSession(s);
+            setUser(u);
+            userIdRef.current = u?.id ?? null;
         })
         .catch((err) => {
             console.error("Auth configuration or network error:", err);
-            // In case of a hard crash (like a DNS failure for Supabase), clear state safely.
             setSession(null);
             setUser(null);
+            userIdRef.current = null;
         })
         .finally(() => {
             setLoading(false);
@@ -42,9 +46,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-                setUser(session?.user ?? null);
+            (event, newSession) => {
+                const newUser = newSession?.user ?? null;
+                const newUserId = newUser?.id ?? null;
+
+                // Always update the session (keeps tokens fresh)
+                setSession(newSession);
+
+                if (event === 'SIGNED_OUT') {
+                    setUser(null);
+                    userIdRef.current = null;
+                } else if (event === 'TOKEN_REFRESHED') {
+                    // Token refresh: same user, just new tokens.
+                    // Only update session (already done above), NOT the user object.
+                    // This prevents unnecessary re-renders in TenantContext/PermissionsContext.
+                    if (newUserId !== userIdRef.current) {
+                        // Edge case: user actually changed during refresh
+                        setUser(newUser);
+                        userIdRef.current = newUserId;
+                    }
+                } else {
+                    // SIGNED_IN, INITIAL_SESSION, USER_UPDATED
+                    // Only set user if it actually changed
+                    if (newUserId !== userIdRef.current) {
+                        setUser(newUser);
+                        userIdRef.current = newUserId;
+                    } else if (event === 'USER_UPDATED' && newUser) {
+                        // User metadata may have changed (name, avatar, etc)
+                        setUser(newUser);
+                    }
+                }
+
                 setLoading(false);
             }
         );
@@ -52,9 +84,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const signOut = async () => {
+    const signOut = useCallback(async () => {
         await supabase.auth.signOut();
-    };
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, session, loading, signOut }}>
@@ -70,4 +102,3 @@ export const useAuth = () => {
     }
     return context;
 };
-

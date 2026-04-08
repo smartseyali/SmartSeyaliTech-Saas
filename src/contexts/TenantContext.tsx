@@ -58,7 +58,6 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (!user) {
-            setLoading(true);
             // For guest users (storefront), use detected company or fallback to first one for demo
             if (detectedCompany) {
                 setActiveCompany(detectedCompany);
@@ -177,7 +176,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         initializeTenant();
-    }, [user]);
+    }, [user?.id]);
 
     const setCompany = (id: number) => {
         const company = companies.find(c => c.id === id);

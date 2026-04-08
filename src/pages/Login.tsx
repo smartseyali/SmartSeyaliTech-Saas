@@ -34,7 +34,7 @@ export default function Login() {
         if (user && !authLoading) {
             checkRoleAndRedirect();
         }
-    }, [user, authLoading, navigate]);
+    }, [user?.id, authLoading]);
 
     const checkRoleAndRedirect = async () => {
         if (!user) return;
@@ -42,7 +42,7 @@ export default function Login() {
         try {
             const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
             if (isSuperAdminByEmail) {
-                navigate("/super-admin");
+                navigate("/super-admin", { replace: true });
                 return;
             }
             const { data: localUser } = await supabase
@@ -52,7 +52,7 @@ export default function Login() {
                 .maybeSingle();
 
             if (localUser?.is_super_admin) {
-                navigate("/super-admin");
+                navigate("/super-admin", { replace: true });
                 return;
             }
             const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
@@ -61,12 +61,12 @@ export default function Login() {
             ]);
             const hasCompany = (mappings && mappings.length > 0) || (ownedCompanies && ownedCompanies.length > 0);
             if (!hasCompany) {
-                navigate(`/onboarding${window.location.search}`);
+                navigate(`/onboarding${window.location.search}`, { replace: true });
                 return;
             }
-            navigate("/apps");
+            navigate("/apps", { replace: true });
         } catch (err) {
-            navigate("/apps");
+            navigate("/apps", { replace: true });
         }
     };
 

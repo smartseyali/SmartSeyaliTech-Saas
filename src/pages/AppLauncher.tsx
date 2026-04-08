@@ -186,7 +186,7 @@ export default function AppLauncher() {
                                 <span className="sm:hidden">More</span>
                             </Link>
                             <button
-                                onClick={async () => { await signOut(); navigate("/login"); }}
+                                onClick={async () => { await signOut(); navigate("/login", { replace: true }); }}
                                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
                             >
                                 <LogOut className="w-4 h-4" />

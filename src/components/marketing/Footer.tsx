@@ -38,7 +38,7 @@ export const Footer = () => {
                   key={i}
                   href="#"
                   aria-label={label}
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary-600 hover:border-primary-600 transition-all duration-300 hover:-translate-y-1 group"
+                  className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center hover:bg-primary-600 hover:border-primary-600 transition-all duration-300 hover:-translate-y-1 group"
                 >
                   <Icon className="h-4 w-4 text-gray-500 group-hover:text-white transition-colors" />
                 </a>

@@ -298,7 +298,7 @@ const Index = () => {
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="h-14 px-8 rounded-full border-white/20 text-white hover:bg-white/10 font-semibold text-base backdrop-blur-sm transition-all duration-300">
+                <Button asChild variant="outline" size="lg" className="h-14 px-8 rounded-full border-white/40 bg-white/5 text-white hover:bg-white/10 font-semibold text-base backdrop-blur-sm transition-all duration-300">
                   <Link to="/products" className="flex items-center gap-2">
                     <Play className="h-4 w-4" /> Explore Products
                   </Link>
@@ -585,7 +585,7 @@ const Index = () => {
                       Start Your Project <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 h-14 px-10 rounded-full font-semibold text-base backdrop-blur-sm transition-all duration-300">
+                  <Button asChild variant="outline" size="lg" className="border-white/40 bg-white/5 text-white hover:bg-white/10 h-14 px-10 rounded-full font-semibold text-base backdrop-blur-sm transition-all duration-300">
                     <Link to="/login">Sign In</Link>
                   </Button>
                 </div>
