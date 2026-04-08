@@ -6,13 +6,14 @@ import {
   Box,
   Search,
   ArrowRight,
-  Code,
   Settings,
   X,
   SlidersHorizontal,
   ListFilter,
+  Sparkles,
+  Package,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,37 +114,39 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans selection:bg-primary-600 selection:text-white">
+    <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 overflow-hidden bg-slate-50 border-b border-gray-100">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 w-96 h-96 bg-primary-600 rounded-full blur-3xl" />
-        </div>
+      <section className="relative pt-32 lg:pt-40 pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-primary-950 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <motion.div className="absolute top-20 right-[15%] w-72 h-72 bg-primary-600/20 rounded-full blur-[100px]" animate={{ y: [0, -20, 0], scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                Explore Our <span className="text-primary-600">Product Lineup</span>
-              </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
-                Powerful, modular software solutions designed to scale your business and automate your workflows.
-              </p>
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl space-y-6"
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-primary-300 text-sm font-medium">
+              <Package className="w-4 h-4" /> Product Catalog
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+              Explore Our
+              <br />
+              <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">Product Lineup</span>
+            </h1>
+            <p className="text-xl text-gray-400 leading-relaxed max-w-xl">
+              Powerful, modular software solutions designed to scale your business and automate your workflows.
+            </p>
+          </motion.div>
         </div>
       </section>
 
       {/* Sticky Filters Section */}
-      <section className="py-4 bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+      <section className="py-4 bg-white/80 backdrop-blur-xl sticky top-0 z-40 border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col gap-4">
-            {/* Search & Main Actions */}
             <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-              {/* Search Input */}
               <div className="relative flex-grow group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-600 transition-colors" />
                 <Input
@@ -151,12 +154,11 @@ const Products = () => {
                   placeholder="Search modules and capabilities..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-primary-600/20 focus:ring-1 focus:ring-primary-600/20 shadow-none transition-all text-base"
+                  className="pl-12 h-12 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-primary-200 focus:ring-2 focus:ring-primary-600/10 shadow-none transition-all text-base"
                 />
               </div>
 
               <div className="flex gap-3 items-center">
-                {/* Desktop Status Select */}
                 <div className="hidden lg:flex items-center gap-3">
                   <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="w-[180px] h-12 rounded-xl border-transparent bg-gray-50 focus:bg-white text-sm font-medium">
@@ -175,7 +177,6 @@ const Products = () => {
                   </Select>
                 </div>
 
-                {/* Mobile & Tablet Filter Drawer */}
                 <Sheet open={showFilters} onOpenChange={setShowFilters}>
                   <SheetTrigger asChild>
                     <Button
@@ -198,10 +199,9 @@ const Products = () => {
                     </SheetHeader>
 
                     <div className="flex-grow overflow-y-auto py-6 space-y-8">
-                      {/* Search in Drawer */}
                       <div className="space-y-3">
-                        <label className="text-sm font-bold uppercase tracking-widest text-gray-400 block">Search</label>
-                        <div className="relative group">
+                        <label className="text-sm font-semibold text-gray-700 block">Search</label>
+                        <div className="relative">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                           <Input
                             type="text"
@@ -213,19 +213,18 @@ const Products = () => {
                         </div>
                       </div>
 
-                      {/* Status in Drawer */}
                       <div className="space-y-3">
-                        <div className="text-sm font-bold uppercase tracking-widest text-gray-400">Status</div>
+                        <div className="text-sm font-semibold text-gray-700">Status</div>
                         <div className="grid grid-cols-2 gap-2">
                           {STATUSES.map((status) => (
                             <button
                               key={status}
                               onClick={() => setSelectedStatus(status)}
                               className={cn(
-                                "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
+                                "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border",
                                 selectedStatus === status
-                                  ? "bg-primary-600 border-primary-600 text-white shadow-sm"
-                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-600/30"
+                                  ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
+                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
                               )}
                             >
                               {status}
@@ -234,17 +233,16 @@ const Products = () => {
                         </div>
                       </div>
 
-                      {/* Categories in Drawer */}
                       <div className="space-y-3">
-                        <div className="text-sm font-bold uppercase tracking-widest text-gray-400">Categories</div>
+                        <div className="text-sm font-semibold text-gray-700">Categories</div>
                         <div className="flex flex-wrap gap-2">
                           <button
                             onClick={() => handleCategoryChange("All")}
                             className={cn(
-                              "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
+                              "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border",
                               selectedCategory === "All"
-                                ? "bg-primary-600 border-primary-600 text-white shadow-sm"
-                                : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-600/30"
+                                ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
+                                : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
                             )}
                           >
                             All Categories
@@ -254,10 +252,10 @@ const Products = () => {
                               key={category}
                               onClick={() => handleCategoryChange(category)}
                               className={cn(
-                                "px-4 py-2 rounded-lg text-sm font-medium transition-all border capitalize",
+                                "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border capitalize",
                                 selectedCategory === category
-                                  ? "bg-primary-600 border-primary-600 text-white shadow-sm"
-                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-600/30"
+                                  ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
+                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
                               )}
                             >
                               {category}
@@ -269,14 +267,11 @@ const Products = () => {
 
                     <SheetFooter className="pt-6 border-t mt-auto">
                       <div className="flex items-center justify-between w-full gap-4">
-                        <button
-                          onClick={clearAllFilters}
-                          className="text-sm font-semibold text-gray-500 hover:text-primary-600 transition-colors px-4 py-2"
-                        >
+                        <button onClick={clearAllFilters} className="text-sm font-semibold text-gray-500 hover:text-primary-600 transition-colors px-4 py-2">
                           Clear All
                         </button>
                         <SheetClose asChild>
-                          <Button className="flex-grow rounded-xl h-11 font-bold bg-primary-600 hover:bg-primary-700 text-white">
+                          <Button className="flex-grow rounded-xl h-11 font-semibold bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-600/25">
                             Apply Filters
                           </Button>
                         </SheetClose>
@@ -287,19 +282,17 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Desktop Categories (Horizontal Scroll) */}
+            {/* Desktop Categories */}
             <div className="hidden lg:flex items-center gap-4">
-              <span className="text-sm font-bold uppercase tracking-widest text-gray-400 whitespace-nowrap">
-                Categories:
-              </span>
+              <span className="text-sm font-semibold text-gray-400 whitespace-nowrap">Categories:</span>
               <div className="flex gap-2 pb-1 overflow-x-auto no-scrollbar scroll-smooth">
                 <button
                   onClick={() => handleCategoryChange("All")}
                   className={cn(
-                    "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 border",
+                    "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300",
                     selectedCategory === "All"
-                      ? "bg-primary-600 border-primary-600 text-white shadow-md"
-                      : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-600/30"
+                      ? "bg-primary-600 text-white shadow-lg shadow-primary-600/25"
+                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                   )}
                 >
                   All
@@ -309,10 +302,10 @@ const Products = () => {
                     key={category}
                     onClick={() => handleCategoryChange(category)}
                     className={cn(
-                      "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 border capitalize",
+                      "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 capitalize",
                       selectedCategory === category
-                        ? "bg-primary-600 border-primary-600 text-white shadow-md"
-                        : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-600/30"
+                        ? "bg-primary-600 text-white shadow-lg shadow-primary-600/25"
+                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                     )}
                   >
                     {category}
@@ -323,7 +316,7 @@ const Products = () => {
               {hasActiveFilters && (
                 <button
                   onClick={clearAllFilters}
-                  className="ml-auto text-sm font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1.5 transition-colors"
+                  className="ml-auto text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1.5 transition-colors"
                 >
                   <X className="w-4 h-4" /> Reset
                 </button>
@@ -335,15 +328,15 @@ const Products = () => {
               <div className="flex items-center gap-3 lg:hidden">
                 <div className="flex flex-wrap gap-2">
                   {selectedCategory !== "All" && (
-                    <div className="px-3 py-1.5 rounded-lg bg-primary-600/10 text-primary-600 border border-primary-600/20 flex items-center gap-1.5 text-xs font-semibold capitalize">
+                    <div className="px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 border border-primary-100 flex items-center gap-1.5 text-xs font-semibold capitalize">
                       {selectedCategory}
-                      <X className="w-3 h-3 cursor-pointer hover:text-gray-900 transition-colors" onClick={() => handleCategoryChange("All")} />
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => handleCategoryChange("All")} />
                     </div>
                   )}
                   {selectedStatus !== "All" && (
-                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 border border-orange-200 flex items-center gap-1.5 text-xs font-semibold">
+                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 border border-orange-100 flex items-center gap-1.5 text-xs font-semibold">
                       {selectedStatus}
-                      <X className="w-3 h-3 cursor-pointer hover:text-gray-900 transition-colors" onClick={() => setSelectedStatus("All")} />
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedStatus("All")} />
                     </div>
                   )}
                 </div>
@@ -356,7 +349,6 @@ const Products = () => {
       {/* Modules Grid */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          {/* Results count */}
           <div className="mb-8">
             <p className="text-gray-500">
               Showing <span className="font-semibold text-gray-900">{filteredModules.length}</span> modules
@@ -365,69 +357,86 @@ const Products = () => {
 
           {loading ? (
             <div className="text-center py-40">
-              <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-6"
+              />
               <p className="text-gray-500 font-medium">Loading module inventory...</p>
             </div>
           ) : Object.keys(modulesByCategory).length > 0 ? (
             <div className="space-y-20">
               {Object.entries(modulesByCategory).map(([category, items]: [string, any]) => (
-                <div key={category} className="space-y-10 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-6">
+                <div key={category} className="space-y-8">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-4">
-                      <div className="bg-primary-100 p-3 rounded-xl">
-                        <Settings className="w-6 h-6 text-primary-600" />
+                      <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-xl shadow-lg shadow-primary-600/25">
+                        <Settings className="w-5 h-5 text-white" />
                       </div>
                       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 capitalize">
-                        {category} <span className="text-primary-600 font-medium ml-1">Solutions</span>
+                        {category} <span className="text-primary-600 font-medium">Solutions</span>
                       </h2>
                     </div>
-                    <span className="text-sm font-semibold text-gray-400 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 uppercase tracking-wider">
+                    <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-4 py-1.5 rounded-full">
                       {items.length} {items.length === 1 ? "Module" : "Modules"}
                     </span>
-                  </div>
+                  </motion.div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     {items.map((mod: any, i: number) => (
                       <motion.div
                         key={mod.id}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+                        transition={{ delay: i * 0.08 }}
+                        className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/[0.06] hover:-translate-y-1 transition-all duration-500 overflow-hidden"
                       >
                         <Link to={`/products/${mod.slug}`} className="block flex-1">
-                          <div className="aspect-[1.8/1] bg-slate-50 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-indigo-50 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-                              <div className="p-4 bg-white rounded-2xl shadow-lg border border-white/50 transform group-hover:scale-105 transition-transform duration-500">
-                                <span className="text-4xl filter grayscale group-hover:grayscale-0 transition-all">
-                                  {mod.icon || "📦"}
-                                </span>
-                              </div>
+                          <div className="aspect-[1.8/1] bg-gradient-to-br from-gray-50 to-primary-50/30 relative overflow-hidden">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <motion.div
+                                whileHover={{ scale: 1.1, rotate: 3 }}
+                                className="p-5 bg-white rounded-2xl shadow-lg border border-gray-100"
+                              >
+                                <span className="text-4xl">{mod.icon || "📦"}</span>
+                              </motion.div>
                             </div>
-                            <div className="absolute top-4 left-4">
-                              <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-white/50 shadow-sm text-[13px] font-bold text-primary-600 uppercase tracking-wider">
+                            <div className="absolute top-3 left-3">
+                              <div className={cn(
+                                "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
+                                (mod.status || "Operational") === "Operational"
+                                  ? "bg-green-100 text-green-700"
+                                  : (mod.status || "Operational") === "Beta"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-gray-100 text-gray-600"
+                              )}>
                                 {mod.status || "Operational"}
                               </div>
                             </div>
                           </div>
 
-                          <div className="p-4 space-y-2">
+                          <div className="p-5 space-y-2">
                             <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
                               {mod.name}
                             </h3>
-                            <p className="text-[13px] font-semibold text-primary-600/60 uppercase tracking-widest">
+                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider line-clamp-1">
                               {mod.tagline || category + " Engine"}
                             </p>
                           </div>
                         </Link>
 
-                        <div className="p-4 pt-0 mt-auto">
+                        <div className="p-5 pt-0 mt-auto">
                           <Button
                             onClick={() => navigate(`/login?module=${mod.slug}`)}
-                            className="w-full h-9 rounded-lg bg-gray-50 text-gray-900 border border-gray-100 font-bold text-xs hover:bg-primary-600 hover:text-white transition-all group/btn"
+                            className="w-full h-10 rounded-xl bg-gray-50 text-gray-700 border border-gray-100 font-semibold text-sm hover:bg-primary-600 hover:text-white hover:border-primary-600 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 group/btn"
                           >
-                            Initialize <ArrowRight className="ml-1.5 w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                            Get Started <ArrowRight className="ml-1.5 w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                           </Button>
                         </div>
                       </motion.div>
@@ -437,42 +446,53 @@ const Products = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-40 border-2 border-dashed border-gray-100 rounded-3xl">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-40 border-2 border-dashed border-gray-100 rounded-3xl"
+            >
               <Box className="w-16 h-16 mx-auto text-gray-200 mb-6" />
               <h3 className="text-2xl font-bold text-gray-900">No Modules Found</h3>
               <p className="text-gray-500 mt-2">Try adjusting your search filters to find what you're looking for.</p>
-              <Button variant="link" onClick={clearAllFilters} className="mt-4 text-primary-600 font-bold">
+              <Button variant="link" onClick={clearAllFilters} className="mt-4 text-primary-600 font-semibold">
                 Clear all filters
               </Button>
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
 
-      {/* Final Call to Action */}
-      <section className="py-24 bg-slate-50 border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="bg-primary-600 rounded-3xl p-16 md:p-24 text-white space-y-10 relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+      {/* CTA */}
+      <section className="py-28 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-primary-900 rounded-[2.5rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px]" />
+              <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-[100px]" />
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-            <div className="relative z-10 space-y-6">
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-                Ready to Experience <br /> the Dashboard?
-              </h2>
-              <p className="text-primary-100 text-lg max-w-2xl mx-auto opacity-90">
-                Contact our team to get a personalized demo of any module or start your journey today by creating an instance.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                <Button asChild size="lg" className="h-16 px-12 rounded-xl bg-white text-primary-600 hover:bg-gray-100 font-bold text-lg shadow-xl">
-                  <Link to="/contact">Book a Demo</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="h-16 px-12 rounded-xl border-white/20 text-white hover:bg-white/10 font-bold text-lg backdrop-blur-sm">
-                  <Link to="/services">Platform FAQ</Link>
-                </Button>
+              <div className="relative z-10 space-y-8">
+                <h2 className="text-3xl lg:text-5xl font-bold leading-tight">
+                  Ready to Experience
+                  <br />
+                  <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">the Dashboard?</span>
+                </h2>
+                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                  Contact our team for a personalized demo or start your journey today.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                  <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary-600 hover:bg-primary-500 text-white font-semibold shadow-2xl shadow-primary-600/30 group transition-all duration-300 hover:-translate-y-0.5">
+                    <Link to="/contact">
+                      Book a Demo <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-white/20 text-white hover:bg-white/10 font-semibold backdrop-blur-sm transition-all">
+                    <Link to="/services">View Services</Link>
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
