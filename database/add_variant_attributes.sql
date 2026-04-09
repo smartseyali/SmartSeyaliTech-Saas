@@ -1,15 +1,18 @@
 -- ═══════════════════════════════════════════════════════════════
---  Add structured attributes to master_product_variants
---  Enables Flipkart-style color/size selection with per-variant images
+--  Add all missing columns to master_product_variants
+--  Run this ONCE in Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════════
 
--- Image per variant (Red/XL shows different image than Blue/M)
+-- Variant images
 ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS image_url TEXT;
 
--- Structured color & size (instead of just a free-text name)
+-- Structured attributes
 ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS color VARCHAR(100);
 ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS size VARCHAR(100);
 
-COMMENT ON COLUMN master_product_variants.image_url IS 'Variant-specific product image';
-COMMENT ON COLUMN master_product_variants.color IS 'Color attribute (e.g. Red, Blue, Black)';
-COMMENT ON COLUMN master_product_variants.size IS 'Size attribute (e.g. S, M, L, XL, 500g)';
+-- Pricing
+ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS selling_price DECIMAL(15,2);
+ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS mrp DECIMAL(15,2);
+
+-- Unit of Measure
+ALTER TABLE master_product_variants ADD COLUMN IF NOT EXISTS uom VARCHAR(50);

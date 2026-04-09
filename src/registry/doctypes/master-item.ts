@@ -101,14 +101,14 @@ export const masterItem: DocTypeDef = {
 
   itemFields: [
     { key: "image_url", label: "Image", type: "image" },
-    { key: "color", label: "Color", type: "text", placeholder: "e.g. Red" },
-    { key: "size", label: "Size", type: "text", placeholder: "e.g. XL" },
-    { key: "name", label: "Variant Label", type: "text", placeholder: "e.g. Red / XL" },
+    { key: "name", label: "Variant Label", type: "text", required: true, placeholder: "e.g. Thokku 250g" },
     { key: "sku", label: "SKU Code", type: "text" },
-    { key: "barcode", label: "Barcode (EAN)", type: "text" },
+    { key: "uom", label: "UOM", type: "select", lookupTable: "master_uoms", lookupLabel: "name", lookupValue: "name" },
+    { key: "color", label: "Color", type: "text", placeholder: "e.g. Red" },
+    { key: "size", label: "Size", type: "text", placeholder: "e.g. 250g / XL" },
     { key: "selling_price", label: "Selling Price", type: "currency", placeholder: "0.00" },
     { key: "mrp", label: "MRP", type: "currency", placeholder: "0.00" },
-    { key: "stock_qty", label: "Stock", type: "number", placeholder: "0" },
+    { key: "is_in_stock", label: "In Stock", type: "checkbox" },
   ],
 
   columns: [

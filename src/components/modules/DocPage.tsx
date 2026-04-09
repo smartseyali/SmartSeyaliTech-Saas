@@ -289,8 +289,6 @@ export default function DocPage({
             };
           });
 
-        console.log("Variant lineItems to insert:", JSON.stringify(lineItems, null, 2));
-        console.log("Inserting into table:", def.itemTableName);
         if (lineItems.length > 0) {
           const { error } = await supabase
             .from(def.itemTableName)
@@ -298,11 +296,7 @@ export default function DocPage({
           if (error) {
             console.error("Variant insert error:", error);
             toast.error(`Variants failed: ${error.message}`);
-          } else {
-            console.log("Variants saved successfully!");
           }
-        } else {
-          console.log("No valid variant rows to insert");
         }
       }
 
