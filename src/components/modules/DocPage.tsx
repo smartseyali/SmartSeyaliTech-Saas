@@ -165,7 +165,8 @@ export default function DocPage({
         query = query.eq("company_id", activeCompany.id);
       }
 
-      const { data } = await query.order("sort_order", { ascending: true });
+      const { data, error } = await query.order("created_at", { ascending: true });
+      if (error) console.error("loadItems error:", error);
       return data || [];
     },
     [def, activeCompany]
@@ -288,17 +289,26 @@ export default function DocPage({
             };
           });
 
+        console.log("Variant lineItems to insert:", JSON.stringify(lineItems, null, 2));
+        console.log("Inserting into table:", def.itemTableName);
         if (lineItems.length > 0) {
           const { error } = await supabase
             .from(def.itemTableName)
             .insert(lineItems);
-          if (error) throw error;
+          if (error) {
+            console.error("Variant insert error:", error);
+            toast.error(`Variants failed: ${error.message}`);
+          } else {
+            console.log("Variants saved successfully!");
+          }
+        } else {
+          console.log("No valid variant rows to insert");
         }
       }
 
       toast.success(`${def.name} saved successfully`);
 
-      // Stay on the form with the saved record
+      // Always refresh the list so the parent record shows up
       await fetchItems();
       if (savedHeader) {
         const updated = unpackCustomFields(savedHeader);
@@ -310,6 +320,8 @@ export default function DocPage({
       }
     } catch (err: any) {
       toast.error(`Save failed: ${err.message}`);
+      // Still refresh list in case the parent was already saved
+      await fetchItems();
     }
   };
 

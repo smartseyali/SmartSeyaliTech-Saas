@@ -10,6 +10,8 @@ export const masterItem: DocTypeDef = {
   formTitle: "Product",
   showItems: true,
   itemTitle: "Product Variants",
+  itemTableName: "master_product_variants",
+  itemForeignKey: "item_id",
 
   defaults: {
     item_type: "Goods",
@@ -101,8 +103,8 @@ export const masterItem: DocTypeDef = {
     { key: "image_url", label: "Image", type: "image" },
     { key: "color", label: "Color", type: "text", placeholder: "e.g. Red" },
     { key: "size", label: "Size", type: "text", placeholder: "e.g. XL" },
-    { key: "variant_name", label: "Variant Label", type: "text", placeholder: "e.g. Red / XL" },
-    { key: "sku_suffix", label: "SKU Code", type: "text" },
+    { key: "name", label: "Variant Label", type: "text", placeholder: "e.g. Red / XL" },
+    { key: "sku", label: "SKU Code", type: "text" },
     { key: "barcode", label: "Barcode (EAN)", type: "text" },
     { key: "selling_price", label: "Selling Price", type: "currency", placeholder: "0.00" },
     { key: "mrp", label: "MRP", type: "currency", placeholder: "0.00" },
