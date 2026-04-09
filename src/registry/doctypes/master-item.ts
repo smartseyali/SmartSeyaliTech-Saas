@@ -93,16 +93,20 @@ export const masterItem: DocTypeDef = {
       { key: "reorder_level", label: "Low Stock Alert Level", type: "number", placeholder: "Threshold" },
       { key: "min_stock", label: "Minimum Buffer Stock", type: "number" },
       { key: "max_stock", label: "Maximum Stock Capacity", type: "number" },
-      { key: "current_stock", label: "Current Stock", type: "number", readOnly: true },
+      { key: "current_stock", label: "Current Stock", type: "number", placeholder: "0" },
     ],
   },
 
   itemFields: [
-    { key: "variant_name", label: "Size / Color / Variant", type: "text", placeholder: "e.g. Red / XL" },
+    { key: "image_url", label: "Image", type: "image" },
+    { key: "color", label: "Color", type: "text", placeholder: "e.g. Red" },
+    { key: "size", label: "Size", type: "text", placeholder: "e.g. XL" },
+    { key: "variant_name", label: "Variant Label", type: "text", placeholder: "e.g. Red / XL" },
     { key: "sku_suffix", label: "SKU Code", type: "text" },
     { key: "barcode", label: "Barcode (EAN)", type: "text" },
-    { key: "price_impact", label: "Price Change (+/-)", type: "currency", placeholder: "Price difference" },
-    { key: "stock_qty", label: "Available Stock", type: "number", placeholder: "0" },
+    { key: "selling_price", label: "Selling Price", type: "currency", placeholder: "0.00" },
+    { key: "mrp", label: "MRP", type: "currency", placeholder: "0.00" },
+    { key: "stock_qty", label: "Stock", type: "number", placeholder: "0" },
   ],
 
   columns: [
