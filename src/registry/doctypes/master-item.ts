@@ -109,6 +109,7 @@ export const masterItem: DocTypeDef = {
     { key: "selling_price", label: "Selling Price", type: "currency", placeholder: "0.00" },
     { key: "mrp", label: "MRP", type: "currency", placeholder: "0.00" },
     { key: "is_in_stock", label: "In Stock", type: "checkbox" },
+    { key: "is_default", label: "Default", type: "checkbox" },
   ],
 
   columns: [

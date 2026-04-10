@@ -142,7 +142,12 @@ export default function DocForm({
   const handleAddItem = () => setItems([...items, { id: Date.now() }]);
   const handleRemoveItem = (idx: number) => { if (items.length > 1) setItems(items.filter((_, i) => i !== idx)); };
   const updateItem = (idx: number, field: string, value: any) => {
-    setItems(items.map((item, i) => (i === idx ? { ...item, [field]: value } : item)));
+    if (field === "is_default" && value) {
+      // Only one item can be default — clear others
+      setItems(items.map((item, i) => ({ ...item, is_default: i === idx })));
+    } else {
+      setItems(items.map((item, i) => (i === idx ? { ...item, [field]: value } : item)));
+    }
   };
 
   /* ── Save ────────────────────────────────────────────────────────────────── */

@@ -15,6 +15,7 @@ interface Variant {
     price: number;
     stock: number;
     image_url: string;
+    is_default: boolean;
 }
 
 const inputStyle = "w-full h-10 px-3.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all shadow-sm";
@@ -49,7 +50,7 @@ export function ProductVariantDialog({
         try {
             const { data } = await supabase
                 .from("product_variants")
-                .select("id, sku, price, stock_qty, image_url, attributes_summary")
+                .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default")
                 .eq("product_id", productId);
 
             const mapped = (data || []).map((row: any) => {
@@ -61,7 +62,8 @@ export function ProductVariantDialog({
                     options: opts,
                     price: row.price || 0,
                     stock: row.stock_qty || 0,
-                    image_url: row.image_url || ""
+                    image_url: row.image_url || "",
+                    is_default: row.is_default || false
                 };
             });
             setVariants(mapped);
@@ -73,7 +75,7 @@ export function ProductVariantDialog({
     };
 
     const addVariant = () => {
-        setVariants([...variants, { sku: "", options: { color: "", size: "" }, price: 0, stock: 0, image_url: "" }]);
+        setVariants([...variants, { sku: "", options: { color: "", size: "" }, price: 0, stock: 0, image_url: "", is_default: false }]);
     };
 
     const removeVariant = async (index: number, id?: number) => {
@@ -89,6 +91,7 @@ export function ProductVariantDialog({
         price: v.price,
         stock_qty: v.stock,
         image_url: v.image_url,
+        is_default: v.is_default,
         attributes_summary: JSON.stringify(v.options),
         name: [v.options.color, v.options.size].filter(Boolean).join(' / ') || v.sku || 'Variant',
         ...extra
@@ -206,9 +209,19 @@ export function ProductVariantDialog({
 
                                         {/* Status + Delete row */}
                                         <div className="flex items-end justify-between col-span-2 lg:col-span-3 pt-4 mt-2 border-t border-slate-100">
-                                            <span className="text-xs font-medium text-slate-500">
-                                                {v.id ? `ID: ${v.id}` : <span className="text-blue-500 ">Unsaved variant</span>}
-                                            </span>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-xs font-medium text-slate-500">
+                                                    {v.id ? `ID: ${v.id}` : <span className="text-blue-500 ">Unsaved variant</span>}
+                                                </span>
+                                                <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                    <input type="checkbox" checked={v.is_default} onChange={e => {
+                                                        const next = variants.map((vr, vi) => ({ ...vr, is_default: vi === i ? e.target.checked : false }));
+                                                        setVariants(next);
+                                                    }}
+                                                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 cursor-pointer" />
+                                                    <span className={cn("text-xs font-semibold", v.is_default ? "text-blue-600" : "text-slate-500")}>Default</span>
+                                                </label>
+                                            </div>
                                             <button
                                                 onClick={() => removeVariant(i, v.id)}
                                                 className="h-8 px-3 flex items-center gap-1.5 rounded-lg text-red-500 hover:bg-red-50 text-sm font-semibold transition-colors"
