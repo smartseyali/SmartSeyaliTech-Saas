@@ -62,7 +62,9 @@ export const masterItem: DocTypeDef = {
     mapping: [
       { key: "is_live", label: "Show on Website / Store", type: "checkbox" },
       { key: "is_published", label: "Published on Website", type: "checkbox" },
-      { key: "featured", label: "Featured on Homepage", type: "checkbox" },
+      { key: "featured", label: "Pattikadai Special", type: "checkbox" },
+      { key: "is_best_seller", label: "Best Selling", type: "checkbox" },
+      { key: "is_combo", label: "Special Combo", type: "checkbox" },
       { key: "delivery_mode", label: "Delivery Mode", type: "select", options: [
         { value: "online", label: "Online" },
         { value: "offline", label: "Offline / In-person" },
