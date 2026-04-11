@@ -54,6 +54,11 @@ import { hrmsEmployee } from "./doctypes/hrms-employee";
 import { whatsappTemplate } from "./doctypes/whatsapp-template";
 import { whatsappAccount } from "./doctypes/whatsapp-account";
 import { whatsappLog } from "./doctypes/whatsapp-log";
+import { whatsappContact } from "./doctypes/whatsapp-contact";
+import { whatsappCampaign } from "./doctypes/whatsapp-campaign";
+import { whatsappBotRule } from "./doctypes/whatsapp-bot-rule";
+import { whatsappConversation } from "./doctypes/whatsapp-conversation";
+import { whatsappMessage } from "./doctypes/whatsapp-message";
 
 // ── Website ───────────────────────────────────────────────────────────────
 import { blogPost } from "./doctypes/blog-post";
@@ -161,6 +166,11 @@ export const REGISTRY: Record<string, DocTypeDef> = {
   whatsappTemplate,
   whatsappAccount,
   whatsappLog,
+  whatsappContact,
+  whatsappCampaign,
+  whatsappBotRule,
+  whatsappConversation,
+  whatsappMessage,
 
   // Website
   blogPost,

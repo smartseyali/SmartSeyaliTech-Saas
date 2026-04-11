@@ -13,7 +13,7 @@ import {
   Clock, Layers, ListTree, Ruler, DollarSign, Percent, Share2,
   Landmark, BookOpen, PieChart, ArrowLeftRight, Receipt, TrendingUp,
   UserPlus, Award, Palette, CalendarDays, Languages, GraduationCap,
-  FileText,
+  FileText, Bot, MessageCircle, Megaphone, Mail, Eye,
 } from "lucide-react";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
@@ -168,9 +168,27 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
       label: "Messaging",
       icon: MessageSquare,
       items: [
+        { title: "Contacts", url: "/apps/whatsapp/contacts", icon: Users, resource: "contacts" },
+        { title: "Templates", url: "/apps/whatsapp/templates", icon: FileText, resource: "marketing" },
+        { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Megaphone, resource: "marketing" },
+      ],
+    },
+    {
+      label: "Conversations",
+      icon: MessageCircle,
+      items: [
+        { title: "Agent Inbox", url: "/apps/whatsapp/inbox", icon: Mail, resource: "support" },
+        { title: "All Conversations", url: "/apps/whatsapp/conversations", icon: MessageCircle, resource: "support" },
+        { title: "Bot Rules", url: "/apps/whatsapp/bot-rules", icon: Bot, resource: "automation" },
+      ],
+    },
+    {
+      label: "Insights",
+      icon: BarChart3,
+      items: [
+        { title: "Analytics", url: "/apps/whatsapp/analytics", icon: Eye, resource: "analytics" },
+        { title: "Logs", url: "/apps/whatsapp/logs", icon: Clock, resource: "settings" },
         { title: "Accounts", url: "/apps/whatsapp/accounts", icon: Smartphone, resource: "settings" },
-        { title: "Templates", url: "/apps/whatsapp/templates", icon: Library, resource: "marketing" },
-        { title: "Campaigns", url: "/apps/whatsapp/campaigns", icon: Zap, resource: "marketing" },
       ],
     },
   ],
