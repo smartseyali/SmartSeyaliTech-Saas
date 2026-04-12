@@ -35,6 +35,7 @@ interface Message {
   status: string;
   created_at: string;
   sent_by: string | null;
+  wa_message_id?: string;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -87,7 +88,15 @@ export default function AgentInbox() {
           filter: `conversation_id=eq.${activeConv.id}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const incoming = payload.new as Message;
+          setMessages((prev) => {
+            // Update existing message (status change) or append new one
+            const exists = prev.some((m) => m.id === incoming.id);
+            if (exists) {
+              return prev.map((m) => m.id === incoming.id ? incoming : m);
+            }
+            return [...prev, incoming];
+          });
         }
       )
       .subscribe();
@@ -131,57 +140,89 @@ export default function AgentInbox() {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !activeConv || !activeCompany || !user) return;
+
+    const msgBody = newMessage.trim();
+    const now = new Date().toISOString();
+    const convId = activeConv.id;
+    const contactId = activeConv.contact_id;
+    const contactPhone = activeConv.whatsapp_contacts?.phone;
+
+    // Clear input immediately
+    setNewMessage("");
     setSending(true);
+
+    // 1. Show message in chat INSTANTLY (before any API call)
+    const tempId = Date.now();
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: tempId,
+        direction: "outbound",
+        message_type: "text",
+        body: msgBody,
+        status: "sending",
+        created_at: now,
+        sent_by: user.id,
+      },
+    ]);
 
     try {
       const account = await getActiveAccount(activeCompany.id);
       if (!account) {
+        setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, status: "failed" } : m));
         alert("No verified WhatsApp account configured");
         return;
       }
 
-      const contactPhone = activeConv.whatsapp_contacts?.phone;
-      if (!contactPhone) return;
+      if (!contactPhone) {
+        setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, status: "failed" } : m));
+        return;
+      }
 
-      // Check session window
       if (!isWithinSessionWindow(activeConv.session_expires_at)) {
+        setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, status: "failed" } : m));
         alert("Session expired. Use a template message to re-engage this contact.");
         return;
       }
 
-      const result = await sendTextMessage(account, contactPhone, newMessage);
+      // 2. Send via API (mock in test mode)
+      const result = await sendTextMessage(account, contactPhone, msgBody);
 
-      if (result.success) {
-        // Save to DB
-        await supabase.from("whatsapp_messages").insert({
-          company_id: activeCompany.id,
-          conversation_id: activeConv.id,
-          contact_id: activeConv.contact_id,
-          direction: "outbound",
-          message_type: "text",
-          body: newMessage,
-          wa_message_id: result.wa_message_id,
-          status: "sent",
-          sent_by: user.id,
-          sent_at: new Date().toISOString(),
-        });
-
-        // Update conversation
-        await supabase
-          .from("whatsapp_conversations")
-          .update({
-            last_message_at: new Date().toISOString(),
-            last_message_preview: newMessage.substring(0, 100),
-            status: "open",
-            assigned_to: user.id,
-          })
-          .eq("id", activeConv.id);
-
-        setNewMessage("");
-        loadConversations();
-      } else {
+      if (!result.success) {
+        setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, status: "failed" } : m));
         alert(`Failed to send: ${result.error}`);
+        return;
       }
+
+      // 3. Update temp message status to "sent"
+      setMessages((prev) => prev.map((m) => m.id === tempId ? { ...m, status: "sent" } : m));
+
+      // 4. Persist to DB in background (don't block UI)
+      supabase.from("whatsapp_messages").insert({
+        company_id: activeCompany.id,
+        conversation_id: convId,
+        contact_id: contactId,
+        direction: "outbound",
+        message_type: "text",
+        body: msgBody,
+        wa_message_id: result.wa_message_id,
+        status: "sent",
+        sent_by: user.id,
+        sent_at: now,
+      }).then(({ error }) => {
+        if (error) console.error("[AgentInbox] DB insert error:", error.message);
+      });
+
+      // 5. Update conversation in background
+      supabase.from("whatsapp_conversations").update({
+        last_message_at: now,
+        last_message_preview: msgBody.substring(0, 100),
+        status: "open",
+        assigned_to: user.id,
+      }).eq("id", convId).then(() => {
+        loadConversations();
+      });
+
     } finally {
       setSending(false);
     }
