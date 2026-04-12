@@ -8,6 +8,13 @@ export const whatsappMessage: DocTypeDef = {
   listTitle: "Messages",
   formTitle: "Message",
   showItems: false,
+  selectQuery: "*, whatsapp_conversations(id, whatsapp_contacts(name, phone))",
+
+  defaults: {
+    direction: "outbound",
+    message_type: "text",
+    status: "pending",
+  },
 
   headerFields: [
     {
@@ -50,7 +57,26 @@ export const whatsappMessage: DocTypeDef = {
     },
   ],
 
+  tabFields: {
+    audit: [
+      { key: "wa_message_id", label: "WA Message ID", readOnly: true },
+      { key: "sent_at", label: "Sent At", type: "datetime-local", readOnly: true },
+      { key: "delivered_at", label: "Delivered At", type: "datetime-local", readOnly: true },
+      { key: "read_at", label: "Read At", type: "datetime-local", readOnly: true },
+      { key: "error_code", label: "Error Code", readOnly: true },
+      { key: "error_message", label: "Error Message", readOnly: true },
+    ],
+  },
+
   columns: [
+    {
+      key: "conversation_id", label: "Contact",
+      render: (item: any) => {
+        const conv = item.whatsapp_conversations;
+        const contact = conv?.whatsapp_contacts;
+        return contact ? `${contact.name}` : `#${item.conversation_id}`;
+      },
+    },
     { key: "direction", label: "Direction" },
     { key: "message_type", label: "Type" },
     { key: "body", label: "Message" },
@@ -59,4 +85,5 @@ export const whatsappMessage: DocTypeDef = {
   ],
 
   defaultSort: { key: "created_at", dir: "desc" },
+  searchableFields: ["body", "wa_message_id"],
 };

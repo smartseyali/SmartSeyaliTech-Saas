@@ -6,6 +6,13 @@
  */
 
 import { supabase } from "@/lib/supabase";
+import {
+  isTestMode,
+  mockSendWhatsAppMessage,
+  mockSubmitTemplateToMeta,
+  mockSyncTemplateStatuses,
+  getMockAccount,
+} from "./whatsappMockService";
 
 const META_API_VERSION = "v21.0";
 const META_BASE_URL = `https://graph.facebook.com/${META_API_VERSION}`;
@@ -101,7 +108,13 @@ export async function getActiveAccount(companyId: string): Promise<WAAccount | n
     .eq("company_id", companyId)
     .eq("status", "verified")
     .limit(1)
-    .single();
+    .maybeSingle();
+
+  // In test mode, return a mock account if no real one exists
+  if (!data && isTestMode()) {
+    return getMockAccount(companyId);
+  }
+
   return data;
 }
 
@@ -111,6 +124,11 @@ export async function sendWhatsAppMessage(
   account: WAAccount,
   payload: SendMessagePayload
 ): Promise<{ success: boolean; wa_message_id?: string; error?: string }> {
+  // Route to mock in test mode
+  if (isTestMode()) {
+    return mockSendWhatsAppMessage(account, payload);
+  }
+
   try {
     const response = await fetch(
       `${META_BASE_URL}/${account.phone_number_id}/messages`,
@@ -231,6 +249,11 @@ export async function submitTemplateToMeta(
     buttons?: any[];
   }
 ): Promise<{ success: boolean; meta_template_id?: string; error?: string }> {
+  // Route to mock in test mode
+  if (isTestMode()) {
+    return mockSubmitTemplateToMeta(account, template);
+  }
+
   const components: any[] = [];
 
   // Header component
@@ -302,6 +325,11 @@ export async function syncTemplateStatuses(
   account: WAAccount,
   companyId: string
 ): Promise<{ synced: number; errors: string[] }> {
+  // Route to mock in test mode — auto-approves all pending templates
+  if (isTestMode()) {
+    return mockSyncTemplateStatuses(account, companyId);
+  }
+
   const errors: string[] = [];
   let synced = 0;
 
@@ -380,7 +408,7 @@ async function handleIncomingMessage(
     .select("id")
     .eq("company_id", companyId)
     .eq("phone", phone)
-    .single();
+    .maybeSingle();
 
   let contactId: number;
   if (existingContact) {
@@ -415,7 +443,7 @@ async function handleIncomingMessage(
     .in("status", ["bot", "waiting", "open"])
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!conversation) {
     const { data: newConv } = await supabase
@@ -534,3 +562,6 @@ export function isWithinSessionWindow(sessionExpiresAt: string | null): boolean 
   if (!sessionExpiresAt) return false;
   return new Date(sessionExpiresAt) > new Date();
 }
+
+// Re-export for UI components
+export { isTestMode } from "./whatsappMockService";

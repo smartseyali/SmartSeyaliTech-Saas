@@ -6,10 +6,12 @@ import {
   MessageSquare, Send, CheckCircle2, Clock, Plus, Zap,
   Users, BarChart3, Settings, MessageCircle, Bot,
   UserCircle, Megaphone, FileText, RefreshCw,
-  Phone, ArrowUpRight, Eye, AlertCircle,
+  Phone, ArrowUpRight, Eye, AlertCircle, FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { isTestMode } from "@/lib/services/whatsappService";
+import { simulateInboundMessage } from "@/lib/services/whatsappMockService";
 
 interface Stats {
   sentToday: number;
@@ -48,10 +50,32 @@ export default function WhatsAppDashboard() {
   const [campaigns, setCampaigns] = useState<RecentCampaign[]>([]);
   const [conversations, setConversations] = useState<RecentConversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [simulating, setSimulating] = useState(false);
+  const [showSimDialog, setShowSimDialog] = useState(false);
+  const [simPhone, setSimPhone] = useState("+919566907059");
+  const [simName, setSimName] = useState("Natesh");
+  const [simBody, setSimBody] = useState("");
 
   useEffect(() => {
     if (activeCompany) load();
   }, [activeCompany]);
+
+  const handleSimulateInbound = async (useCustom = false) => {
+    if (!activeCompany || simulating) return;
+    setSimulating(true);
+    try {
+      const options = useCustom
+        ? { phone: simPhone, name: simName, body: simBody || undefined }
+        : undefined;
+      const result = await simulateInboundMessage(activeCompany.id, options);
+      console.log("[WA Mock] Simulated inbound:", result);
+      setShowSimDialog(false);
+      setSimBody("");
+      await load();
+    } finally {
+      setSimulating(false);
+    }
+  };
 
   const load = async () => {
     if (!activeCompany) return;
@@ -120,6 +144,64 @@ export default function WhatsAppDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {isTestMode() && (
+            <div className="relative">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowSimDialog((p) => !p)}
+                disabled={simulating}
+                className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-1.5 border-amber-300 text-amber-600 hover:bg-amber-50 rounded-lg"
+              >
+                <FlaskConical className={cn("w-3.5 h-3.5", simulating && "animate-pulse")} />
+                Simulate Inbound
+              </Button>
+              {showSimDialog && (
+                <div className="absolute right-0 top-10 z-50 w-80 bg-white rounded-xl border border-slate-200 shadow-2xl p-4 space-y-3">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Simulate Incoming Message</p>
+                  <div className="space-y-2">
+                    <input
+                      value={simPhone}
+                      onChange={(e) => setSimPhone(e.target.value)}
+                      className="w-full h-8 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-300 font-mono"
+                      placeholder="Phone (e.g. +919566907059)"
+                    />
+                    <input
+                      value={simName}
+                      onChange={(e) => setSimName(e.target.value)}
+                      className="w-full h-8 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-300"
+                      placeholder="Contact Name"
+                    />
+                    <input
+                      value={simBody}
+                      onChange={(e) => setSimBody(e.target.value)}
+                      className="w-full h-8 px-3 rounded-lg bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-300"
+                      placeholder="Message (leave empty for random)"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleSimulateInbound(true)}
+                      disabled={simulating}
+                      className="flex-1 h-8 text-[9px] font-black uppercase tracking-widest bg-amber-500 hover:bg-amber-600 text-white rounded-lg"
+                    >
+                      {simulating ? "Sending..." : "Send as " + simName}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleSimulateInbound(false)}
+                      disabled={simulating}
+                      className="h-8 text-[9px] font-black uppercase tracking-widest rounded-lg"
+                    >
+                      Random
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={load}
             className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-600 transition-all"
@@ -133,6 +215,18 @@ export default function WhatsAppDashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Test Mode Banner */}
+      {isTestMode() && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl">
+          <FlaskConical className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <p className="text-[10px] font-bold text-amber-700 leading-relaxed">
+            <span className="font-black uppercase tracking-widest">Test Mode Active</span>
+            &nbsp;&mdash;&nbsp;Messages are simulated locally. No Meta API calls are made. Status progression (sent &rarr; delivered &rarr; read) is auto-simulated.
+            Set <code className="px-1.5 py-0.5 bg-amber-100 rounded text-[9px] font-mono">VITE_WHATSAPP_MODE=live</code> to switch to real API.
+          </p>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

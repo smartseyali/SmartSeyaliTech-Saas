@@ -29,9 +29,11 @@ export const whatsappAccount: DocTypeDef = {
   ],
 
   columns: [
-    { key: "identity", label: "Account Name" },
-    { key: "infrastructure", label: "Status" },
-    { key: "security", label: "Verified" },
+    { key: "display_name", label: "Account Name" },
+    { key: "phone_number_id", label: "Phone Number ID" },
+    { key: "waba_id", label: "WABA ID" },
     { key: "status", label: "Status" },
   ],
+
+  searchableFields: ["display_name", "phone_number_id"],
 };

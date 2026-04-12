@@ -68,7 +68,10 @@ export const whatsappBotRule: DocTypeDef = {
     { key: "rule_type", label: "Trigger" },
     { key: "priority", label: "Priority" },
     { key: "response_type", label: "Response" },
-    { key: "is_active", label: "Active" },
+    {
+      key: "is_active", label: "Active",
+      render: (item: any) => item.is_active ? "Active" : "Inactive",
+    },
   ],
 
   defaultSort: { key: "priority", dir: "asc" },

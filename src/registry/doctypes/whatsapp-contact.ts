@@ -58,7 +58,10 @@ export const whatsappContact: DocTypeDef = {
     { key: "name", label: "Contact" },
     { key: "phone", label: "Phone" },
     { key: "lifecycle_stage", label: "Stage" },
-    { key: "opt_in", label: "Opt-in" },
+    {
+      key: "opt_in", label: "Opt-in",
+      render: (item: any) => item.opt_in ? "Yes" : "No",
+    },
     { key: "source", label: "Source" },
   ],
 

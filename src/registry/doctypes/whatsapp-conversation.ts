@@ -8,7 +8,7 @@ export const whatsappConversation: DocTypeDef = {
   listTitle: "Conversations",
   formTitle: "Conversation",
   showItems: false,
-  selectQuery: "*, whatsapp_contacts(name, phone)",
+  selectQuery: "*, whatsapp_contacts(name, phone), whatsapp_accounts(display_name), master_users(full_name)",
 
   defaults: {
     status: "bot",
@@ -58,9 +58,21 @@ export const whatsappConversation: DocTypeDef = {
   },
 
   columns: [
-    { key: "contact_id", label: "Contact" },
+    {
+      key: "contact_id", label: "Contact",
+      render: (item: any) => {
+        const c = item.whatsapp_contacts;
+        return c ? `${c.name} (${c.phone})` : item.contact_id || "—";
+      },
+    },
     { key: "status", label: "Status" },
-    { key: "assigned_to", label: "Agent" },
+    {
+      key: "assigned_to", label: "Agent",
+      render: (item: any) => {
+        const u = item.master_users;
+        return u?.full_name || (item.assigned_to ? "Unresolved" : "Unassigned");
+      },
+    },
     { key: "last_message_preview", label: "Last Message" },
     { key: "unread_count", label: "Unread" },
     { key: "last_message_at", label: "Last Active" },
