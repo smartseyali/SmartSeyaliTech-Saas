@@ -383,14 +383,14 @@ export default function DocForm({
       {/* ── Form Body ─────────────────────────────────────────────────────── */}
       <div className="max-w-[1200px] mx-auto px-4 py-5 space-y-4">
 
-        {/* ── headerFields mode: all fields in one card (ERPNext flat form) ── */}
-        {!isTabMode && headerFields && headerFields.length > 0 && (
+        {/* ── Header Fields: always render as top card when present ────── */}
+        {headerFields && headerFields.length > 0 && (
           <div className="bg-white rounded border border-slate-200 shadow-sm overflow-hidden">
             {renderFieldGrid(headerFields)}
           </div>
         )}
 
-        {/* ── tabFields mode: each tab is a collapsible section ─────────── */}
+        {/* ── Tab sections: collapsible sections below header fields ───── */}
         {isTabMode && sections.map(section => {
           const isCollapsed = collapsedSections.has(section.id);
           return (

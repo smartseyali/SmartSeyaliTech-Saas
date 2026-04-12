@@ -40,19 +40,12 @@ export const whatsappContact: DocTypeDef = {
     },
     { key: "opt_in", label: "Opt-in Consent", type: "checkbox" },
     { key: "opt_in_at", label: "Opt-in Date", type: "datetime-local" },
+    { key: "tags", label: "Tags (comma-separated)", type: "text", placeholder: "vip, repeat-buyer, wholesale" },
+    { key: "attributes", label: "Custom Attributes (JSON)", type: "textarea", placeholder: '{"city": "Chennai", "plan": "premium"}' },
+    { key: "last_message_at", label: "Last Message", type: "datetime-local", readOnly: true },
+    { key: "created_at", label: "Created", type: "datetime-local", readOnly: true },
+    { key: "updated_at", label: "Updated", type: "datetime-local", readOnly: true },
   ],
-
-  tabFields: {
-    basic: [
-      { key: "tags", label: "Tags (comma-separated)", type: "text", placeholder: "vip, repeat-buyer, wholesale" },
-      { key: "attributes", label: "Custom Attributes (JSON)", type: "textarea", placeholder: '{"city": "Chennai", "plan": "premium"}' },
-    ],
-    audit: [
-      { key: "last_message_at", label: "Last Message", type: "datetime-local", readOnly: true },
-      { key: "created_at", label: "Created", type: "datetime-local", readOnly: true },
-      { key: "updated_at", label: "Updated", type: "datetime-local", readOnly: true },
-    ],
-  },
 
   columns: [
     { key: "name", label: "Contact" },

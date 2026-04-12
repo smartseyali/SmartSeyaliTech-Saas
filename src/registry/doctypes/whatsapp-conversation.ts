@@ -45,17 +45,12 @@ export const whatsappConversation: DocTypeDef = {
       ],
     },
     { key: "tags", label: "Tags", type: "text", placeholder: "support, billing" },
+    { key: "last_message_at", label: "Last Message", type: "datetime-local", readOnly: true },
+    { key: "last_message_preview", label: "Last Message Preview", type: "text", readOnly: true },
+    { key: "unread_count", label: "Unread Count", type: "number", readOnly: true },
+    { key: "session_expires_at", label: "Session Expires", type: "datetime-local", readOnly: true },
+    { key: "created_at", label: "Created", type: "datetime-local", readOnly: true },
   ],
-
-  tabFields: {
-    audit: [
-      { key: "last_message_at", label: "Last Message", type: "datetime-local", readOnly: true },
-      { key: "last_message_preview", label: "Last Message Preview", type: "text", readOnly: true },
-      { key: "unread_count", label: "Unread Count", type: "number", readOnly: true },
-      { key: "session_expires_at", label: "Session Expires", type: "datetime-local", readOnly: true },
-      { key: "created_at", label: "Created", type: "datetime-local", readOnly: true },
-    ],
-  },
 
   columns: [
     {

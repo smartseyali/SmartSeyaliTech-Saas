@@ -55,18 +55,13 @@ export const whatsappMessage: DocTypeDef = {
         { label: "Failed", value: "failed" },
       ],
     },
+    { key: "wa_message_id", label: "WA Message ID", readOnly: true },
+    { key: "sent_at", label: "Sent At", type: "datetime-local", readOnly: true },
+    { key: "delivered_at", label: "Delivered At", type: "datetime-local", readOnly: true },
+    { key: "read_at", label: "Read At", type: "datetime-local", readOnly: true },
+    { key: "error_code", label: "Error Code", readOnly: true },
+    { key: "error_message", label: "Error Message", readOnly: true },
   ],
-
-  tabFields: {
-    audit: [
-      { key: "wa_message_id", label: "WA Message ID", readOnly: true },
-      { key: "sent_at", label: "Sent At", type: "datetime-local", readOnly: true },
-      { key: "delivered_at", label: "Delivered At", type: "datetime-local", readOnly: true },
-      { key: "read_at", label: "Read At", type: "datetime-local", readOnly: true },
-      { key: "error_code", label: "Error Code", readOnly: true },
-      { key: "error_message", label: "Error Message", readOnly: true },
-    ],
-  },
 
   columns: [
     {

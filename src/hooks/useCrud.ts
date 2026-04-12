@@ -88,11 +88,10 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
     const createItem = async (payload: any) => {
         if (!activeCompany && !options.isGlobal) throw new Error("No active workspace selected.");
 
-        // Always stamp company_id and created_by on creation — the SaaS foundation
+        // Always stamp company_id on creation — the SaaS foundation
         const payloadWithCompany = cleanPayload({
             ...payload,
             ...(options.isGlobal ? {} : { company_id: activeCompany?.id }),
-            user_id: authUser?.id // Optional: attribute to specific user
         });
 
         const { data: result, error } = await supabase

@@ -42,23 +42,16 @@ export const whatsappCampaign: DocTypeDef = {
       ],
     },
     { key: "scheduled_at", label: "Schedule Date/Time", type: "datetime-local" },
+    { key: "segment_tags", label: "Target Tags (comma-separated)", type: "text", placeholder: "vip, repeat-buyer" },
+    { key: "variable_map", label: "Variable Mapping (JSON)", type: "textarea", placeholder: '{"name": "contact.name", "order_id": "contact.attributes.last_order"}' },
+    { key: "total_recipients", label: "Total Recipients", type: "number", readOnly: true },
+    { key: "sent_count", label: "Sent", type: "number", readOnly: true },
+    { key: "delivered_count", label: "Delivered", type: "number", readOnly: true },
+    { key: "read_count", label: "Read", type: "number", readOnly: true },
+    { key: "failed_count", label: "Failed", type: "number", readOnly: true },
+    { key: "started_at", label: "Started At", type: "datetime-local", readOnly: true },
+    { key: "completed_at", label: "Completed At", type: "datetime-local", readOnly: true },
   ],
-
-  tabFields: {
-    basic: [
-      { key: "segment_tags", label: "Target Tags (comma-separated)", type: "text", placeholder: "vip, repeat-buyer" },
-      { key: "variable_map", label: "Variable Mapping (JSON)", type: "textarea", placeholder: '{"name": "contact.name", "order_id": "contact.attributes.last_order"}' },
-    ],
-    audit: [
-      { key: "total_recipients", label: "Total Recipients", type: "number", readOnly: true },
-      { key: "sent_count", label: "Sent", type: "number", readOnly: true },
-      { key: "delivered_count", label: "Delivered", type: "number", readOnly: true },
-      { key: "read_count", label: "Read", type: "number", readOnly: true },
-      { key: "failed_count", label: "Failed", type: "number", readOnly: true },
-      { key: "started_at", label: "Started At", type: "datetime-local", readOnly: true },
-      { key: "completed_at", label: "Completed At", type: "datetime-local", readOnly: true },
-    ],
-  },
 
   columns: [
     { key: "name", label: "Campaign" },

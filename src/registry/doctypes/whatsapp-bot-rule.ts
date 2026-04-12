@@ -49,19 +49,14 @@ export const whatsappBotRule: DocTypeDef = {
       lookupValue: "id",
       lookupFilter: { status: "approved" },
     },
+    { key: "response_buttons", label: "Button Config (JSON)", type: "textarea", placeholder: '[{"id":"1","title":"View Pricing"},{"id":"2","title":"Talk to Agent"}]' },
+    {
+      key: "transfer_to", label: "Transfer to Agent", type: "select",
+      lookupTable: "master_users",
+      lookupLabel: "full_name",
+      lookupValue: "id",
+    },
   ],
-
-  tabFields: {
-    config: [
-      { key: "response_buttons", label: "Button Config (JSON)", type: "textarea", placeholder: '[{"id":"1","title":"View Pricing"},{"id":"2","title":"Talk to Agent"}]' },
-      {
-        key: "transfer_to", label: "Transfer to Agent", type: "select",
-        lookupTable: "master_users",
-        lookupLabel: "full_name",
-        lookupValue: "id",
-      },
-    ],
-  },
 
   columns: [
     { key: "name", label: "Rule Name" },
