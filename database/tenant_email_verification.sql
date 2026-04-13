@@ -3,10 +3,9 @@
 -- Application-level email verification for platform (tenant) users
 -- Follows the same pattern as storefront customer verification (ecom_complete_v2.sql)
 -- Safe to run multiple times (idempotent)
+-- NO external extensions required (uses built-in gen_random_uuid)
 -- ========================================================================================
 
--- Required extension
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ========================================================================================
 -- 1. ADD VERIFICATION COLUMNS TO users TABLE
@@ -42,7 +41,8 @@ BEGIN
     RETURN jsonb_build_object('already_verified', true);
   END IF;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
+  -- Generate 64-char hex token using built-in gen_random_uuid (no pgcrypto needed)
+  v_token := replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
 
   UPDATE public.users
   SET verification_token = v_token,
@@ -121,7 +121,8 @@ BEGIN
     RETURN jsonb_build_object('already_verified', true);
   END IF;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
+  -- Generate 64-char hex token using built-in gen_random_uuid (no pgcrypto needed)
+  v_token := replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
 
   UPDATE public.users
   SET verification_token = v_token,

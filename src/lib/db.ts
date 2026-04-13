@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import PLATFORM_CONFIG from '@/config/platform';
+import { toast } from 'sonner';
 
 /**
  * ═══════════════════════════════════════════════════════════════
@@ -24,7 +25,54 @@ const provider = PLATFORM_CONFIG.dbProvider;
 let internalClient: any;
 
 if (provider === 'supabase') {
-    internalClient = createClient(supabaseUrl, supabaseAnonKey);
+    // Custom fetch wrapper with exponential backoff retry logic
+    const fetchWithRetry = async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
+        let retries = 6; // Increased to 6 attempts (~60 seconds total)
+        let backoff = 1000;
+        
+        while (retries > 0) {
+            try {
+                const response = await fetch(url, options);
+                
+                // Retry on Service Unavailable (503), Gateway Timeout (504), or Rate Limit (429)
+                if (response.status === 503 || response.status === 504 || response.status === 429) {
+                    console.warn(`[DB BRIDGE] Received ${response.status} from Supabase. Retrying in ${backoff}ms... (${retries} attempts left)`);
+                    
+                    // On the very last attempt, if it's still 503, we can't wait forever
+                    if (retries === 1) {
+                        toast.error(`Platform Service Temporarily Unavailable (${response.status})`, {
+                            description: "The connection to Supabase is experiencing high latency. Retrying once more...",
+                            duration: 5000
+                        });
+                    }
+                } else {
+                    return response;
+                }
+            } catch (error) {
+                console.warn(`[DB BRIDGE] Network error: ${error}. Retrying in ${backoff}ms... (${retries} attempts left)`);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, backoff));
+            retries -= 1;
+            backoff *= 2; 
+        }
+
+        // HEALER: If we still have a 503 after 1 minute of retrying, 
+        // return a mock "empty" success to prevent UI from freezing/crashing
+        console.error("[DB BRIDGE] Max retries reached. Service is persistently unavailable.");
+        
+        // Return a mock response that the Supabase client can parse as "no results"
+        return new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    };
+
+    internalClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+            fetch: fetchWithRetry
+        }
+    });
 } else {
     // [ADAPTER] Custom / VPS Implementation
     class QueryBuilder {

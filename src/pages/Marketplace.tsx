@@ -101,9 +101,22 @@ export default function Marketplace() {
                 .maybeSingle();
 
             if (psData) {
-                setPlatformSettings(psData as PlatformSettings);
+                const settings = psData as PlatformSettings;
+                setPlatformSettings({
+                    ...settings,
+                    razorpay_key_id: settings.razorpay_key_id || import.meta.env.VITE_RAZORPAY_KEY_ID || null
+                });
                 // Default billing period based on admin config
                 if (psData.billing_mode === "yearly") setBillingPeriod("yearly");
+            } else if (import.meta.env.VITE_RAZORPAY_KEY_ID) {
+                setPlatformSettings({
+                    razorpay_key_id: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                    razorpay_key_secret: import.meta.env.VITE_RAZORPAY_KEY_SECRET || null,
+                    razorpay_test_mode: import.meta.env.VITE_RAZORPAY_KEY_ID.includes("test"),
+                    billing_mode: "monthly",
+                    currency: "INR",
+                    currency_symbol: "₹"
+                });
             }
 
             const { data, error } = await supabase
