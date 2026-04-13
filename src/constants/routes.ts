@@ -5,6 +5,8 @@ export const RESERVED_ROUTES = [
   "onboarding",
   "super-admin",
   "reset-password",
+  "verify-email-pending",
+  "verify-tenant-email",
   "about",
   "services",
   "products",

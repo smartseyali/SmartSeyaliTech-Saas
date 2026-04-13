@@ -201,7 +201,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         if (appRoutes.includes(first)) return false;
 
         // If it's a known non-app reserved route, it's public (Marketing, Auth, etc)
-        const publicReserved = ['login', 'onboarding', 'reset-password', 'ecommerce-login', 'about', 'services', 'products', 'contact', 'policy', 'seed'];
+        const publicReserved = ['login', 'onboarding', 'reset-password', 'ecommerce-login', 'verify-email-pending', 'verify-tenant-email', 'about', 'services', 'products', 'contact', 'policy', 'seed'];
         if (publicReserved.includes(first)) return true;
 
         // Root is public

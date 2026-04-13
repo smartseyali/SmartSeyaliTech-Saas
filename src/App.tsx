@@ -23,6 +23,8 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AppLauncher = lazy(() => import("./pages/AppLauncher"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const VerifyEmailPending = lazy(() => import("./pages/VerifyEmailPending"));
+const VerifyTenantEmail = lazy(() => import("./pages/VerifyTenantEmail"));
 
 // ── Storefront Customer Pages (public, not behind ProtectedRoute) ──
 const StorefrontLogin = lazy(() => import("./pages/StorefrontLogin"));
@@ -61,7 +63,7 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
     const { needsOnboarding, loading: tLoading } = useTenant();
-    const { isSuperAdmin, loading: pLoading } = usePermissions();
+    const { isSuperAdmin, emailVerified, loading: pLoading } = usePermissions();
     const currentPath = window.location.pathname;
 
     // Not logged in → go to login
@@ -76,8 +78,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         return <PlatformLoader message="Synchronizing Platform" subtext="Clinical Workspace Induction" />;
     }
 
-    // Super Admins bypass the onboarding logic entirely
+    // Super Admins bypass all checks (email verification + onboarding)
     if (isSuperAdmin) return <>{children}</>;
+
+    // Email not verified → must verify before accessing any protected route
+    if (!emailVerified) {
+        return <Navigate to="/verify-email-pending" replace />;
+    }
 
     // If user has no company yet, send them to onboarding
     if (needsOnboarding && currentPath !== '/onboarding') {
@@ -135,6 +142,8 @@ const App = () => (
                                             <Route path="/login" element={<Login />} />
                                             <Route path="/ecommerce-login" element={<Login />} />
                                             <Route path="/reset-password" element={<ResetPassword />} />
+                                            <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
+                                            <Route path="/verify-tenant-email" element={<VerifyTenantEmail />} />
 
                                             {/* ── Super Admin Control Center ── */}
                                             <Route element={<AppLayout />}>

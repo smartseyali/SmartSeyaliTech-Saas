@@ -17,6 +17,7 @@ interface PermissionsContextType {
     hasModule: (moduleName: string) => boolean;
     isAdmin: boolean;
     isSuperAdmin: boolean;
+    emailVerified: boolean;
     loading: boolean;
     refreshPermissions: () => void;
 }
@@ -30,6 +31,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const [emailVerified, setEmailVerified] = useState(false);
     const [loading, setLoading] = useState(true);
     const [refreshTick, setRefreshTick] = useState(0); // incrementing this triggers a reload
 
@@ -43,6 +45,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 setLoading(false);
                 setIsAdmin(false);
                 setIsSuperAdmin(false);
+                setEmailVerified(false);
                 setPermissions([]);
                 setAvailableModules([]);
                 return;
@@ -65,10 +68,13 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 try {
                     const { data } = await supabase
                         .from("users")
-                        .select("id, is_super_admin")
+                        .select("id, is_super_admin, email_verified")
                         .ilike("username", user.email || "")
                         .maybeSingle();
-                    if (data) localUser = data;
+                    if (data) {
+                        localUser = data;
+                        setEmailVerified(data.email_verified ?? false);
+                    }
                 } catch (e) {
                     console.warn("User lookup failed, ignoring:", e);
                 }
@@ -84,6 +90,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
 
                     setIsAdmin(true);
                     setIsSuperAdmin(true);
+                    setEmailVerified(true);
                     setAvailableModules(refreshedIdentifiers.filter(Boolean) as string[]);
                     setPermissions([]);
                     setLoading(false);
@@ -212,7 +219,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
     };
 
     return (
-        <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, isAdmin, isSuperAdmin, loading, refreshPermissions }}>
+        <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, isAdmin, isSuperAdmin, emailVerified, loading, refreshPermissions }}>
             {children}
         </PermissionsContext.Provider>
     );

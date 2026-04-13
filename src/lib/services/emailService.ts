@@ -102,6 +102,80 @@ export async function sendVerificationEmail(
     });
 }
 
+/**
+ * Platform-level email — uses env-var SMTP (no company_id needed)
+ */
+async function sendPlatformEmail(payload: EmailPayload): Promise<boolean> {
+    try {
+        const { data, error } = await supabase.functions.invoke("send-email", {
+            body: {
+                to: payload.to,
+                subject: payload.subject,
+                html: payload.html,
+                // No company_id → edge function uses platform SMTP env vars
+            },
+        });
+        if (error) {
+            console.error("Platform email error:", error);
+            return false;
+        }
+        return true;
+    } catch (err) {
+        console.error("Platform email service error:", err);
+        return false;
+    }
+}
+
+/**
+ * Send verification email to a tenant (platform) user during onboarding
+ */
+export async function sendTenantVerificationEmail(
+    userEmail: string,
+    userName: string,
+    verificationToken: string
+): Promise<boolean> {
+    const verifyUrl = `${window.location.origin}/verify-tenant-email?token=${verificationToken}`;
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:480px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <div style="background:#0f172a;padding:32px 24px;text-align:center;">
+      <h1 style="color:#ffffff;font-size:20px;font-weight:700;margin:0;letter-spacing:0.5px;">Smartseyali</h1>
+      <p style="color:#94a3b8;font-size:12px;margin:8px 0 0;letter-spacing:1px;">BUSINESS PLATFORM</p>
+    </div>
+    <div style="padding:32px 24px;">
+      <h2 style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 12px;">Verify Your Email</h2>
+      <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        Hi ${userName},<br><br>
+        Welcome to Smartseyali! Please verify your email address to complete your account setup and access the platform.
+      </p>
+      <a href="${verifyUrl}"
+         style="display:inline-block;background:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;letter-spacing:0.5px;">
+        Verify Email Address
+      </a>
+      <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;line-height:1.5;">
+        This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.
+      </p>
+      <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0;">
+      <p style="color:#cbd5e1;font-size:11px;margin:0;text-align:center;">
+        Can't click the button? Copy this link:<br>
+        <span style="color:#94a3b8;word-break:break-all;">${verifyUrl}</span>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+    return sendPlatformEmail({
+        to: userEmail,
+        subject: "Verify your email — Smartseyali",
+        html,
+    });
+}
+
 export async function sendOrderConfirmationEmail(
     companyId: number,
     customerEmail: string,

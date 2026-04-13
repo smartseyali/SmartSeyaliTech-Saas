@@ -5,6 +5,9 @@ import { useTenant } from "@/contexts/TenantContext";
 import { supabase } from "@/lib/supabase";
 import { PLATFORM_MODULES, type PlatformModule } from "@/config/modules";
 import { toast } from "sonner";
+import { sendTenantVerificationEmail } from "@/lib/services/emailService";
+import { initiateRazorpayPayment } from "@/lib/services/paymentService";
+import PLATFORM_CONFIG from "@/config/platform";
 import {
   Check,
   ArrowRight,
@@ -18,6 +21,7 @@ import {
   RefreshCw,
   AlertCircle,
   LogOut,
+  CreditCard,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -291,6 +295,13 @@ export default function Onboarding() {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Step 4 fields (Payment)
+  const [platformSettings, setPlatformSettings] = useState<{
+    razorpay_key_id: string | null;
+    currency: string;
+    currency_symbol: string;
+  } | null>(null);
+
   // Step 5 fields (Setup)
   const [setupIndex, setSetupIndex] = useState(0);
   const [setupDone, setSetupDone] = useState(false);
@@ -300,6 +311,9 @@ export default function Onboarding() {
   // Global
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Ref to prevent useEffect from overriding step during active signup
+  const isSigningUp = useRef(false);
 
   // ── Redirect logic for logged-in users ───────────────────────
   useEffect(() => {
@@ -315,10 +329,29 @@ export default function Onboarding() {
       return;
     }
 
-    // User is logged in but has no company → skip to app store (Step 3)
-    // Only auto-advance if we're still on Step 1 (don't interfere with other steps)
+    // Don't auto-advance if signup is in progress (handleStep1Next controls the flow)
+    if (isSigningUp.current) return;
+
+    // User is logged in but has no company → check email verification before advancing
     if (step === 1 && searchParams.get("step") !== "verified") {
-      setStep(3);
+      supabase
+        .from("users")
+        .select("email_verified")
+        .eq("id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          // Only advance if signup isn't in progress (could have started while query ran)
+          if (isSigningUp.current) return;
+          if (data?.email_verified) {
+            setStep(3); // Verified → app store
+          } else if (data && data.email_verified === false) {
+            // User exists but not verified → show verification step
+            generateAndSendVerification(user.id, user.email || "", user.user_metadata?.full_name || "");
+            setResendCooldown(60);
+            setStep(2);
+          }
+          // If data is null (user not in public.users yet), stay on step 1
+        });
     }
   }, [user?.id, tenantLoading, needsOnboarding, companies.length]);
 
@@ -349,33 +382,31 @@ export default function Onboarding() {
         setGstNo(draft.gstNo);
       }
 
-      // Check if session exists (email was confirmed)
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session) {
-          toast.success("Email verified successfully!");
-          setStep(3);
-        } else {
-          // Session not ready yet, might need a moment
-          setTimeout(async () => {
-            const { data: retry } = await supabase.auth.getSession();
-            if (retry.session) {
-              toast.success("Email verified successfully!");
-              setStep(3);
-            } else {
-              toast.error("Verification failed. Please try again.");
-              setStep(1);
-            }
-          }, 2000);
+      // Check if user is verified (from our users table)
+      const checkVerified = async () => {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData.session?.user) {
+          const { data: profile } = await supabase
+            .from("users")
+            .select("email_verified")
+            .eq("id", sessionData.session.user.id)
+            .maybeSingle();
+
+          if (profile?.email_verified) {
+            toast.success("Email verified successfully!");
+            setStep(3);
+            return;
+          }
         }
-      });
+        // Not verified yet — show verification step
+        setStep(2);
+      };
+      checkVerified();
     }
   }, []);
 
   // ── Polling for email verification (Step 2) ─────────────────
-  // The challenge: user verifies on mobile/another device, but this tab
-  // has no session. getSession() only returns the locally cached session.
-  // Solution: Try signing in with saved credentials. If email is confirmed,
-  // Supabase will return a valid session. If not confirmed, it will fail.
+  // Polls the users table for email_verified = true (set by tenant_verify_email RPC)
   useEffect(() => {
     if (step !== 2) {
       if (pollRef.current) {
@@ -387,32 +418,18 @@ export default function Onboarding() {
 
     pollRef.current = setInterval(async () => {
       try {
-        // First check if we already have a session (e.g. user clicked link in same browser)
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (sessionData.session) {
+        if (!user) return;
+        const { data } = await supabase
+          .from("users")
+          .select("email_verified")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (data?.email_verified) {
           clearInterval(pollRef.current!);
           pollRef.current = null;
           toast.success("Email verified successfully!");
           setStep(3);
-          return;
-        }
-
-        // No local session — try signing in with the credentials.
-        // If the email is verified, Supabase will return a session.
-        // If not verified yet, it will return an error.
-        if (loginEmail && password) {
-          const { data: signInData, error: signInErr } =
-            await supabase.auth.signInWithPassword({
-              email: loginEmail,
-              password,
-            });
-
-          if (!signInErr && signInData.session) {
-            clearInterval(pollRef.current!);
-            pollRef.current = null;
-            toast.success("Email verified successfully!");
-            setStep(3);
-          }
         }
       } catch {}
     }, 5000);
@@ -423,23 +440,7 @@ export default function Onboarding() {
         pollRef.current = null;
       }
     };
-  }, [step, loginEmail, password]);
-
-  // ── Listen for auth state changes (same-browser verification) ─
-  useEffect(() => {
-    if (step !== 2) return;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
-          toast.success("Email verified successfully!");
-          setStep(3);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [step]);
+  }, [step, user?.id]);
 
   // ── Resend cooldown timer ───────────────────────────────────
   useEffect(() => {
@@ -468,6 +469,20 @@ export default function Onboarding() {
     const mod = PLATFORM_MODULES.find((m) => m.id === id);
     return sum + (mod?.priceMonthly || 0);
   }, 0);
+
+  // Fetch platform settings (Razorpay key) when reaching app store or payment step
+  useEffect(() => {
+    if (step >= 3 && !platformSettings) {
+      supabase
+        .from("platform_settings")
+        .select("razorpay_key_id, currency, currency_symbol")
+        .eq("id", 1)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) setPlatformSettings(data);
+        });
+    }
+  }, [step]);
 
   const hasNonFreeApps = selectedModules.some((id) => {
     const mod = PLATFORM_MODULES.find((m) => m.id === id);
@@ -511,12 +526,31 @@ export default function Onboarding() {
     setError("");
     if (!validateStep1()) return;
 
-    // If user is already logged in (returning user with no company), skip to step 3
+    // If user is already logged in (returning user with no company), check verification
     if (user) {
-      setStep(3);
+      isSigningUp.current = true;
+      try {
+        const { data: profile } = await supabase
+          .from("users")
+          .select("email_verified")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profile?.email_verified) {
+          setStep(3);
+        } else {
+          // Need to verify — generate token & send email
+          await generateAndSendVerification(user.id, user.email || loginEmail, fullName);
+          setResendCooldown(60);
+          setStep(2);
+        }
+      } finally {
+        isSigningUp.current = false;
+      }
       return;
     }
 
+    isSigningUp.current = true;
     setLoading(true);
     try {
       // Save form data to localStorage (for cross-tab redirect recovery)
@@ -550,19 +584,51 @@ export default function Onboarding() {
         throw signUpErr;
       }
 
-      // If Supabase returned a session immediately (email confirmation disabled), skip verification
-      if (authData.session) {
-        toast.success("Account created successfully!");
-        setStep(3);
-      } else {
-        // Email confirmation required — go to verification screen
-        setResendCooldown(60);
-        setStep(2);
+      // Ensure user profile exists in public.users (with email_verified = false)
+      const signedUpUser = authData.session?.user || authData.user;
+      if (signedUpUser) {
+        await supabase.from("users").upsert({
+          id: signedUpUser.id,
+          username: loginEmail,
+          full_name: fullName || loginEmail.split("@")[0],
+          is_super_admin: false,
+          email_verified: false,
+        }, { onConflict: "id" });
+
+        // Generate verification token & send email
+        await generateAndSendVerification(signedUpUser.id, loginEmail, fullName);
       }
+
+      // Always go to verification step — regardless of session/confirm-email setting
+      setResendCooldown(60);
+      setStep(2);
     } catch (err: any) {
       setError(err.message || "Failed to create account. Please try again.");
     } finally {
+      isSigningUp.current = false;
       setLoading(false);
+    }
+  }
+
+  // ── Generate verification token & send email ────────────────
+  async function generateAndSendVerification(userId: string, email: string, name: string) {
+    try {
+      const { data, error } = await supabase.rpc("tenant_generate_verification", {
+        p_user_id: userId,
+      });
+      if (error) {
+        console.error("Token generation failed:", error.message);
+        return;
+      }
+      if (data?.already_verified) return;
+      if (data?.token) {
+        const sent = await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
+        if (!sent) {
+          console.warn("Verification email send failed — user can resend from step 2");
+        }
+      }
+    } catch (err) {
+      console.error("Verification setup error:", err);
     }
   }
 
@@ -570,16 +636,37 @@ export default function Onboarding() {
   async function handleResendEmail() {
     if (resendCooldown > 0) return;
     try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: loginEmail,
-        options: {
-          emailRedirectTo: `${window.location.origin}/onboarding?step=verified`,
-        },
+      const activeUser = user;
+      if (!activeUser) {
+        toast.error("Please sign in first.");
+        return;
+      }
+
+      const { data, error } = await supabase.rpc("tenant_resend_verification", {
+        p_user_id: activeUser.id,
       });
       if (error) throw error;
+
+      if (data?.already_verified) {
+        toast.success("Email already verified!");
+        setStep(3);
+        return;
+      }
+
+      if (data?.token) {
+        const sent = await sendTenantVerificationEmail(
+          data.email || loginEmail,
+          data.full_name || fullName || loginEmail.split("@")[0],
+          data.token
+        );
+        if (sent) {
+          toast.success("Verification email sent again!");
+        } else {
+          toast.error("Failed to send email. Please check platform SMTP settings.");
+        }
+      }
+
       setResendCooldown(60);
-      toast.success("Verification email sent again!");
     } catch (err: any) {
       if (err.message?.includes("rate")) {
         toast.error("Please wait before requesting another email.");
@@ -603,12 +690,49 @@ export default function Onboarding() {
   }
 
   const [launchMode, setLaunchMode] = useState<"trial" | "live" | null>(null);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  function handleStep4Next() {
-    if (launchMode === "live") {
-      toast.success("Payment integration coming soon. Starting as trial.");
+  async function handleStep4Next() {
+    if (launchMode === "trial") {
+      handleDeploy();
+      return;
     }
-    handleDeploy();
+
+    // "Go Live" — process Razorpay payment
+    const keyId = platformSettings?.razorpay_key_id;
+    if (!keyId) {
+      toast.error("Payment gateway is not configured. Please contact support.");
+      return;
+    }
+
+    setPaymentProcessing(true);
+    const orderNumber = `ONBOARD-${Date.now()}`;
+
+    try {
+      const result = await initiateRazorpayPayment({
+        keyId,
+        amount: monthlyTotal,
+        currency: platformSettings?.currency || "INR",
+        orderNumber,
+        customerName: fullName || user?.user_metadata?.full_name || "",
+        customerEmail: loginEmail || user?.email || "",
+        customerPhone: phone || "",
+        businessName: PLATFORM_CONFIG.name,
+        description: `${companyName} — Monthly subscription`,
+      });
+
+      // Payment succeeded — store payment info for deploy step
+      toast.success("Payment successful!");
+      handleDeploy();
+    } catch (err: any) {
+      if (err.message?.includes("cancelled")) {
+        toast.info("Payment cancelled. You can try again or start a free trial.");
+      } else {
+        toast.error(err.message || "Payment failed. Please try again.");
+      }
+    } finally {
+      setPaymentProcessing(false);
+    }
   }
 
   // ── Deploy ──────────────────────────────────────────────────
@@ -1273,12 +1397,19 @@ export default function Onboarding() {
           {launchMode === "live" && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
               <h3 className="text-sm font-semibold text-amber-800 mb-2">Payment Required</h3>
-              <p className="text-sm text-amber-700 mb-4">
-                You will be charged ₹{monthlyTotal.toLocaleString("en-IN")} now for the first month.
+              <p className="text-sm text-amber-700 mb-2">
+                You will be charged {platformSettings?.currency_symbol || "₹"}{monthlyTotal.toLocaleString("en-IN")} now for the first month.
               </p>
-              <div className="bg-white border border-amber-200 rounded-lg p-4">
-                <p className="text-xs text-slate-500 font-medium">Payment gateway integration coming soon. Your workspace will start as a trial and our team will contact you for payment setup.</p>
-              </div>
+              {platformSettings?.razorpay_key_id ? (
+                <div className="bg-white border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-blue-600 shrink-0" />
+                  <p className="text-xs text-slate-600 font-medium">Secure payment via Razorpay. You'll be redirected to complete the payment when you click "Pay & Launch".</p>
+                </div>
+              ) : (
+                <div className="bg-white border border-amber-200 rounded-lg p-4">
+                  <p className="text-xs text-slate-500 font-medium">Payment gateway is not configured. Please contact the administrator or start with a free trial.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -1300,11 +1431,20 @@ export default function Onboarding() {
             </button>
             <button
               onClick={handleStep4Next}
-              disabled={!launchMode}
+              disabled={!launchMode || paymentProcessing}
               className="flex-1 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition flex items-center justify-center gap-2"
             >
-              {launchMode === "live" ? "Pay & Launch" : launchMode === "trial" ? "Start Free Trial" : "Select an option above"}
-              <ArrowRight className="w-4 h-4" />
+              {paymentProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Processing Payment...
+                </>
+              ) : (
+                <>
+                  {launchMode === "live" ? "Pay & Launch" : launchMode === "trial" ? "Start Free Trial" : "Select an option above"}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 // Supabase Edge Function: send-email
 // Reads SMTP config from ecom_settings (via service role) — credentials never hit the frontend
+// Supports platform-level SMTP via env vars when no company_id is provided
 // Deploy: supabase functions deploy send-email
 
 import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
@@ -23,42 +24,73 @@ Deno.serve(async (req) => {
     try {
         const { company_id, to, subject, html } = await req.json();
 
-        if (!company_id || !to || !subject) {
-            return new Response(JSON.stringify({ error: "Missing company_id, to, or subject" }), {
+        if (!to || !subject) {
+            return new Response(JSON.stringify({ error: "Missing to or subject" }), {
                 status: 400,
                 headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
             });
         }
 
-        // Read SMTP config from DB using service role (secure — never exposed to frontend)
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-        const { data: settings, error: dbErr } = await supabase
-            .from("ecom_settings")
-            .select("smtp_host, smtp_port, smtp_user, smtp_pass, smtp_from_name, smtp_from_email, store_name")
-            .eq("company_id", company_id)
-            .maybeSingle();
+        let smtpHost: string;
+        let smtpPort: number;
+        let smtpUser: string;
+        let smtpPass: string;
+        let fromName: string;
+        let fromEmail: string;
 
-        if (dbErr || !settings?.smtp_user || !settings?.smtp_pass) {
-            return new Response(JSON.stringify({ error: "SMTP not configured for this store" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-            });
+        if (company_id) {
+            // Company-level SMTP: read from ecom_settings
+            const supabase = createClient(supabaseUrl, supabaseServiceKey);
+            const { data: settings, error: dbErr } = await supabase
+                .from("ecom_settings")
+                .select("smtp_host, smtp_port, smtp_user, smtp_pass, smtp_from_name, smtp_from_email, store_name")
+                .eq("company_id", company_id)
+                .maybeSingle();
+
+            if (dbErr || !settings?.smtp_user || !settings?.smtp_pass) {
+                return new Response(JSON.stringify({ error: "SMTP not configured for this store" }), {
+                    status: 400,
+                    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+                });
+            }
+
+            smtpHost = settings.smtp_host || "smtp.gmail.com";
+            smtpPort = settings.smtp_port || 587;
+            smtpUser = settings.smtp_user;
+            smtpPass = settings.smtp_pass;
+            fromName = settings.smtp_from_name || settings.store_name || "Store";
+            fromEmail = settings.smtp_from_email || settings.smtp_user;
+        } else {
+            // Platform-level SMTP: read from env vars
+            const envUser = Deno.env.get("PLATFORM_SMTP_USER");
+            const envPass = Deno.env.get("PLATFORM_SMTP_PASS");
+
+            if (!envUser || !envPass) {
+                return new Response(JSON.stringify({ error: "Platform SMTP not configured. Set PLATFORM_SMTP_USER and PLATFORM_SMTP_PASS env vars." }), {
+                    status: 400,
+                    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+                });
+            }
+
+            smtpHost = Deno.env.get("PLATFORM_SMTP_HOST") || "smtp.gmail.com";
+            smtpPort = parseInt(Deno.env.get("PLATFORM_SMTP_PORT") || "587");
+            smtpUser = envUser;
+            smtpPass = envPass;
+            fromName = Deno.env.get("PLATFORM_SMTP_FROM_NAME") || "Smartseyali";
+            fromEmail = Deno.env.get("PLATFORM_SMTP_FROM_EMAIL") || envUser;
         }
 
         const client = new SMTPClient({
             connection: {
-                hostname: settings.smtp_host || "smtp.gmail.com",
-                port: settings.smtp_port || 587,
+                hostname: smtpHost,
+                port: smtpPort,
                 tls: true,
                 auth: {
-                    username: settings.smtp_user,
-                    password: settings.smtp_pass,
+                    username: smtpUser,
+                    password: smtpPass,
                 },
             },
         });
-
-        const fromName = settings.smtp_from_name || settings.store_name || "Store";
-        const fromEmail = settings.smtp_from_email || settings.smtp_user;
 
         await client.send({
             from: `${fromName} <${fromEmail}>`,

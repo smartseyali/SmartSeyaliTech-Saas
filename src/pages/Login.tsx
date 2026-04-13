@@ -40,6 +40,7 @@ export default function Login() {
         if (!user) return;
         setRedirecting(true);
         try {
+            // Super admin check first — they bypass email verification
             const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
             if (isSuperAdminByEmail) {
                 navigate("/super-admin", { replace: true });
@@ -55,6 +56,19 @@ export default function Login() {
                 navigate("/super-admin", { replace: true });
                 return;
             }
+
+            // Email not verified → must verify first before accessing platform
+            const { data: profile } = await supabase
+                .from('users')
+                .select('email_verified')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            if (profile && !profile.email_verified) {
+                navigate("/verify-email-pending", { replace: true });
+                return;
+            }
+
             const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
                 supabase.from('company_users').select('role').eq('user_id', user.id),
                 supabase.from('companies').select('id').eq('user_id', user.id).limit(1)
