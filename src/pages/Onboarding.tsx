@@ -165,28 +165,31 @@ function ModuleCard({
   selected,
   onInstall,
   onRemove,
+  onViewDetails,
 }: {
   mod: PlatformModule;
   selected: boolean;
   onInstall: () => void;
   onRemove: () => void;
+  onViewDetails: () => void;
 }) {
   return (
     <div
-      className={`relative bg-white rounded-xl border transition-all duration-200 overflow-hidden flex flex-col ${
+      className={`relative bg-white rounded-xl border transition-all duration-200 overflow-hidden flex flex-col cursor-pointer ${
         selected
           ? "border-blue-400 shadow-md ring-1 ring-blue-100"
           : "border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300"
       }`}
+      onClick={onViewDetails}
     >
       {selected && (
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+        <div className="absolute top-3 right-3 flex items-center gap-1 bg-blue-600 text-white text-[11px] font-medium px-2 py-0.5 rounded-full z-10">
           <Check className="w-3 h-3" />
           Selected
         </div>
       )}
       {mod.status === "beta" && (
-        <div className="absolute top-3 left-3 text-[10px] font-medium bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+        <div className="absolute top-3 left-3 text-[10px] font-medium bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded z-10">
           Beta
         </div>
       )}
@@ -237,19 +240,163 @@ function ModuleCard({
           <div className="flex items-center gap-2">
             {selected ? (
               <button
-                onClick={onRemove}
+                onClick={(e) => { e.stopPropagation(); onRemove(); }}
                 className="text-xs text-red-500 hover:text-red-600 font-medium transition"
               >
                 Remove
               </button>
             ) : (
               <button
-                onClick={onInstall}
+                onClick={(e) => { e.stopPropagation(); onInstall(); }}
                 className="px-3.5 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
               >
                 Install
               </button>
             )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── App Detail Panel (slide-over) ────────────────────────────
+function AppDetailPanel({
+  mod,
+  selected,
+  onInstall,
+  onRemove,
+  onClose,
+}: {
+  mod: PlatformModule;
+  selected: boolean;
+  onInstall: () => void;
+  onRemove: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+
+      {/* Panel */}
+      <div
+        className="relative w-full max-w-lg bg-white h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Hero gradient */}
+        <div className={`h-36 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} relative`}>
+          <div className="absolute inset-0 bg-black/10" />
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white hover:bg-white/30 transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-6 pb-8 -mt-10 relative">
+          {/* Icon + name */}
+          <div className="flex items-end gap-4 mb-5">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl bg-white shadow-lg border border-slate-100 shrink-0">
+              {mod.icon}
+            </div>
+            <div className="pb-1 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-bold text-slate-900">{mod.name}</h2>
+                {mod.status === "beta" && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">Beta</span>
+                )}
+                {selected && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 inline-flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Selected
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-slate-500 mt-0.5">{mod.tagline}</p>
+            </div>
+          </div>
+
+          {/* Pricing + Action */}
+          <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 mb-6 flex items-center justify-between">
+            <div>
+              {mod.isFree ? (
+                <span className="text-lg font-bold text-emerald-600">Free</span>
+              ) : (
+                <div>
+                  <span className="text-lg font-bold text-slate-900">₹{mod.priceMonthly}</span>
+                  <span className="text-sm text-slate-500">/month</span>
+                  {mod.trialDays > 0 && (
+                    <p className="text-xs text-blue-600 font-medium mt-0.5">{mod.trialDays}-day free trial</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {selected ? (
+              <button
+                onClick={onRemove}
+                className="px-5 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
+              >
+                Remove
+              </button>
+            ) : (
+              <button
+                onClick={onInstall}
+                className="px-5 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+              >
+                Add to Workspace
+              </button>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-800 mb-2">About this app</h3>
+            <p className="text-sm text-slate-600 leading-relaxed">{mod.description}</p>
+          </div>
+
+          {/* Features */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">Features & Capabilities</h3>
+            <div className="space-y-2">
+              {mod.features.map((f, i) => (
+                <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                  </div>
+                  <span className="text-sm text-slate-700">{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Specs */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">Specifications</h3>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Category</dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.category}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Status</dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.status}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">License</dt>
+                <dd className="text-slate-800 font-medium mt-0.5">{mod.isFree ? "Free" : "Subscription"}</dd>
+              </div>
+              {mod.trialDays > 0 && (
+                <div>
+                  <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Trial Period</dt>
+                  <dd className="text-slate-800 font-medium mt-0.5">{mod.trialDays} days</dd>
+                </div>
+              )}
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Requires</dt>
+                <dd className="text-slate-800 font-medium mt-0.5">Master Data Hub</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </div>
@@ -294,6 +441,7 @@ export default function Onboarding() {
   // Step 3 fields (App Store)
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [detailModule, setDetailModule] = useState<PlatformModule | null>(null);
 
   // Step 4 fields (Payment)
   const [platformSettings, setPlatformSettings] = useState<{
@@ -1256,9 +1404,20 @@ export default function Onboarding() {
           {/* Module grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredModules.map((mod) => (
-              <ModuleCard key={mod.id} mod={mod} selected={selectedModules.includes(mod.id)} onInstall={() => toggleModule(mod.id)} onRemove={() => toggleModule(mod.id)} />
+              <ModuleCard key={mod.id} mod={mod} selected={selectedModules.includes(mod.id)} onInstall={() => toggleModule(mod.id)} onRemove={() => toggleModule(mod.id)} onViewDetails={() => setDetailModule(mod)} />
             ))}
           </div>
+
+          {/* App Detail Panel */}
+          {detailModule && (
+            <AppDetailPanel
+              mod={detailModule}
+              selected={selectedModules.includes(detailModule.id)}
+              onInstall={() => { toggleModule(detailModule.id); }}
+              onRemove={() => { toggleModule(detailModule.id); }}
+              onClose={() => setDetailModule(null)}
+            />
+          )}
 
           {filteredModules.length === 0 && (
             <div className="text-center py-16">
