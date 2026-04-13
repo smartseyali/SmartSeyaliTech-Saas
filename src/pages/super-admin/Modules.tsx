@@ -57,7 +57,7 @@ export default function PlatformModules() {
     }
 
     // Boolean selects
-    ["is_active", "is_core", "needs_template"].forEach((f) => {
+    ["is_active", "is_core", "is_free", "needs_template"].forEach((f) => {
       if (p[f] === "true") p[f] = true;
       if (p[f] === "false") p[f] = false;
     });

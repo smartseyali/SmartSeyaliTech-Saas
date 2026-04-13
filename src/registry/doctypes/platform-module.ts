@@ -62,6 +62,16 @@ export const platformModule: DocTypeDef = {
     { key: "interface_overview", label: "Interface Overview", type: "textarea", placeholder: "Explain how it looks after deployment..." },
     { key: "screenshots", label: "Screenshots (comma-separated URLs)", type: "textarea", placeholder: "https://example.com/img1.png, https://example.com/img2.png" },
     { key: "use_cases", label: "Use Cases (JSON)", type: "textarea", placeholder: '[{"title": "Retail", "description": "Manage shops", "icon": "store"}]' },
+    { key: "price_monthly", label: "Monthly Price", type: "number", placeholder: "e.g. 999" },
+    { key: "price_yearly", label: "Yearly Price", type: "number", placeholder: "e.g. 9990" },
+    { key: "trial_days", label: "Trial Days", type: "number", placeholder: "e.g. 14" },
+    {
+      key: "is_free", label: "Free Module", type: "select",
+      options: [
+        { value: "true", label: "Yes — Free" },
+        { value: "false", label: "No — Paid" },
+      ],
+    },
     { key: "sort_order", label: "Sort Order", type: "number", placeholder: "0" },
     {
       key: "is_core", label: "Core Module", type: "select",
@@ -90,10 +100,11 @@ export const platformModule: DocTypeDef = {
     { key: "name", label: "Module Name", className: "font-bold text-slate-900" },
     { key: "slug", label: "Slug" },
     { key: "category", label: "Category" },
+    { key: "price_monthly", label: "Price/Mo" },
+    { key: "price_yearly", label: "Price/Yr" },
     { key: "status", label: "Status" },
     { key: "is_core", label: "Core" },
     { key: "is_active", label: "Active" },
-    { key: "sort_order", label: "Sort" },
   ],
 
   statusField: "status",
