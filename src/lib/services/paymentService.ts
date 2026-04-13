@@ -10,6 +10,8 @@ interface RazorpayOptions {
     customerName: string;
     customerEmail: string;
     customerPhone: string;
+    businessName?: string;
+    description?: string;
 }
 
 interface RazorpayResult {
@@ -55,8 +57,8 @@ export async function initiateRazorpayPayment(options: RazorpayOptions): Promise
             key: options.keyId,
             amount: Math.round(options.amount * 100), // Convert to paise
             currency: options.currency || "INR",
-            name: "Store Checkout",
-            description: `Order ${options.orderNumber}`,
+            name: options.businessName || "Smartseyali",
+            description: options.description || `Order ${options.orderNumber}`,
             prefill: {
                 name: options.customerName,
                 email: options.customerEmail,

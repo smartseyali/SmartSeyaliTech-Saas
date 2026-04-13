@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import {
     LayoutDashboard, ChevronDown, ChevronLeft, Check,
     ShieldCheck, Rocket, Crown, Globe2, CreditCard,
-    LayoutGrid, Layout, Users, Zap, ChevronRight, CalendarDays
+    LayoutGrid, Layout, Users, Zap, ChevronRight, CalendarDays, Settings
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -33,6 +33,7 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "Marketplace Modules", url: "/super-admin/modules", icon: LayoutGrid },
             { title: "User Management", url: "/super-admin/users", icon: Users },
             { title: "Headless Connectors", url: "/super-admin/connectors", icon: Zap },
+            { title: "Platform Settings", url: "/super-admin/settings", icon: Settings },
         ],
     }
 ];

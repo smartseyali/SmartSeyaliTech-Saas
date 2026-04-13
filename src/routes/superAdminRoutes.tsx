@@ -7,6 +7,7 @@ const PlatformUsers = lazy(() => import("@/pages/super-admin/Users"));
 const PlatformPlans = lazy(() => import("@/pages/super-admin/Plans"));
 const PlatformModules = lazy(() => import("@/pages/super-admin/Modules"));
 const PlatformSubscriptions = lazy(() => import("@/pages/super-admin/Subscriptions"));
+const PlatformSettings = lazy(() => import("@/pages/super-admin/Settings"));
 
 export const superAdminRoutes = [
     { path: "/super-admin", element: <SuperAdminDashboard /> },
@@ -16,4 +17,5 @@ export const superAdminRoutes = [
     { path: "/super-admin/modules", element: <PlatformModules /> },
     { path: "/super-admin/subscriptions", element: <PlatformSubscriptions /> },
     { path: "/super-admin/connectors", element: <HeadlessConsole /> },
+    { path: "/super-admin/settings", element: <PlatformSettings /> },
 ];

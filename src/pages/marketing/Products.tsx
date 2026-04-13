@@ -399,14 +399,22 @@ const Products = () => {
                       >
                         <Link to={`/products/${mod.slug}`} className="block flex-1">
                           <div className="aspect-[1.8/1] bg-gradient-to-br from-gray-50 to-primary-50/30 relative overflow-hidden">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <motion.div
-                                whileHover={{ scale: 1.1, rotate: 3 }}
-                                className="p-5 bg-white rounded-2xl shadow-lg border border-gray-100"
-                              >
-                                <span className="text-4xl">{mod.icon || "📦"}</span>
-                              </motion.div>
-                            </div>
+                            {mod.screenshots?.[0] || mod.image_url ? (
+                              <img
+                                src={mod.screenshots?.[0] || mod.image_url}
+                                alt={mod.name}
+                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <motion.div
+                                  whileHover={{ scale: 1.1, rotate: 3 }}
+                                  className="p-5 bg-white rounded-2xl shadow-lg border border-gray-100"
+                                >
+                                  <span className="text-4xl">{mod.icon || "📦"}</span>
+                                </motion.div>
+                              </div>
+                            )}
                             <div className="absolute top-3 left-3">
                               <div className={cn(
                                 "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
