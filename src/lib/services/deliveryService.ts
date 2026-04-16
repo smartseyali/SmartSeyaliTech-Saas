@@ -100,17 +100,16 @@ export async function calculateShippingCharge(
     pincode: string = ""
 ): Promise<ShippingResult> {
     const agg = aggregateCart(items);
-    const weightKg = agg.totalGrams / 1000;
-    const volumeCm3 = agg.totalMl; // ml ≈ cm³
 
+    // Unified engine: send grams and ml directly (not kg/cm³)
     const { data, error } = await supabase.rpc("calc_shipping", {
         p_company_id: companyId,
         p_state: state,
         p_pincode: pincode,
-        p_weight_kg: weightKg,
+        p_weight_kg: agg.totalGrams,    // grams (param name kept for compat)
         p_qty: agg.totalQty,
         p_order_value: agg.orderValue,
-        p_volume_cm3: volumeCm3,
+        p_volume_cm3: agg.totalMl,      // ml (param name kept for compat)
         p_payment_method: paymentMethod,
     });
 

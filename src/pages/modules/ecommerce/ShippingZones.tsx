@@ -71,12 +71,14 @@ export default function ShippingZones() {
         basic: [
             { key: "tariff_name", label: "Tariff Name", type: "text" as const, required: true, ph: "e.g. Standard Shipping" },
             { key: "shipping_type", label: "Shipping Type", type: "select" as const, required: true, options: [
+                { value: "UNIFIED", label: "Unified (Weight + Volume → Grams)" },
                 { value: "WEIGHT", label: "Weight-Based (kg)" },
                 { value: "QTY", label: "Quantity-Based (units)" },
                 { value: "VALUE", label: "Value-Based (₹)" },
                 { value: "VOLUME", label: "Volume-Based (cm³)" },
             ]},
-            { key: "primary_uom", label: "Primary UoM", type: "text" as const, ph: "kg / units / ₹ / cm³" },
+            { key: "primary_uom", label: "Primary UoM", type: "text" as const, ph: "g / kg / units / ₹ / ml" },
+            { key: "ml_to_g_factor", label: "ML → Grams Factor", type: "number" as const, ph: "1.0 (1ml = 1g)" },
             { key: "priority", label: "Priority", type: "number" as const, ph: "1 = highest" },
             { key: "is_active", label: "Active", type: "checkbox" as const },
             { key: "rounding_rule", label: "Rounding Rule", type: "select" as const, options: [
@@ -106,8 +108,9 @@ export default function ShippingZones() {
         const payload = {
             company_id: activeCompany.id,
             tariff_name: header.tariff_name || "Standard Shipping",
-            shipping_type: header.shipping_type || "WEIGHT",
-            primary_uom: header.primary_uom || "kg",
+            shipping_type: header.shipping_type || "UNIFIED",
+            primary_uom: header.primary_uom || "g",
+            ml_to_g_factor: Number(header.ml_to_g_factor) || 1.0,
             priority: Number(header.priority) || 1,
             is_active: header.is_active ?? true,
             rounding_rule: header.rounding_rule || "ROUND_UP",
@@ -144,7 +147,10 @@ export default function ShippingZones() {
             </div>
         )},
         { key: "shipping_type", label: "Type", render: (r: any) => (
-            <span className="text-[11px] font-semibold px-2 py-1 rounded bg-blue-50 text-blue-700">{r.shipping_type} ({r.primary_uom})</span>
+            <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] font-semibold px-2 py-1 rounded bg-blue-50 text-blue-700">{r.shipping_type} ({r.primary_uom})</span>
+                {r.shipping_type === "UNIFIED" && <span className="text-[10px] text-slate-400">1ml = {r.ml_to_g_factor ?? 1}g</span>}
+            </div>
         )},
         { key: "rounding_rule", label: "Rounding", render: (r: any) => (
             <span className="text-[12px] text-slate-600">{r.rounding_rule?.replace("ROUND_", "")}</span>
@@ -571,10 +577,10 @@ export default function ShippingZones() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5"><label className={labelCls}>State</label><input value={testForm.state} onChange={e => setTestForm(f => ({ ...f, state: e.target.value }))} className={inputCls} placeholder="e.g. Tamil Nadu" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Pincode</label><input value={testForm.pincode} onChange={e => setTestForm(f => ({ ...f, pincode: e.target.value }))} className={inputCls} placeholder="e.g. 641001" /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Weight (kg)</label><input type="number" value={testForm.weight} onChange={e => setTestForm(f => ({ ...f, weight: e.target.value }))} className={inputCls} step="0.1" placeholder="2.5" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Weight (grams)</label><input type="number" value={testForm.weight} onChange={e => setTestForm(f => ({ ...f, weight: e.target.value }))} className={inputCls} step="1" placeholder="500" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Quantity</label><input type="number" value={testForm.qty} onChange={e => setTestForm(f => ({ ...f, qty: e.target.value }))} className={inputCls} placeholder="1" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Order Value (₹)</label><input type="number" value={testForm.value} onChange={e => setTestForm(f => ({ ...f, value: e.target.value }))} className={inputCls} placeholder="750" /></div>
-                                <div className="space-y-1.5"><label className={labelCls}>Volume (cm³)</label><input type="number" value={testForm.volume} onChange={e => setTestForm(f => ({ ...f, volume: e.target.value }))} className={inputCls} placeholder="0" /></div>
+                                <div className="space-y-1.5"><label className={labelCls}>Volume (ml)</label><input type="number" value={testForm.volume} onChange={e => setTestForm(f => ({ ...f, volume: e.target.value }))} className={inputCls} step="1" placeholder="1000" /></div>
                                 <div className="space-y-1.5"><label className={labelCls}>Payment Method</label>
                                     <select value={testForm.payment} onChange={e => setTestForm(f => ({ ...f, payment: e.target.value }))} className={inputCls}>
                                         <option value="prepaid">Prepaid</option>
@@ -600,8 +606,8 @@ export default function ShippingZones() {
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Zone Matched</span><span className="font-medium text-slate-900">{testResult.zone}</span></div>
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Method</span><span className="font-medium text-slate-900">{testResult.method}</span></div>
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Base Charge</span><span className="font-medium text-slate-900">₹{testResult.breakdown?.base || 0}</span></div>
-                                    {testResult.breakdown?.calc_value != null && (
-                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Calc Value ({testResult.breakdown?.shipping_type})</span><span className="font-medium text-slate-900">{testResult.breakdown.calc_value}</span></div>
+                                    {testResult.breakdown?.effective_weight_g != null && (
+                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Effective Weight</span><span className="font-medium text-slate-900">{testResult.breakdown.effective_weight_g}g = {testResult.breakdown.weight_g || 0}g + {testResult.breakdown.volume_ml || 0}ml × {testResult.breakdown.ml_to_g_factor || 1}</span></div>
                                     )}
                                     {testResult.breakdown?.slab_from != null && (
                                         <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Slab Range</span><span className="font-medium text-slate-900">{testResult.breakdown.slab_from} – {testResult.breakdown.slab_to ?? "∞"}</span></div>
