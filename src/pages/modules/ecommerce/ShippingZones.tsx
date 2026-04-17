@@ -262,17 +262,39 @@ export default function ShippingZones() {
         ...zones.map(z => ({ value: z.id, label: z.zone_name }))
     ], [zones]);
 
+    // Merchant-friendly UoM registry. Add a row here to support a new dimension.
+    const UOM_CATALOG: Record<string, { label: string; unit: string; desc: string; color: string }> = {
+        g:     { label: "Weight",      unit: "grams",  desc: "Matches against total cart weight in grams",     color: "bg-amber-50 text-amber-700" },
+        ml:    { label: "Volume",      unit: "ml",     desc: "Matches against total cart volume in millilitres", color: "bg-violet-50 text-violet-700" },
+        qty:   { label: "Quantity",    unit: "pcs",    desc: "Matches against total number of items in cart",  color: "bg-sky-50 text-sky-700" },
+        value: { label: "Order Value", unit: "₹",      desc: "Matches against order subtotal in rupees",       color: "bg-emerald-50 text-emerald-700" },
+    };
+    const uomOf     = (r: any) => (r.slab_uom || "g") as keyof typeof UOM_CATALOG;
+    const uomMeta   = (key: string) => UOM_CATALOG[key] || UOM_CATALOG.g;
+    const uomLabel  = (key: string) => uomMeta(key).label;
+    const uomUnit   = (key: string) => uomMeta(key).unit;
+
+    // Auto-default tariff when the merchant has only one (most common case)
+    const defaultTariffId = tariffs.length === 1 ? tariffs[0].id : "";
+    const showTariffField = tariffs.length > 1;
+
     const slabFields = {
         basic: [
-            { key: "tariff_id", label: "Tariff", type: "select" as const, required: true, options: tariffOptions },
-            { key: "zone_id", label: "Zone (optional)", type: "select" as const, options: zoneOptions },
-            { key: "range_from", label: "Range From", type: "number" as const, required: true, ph: "0" },
-            { key: "range_to", label: "Range To (empty = unlimited)", type: "number" as const, ph: "∞" },
-            { key: "base_charge", label: "Base Charge (₹)", type: "number" as const, required: true, ph: "50" },
-            { key: "has_per_unit", label: "Enable Per-Unit Extra Charge", type: "checkbox" as const },
+            ...(showTariffField ? [{ key: "tariff_id", label: "Tariff", type: "select" as const, required: true, options: tariffOptions }] : []),
+            { key: "zone_id", label: "Zone", type: "select" as const, options: zoneOptions, ph: "Applies to which zone?" },
+            { key: "slab_uom", label: "Charge Based On", type: "select" as const, required: true, options: [
+                { value: "g",     label: "Weight (grams)" },
+                { value: "ml",    label: "Volume (millilitres)" },
+                { value: "qty",   label: "Quantity (pieces)" },
+                { value: "value", label: "Order Value (₹)" },
+            ]},
+            { key: "range_from", label: "From", type: "number" as const, required: true, ph: "e.g. 0" },
+            { key: "range_to", label: "To (leave empty for ∞)", type: "number" as const, ph: "e.g. 750" },
+            { key: "base_charge", label: "Charge (₹)", type: "number" as const, required: true, ph: "e.g. 120" },
         ],
         config: [
-            { key: "extra_charge_per_unit", label: "Extra Charge Per Unit (₹)", type: "number" as const, ph: "e.g. 20 per kg beyond threshold" },
+            { key: "has_per_unit", label: "Add per-unit extra beyond the 'From' value", type: "checkbox" as const },
+            { key: "extra_charge_per_unit", label: "Extra per Unit (₹)", type: "number" as const, ph: "e.g. 20" },
             { key: "display_order", label: "Display Order", type: "number" as const, ph: "0" },
         ],
     };
@@ -281,8 +303,9 @@ export default function ShippingZones() {
         if (!activeCompany) return;
         const payload = {
             company_id: activeCompany.id,
-            tariff_id: header.tariff_id,
+            tariff_id: header.tariff_id || defaultTariffId,
             zone_id: header.zone_id || null,
+            slab_uom: header.slab_uom || "g",
             range_from: Number(header.range_from) || 0,
             range_to: header.range_to ? Number(header.range_to) : null,
             base_charge: Number(header.base_charge) || 0,
@@ -290,6 +313,10 @@ export default function ShippingZones() {
             has_per_unit: header.has_per_unit || false,
             display_order: Number(header.display_order) || 0,
         };
+        if (!payload.tariff_id) {
+            toast({ title: "No tariff configured", description: "Create a tariff first in the Settings tab.", variant: "destructive" as any });
+            return;
+        }
         if (editingItem?.id) {
             const { error } = await supabase.from("shipping_slabs").update(payload).eq("id", editingItem.id);
             if (error) throw error;
@@ -297,43 +324,47 @@ export default function ShippingZones() {
             const { error } = await supabase.from("shipping_slabs").insert([payload]);
             if (error) throw error;
         }
-        toast({ title: editingItem ? "Slab updated" : "Slab created" });
+        toast({ title: editingItem ? "Rule updated" : "Rule added" });
         backToList();
         loadAll();
     };
 
     const deleteSlab = async (id: string) => {
         await supabase.from("shipping_slabs").delete().eq("id", id);
-        toast({ title: "Slab deleted" });
+        toast({ title: "Rule deleted" });
         backToList();
         loadAll();
     };
 
-    const getUom = (tariffId: string) => {
-        const t = tariffs.find(x => x.id === tariffId);
-        return t?.primary_uom || "kg";
-    };
-
     const slabColumns = [
-        { key: "tariff_id", label: "Tariff", render: (r: any) => (
-            <span className="text-[12px] font-medium text-slate-700">{tariffs.find(t => t.id === r.tariff_id)?.tariff_name || "—"}</span>
+        { key: "zone_id", label: "Zone", render: (r: any) => (
+            <span className="text-[13px] font-semibold text-slate-800">{zones.find(z => z.id === r.zone_id)?.zone_name || "All Zones"}</span>
         )},
-        { key: "range_from", label: "Range", render: (r: any) => {
-            const uom = getUom(r.tariff_id);
-            return <span className="text-[13px] font-mono font-medium text-slate-900">{r.range_from} – {r.range_to ?? "∞"} {uom}</span>;
+        { key: "slab_uom", label: "Based On", render: (r: any) => {
+            const u = uomOf(r);
+            const meta = uomMeta(u);
+            return <span className={cn("text-[11px] font-semibold px-2 py-1 rounded", meta.color)}>{meta.label}</span>;
         }},
-        { key: "base_charge", label: "Base Charge", render: (r: any) => (
+        { key: "range_from", label: "Range", render: (r: any) => {
+            const unit = uomUnit(uomOf(r));
+            return <span className="text-[13px] font-mono font-medium text-slate-900">{r.range_from} – {r.range_to ?? "∞"} {unit}</span>;
+        }},
+        { key: "base_charge", label: "Charge", render: (r: any) => (
             <span className="text-[13px] font-semibold text-slate-900">₹{r.base_charge}</span>
         )},
         { key: "extra_charge_per_unit", label: "Extra/Unit", render: (r: any) => (
             r.has_per_unit
-                ? <span className="text-[12px] font-medium text-blue-700">₹{r.extra_charge_per_unit}/{getUom(r.tariff_id)}</span>
+                ? <span className="text-[12px] font-medium text-blue-700">+₹{r.extra_charge_per_unit}/{uomUnit(uomOf(r))}</span>
                 : <span className="text-[12px] text-slate-400">—</span>
         )},
-        { key: "zone_id", label: "Zone", render: (r: any) => (
-            <span className="text-[12px] text-slate-500">{zones.find(z => z.id === r.zone_id)?.zone_name || "All Zones"}</span>
-        )},
+        ...(tariffs.length > 1 ? [{ key: "tariff_id", label: "Tariff", render: (r: any) => (
+            <span className="text-[12px] text-slate-500">{tariffs.find(t => t.id === r.tariff_id)?.tariff_name || "—"}</span>
+        )}] : []),
     ];
+
+    // Preselect tariff on new-rule form when there's exactly one
+    const prepareSlabForEdit = (s: any) => s || {};
+    const slabInitialData = editingItem ? editingItem : (defaultTariffId ? { tariff_id: defaultTariffId, slab_uom: "g" } : { slab_uom: "g" });
 
     // ════════════════════════════════════════════════════════════
     // EXTRA CHARGES
@@ -453,14 +484,15 @@ export default function ShippingZones() {
         fields: any; onSave: (h: any, i: any[]) => Promise<void>;
         onDelete?: (id: string) => Promise<void>;
         prepareEdit?: (item: any) => any;
+        defaultsForNew?: any;
         formTitle: string; formSubtitle: string;
     } | null> = {
         tariffs: {
-            label: "Shipping Tariffs", icon: Settings,
+            label: "Shipping Settings", icon: Settings,
             data: tariffs, columns: tariffColumns, fields: tariffFields,
             onSave: saveTariff, onDelete: deleteTariff,
             formTitle: editingItem ? "Edit Tariff" : "New Shipping Tariff",
-            formSubtitle: "Tariff Configuration",
+            formSubtitle: "Free shipping threshold, rounding, priority",
         },
         zones: {
             label: "Shipping Zones", icon: Globe,
@@ -468,21 +500,22 @@ export default function ShippingZones() {
             onSave: saveZone, onDelete: deleteZone,
             prepareEdit: prepareZoneForEdit,
             formTitle: editingItem ? "Edit Zone" : "New Shipping Zone",
-            formSubtitle: "Zone Configuration",
+            formSubtitle: "Where you ship (state / pincode range / flat-rate zones)",
         },
         slabs: {
-            label: "Shipping Slabs", icon: Scale,
+            label: "Pricing Rules", icon: Scale,
             data: slabs, columns: slabColumns, fields: slabFields,
             onSave: saveSlab, onDelete: deleteSlab,
-            formTitle: editingItem ? "Edit Slab" : "New Shipping Slab",
-            formSubtitle: "Range-based Pricing",
+            defaultsForNew: slabInitialData,
+            formTitle: editingItem ? "Edit Pricing Rule" : "New Pricing Rule",
+            formSubtitle: "Pick a zone, pick what to charge based on, set the range and the amount",
         },
         extras: {
             label: "Extra Charges", icon: DollarSign,
             data: extras, columns: extraColumns, fields: extraFields,
             onSave: saveExtra, onDelete: deleteExtra,
             formTitle: editingItem ? "Edit Extra Charge" : "New Extra Charge",
-            formSubtitle: "Additional Shipping Charges",
+            formSubtitle: "COD / Express / Handling fees",
         },
         test: null,
     };
@@ -494,7 +527,9 @@ export default function ShippingZones() {
     // ════════════════════════════════════════════════════════════
 
     if (view === "form" && cfg) {
-        const editData = editingItem ? (cfg.prepareEdit ? cfg.prepareEdit(editingItem) : editingItem) : undefined;
+        const editData = editingItem
+            ? (cfg.prepareEdit ? cfg.prepareEdit(editingItem) : editingItem)
+            : cfg.defaultsForNew;
         return (
             <ERPEntryForm
                 title={cfg.formTitle}
@@ -520,24 +555,33 @@ export default function ShippingZones() {
     }) : [];
 
     const sections: { key: Section; label: string; icon: any; count: number }[] = [
-        { key: "tariffs", label: "Tariffs", icon: Settings, count: tariffs.length },
-        { key: "zones", label: "Zones", icon: Globe, count: zones.length },
-        { key: "slabs", label: "Slabs", icon: Scale, count: slabs.length },
-        { key: "extras", label: "Extras", icon: DollarSign, count: extras.length },
-        { key: "test", label: "Test", icon: FlaskConical, count: 0 },
+        { key: "zones",   label: "Zones",         icon: Globe,        count: zones.length },
+        { key: "slabs",   label: "Pricing Rules", icon: Scale,        count: slabs.length },
+        { key: "extras",  label: "Extra Charges", icon: DollarSign,   count: extras.length },
+        { key: "tariffs", label: "Settings",      icon: Settings,     count: tariffs.length },
+        { key: "test",    label: "Test",          icon: FlaskConical, count: 0 },
     ];
+
+    const sectionHint: Record<Section, string> = {
+        zones:   "1. Define where you ship — by state, pincode, or a flat-rate zone.",
+        slabs:   "2. Add pricing rules per zone. Each rule charges based on one dimension (weight / volume / quantity / order value). Charges from all matching rules are summed.",
+        extras:  "3. Add extra fees like COD, Express, or Handling that apply on top of the base shipping.",
+        tariffs: "4. Tariff settings — free-shipping thresholds, rounding rule, priority.",
+        test:    "Simulate a customer cart to verify your rules produce the charge you expect.",
+    };
 
     return (
         <div className="space-y-0 animate-in fade-in duration-300">
             {/* Section Tabs */}
             <div className="px-3 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-2">
                     <Truck className="w-5 h-5 text-blue-600" />
                     <div>
                         <h1 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">Shipping & Delivery</h1>
-                        <p className="text-[11px] text-slate-400 font-medium">Configure tariffs, zones, slabs and charges for your company</p>
+                        <p className="text-[11px] text-slate-400 font-medium">Set up your zones, then add pricing rules. Charges from every matching rule are summed.</p>
                     </div>
                 </div>
+                <p className="text-[11px] text-slate-500 mb-3 pl-8">{sectionHint[section]}</p>
                 <div className="flex gap-1 flex-wrap overflow-x-auto pb-1 -mb-1">
                     {sections.map(s => (
                         <button
@@ -605,13 +649,21 @@ export default function ShippingZones() {
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Tariff</span><span className="font-medium text-slate-900">{testResult.tariff || "—"}</span></div>
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Zone Matched</span><span className="font-medium text-slate-900">{testResult.zone}</span></div>
                                     <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Method</span><span className="font-medium text-slate-900">{testResult.method}</span></div>
-                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Base Charge</span><span className="font-medium text-slate-900">₹{testResult.breakdown?.base || 0}</span></div>
-                                    {testResult.breakdown?.effective_weight_g != null && (
-                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Effective Weight</span><span className="font-medium text-slate-900">{testResult.breakdown.effective_weight_g}g = {testResult.breakdown.weight_g || 0}g + {testResult.breakdown.volume_ml || 0}ml × {testResult.breakdown.ml_to_g_factor || 1}</span></div>
+                                    {(testResult.breakdown?.weight_g != null || testResult.breakdown?.volume_ml != null) && (
+                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Cart Input</span><span className="font-medium text-slate-900">{testResult.breakdown.weight_g || 0}g · {testResult.breakdown.volume_ml || 0}ml</span></div>
                                     )}
-                                    {testResult.breakdown?.slab_from != null && (
-                                        <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Slab Range</span><span className="font-medium text-slate-900">{testResult.breakdown.slab_from} – {testResult.breakdown.slab_to ?? "∞"}</span></div>
-                                    )}
+                                    {(testResult.breakdown?.matched_slabs || []).map((m: any, i: number) => (
+                                        <div key={i} className="flex justify-between py-2 border-b border-slate-50">
+                                            <span className="text-slate-500">
+                                                {uomLabel(m.uom)} rule
+                                                <span className="text-[10px] text-slate-400 ml-1">
+                                                    ({m.from}–{m.to ?? "∞"} {uomUnit(m.uom)} · input {m.input})
+                                                </span>
+                                            </span>
+                                            <span className="font-medium text-slate-900">₹{m.charge}</span>
+                                        </div>
+                                    ))}
+                                    <div className="flex justify-between py-2 border-b border-slate-50"><span className="text-slate-500">Base Charge Subtotal</span><span className="font-semibold text-slate-900">₹{testResult.breakdown?.base || 0}</span></div>
                                     {(testResult.breakdown?.extra_items || []).map((ex: any, i: number) => (
                                         <div key={i} className="flex justify-between py-2 border-b border-slate-50">
                                             <span className="text-slate-500">{ex.name} <span className="text-[10px] text-slate-400">({ex.type})</span></span>
