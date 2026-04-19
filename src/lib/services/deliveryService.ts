@@ -101,35 +101,70 @@ export async function calculateShippingCharge(
 ): Promise<ShippingResult> {
     const agg = aggregateCart(items);
 
-    // Unified engine: send grams and ml directly (not kg/cm³)
-    const { data, error } = await supabase.rpc("calc_shipping", {
+    // Per-line slab lookup: each cart line runs its own calc_shipping and we sum
+    // the slab (`base`) charges. Extras (COD/handling/etc) apply once at cart level
+    // so we pull them from a single aggregated call.
+    let totalBase = 0;
+    let zone = "Default";
+    let method = "per_item";
+    let freeShipping = false;
+
+    for (const item of items) {
+        const { grams, ml } = parseItemUnit(item.weight || "", item.title);
+        const qty = item.quantity || 1;
+        const lineGrams = grams * qty;
+        const lineMl = ml * qty;
+
+        if (lineGrams === 0 && lineMl === 0) continue;
+
+        const { data, error } = await supabase.rpc("calc_shipping", {
+            p_company_id: companyId,
+            p_state: state,
+            p_pincode: pincode,
+            p_weight_kg: lineGrams,        // grams (param name kept for compat)
+            p_qty: qty,
+            p_order_value: agg.orderValue, // full order value for free-shipping check
+            p_volume_cm3: lineMl,          // ml (param name kept for compat)
+            p_payment_method: paymentMethod,
+        });
+
+        if (error || !data) {
+            console.error("Shipping calc error (line):", error, item);
+            continue;
+        }
+
+        totalBase += Number(data.breakdown?.base) || 0;
+        zone = data.zone || zone;
+        method = data.method || method;
+        if (data.free_shipping) freeShipping = true;
+    }
+
+    // One aggregated call just to resolve cart-level extras (COD, handling, etc)
+    const { data: extrasData } = await supabase.rpc("calc_shipping", {
         p_company_id: companyId,
         p_state: state,
         p_pincode: pincode,
-        p_weight_kg: agg.totalGrams,    // grams (param name kept for compat)
+        p_weight_kg: agg.totalGrams,
         p_qty: agg.totalQty,
         p_order_value: agg.orderValue,
-        p_volume_cm3: agg.totalMl,      // ml (param name kept for compat)
+        p_volume_cm3: agg.totalMl,
         p_payment_method: paymentMethod,
     });
+    const extras = Number(extrasData?.breakdown?.extras) || 0;
+    const extraItems = extrasData?.breakdown?.extra_items || [];
 
-    if (error || !data) {
-        console.error("Shipping calc error:", error);
+    if (freeShipping) {
         return {
-            shippingCharge: 0, zone: "Default", method: "error", freeShipping: false,
+            shippingCharge: 0, zone, method: "free_shipping", freeShipping: true,
             breakdown: { base: 0, extras: 0, extraItems: [] },
         };
     }
 
     return {
-        shippingCharge: Number(data.shipping_charge) || 0,
-        zone: data.zone || "Default",
-        method: data.method || "unknown",
-        freeShipping: data.free_shipping || false,
-        breakdown: {
-            base: Number(data.breakdown?.base) || 0,
-            extras: Number(data.breakdown?.extras) || 0,
-            extraItems: data.breakdown?.extra_items || [],
-        },
+        shippingCharge: Math.ceil(totalBase + extras),
+        zone,
+        method,
+        freeShipping: false,
+        breakdown: { base: Math.ceil(totalBase), extras, extraItems },
     };
 }
