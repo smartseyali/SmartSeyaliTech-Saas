@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import db from "@/lib/db";
 import {
   Plus, Trash2, Save, X, ChevronDown, ChevronRight, ChevronLeft, ArrowLeft,
+  AlignLeft, AlignCenter, AlignRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -136,6 +137,82 @@ export default function DocForm({
     };
     fetchLookups();
   }, [headerFields, tabFields, itemFields]);
+
+  /* ── Item column controls (order / align / resize) ──────────────────────── */
+
+  type ColAlign = "left" | "center" | "right";
+  const [columnOrder, setColumnOrder] = useState<string[]>(() => (itemFields || []).map(f => f.key));
+  const [columnAligns, setColumnAligns] = useState<Record<string, ColAlign>>(() => {
+    const init: Record<string, ColAlign> = {};
+    (itemFields || []).forEach(f => {
+      init[f.key] = (f.type === "number" || f.type === "currency" || f.type === "percentage") ? "right" : "left";
+    });
+    return init;
+  });
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!itemFields) return;
+    const keys = itemFields.map(f => f.key);
+    setColumnOrder(prev => {
+      const filtered = prev.filter(k => keys.includes(k));
+      const added = keys.filter(k => !filtered.includes(k));
+      return [...filtered, ...added];
+    });
+    setColumnAligns(prev => {
+      const next = { ...prev };
+      itemFields.forEach(f => {
+        if (!next[f.key]) {
+          next[f.key] = (f.type === "number" || f.type === "currency" || f.type === "percentage") ? "right" : "left";
+        }
+      });
+      return next;
+    });
+  }, [itemFields]);
+
+  const orderedItemFields = useMemo(() => {
+    if (!itemFields) return [];
+    const byKey = Object.fromEntries(itemFields.map(f => [f.key, f]));
+    return columnOrder.map(k => byKey[k]).filter(Boolean) as ERPField[];
+  }, [itemFields, columnOrder]);
+
+  const moveColumn = (key: string, direction: -1 | 1) => {
+    setColumnOrder(prev => {
+      const idx = prev.indexOf(key);
+      if (idx < 0) return prev;
+      const j = idx + direction;
+      if (j < 0 || j >= prev.length) return prev;
+      const next = prev.slice();
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return next;
+    });
+  };
+
+  const cycleAlign = (key: string) => {
+    setColumnAligns(prev => {
+      const cur = prev[key] || "left";
+      const nextAlign: ColAlign = cur === "left" ? "center" : cur === "center" ? "right" : "left";
+      return { ...prev, [key]: nextAlign };
+    });
+  };
+
+  const startResize = (key: string, startWidth: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const onMove = (me: MouseEvent) => {
+      const w = Math.max(72, startWidth + me.clientX - startX);
+      setColumnWidths(prev => ({ ...prev, [key]: w }));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      document.body.style.cursor = "";
+    };
+    document.body.style.cursor = "col-resize";
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
 
   /* ── Items ──────────────────────────────────────────────────────────────── */
 
@@ -434,14 +511,64 @@ export default function DocForm({
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
                     <th className="w-9 px-2 py-2 text-center text-[10px] font-semibold text-slate-400">No.</th>
-                    {itemFields.map(f => (
-                      <th key={f.key} className={cn(
-                        "px-2 py-2 text-[11px] font-semibold text-slate-500 text-left whitespace-nowrap",
-                        (f.type === "number" || f.type === "currency" || f.type === "percentage") && "text-right",
-                      )}>
-                        {f.label}
-                      </th>
-                    ))}
+                    {orderedItemFields.map((f, i) => {
+                      const align: ColAlign = columnAligns[f.key] || "left";
+                      const alignCls = align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
+                      const justifyCls = align === "right" ? "justify-end" : align === "center" ? "justify-center" : "justify-start";
+                      const width = columnWidths[f.key];
+                      const AlignIcon = align === "right" ? AlignRight : align === "center" ? AlignCenter : AlignLeft;
+                      return (
+                        <th
+                          key={f.key}
+                          style={width ? { width, minWidth: width } : undefined}
+                          className={cn(
+                            "relative px-2 py-2 text-[11px] font-semibold text-slate-500 whitespace-nowrap select-none group/col",
+                            alignCls,
+                          )}
+                        >
+                          <div className={cn("flex items-center gap-1", justifyCls)}>
+                            <button
+                              type="button"
+                              onClick={() => moveColumn(f.key, -1)}
+                              disabled={i === 0}
+                              title="Move column left"
+                              className="opacity-0 group-hover/col:opacity-100 disabled:opacity-20 disabled:cursor-not-allowed p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-all"
+                            >
+                              <ChevronLeft className="w-3 h-3" />
+                            </button>
+                            <span className="truncate">{f.label}</span>
+                            <button
+                              type="button"
+                              onClick={() => cycleAlign(f.key)}
+                              title={`Align: ${align} (click to cycle)`}
+                              className="opacity-0 group-hover/col:opacity-100 p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-all"
+                            >
+                              <AlignIcon className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveColumn(f.key, 1)}
+                              disabled={i === orderedItemFields.length - 1}
+                              title="Move column right"
+                              className="opacity-0 group-hover/col:opacity-100 disabled:opacity-20 disabled:cursor-not-allowed p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-all"
+                            >
+                              <ChevronRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <span
+                            role="separator"
+                            aria-orientation="vertical"
+                            title="Drag to resize column"
+                            onMouseDown={(e) => {
+                              const th = e.currentTarget.parentElement as HTMLElement | null;
+                              const current = width ?? (th?.offsetWidth ?? 140);
+                              startResize(f.key, current, e);
+                            }}
+                            className="absolute right-0 top-1 bottom-1 w-1 cursor-col-resize bg-transparent hover:bg-blue-400 group-hover/col:bg-slate-300 transition-colors"
+                          />
+                        </th>
+                      );
+                    })}
                     <th className="w-8"></th>
                   </tr>
                 </thead>
@@ -449,11 +576,20 @@ export default function DocForm({
                   {items.map((row, idx) => (
                     <tr key={idx} className="border-b border-slate-100 hover:bg-blue-50/40 transition-colors group">
                       <td className="px-2 py-1 text-center text-[11px] font-medium text-slate-400">{idx + 1}</td>
-                      {itemFields.map(f => (
-                        <td key={f.key} className="px-1 py-1">
-                          {renderField(f, row[f.key], val => updateItem(idx, f.key, val), true)}
-                        </td>
-                      ))}
+                      {orderedItemFields.map(f => {
+                        const align: ColAlign = columnAligns[f.key] || "left";
+                        const alignCls = align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
+                        const width = columnWidths[f.key];
+                        return (
+                          <td
+                            key={f.key}
+                            style={width ? { width, minWidth: width } : undefined}
+                            className={cn("px-1 py-1", alignCls)}
+                          >
+                            {renderField(f, row[f.key], val => updateItem(idx, f.key, val), true)}
+                          </td>
+                        );
+                      })}
                       <td className="px-1 py-1 text-center">
                         <button onClick={() => handleRemoveItem(idx)} className="p-0.5 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all">
                           <Trash2 className="w-3 h-3" />
