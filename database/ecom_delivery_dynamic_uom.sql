@@ -23,10 +23,18 @@
 -- contributes ₹0 — no slab matched, no error.
 -- ========================================================================================
 
--- ─── 1. Schema: widen slab_uom, no enum constraint ─────────────────────────
+-- ─── 1. Schema: ensure slab_uom exists, widen to VARCHAR(20) ───────────────
+-- First create the column if this is a fresh install (v4 → v6 direct)
+ALTER TABLE public.shipping_slabs
+  ADD COLUMN IF NOT EXISTS slab_uom VARCHAR(20) DEFAULT 'g';
+
+-- Then widen type if it was previously added narrower (e.g. prior v5 attempt)
 ALTER TABLE public.shipping_slabs
   ALTER COLUMN slab_uom TYPE VARCHAR(20),
   ALTER COLUMN slab_uom SET DEFAULT 'g';
+
+-- Backfill any NULLs so the matching loop never skips legacy rows
+UPDATE public.shipping_slabs SET slab_uom = 'g' WHERE slab_uom IS NULL;
 
 COMMENT ON COLUMN public.shipping_slabs.slab_uom
   IS 'Merchant-chosen UoM for this slab: g | ml | qty | value. One best-fit slab per UoM is matched; charges sum.';

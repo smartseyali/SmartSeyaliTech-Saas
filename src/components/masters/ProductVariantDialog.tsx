@@ -27,7 +27,8 @@ export function ProductVariantDialog({
     productId,
     companyId,
     productName,
-    isEmbedded = false
+    isEmbedded = false,
+    onSaved
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -35,6 +36,7 @@ export function ProductVariantDialog({
     companyId: number;
     productName: string;
     isEmbedded?: boolean;
+    onSaved?: () => void;
 }) {
     const { toast } = useToast();
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -42,18 +44,24 @@ export function ProductVariantDialog({
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        if ((open || isEmbedded) && productId) loadVariants();
+        if ((open || isEmbedded) && productId) {
+            setVariants([]);
+            loadVariants();
+        }
     }, [open, isEmbedded, productId]);
 
     const loadVariants = async () => {
         setLoading(true);
         try {
-            const { data } = await supabase
+            const { data, error } = await supabase
                 .from("product_variants")
                 .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default")
-                .eq("product_id", productId);
+                .eq("product_id", productId)
+                .order("created_at", { ascending: true });
 
-            const mapped = (data || []).map((row: any) => {
+            if (error) throw error;
+
+            const mapped: Variant[] = (data || []).map((row: any) => {
                 let opts = { color: "", size: "" };
                 try { opts = JSON.parse(row.attributes_summary || '{}'); } catch { }
                 return {
@@ -68,7 +76,7 @@ export function ProductVariantDialog({
             });
             setVariants(mapped);
         } catch (err: any) {
-            console.warn("loadVariants error:", err.message);
+            toast({ variant: "destructive", title: "Load failed", description: err.message });
         } finally {
             setLoading(false);
         }
@@ -81,7 +89,12 @@ export function ProductVariantDialog({
     const removeVariant = async (index: number, id?: number) => {
         if (id) {
             if (!confirm("Delete this variant?")) return;
-            await supabase.from("product_variants").delete().eq("id", id);
+            const { error } = await supabase.from("product_variants").delete().eq("id", id);
+            if (error) {
+                toast({ variant: "destructive", title: "Delete failed", description: error.message });
+                return;
+            }
+            onSaved?.();
         }
         setVariants(variants.filter((_, i) => i !== index));
     };
@@ -105,7 +118,10 @@ export function ProductVariantDialog({
 
             if (toInsert.length > 0) {
                 const rows = toInsert.map(v => toDbRow(v, { product_id: productId, company_id: companyId }));
-                const { error } = await supabase.from("product_variants").insert(rows);
+                const { error } = await supabase
+                    .from("product_variants")
+                    .insert(rows)
+                    .select("id");
                 if (error) throw error;
             }
             for (const v of toUpdate) {
@@ -113,8 +129,9 @@ export function ProductVariantDialog({
                 if (error) throw error;
             }
             toast({ title: "Variants saved successfully" });
+            await loadVariants();
+            onSaved?.();
             if (!isEmbedded) onOpenChange(false);
-            else loadVariants(); // Refresh if embedded
         } catch (err: any) {
             toast({ variant: "destructive", title: "Save failed", description: err.message });
         } finally {

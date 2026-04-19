@@ -231,6 +231,7 @@ export const EcomProducts = () => {
                                                     companyId={activeCompany?.id || 0}
                                                     productName={selectedProduct.name}
                                                     isEmbedded={true}
+                                                    onSaved={fetchItems}
                                                 />
                                             </div>
                                         </TabsContent>

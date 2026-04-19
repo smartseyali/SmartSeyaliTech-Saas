@@ -128,15 +128,15 @@ export default function ShippingZones() {
             if (error) throw error;
         }
         toast({ title: editingItem ? "Tariff updated" : "Tariff created" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const deleteTariff = async (id: string) => {
         await supabase.from("shipping_tariffs").delete().eq("id", id);
         toast({ title: "Tariff deleted" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const tariffColumns = [
@@ -213,15 +213,15 @@ export default function ShippingZones() {
             if (error) throw error;
         }
         toast({ title: editingItem ? "Zone updated" : "Zone created" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const deleteZone = async (id: string) => {
         await supabase.from("shipping_zones_v2").delete().eq("id", id);
         toast({ title: "Zone deleted" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const zoneColumns = [
@@ -325,15 +325,15 @@ export default function ShippingZones() {
             if (error) throw error;
         }
         toast({ title: editingItem ? "Rule updated" : "Rule added" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const deleteSlab = async (id: string) => {
         await supabase.from("shipping_slabs").delete().eq("id", id);
         toast({ title: "Rule deleted" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const slabColumns = [
@@ -418,15 +418,15 @@ export default function ShippingZones() {
             if (error) throw error;
         }
         toast({ title: editingItem ? "Extra charge updated" : "Extra charge created" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const deleteExtra = async (id: string) => {
         await supabase.from("shipping_extra_charges").delete().eq("id", id);
         toast({ title: "Charge deleted" });
+        await loadAll();
         backToList();
-        loadAll();
     };
 
     const extraColumns = [
