@@ -121,38 +121,52 @@ export function ProductVariantDialog({
             toast({ variant: "destructive", title: "Save failed", description: "No active workspace — select a company first." });
             return;
         }
+        const prevVariants = variants;
         try {
             setSaving(true);
             const toInsert = variants.filter(v => !v.id);
             const toUpdate = variants.filter(v => v.id);
 
-            let insertedVariants: Variant[] = [];
             if (toInsert.length > 0) {
                 const rows = toInsert.map(v => toDbRow(v, { product_id: productId, company_id: companyId }));
-                const { data, error } = await supabase
-                    .from("product_variants")
-                    .insert(rows)
-                    .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default");
+                const { error } = await supabase.from("product_variants").insert(rows);
                 if (error) throw error;
-                if (!data || data.length !== rows.length) {
-                    throw new Error("Variant was written but is not readable back — check RLS policies / company_id.");
-                }
-                insertedVariants = data.map(mapRow);
             }
-
-            const updatedVariants: Variant[] = [];
             for (const v of toUpdate) {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from("product_variants")
                     .update(toDbRow(v))
-                    .eq("id", v.id)
-                    .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default");
+                    .eq("id", v.id);
                 if (error) throw error;
-                if (data && data[0]) updatedVariants.push(mapRow(data[0]));
             }
 
-            setVariants([...updatedVariants, ...insertedVariants]);
             toast({ title: "Variants saved successfully" });
+
+            // Re-read as the source of truth. If the refresh query fails or returns empty,
+            // keep the pre-save state so the user doesn't lose what they entered.
+            const reload = await supabase
+                .from("product_variants")
+                .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default")
+                .eq("product_id", productId)
+                .eq("company_id", companyId)
+                .order("created_at", { ascending: true });
+
+            if (reload.error) {
+                toast({
+                    variant: "destructive",
+                    title: "Saved — but couldn't refresh list",
+                    description: reload.error.message,
+                });
+            } else if ((reload.data?.length ?? 0) === 0 && prevVariants.length > 0) {
+                toast({
+                    variant: "destructive",
+                    title: "Saved — list is empty on refresh",
+                    description: "Record written but not readable back. Check RLS policy for product_variants.",
+                });
+            } else {
+                setVariants((reload.data || []).map(mapRow));
+            }
+
             onSaved?.();
             if (!isEmbedded) onOpenChange(false);
         } catch (err: any) {
