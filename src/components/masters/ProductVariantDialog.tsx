@@ -50,31 +50,33 @@ export function ProductVariantDialog({
         }
     }, [open, isEmbedded, productId]);
 
+    const mapRow = (row: any): Variant => {
+        let opts = { color: "", size: "" };
+        try { opts = JSON.parse(row.attributes_summary || '{}'); } catch { }
+        return {
+            id: row.id,
+            sku: row.sku || "",
+            options: opts,
+            price: row.price || 0,
+            stock: row.stock_qty || 0,
+            image_url: row.image_url || "",
+            is_default: row.is_default || false
+        };
+    };
+
     const loadVariants = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from("product_variants")
                 .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default")
                 .eq("product_id", productId)
                 .order("created_at", { ascending: true });
+            if (companyId) query = query.eq("company_id", companyId);
 
+            const { data, error } = await query;
             if (error) throw error;
-
-            const mapped: Variant[] = (data || []).map((row: any) => {
-                let opts = { color: "", size: "" };
-                try { opts = JSON.parse(row.attributes_summary || '{}'); } catch { }
-                return {
-                    id: row.id,
-                    sku: row.sku || "",
-                    options: opts,
-                    price: row.price || 0,
-                    stock: row.stock_qty || 0,
-                    image_url: row.image_url || "",
-                    is_default: row.is_default || false
-                };
-            });
-            setVariants(mapped);
+            setVariants((data || []).map(mapRow));
         } catch (err: any) {
             toast({ variant: "destructive", title: "Load failed", description: err.message });
         } finally {
@@ -111,25 +113,46 @@ export function ProductVariantDialog({
     });
 
     const handleSave = async () => {
+        if (!productId) {
+            toast({ variant: "destructive", title: "Save failed", description: "Missing product reference." });
+            return;
+        }
+        if (!companyId) {
+            toast({ variant: "destructive", title: "Save failed", description: "No active workspace — select a company first." });
+            return;
+        }
         try {
             setSaving(true);
             const toInsert = variants.filter(v => !v.id);
             const toUpdate = variants.filter(v => v.id);
 
+            let insertedVariants: Variant[] = [];
             if (toInsert.length > 0) {
                 const rows = toInsert.map(v => toDbRow(v, { product_id: productId, company_id: companyId }));
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from("product_variants")
                     .insert(rows)
-                    .select("id");
+                    .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default");
                 if (error) throw error;
+                if (!data || data.length !== rows.length) {
+                    throw new Error("Variant was written but is not readable back — check RLS policies / company_id.");
+                }
+                insertedVariants = data.map(mapRow);
             }
+
+            const updatedVariants: Variant[] = [];
             for (const v of toUpdate) {
-                const { error } = await supabase.from("product_variants").update(toDbRow(v)).eq("id", v.id);
+                const { data, error } = await supabase
+                    .from("product_variants")
+                    .update(toDbRow(v))
+                    .eq("id", v.id)
+                    .select("id, sku, price, stock_qty, image_url, attributes_summary, is_default");
                 if (error) throw error;
+                if (data && data[0]) updatedVariants.push(mapRow(data[0]));
             }
+
+            setVariants([...updatedVariants, ...insertedVariants]);
             toast({ title: "Variants saved successfully" });
-            await loadVariants();
             onSaved?.();
             if (!isEmbedded) onOpenChange(false);
         } catch (err: any) {
