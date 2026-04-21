@@ -7,7 +7,8 @@ import { useState, useEffect } from "react";
 import {
     LayoutDashboard, ChevronDown, ChevronLeft, Check,
     ShieldCheck, Rocket, Crown, Globe2, CreditCard,
-    LayoutGrid, Layout, Users, Zap, ChevronRight, CalendarDays, Settings
+    LayoutGrid, Layout, Users, Zap, ChevronRight, CalendarDays, Settings,
+    Database, MapPin, Map as MapIcon, FileText
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -34,6 +35,16 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "User Management", url: "/super-admin/users", icon: Users },
             { title: "Headless Connectors", url: "/super-admin/connectors", icon: Zap },
             { title: "Platform Settings", url: "/super-admin/settings", icon: Settings },
+        ],
+    },
+    {
+        label: "Global Masters",
+        icon: Database,
+        items: [
+            { title: "Countries", url: "/super-admin/masters/countries", icon: Globe2 },
+            { title: "States", url: "/super-admin/masters/states", icon: MapPin },
+            { title: "Districts", url: "/super-admin/masters/districts", icon: MapIcon },
+            { title: "Print Formats", url: "/super-admin/masters/print-formats", icon: FileText },
         ],
     }
 ];

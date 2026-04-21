@@ -29,6 +29,10 @@ import Roles from "./Roles";
 import ChartOfAccounts from "./ChartOfAccounts";
 import FiscalYears from "./FiscalYears";
 import PrintFormats from "./PrintFormats";
+import Countries from "./Countries";
+import States from "./States";
+import Districts from "./Districts";
+import GlobalPrintFormats from "./GlobalPrintFormats";
 
 export default function MasterDashboard() {
     const { activeCompany } = useTenant();
@@ -67,7 +71,13 @@ export default function MasterDashboard() {
         if (pathname.includes("/fiscal-years")) return <FiscalYears />;
 
         // Print & Templates
+        if (pathname.includes("/global-print-formats")) return <GlobalPrintFormats />;
         if (pathname.includes("/print-formats")) return <PrintFormats />;
+
+        // Global Geography (read-only for merchants, managed by super admin)
+        if (pathname.includes("/countries")) return <Countries />;
+        if (pathname.includes("/states")) return <States />;
+        if (pathname.includes("/districts")) return <Districts />;
 
         return <MasterSummary />;
     };

@@ -629,8 +629,24 @@ export default function Onboarding() {
 
   // ── Global Location Loading ──────────────────────────────────
   useEffect(() => {
-    // 1. Fetch available countries (with cache)
+    // 1. Fetch available countries — master_countries first, external API fallback
     const loadCountries = async () => {
+      try {
+        const { data } = await supabase
+          .from("master_countries")
+          .select("name")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true });
+
+        if (data && data.length > 0) {
+          setCountries(data.map((c: any) => c.name));
+          return;
+        }
+      } catch (err) {
+        console.warn("master_countries unavailable, falling back to external API", err);
+      }
+
       const cached = localStorage.getItem("smartseyali_countries_cache");
       if (cached) {
         setCountries(JSON.parse(cached));
@@ -686,6 +702,21 @@ export default function Onboarding() {
     const loadStates = async () => {
       setLoadingLocations(true);
       try {
+        // Primary source: master_states joined to master_countries
+        const { data: statesData } = await supabase
+          .from("master_states")
+          .select("name, master_countries!inner(name)")
+          .eq("is_active", true)
+          .eq("master_countries.name", country)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true });
+
+        if (statesData && statesData.length > 0) {
+          setStates(statesData.map((s: any) => s.name));
+          return;
+        }
+
+        // Fallback to external API if master table is empty for this country
         const res = await fetch("https://countriesnow.space/api/v0.1/countries/states", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -721,6 +752,22 @@ export default function Onboarding() {
 
     const loadCities = async () => {
       try {
+        // Primary: master_districts joined to master_states (for Indian flow, districts serve as cities)
+        const { data: districtData } = await supabase
+          .from("master_districts")
+          .select("name, master_states!inner(name, master_countries!inner(name))")
+          .eq("is_active", true)
+          .eq("master_states.name", state)
+          .eq("master_states.master_countries.name", country)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true });
+
+        if (districtData && districtData.length > 0) {
+          setCities(districtData.map((d: any) => d.name));
+          return;
+        }
+
+        // Fallback to external API if no districts seeded for this state
         const res = await fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

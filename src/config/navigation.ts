@@ -340,6 +340,18 @@ export const CORE_NAV: NavGroup[] = [
       { title: "Users", url: "/apps/masters/users", icon: Users, resource: "users" },
       { title: "Roles", url: "/apps/masters/roles", icon: ShieldCheck, resource: "users" },
       { title: "Print Formats", url: "/apps/masters/print-formats", icon: FileText, resource: "settings" },
+      {
+        title: "Global Library",
+        url: "/apps/masters/countries",
+        icon: Database,
+        resource: "settings",
+        subItems: [
+          { title: "Countries", url: "/apps/masters/countries", icon: Database, resource: "settings" },
+          { title: "States", url: "/apps/masters/states", icon: Database, resource: "settings" },
+          { title: "Districts", url: "/apps/masters/districts", icon: Database, resource: "settings" },
+          { title: "Print Format Library", url: "/apps/masters/global-print-formats", icon: FileText, resource: "settings" },
+        ],
+      },
     ],
   },
 ];

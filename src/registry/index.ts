@@ -35,6 +35,10 @@ import { masterSkuPattern } from "./doctypes/master-sku-pattern";
 import { masterSubcategory } from "./doctypes/master-subcategory";
 import { masterUser } from "./doctypes/master-user";
 import { masterVariant } from "./doctypes/master-variant";
+import { masterCountry } from "./doctypes/master-country";
+import { masterState } from "./doctypes/master-state";
+import { masterDistrict } from "./doctypes/master-district";
+import { masterPrintFormat } from "./doctypes/master-print-format";
 
 // ── Inventory ──────────────────────────────────────────────────────────────
 import { inventoryItem } from "./doctypes/inventory-item";
@@ -141,6 +145,12 @@ export const REGISTRY: Record<string, DocTypeDef> = {
   masterSubcategory,
   masterUser,
   masterVariant,
+
+  // Global masters (super-admin managed)
+  masterCountry,
+  masterState,
+  masterDistrict,
+  masterPrintFormat,
 
   // Inventory
   inventoryItem,
