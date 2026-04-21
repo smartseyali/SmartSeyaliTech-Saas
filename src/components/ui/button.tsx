@@ -4,23 +4,41 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * ERPNext v16 (Frappe Desk) button
+ * - 32px default height, 28px sm, 36px lg
+ * - Flat fills, 1px borders, subtle hover, 6px radius
+ * - No scale-on-active (Frappe uses opacity + bg shift)
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold tracking-tight ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-sm font-medium leading-none ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-0 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
-        destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
-        outline: "border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 shadow-sm",
-        secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-        ghost: "hover:bg-slate-100/80 hover:text-slate-900",
-        link: "text-blue-600 underline-offset-4 hover:underline",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary-600 active:bg-primary-700",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive-700",
+        outline:
+          "border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:bg-card dark:text-foreground dark:border-border dark:hover:bg-accent",
+        secondary:
+          "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-transparent dark:bg-accent dark:text-foreground dark:hover:bg-accent/80",
+        ghost:
+          "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-foreground dark:hover:bg-accent",
+        subtle:
+          "bg-primary-50 text-primary-700 hover:bg-primary-100 border border-transparent",
+        link:
+          "text-primary underline-offset-4 hover:underline p-0 h-auto",
+        success:
+          "bg-success text-success-foreground hover:bg-success-700",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded px-3 text-xs",
-        lg: "h-11 rounded-md px-8 text-base",
-        icon: "h-9 w-9",
+        default: "h-9 px-3.5 text-sm",
+        sm: "h-8 px-3 text-xs rounded",
+        xs: "h-7 px-2.5 text-xs rounded",
+        lg: "h-10 px-4 text-sm rounded-md",
+        icon: "h-9 w-9 p-0",
+        "icon-sm": "h-8 w-8 p-0",
       },
     },
     defaultVariants: {
@@ -32,7 +50,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
@@ -45,4 +63,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
-

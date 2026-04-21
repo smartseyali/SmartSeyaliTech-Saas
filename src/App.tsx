@@ -22,6 +22,7 @@ const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AppLauncher = lazy(() => import("./pages/AppLauncher"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
+const Profile = lazy(() => import("./pages/Profile"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const VerifyEmailPending = lazy(() => import("./pages/VerifyEmailPending"));
 const VerifyTenantEmail = lazy(() => import("./pages/VerifyTenantEmail"));
@@ -161,6 +162,11 @@ const App = () => (
 
                                             {/* ── Marketplace (browse & install new apps) ── */}
                                             <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+
+                                            {/* ── User Profile ── */}
+                                            <Route element={<AppLayout />}>
+                                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                                            </Route>
 
                                             {/* ── Storefront Customer Pages (public) ── */}
                                             <Route path="/store/login" element={<StorefrontLogin />} />

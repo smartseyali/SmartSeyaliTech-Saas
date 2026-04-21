@@ -1,30 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useDictionary } from "@/hooks/useDictionary";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Download, ArrowRight } from "lucide-react";
+import { Download, ArrowRight, Printer, ChevronDown } from "lucide-react";
 import ERPListView, { StatusBadge } from "@/components/modules/ERPListView";
 import ERPEntryForm from "@/components/modules/ERPEntryForm";
+import {
+    DropdownMenuItem,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const PrintPreview = lazy(() => import("@/components/modules/PrintPreview"));
+
 const STATUSES = [
-    { key: "all", label: "All", color: "bg-secondary text-foreground" },
-    { key: "pending", label: "Pending", color: "bg-amber-100 text-amber-700" },
-    { key: "confirmed", label: "Confirmed", color: "bg-blue-100 text-blue-700" },
-    { key: "packed", label: "Packed", color: "bg-indigo-100 text-indigo-700" },
-    { key: "shipped", label: "Shipped", color: "bg-purple-100 text-purple-700" },
-    { key: "out_for_delivery", label: "Out for Delivery", color: "bg-orange-100 text-orange-700" },
-    { key: "delivered", label: "Delivered", color: "bg-emerald-100 text-emerald-700" },
-    { key: "cancelled", label: "Cancelled", color: "bg-rose-100 text-rose-700" },
-    { key: "returned", label: "Returned", color: "bg-slate-100 text-slate-700" },
+    { key: "all", label: "All" },
+    { key: "pending", label: "Pending" },
+    { key: "confirmed", label: "Confirmed" },
+    { key: "packed", label: "Packed" },
+    { key: "shipped", label: "Shipped" },
+    { key: "out_for_delivery", label: "Out for Delivery" },
+    { key: "delivered", label: "Delivered" },
+    { key: "cancelled", label: "Cancelled" },
+    { key: "returned", label: "Returned" },
 ];
 
 const NEXT_STATUS: Record<string, string> = {
     pending: "confirmed", confirmed: "packed", packed: "shipped",
     shipped: "out_for_delivery", out_for_delivery: "delivered",
 };
+
+const PRINT_DOCTYPE = "ecomOrder";
+
+interface PrintFormat {
+    id: string;
+    name: string;
+    is_default: boolean;
+}
 
 export default function EcomOrders() {
     const { activeCompany } = useTenant();
@@ -38,7 +57,14 @@ export default function EcomOrders() {
     const [view, setView] = useState<"list" | "form">("list");
     const [editingOrder, setEditingOrder] = useState<any>(null);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    // Print state
+    const [printFormats, setPrintFormats] = useState<PrintFormat[]>([]);
+    const [printing, setPrinting] = useState<null | {
+        formatId: string | null;
+        docs: Array<{ record: any; items: any[] }>;
+    }>(null);
+
+    useEffect(() => { if (activeCompany) { load(); loadPrintFormats(); } }, [activeCompany]);
 
     const load = async () => {
         if (!activeCompany) return;
@@ -47,6 +73,51 @@ export default function EcomOrders() {
             .eq("company_id", activeCompany.id).order("created_at", { ascending: false });
         setOrders(data || []);
         setLoading(false);
+    };
+
+    const loadPrintFormats = async () => {
+        if (!activeCompany) return;
+        const { data } = await supabase
+            .from("print_formats")
+            .select("id, name, is_default")
+            .eq("company_id", activeCompany.id)
+            .eq("doctype_key", PRINT_DOCTYPE)
+            .eq("is_active", true)
+            .order("is_default", { ascending: false });
+        setPrintFormats(data || []);
+    };
+
+    /** Fetch items for one or many orders. Returns in the same order as ids. */
+    const fetchOrdersWithItems = async (ids: any[]) => {
+        if (!activeCompany || ids.length === 0) return [];
+        const idToOrder = new Map(orders.filter(o => ids.includes(o.id)).map(o => [o.id, o]));
+        const { data: items } = await supabase
+            .from("ecom_order_items")
+            .select("*")
+            .eq("company_id", activeCompany.id)
+            .in("order_id", ids);
+        const byOrder = new Map<any, any[]>();
+        (items || []).forEach((it) => {
+            const arr = byOrder.get(it.order_id) || [];
+            arr.push(it);
+            byOrder.set(it.order_id, arr);
+        });
+        return ids
+            .map((id) => idToOrder.get(id))
+            .filter(Boolean)
+            .map((record) => ({ record, items: byOrder.get(record!.id) || [] }));
+    };
+
+    const handlePrintOne = async (orderId: any, formatId: string | null = null) => {
+        const docs = await fetchOrdersWithItems([orderId]);
+        if (docs.length === 0) return;
+        setPrinting({ formatId, docs });
+    };
+
+    const handlePrintMany = async (orderIds: any[], formatId: string | null = null) => {
+        const docs = await fetchOrdersWithItems(orderIds);
+        if (docs.length === 0) return;
+        setPrinting({ formatId, docs });
     };
 
     const advanceStatus = async (e: React.MouseEvent, order: any) => {
@@ -68,7 +139,6 @@ export default function EcomOrders() {
     const fmt = (n: number) => `₹${Number(n).toLocaleString("en-IN")}`;
 
     // ─── Order Create Form ──────────────────────────────────────────────
-
     const orderHeaderFields = {
         basic: [
             { key: "customer_name", label: "Customer Name *", type: "text" as const, required: true, ph: "Full name" },
@@ -113,27 +183,20 @@ export default function EcomOrders() {
     const handleSaveOrder = async (header: any, items: any[]) => {
         if (!activeCompany) return;
         try {
-            // Generate order number
             let orderNumber: string;
             const { data: rpcResult, error: rpcErr } = await supabase.rpc("generate_order_number", { p_company_id: activeCompany.id });
-            if (rpcErr || !rpcResult) {
-                orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
-            } else {
-                orderNumber = rpcResult;
-            }
+            if (rpcErr || !rpcResult) orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
+            else orderNumber = rpcResult;
 
-            // Calculate totals
             const subtotal = items.reduce((s, i) => s + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0), 0);
             const shipping = Number(header.shipping_amount) || 0;
             const discount = Number(header.discount_amount) || 0;
 
-            // Get tax rate from settings
             const { data: settings } = await supabase.from("ecom_settings").select("tax_rate").eq("company_id", activeCompany.id).maybeSingle();
             const taxRate = Number(settings?.tax_rate) || 0;
             const taxAmount = Math.round((subtotal * taxRate / 100) * 100) / 100;
             const grandTotal = subtotal + taxAmount + shipping - discount;
 
-            // Insert order
             const { data: order, error: orderErr } = await supabase.from("ecom_orders").insert([{
                 company_id: activeCompany.id,
                 order_number: orderNumber,
@@ -161,7 +224,6 @@ export default function EcomOrders() {
 
             if (orderErr) throw orderErr;
 
-            // Insert order items
             if (items.length > 0) {
                 const orderItems = items.map(item => ({
                     order_id: order.id,
@@ -178,7 +240,6 @@ export default function EcomOrders() {
                 if (itemsErr) throw itemsErr;
             }
 
-            // Initialize timeline
             await supabase.from("ecom_order_timeline").insert([{
                 order_id: order.id,
                 company_id: activeCompany.id,
@@ -187,7 +248,6 @@ export default function EcomOrders() {
                 created_by: "admin",
             }]);
 
-            // Sync ecom_customer
             await supabase.from("ecom_customers").upsert({
                 company_id: activeCompany.id,
                 email: header.customer_email?.toLowerCase(),
@@ -204,7 +264,6 @@ export default function EcomOrders() {
     };
 
     // ─── Form View ──────────────────────────────────────────────────────
-
     if (view === "form") {
         return (
             <ERPEntryForm
@@ -223,15 +282,16 @@ export default function EcomOrders() {
     }
 
     // ─── List View ──────────────────────────────────────────────────────
-
     const orderColumns = [
         {
             key: "order_number",
             label: "Order No",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-blue-600 tracking-widest text-[13px] font-mono group-hover:underline">#{row.order_number}</span>
-                    <span className="text-xs text-gray-400 font-bold tracking-widest mt-1">
+                    <span className="font-semibold text-primary font-mono text-sm group-hover:underline">
+                        #{row.order_number}
+                    </span>
+                    <span className="text-[11px] text-gray-400 mt-0.5">
                         {new Date(row.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
                     </span>
                 </div>
@@ -242,8 +302,8 @@ export default function EcomOrders() {
             label: "Customer",
             render: (row: any) => (
                 <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 tracking-tight">{row.customer_name}</span>
-                    <span className="text-xs text-gray-400 font-bold tracking-widest mt-1">{row.customer_phone || row.customer_email}</span>
+                    <span className="font-medium text-gray-900 dark:text-foreground">{row.customer_name}</span>
+                    <span className="text-[11px] text-gray-400 mt-0.5">{row.customer_phone || row.customer_email}</span>
                 </div>
             )
         },
@@ -251,16 +311,9 @@ export default function EcomOrders() {
             key: "grand_total",
             label: "Amount",
             render: (row: any) => (
-                <div className="flex flex-col items-start">
-                    <span className="font-bold text-slate-900 tracking-tight">{fmt(row.grand_total)}</span>
-                    <div className={cn(
-                        "mt-1 px-2 py-0.5 rounded text-[8px] font-bold tracking-widest border",
-                        row.payment_status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                            row.payment_status === "refunded" ? "bg-violet-50 text-violet-600 border-violet-100" :
-                                "bg-amber-50 text-amber-600 border-amber-100"
-                    )}>
-                        {row.payment_status}
-                    </div>
+                <div className="flex flex-col items-start gap-1">
+                    <span className="font-semibold text-gray-900 tabular-nums dark:text-foreground">{fmt(row.grand_total)}</span>
+                    <StatusBadge status={row.payment_status} />
                 </div>
             )
         },
@@ -271,7 +324,7 @@ export default function EcomOrders() {
                 <div className="flex flex-col items-start gap-1">
                     <StatusBadge status={row.status} />
                     {row.return_status && (
-                        <span className="px-2 py-0.5 rounded text-[8px] font-bold tracking-widest bg-orange-50 text-orange-600 border border-orange-100">
+                        <span className="erp-pill bg-warning-100 text-warning-700">
                             Return: {row.return_status}
                         </span>
                     )}
@@ -282,14 +335,11 @@ export default function EcomOrders() {
             key: "actions",
             label: "",
             render: (row: any) => (
-                <div className="flex items-center gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
+                <div className="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                     {NEXT_STATUS[row.status] && (
-                        <button
-                            onClick={(e) => advanceStatus(e, row)}
-                            className="h-7 px-3 rounded-lg bg-blue-600 text-white text-[11px] font-bold tracking-widest hover:bg-black transition-all flex items-center gap-1.5"
-                        >
+                        <Button size="xs" onClick={(e) => advanceStatus(e, row)}>
                             <ArrowRight className="w-3 h-3" /> Advance
-                        </button>
+                        </Button>
                     )}
                 </div>
             ),
@@ -306,46 +356,112 @@ export default function EcomOrders() {
     });
 
     return (
-        <ERPListView
-            title="Order Management"
-            data={filteredOrders}
-            columns={orderColumns}
-            onNew={() => { setEditingOrder(null); setView("form"); }}
-            onRefresh={load}
-            isLoading={loading}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            primaryKey="id"
-            onRowClick={(row) => navigate(`/apps/ecommerce/orders/${row.id}`)}
-            headerActions={
-                <div className="flex items-center gap-2">
-                    <button className="h-8 px-4 rounded-xl font-bold text-xs tracking-widest bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 shadow-sm">
+        <>
+            <ERPListView
+                title="Order Management"
+                data={filteredOrders}
+                columns={orderColumns}
+                onNew={() => { setEditingOrder(null); setView("form"); }}
+                onRefresh={load}
+                isLoading={loading}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                primaryKey="id"
+                onRowClick={(row) => navigate(`/apps/ecommerce/orders/${row.id}`)}
+                headerActions={
+                    <Button variant="outline" size="sm">
                         <Download className="w-3.5 h-3.5" /> Export
-                    </button>
-                </div>
-            }
-            tabs={
-                STATUSES.map(s => (
-                    <button
-                        key={s.key}
-                        onClick={() => setActiveStatus(s.key)}
-                        className={cn(
-                            "px-3 py-1.5 rounded-lg text-xs font-bold tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
-                            activeStatus === s.key
-                                ? "bg-slate-900 text-white shadow-lg"
-                                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-                        )}
-                    >
-                        {s.label}
-                        <span className={cn(
-                            "px-1.5 py-0.5 rounded text-[8px] font-mono",
-                            activeStatus === s.key ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                        )}>
-                            {s.key === "all" ? orders.length : orders.filter(o => o.status === s.key).length}
-                        </span>
-                    </button>
-                ))
-            }
-        />
+                    </Button>
+                }
+                tabs={
+                    <div className="flex items-center gap-1 overflow-x-auto erp-scrollbar">
+                        {STATUSES.map(s => (
+                            <button
+                                key={s.key}
+                                onClick={() => setActiveStatus(s.key)}
+                                className={cn(
+                                    "px-2.5 h-7 rounded text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5",
+                                    activeStatus === s.key
+                                        ? "bg-primary text-primary-foreground"
+                                        : "text-gray-600 hover:bg-gray-100 dark:hover:bg-accent",
+                                )}
+                            >
+                                {s.label}
+                                <span className={cn(
+                                    "px-1 rounded text-[10px] font-semibold tabular-nums",
+                                    activeStatus === s.key ? "bg-white/25" : "bg-gray-100 text-gray-500 dark:bg-accent/60",
+                                )}>
+                                    {s.key === "all" ? orders.length : orders.filter(o => o.status === s.key).length}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                }
+                rowActions={(row) =>
+                    printFormats.length > 0 ? (
+                        <>
+                            <DropdownMenuLabel>Print</DropdownMenuLabel>
+                            {printFormats.map((fmt) => (
+                                <DropdownMenuItem
+                                    key={fmt.id}
+                                    onClick={(e) => { e.stopPropagation(); handlePrintOne(row.id, fmt.id); }}
+                                >
+                                    <Printer className="w-3.5 h-3.5" />
+                                    {fmt.name}
+                                    {fmt.is_default && <span className="ml-auto text-[10px] text-gray-400">default</span>}
+                                </DropdownMenuItem>
+                            ))}
+                        </>
+                    ) : (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlePrintOne(row.id); }}>
+                            <Printer className="w-3.5 h-3.5" /> Print (default layout)
+                        </DropdownMenuItem>
+                    )
+                }
+                bulkActions={(ids, clear) => (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline">
+                                <Printer className="w-3 h-3" /> Print
+                                <ChevronDown className="w-3 h-3" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuLabel>Print {ids.length} orders</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {printFormats.length > 0 ? (
+                                printFormats.map((f) => (
+                                    <DropdownMenuItem
+                                        key={f.id}
+                                        onClick={() => { handlePrintMany(ids, f.id); clear(); }}
+                                    >
+                                        <Printer className="w-3.5 h-3.5" />
+                                        {f.name}
+                                        {f.is_default && <span className="ml-auto text-[10px] text-gray-400">default</span>}
+                                    </DropdownMenuItem>
+                                ))
+                            ) : (
+                                <DropdownMenuItem onClick={() => { handlePrintMany(ids); clear(); }}>
+                                    <Printer className="w-3.5 h-3.5" /> Default layout
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+            />
+
+            {printing && (
+                <Suspense fallback={null}>
+                    <PrintPreview
+                        doctype={PRINT_DOCTYPE}
+                        record={printing.docs[0]?.record}
+                        items={printing.docs[0]?.items || []}
+                        batchRecords={printing.docs.length > 1 ? printing.docs : undefined}
+                        initialFormatId={printing.formatId}
+                        onClose={() => setPrinting(null)}
+                    />
+                </Suspense>
+            )}
+        </>
     );
 }

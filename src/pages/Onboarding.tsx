@@ -22,8 +22,6 @@ import {
   AlertCircle,
   LogOut,
   CreditCard,
-  Layout,
-  Clock,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -127,12 +125,12 @@ function StepIndicator({ current }: { current: number }) {
           <React.Fragment key={i}>
             <div className="flex items-center gap-1.5">
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-medium transition-all duration-200 ${
                   done
-                    ? "bg-blue-600 text-white"
+                    ? "bg-primary text-white"
                     : active
-                    ? "bg-blue-600 text-white ring-4 ring-blue-100"
-                    : "bg-slate-100 text-slate-400"
+                    ? "bg-primary text-white ring-4 ring-primary-100"
+                    : "bg-gray-100 text-gray-400"
                 }`}
               >
                 {done ? <Check className="w-3.5 h-3.5" /> : step}
@@ -140,10 +138,10 @@ function StepIndicator({ current }: { current: number }) {
               <span
                 className={`text-xs font-medium hidden sm:inline ${
                   active
-                    ? "text-slate-700"
+                    ? "text-gray-800 dark:text-foreground"
                     : done
-                    ? "text-slate-500"
-                    : "text-slate-400"
+                    ? "text-gray-500"
+                    : "text-gray-400"
                 }`}
               >
                 {label}
@@ -151,7 +149,7 @@ function StepIndicator({ current }: { current: number }) {
             </div>
             {i < STEP_LABELS.length - 1 && (
               <div
-                className={`w-6 h-px ${done ? "bg-blue-400" : "bg-slate-200"}`}
+                className={`w-6 h-px ${done ? "bg-primary-300" : "bg-gray-200"}`}
               />
             )}
           </React.Fragment>
@@ -206,17 +204,9 @@ function ModuleCard({
         <h3 className="text-base font-semibold text-slate-800 mb-0.5">
           {mod.name}
         </h3>
-        <p className="text-xs text-slate-500 mb-3 line-clamp-2 leading-relaxed">
-          {mod.description}
+        <p className="text-sm text-slate-500 mb-3 leading-snug">
+          {mod.tagline}
         </p>
-        <div className="mb-3">
-          <button 
-            onClick={(e) => { e.stopPropagation(); onViewDetails(); }}
-            className="text-[11px] text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 transition"
-          >
-            View Details <ArrowRight className="w-2.5 h-2.5" />
-          </button>
-        </div>
         <ul className="space-y-1.5 mb-4 flex-1">
           {mod.features.slice(0, 4).map((f, i) => (
             <li
@@ -285,186 +275,128 @@ function AppDetailPanel({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col animate-in fade-in duration-300">
-      {/* Top Header */}
-      <div className="h-16 border-b border-slate-200 flex items-center px-6 sticky top-0 bg-white/90 backdrop-blur-md z-10">
-        <button
-          onClick={onClose}
-          className="mr-4 p-2 rounded-full hover:bg-slate-100 transition group"
-          title="Go Back"
-        >
-          <ArrowLeft className="w-5 h-5 text-slate-600 group-hover:-translate-x-1 transition-transform" />
-        </button>
-        <div className="flex items-center gap-3">
-          <div className="text-2xl">{mod.icon}</div>
-          <h1 className="text-lg font-bold text-slate-900">{mod.name}</h1>
-        </div>
-        <div className="ml-auto flex items-center gap-4">
-          {selected ? (
-            <button
-              onClick={onRemove}
-              className="px-5 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition"
-            >
-              Remove App
-            </button>
-          ) : (
-            <button
-              onClick={onInstall}
-              className="px-6 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition shadow-lg shadow-blue-600/20"
-            >
-              Install {mod.name}
-            </button>
-          )}
-        </div>
-      </div>
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left Content: Description & Previews */}
-          <div className="lg:col-span-2 space-y-12">
-            <div>
-              <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-                {mod.tagline}
-              </h2>
-              <p className="text-xl text-slate-600 leading-relaxed max-w-3xl">
-                {mod.description}
-              </p>
+      {/* Panel */}
+      <div
+        className="relative w-full max-w-lg bg-white h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Hero gradient */}
+        <div className={`h-36 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} relative`}>
+          <div className="absolute inset-0 bg-black/10" />
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white hover:bg-white/30 transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-6 pb-8 -mt-10 relative">
+          {/* Icon + name */}
+          <div className="flex items-end gap-4 mb-5">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl bg-white shadow-lg border border-slate-100 shrink-0">
+              {mod.icon}
             </div>
-
-            {/* Screenshots Gallery */}
-            {mod.screenshots && mod.screenshots.length > 0 && (
-              <div className="space-y-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <Layout className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900">App Previews</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-8">
-                  {mod.screenshots.map((src, i) => (
-                    <div
-                      key={i}
-                      className="group relative rounded-3xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-200/50 bg-white"
-                    >
-                      <img
-                        src={src}
-                        alt={`${mod.name} preview ${i + 1}`}
-                        className="w-full h-auto object-cover transition duration-500 group-hover:scale-[1.02]"
-                      />
-                      <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-3xl" />
-                    </div>
-                  ))}
-                </div>
+            <div className="pb-1 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-bold text-slate-900">{mod.name}</h2>
+                {mod.status === "beta" && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">Beta</span>
+                )}
+                {selected && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 inline-flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Selected
+                  </span>
+                )}
               </div>
-            )}
-
-            {/* Features Grid */}
-            <div className="pt-12 border-t border-slate-200">
-              <h3 className="text-xl font-bold text-slate-900 mb-8">Key Capabilities</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mod.features.map((f, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-100 shadow-sm"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <div>
-                      <span className="text-base text-slate-700 font-semibold leading-tight">
-                        {f}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-slate-500 mt-0.5">{mod.tagline}</p>
             </div>
           </div>
 
-          {/* Right Sidebar: Details & Specs */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-10 shadow-xl shadow-slate-200/40 sticky top-28">
-              <div className="flex items-center gap-2 mb-8">
-                <span
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                    mod.status === "live"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-amber-100 text-amber-700"
-                  }`}
-                >
-                  {mod.status}
-                </span>
-                <span className="px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-widest border border-slate-200">
-                  {mod.category}
-                </span>
-              </div>
-
-              <div className="mb-10">
-                {mod.isFree ? (
-                  <div className="text-4xl font-black text-emerald-600">Free</div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-black text-slate-900 tracking-tighter">
-                        ₹{mod.priceMonthly}
-                      </span>
-                      <span className="text-lg text-slate-500 font-semibold">/mo</span>
-                    </div>
-                    {mod.trialDays > 0 && (
-                      <div className="flex items-center gap-2.5 text-sm text-blue-700 font-bold bg-blue-50/80 px-4 py-2 rounded-2xl w-fit border border-blue-100">
-                        <Clock className="w-4 h-4" /> {mod.trialDays}-day free trial
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Primary Action */}
-              {selected ? (
-                <button
-                  onClick={onRemove}
-                  className="w-full py-5 text-sm font-bold text-red-600 border-2 border-red-50 rounded-2xl hover:bg-rose-50 hover:border-rose-100 transition duration-300 mb-6"
-                >
-                  Remove Module
-                </button>
+          {/* Pricing + Action */}
+          <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 mb-6 flex items-center justify-between">
+            <div>
+              {mod.isFree ? (
+                <span className="text-lg font-bold text-emerald-600">Free</span>
               ) : (
-                <button
-                  onClick={onInstall}
-                  className="w-full py-5 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all duration-300 shadow-2xl shadow-blue-600/30 hover:shadow-blue-600/40 hover:-translate-y-0.5 mb-6 active:scale-95"
-                >
-                  Install this App
-                </button>
-              )}
-
-              {/* Specifications List */}
-              <div className="pt-8 border-t border-slate-100 space-y-6">
-                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  Specifications
-                </h4>
-                <div className="space-y-4">
-                  {[
-                    { label: "Publisher", value: "Smartseyali" },
-                    { label: "Architecture", value: "Multi-tenant" },
-                    { label: "Requirement", value: "Master Data Hub" },
-                    { label: "Instance", value: "Isolated Cloud" },
-                  ].map((spec, i) => (
-                    <div key={i} className="flex justify-between items-center text-sm">
-                      <span className="text-slate-500 font-medium">{spec.label}</span>
-                      <span className="font-bold text-slate-800">{spec.value}</span>
-                    </div>
-                  ))}
+                <div>
+                  <span className="text-lg font-bold text-slate-900">₹{mod.priceMonthly}</span>
+                  <span className="text-sm text-slate-500">/month</span>
+                  {mod.trialDays > 0 && (
+                    <p className="text-xs text-blue-600 font-medium mt-0.5">{mod.trialDays}-day free trial</p>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
+            {selected ? (
+              <button
+                onClick={onRemove}
+                className="px-5 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
+              >
+                Remove
+              </button>
+            ) : (
+              <button
+                onClick={onInstall}
+                className="px-5 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+              >
+                Add to Workspace
+              </button>
+            )}
+          </div>
 
-            {/* Help box */}
-            <div className="p-8 rounded-[2rem] bg-slate-900 text-white flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
-                 <AlertCircle className="w-6 h-6 text-blue-400" />
-              </div>
-              <h4 className="font-bold mb-2">Need help?</h4>
-              <p className="text-sm text-slate-400 mb-0">Our experts can help you configure this module for your unique business needs.</p>
+          {/* Description */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-800 mb-2">About this app</h3>
+            <p className="text-sm text-slate-600 leading-relaxed">{mod.description}</p>
+          </div>
+
+          {/* Features */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">Features & Capabilities</h3>
+            <div className="space-y-2">
+              {mod.features.map((f, i) => (
+                <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                  </div>
+                  <span className="text-sm text-slate-700">{f}</span>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Specs */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">Specifications</h3>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Category</dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.category}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Status</dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.status}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">License</dt>
+                <dd className="text-slate-800 font-medium mt-0.5">{mod.isFree ? "Free" : "Subscription"}</dd>
+              </div>
+              {mod.trialDays > 0 && (
+                <div>
+                  <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Trial Period</dt>
+                  <dd className="text-slate-800 font-medium mt-0.5">{mod.trialDays} days</dd>
+                </div>
+              )}
+              <div>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Requires</dt>
+                <dd className="text-slate-800 font-medium mt-0.5">Master Data Hub</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </div>
@@ -501,12 +433,6 @@ export default function Onboarding() {
   const [gstNo, setGstNo] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Dynamic Location data
-  const [countries, setCountries] = useState<string[]>([]);
-  const [states, setStates] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
-  const [loadingLocations, setLoadingLocations] = useState(false);
 
   // Step 2 (verification) fields
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -627,170 +553,6 @@ export default function Onboarding() {
     }
   }, []);
 
-  // ── Global Location Loading ──────────────────────────────────
-  useEffect(() => {
-    // 1. Fetch available countries — master_countries first, external API fallback
-    const loadCountries = async () => {
-      try {
-        const { data } = await supabase
-          .from("master_countries")
-          .select("name")
-          .eq("is_active", true)
-          .order("sort_order", { ascending: true })
-          .order("name", { ascending: true });
-
-        if (data && data.length > 0) {
-          setCountries(data.map((c: any) => c.name));
-          return;
-        }
-      } catch (err) {
-        console.warn("master_countries unavailable, falling back to external API", err);
-      }
-
-      const cached = localStorage.getItem("smartseyali_countries_cache");
-      if (cached) {
-        setCountries(JSON.parse(cached));
-        return;
-      }
-
-      try {
-        const res = await fetch("https://countriesnow.space/api/v0.1/countries");
-        const json = await res.json();
-        if (!json.error) {
-          const list = json.data.map((c: any) => c.country).sort();
-          setCountries(list);
-          localStorage.setItem("smartseyali_countries_cache", JSON.stringify(list));
-        }
-      } catch (err) {
-        console.error("Countries fetch failed", err);
-      }
-    };
-
-    // 2. Auto-detect user's country (with cache)
-    const detectCountry = async () => {
-      const cached = localStorage.getItem("smartseyali_detected_country");
-      if (cached) {
-        setCountry(cached);
-        return;
-      }
-
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        if (res.status === 429) {
-          console.warn("ipapi rate limited, skipping auto-detection");
-          return;
-        }
-        const json = await res.json();
-        if (json.country_name) {
-          setCountry(json.country_name);
-          localStorage.setItem("smartseyali_detected_country", json.country_name);
-        }
-      } catch {}
-    };
-
-    loadCountries();
-    detectCountry();
-  }, []);
-
-  // Fetch states when country changes
-  useEffect(() => {
-    if (!country) {
-      setStates([]);
-      return;
-    }
-
-    const loadStates = async () => {
-      setLoadingLocations(true);
-      try {
-        // Primary source: master_states joined to master_countries
-        const { data: statesData } = await supabase
-          .from("master_states")
-          .select("name, master_countries!inner(name)")
-          .eq("is_active", true)
-          .eq("master_countries.name", country)
-          .order("sort_order", { ascending: true })
-          .order("name", { ascending: true });
-
-        if (statesData && statesData.length > 0) {
-          setStates(statesData.map((s: any) => s.name));
-          return;
-        }
-
-        // Fallback to external API if master table is empty for this country
-        const res = await fetch("https://countriesnow.space/api/v0.1/countries/states", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ country }),
-        });
-        const json = await res.json();
-        if (!json.error) {
-          setStates(json.data.states.map((s: any) => s.name).sort());
-        } else {
-          setStates([]);
-        }
-      } catch {
-        setStates([]);
-      } finally {
-        setLoadingLocations(false);
-      }
-    };
-
-    loadStates();
-    // Reset state/city
-    if (country !== loadDraft()?.country) {
-      setState("");
-      setCity("");
-    }
-  }, [country]);
-
-  // Fetch cities when state changes
-  useEffect(() => {
-    if (!state || !country) {
-      setCities([]);
-      return;
-    }
-
-    const loadCities = async () => {
-      try {
-        // Primary: master_districts joined to master_states (for Indian flow, districts serve as cities)
-        const { data: districtData } = await supabase
-          .from("master_districts")
-          .select("name, master_states!inner(name, master_countries!inner(name))")
-          .eq("is_active", true)
-          .eq("master_states.name", state)
-          .eq("master_states.master_countries.name", country)
-          .order("sort_order", { ascending: true })
-          .order("name", { ascending: true });
-
-        if (districtData && districtData.length > 0) {
-          setCities(districtData.map((d: any) => d.name));
-          return;
-        }
-
-        // Fallback to external API if no districts seeded for this state
-        const res = await fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ country, state }),
-        });
-        const json = await res.json();
-        if (!json.error) {
-          setCities(json.data.sort());
-        } else {
-          setCities([]);
-        }
-      } catch {
-        setCities([]);
-      }
-    };
-
-    loadCities();
-    // Reset city
-    if (state !== loadDraft()?.state) {
-      setCity("");
-    }
-  }, [state, country]);
-
   // ── Polling for email verification (Step 2) ─────────────────
   // Polls the users table for email_verified = true (set by tenant_verify_email RPC)
   useEffect(() => {
@@ -865,19 +627,7 @@ export default function Onboarding() {
         .eq("id", 1)
         .maybeSingle()
         .then(({ data }) => {
-          if (data) {
-            setPlatformSettings({
-              ...data,
-              razorpay_key_id: data.razorpay_key_id || import.meta.env.VITE_RAZORPAY_KEY_ID || null
-            });
-          } else if (import.meta.env.VITE_RAZORPAY_KEY_ID) {
-            // Fallback for missing settings record
-            setPlatformSettings({
-              razorpay_key_id: import.meta.env.VITE_RAZORPAY_KEY_ID,
-              currency: "INR",
-              currency_symbol: "₹"
-            });
-          }
+          if (data) setPlatformSettings(data);
         });
     }
   }, [step]);
@@ -1022,11 +772,7 @@ export default function Onboarding() {
       if (data?.token) {
         const sent = await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
         if (!sent) {
-          toast.error("Failed to send verification email. Please check your internet or try again later.", {
-            description: "You can also manually resend the email in the next step."
-          });
-        } else {
-          toast.success("Verification email sent!");
+          console.warn("Verification email send failed — user can resend from step 2");
         }
       }
     } catch (err) {
@@ -1301,15 +1047,15 @@ export default function Onboarding() {
     }
   }
 
-  // ── Input class helper ──────────────────────────────────────
+  // ── Input class helper — ERPNext v16 style ──────────────────
   const inputClass =
-    "w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
+    "w-full px-2.5 h-8 rounded-md border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors";
 
   // ══════════════════════════════════════════════════════════════
   //  RENDER
   // ══════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
@@ -1397,75 +1143,23 @@ export default function Onboarding() {
                     </div>
                   </div>
 
-                  {/* Country, State, District / City Selection (Dynamic API) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* City, State, Pincode, Country */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Country</label>
-                      <select 
-                        value={country} 
-                        onChange={(e) => setCountry(e.target.value)} 
-                        className={`${inputClass} bg-white appearance-none h-[42px]`}
-                      >
-                        <option value="">Select Country</option>
-                        {countries.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">City</label>
+                      <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Mumbai" className={inputClass} />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-2">
-                        State {loadingLocations && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
-                      </label>
-                      {states.length > 0 ? (
-                        <select 
-                          value={state} 
-                          onChange={(e) => setState(e.target.value)} 
-                          className={`${inputClass} bg-white appearance-none h-[42px]`}
-                        >
-                          <option value="">Select State</option>
-                          {states.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      ) : (
-                        <input 
-                          type="text" 
-                          value={state} 
-                          onChange={(e) => setState(e.target.value)} 
-                          placeholder="State / Province" 
-                          className={inputClass} 
-                        />
-                      )}
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">State</label>
+                      <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="Maharashtra" className={inputClass} />
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">District / City</label>
-                      {cities.length > 0 ? (
-                        <select 
-                          value={city} 
-                          onChange={(e) => setCity(e.target.value)} 
-                          className={`${inputClass} bg-white appearance-none h-[42px]`}
-                        >
-                          <option value="">Select City</option>
-                          {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                      ) : (
-                        <input 
-                          type="text" 
-                          value={city} 
-                          onChange={(e) => setCity(e.target.value)} 
-                          placeholder="City name" 
-                          className={inputClass} 
-                        />
-                      )}
-                    </div>
-
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">Pincode</label>
-                      <input 
-                        type="text" 
-                        value={pincode} 
-                        onChange={(e) => setPincode(e.target.value)} 
-                        placeholder="Zip/Pincode" 
-                        className={inputClass} 
-                      />
+                      <input type="text" value={pincode} onChange={(e) => setPincode(e.target.value)} placeholder="400001" className={inputClass} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Country</label>
+                      <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} className={inputClass} />
                     </div>
                   </div>
 
@@ -1571,26 +1265,28 @@ export default function Onboarding() {
               </div>
             </div>
 
-            {/* Right — Branding area */}
+            {/* Right — Summary aside (ERPNext v16 style) */}
             <div className="hidden lg:flex lg:col-span-2 items-start">
-              <div className="w-full rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white min-h-[480px] flex flex-col justify-between">
+              <div className="w-full rounded-lg bg-card border border-gray-200 p-6 min-h-[480px] flex flex-col justify-between dark:border-border">
                 <div>
-                  <div className="text-3xl font-bold mb-2 tracking-tight">Smartseyali</div>
-                  <p className="text-blue-100 text-sm leading-relaxed">
-                    Your all-in-one business platform. Manage sales, inventory, HR, accounting, and more from a single workspace.
+                  <div className="text-lg font-semibold text-gray-900 mb-1 dark:text-foreground">{PLATFORM_CONFIG.name}</div>
+                  <p className="text-gray-500 text-xs leading-relaxed">
+                    All-in-one business platform. Sales, inventory, HR, accounting — a single workspace.
                   </p>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[
-                    { emoji: "🚀", title: "Ready in seconds", desc: "Set up your workspace instantly" },
-                    { emoji: "🔒", title: "Multi-tenant secure", desc: "Your data is isolated and protected" },
-                    { emoji: "📦", title: "Install only what you need", desc: "Pay per app, scale as you grow" },
+                    { title: "Ready in seconds", desc: "Workspace provisioned instantly" },
+                    { title: "Multi-tenant secure", desc: "Your data is isolated and encrypted" },
+                    { title: "Install only what you need", desc: "Pay per app, scale as you grow" },
                   ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm">{item.emoji}</div>
+                    <div key={i} className="flex items-start gap-2.5">
+                      <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3 text-success-700" />
+                      </div>
                       <div>
-                        <div className="text-sm font-medium">{item.title}</div>
-                        <div className="text-xs text-blue-200">{item.desc}</div>
+                        <div className="text-xs font-medium text-gray-800 dark:text-foreground">{item.title}</div>
+                        <div className="text-[11px] text-gray-500">{item.desc}</div>
                       </div>
                     </div>
                   ))}
@@ -1643,28 +1339,11 @@ export default function Onboarding() {
                   disabled={resendCooldown > 0}
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
                 >
-                  <RefreshCw
-                    className={`w-4 h-4 ${
-                      resendCooldown > 0
-                        ? ""
-                        : "group-hover:rotate-180 transition-transform"
-                    }`}
-                  />
+                  <RefreshCw className={`w-4 h-4 ${resendCooldown > 0 ? "" : "group-hover:rotate-180 transition-transform"}`} />
                   {resendCooldown > 0
                     ? `Resend in ${resendCooldown}s`
                     : "Resend verification email"}
                 </button>
-
-                {import.meta.env.DEV && (
-                  <div className="pt-2">
-                    <button
-                      onClick={() => setStep(3)}
-                      className="text-[11px] text-slate-400 hover:text-blue-600 font-medium underline transition"
-                    >
-                      Skip verification (Development Only)
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Change email / back */}

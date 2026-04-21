@@ -1,277 +1,299 @@
-import { useState, useMemo } from "react";
-import { 
-    Search, 
-    Plus, 
-    RefreshCw, 
-    MoreHorizontal,
-    ChevronDown,
-    Filter,
-    FileText,
-    ArrowUpDown,
-    FileDown,
-    FileUp,
-    Trash2,
-    CheckSquare,
-    Square
+import { useState } from "react";
+import {
+  Search,
+  Plus,
+  RefreshCw,
+  MoreHorizontal,
+  Filter,
+  FileText,
+  ArrowUpDown,
+  FileDown,
+  FileUp,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface Column {
-    key: string;
-    label: string;
-    render?: (item: any) => React.ReactNode;
-    className?: string;
-    sortable?: boolean;
+  key: string;
+  label: string;
+  render?: (item: any) => React.ReactNode;
+  className?: string;
+  sortable?: boolean;
 }
 
 interface ERPListViewProps {
-    title: string;
-    data: any[];
-    columns: Column[];
-    onNew: () => void;
-    onRefresh: () => void;
-    onRowClick?: (item: any) => void;
-    onDeleteItem?: (id: any) => void;
-    onDeleteIds?: (ids: any[]) => void;
-    isLoading?: boolean;
-    searchTerm: string;
-    onSearchChange: (val: string) => void;
-    primaryKey?: string;
-    statusField?: string;
-    headerActions?: React.ReactNode;
-    tabs?: React.ReactNode;
+  title: string;
+  data: any[];
+  columns: Column[];
+  onNew: () => void;
+  onRefresh: () => void;
+  onRowClick?: (item: any) => void;
+  onDeleteItem?: (id: any) => void;
+  onDeleteIds?: (ids: any[]) => void;
+  isLoading?: boolean;
+  searchTerm: string;
+  onSearchChange: (val: string) => void;
+  primaryKey?: string;
+  statusField?: string;
+  headerActions?: React.ReactNode;
+  tabs?: React.ReactNode;
+  /** Extra menu items shown in each row's dropdown, above Delete */
+  rowActions?: (row: any) => React.ReactNode;
+  /** Extra toolbar buttons shown when rows are selected */
+  bulkActions?: (selectedIds: any[], clearSelection: () => void) => React.ReactNode;
 }
 
-// Re-export from centralized StatusBadge for backward compatibility
 import { StatusBadge } from "@/components/ui/status-badge";
 export { StatusBadge } from "@/components/ui/status-badge";
 
 export default function ERPListView({
-    title,
-    data,
-    columns,
-    onNew,
-    onRefresh,
-    onRowClick,
-    onDeleteItem,
-    onDeleteIds,
-    isLoading,
-    searchTerm,
-    onSearchChange,
-    primaryKey = "id",
-    statusField = "status",
-    headerActions,
-    tabs
+  title,
+  data,
+  columns,
+  onNew,
+  onRefresh,
+  onRowClick,
+  onDeleteItem,
+  onDeleteIds,
+  isLoading,
+  searchTerm,
+  onSearchChange,
+  primaryKey = "id",
+  statusField = "status",
+  headerActions,
+  tabs,
+  rowActions,
+  bulkActions,
 }: ERPListViewProps) {
-    const [selectedIds, setSelectedIds] = useState<Set<any>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<any>>(new Set());
 
-    const toggleSelectAll = () => {
-        if (selectedIds.size === data.length) {
-            setSelectedIds(new Set());
-        } else {
-            setSelectedIds(new Set(data.map(i => i[primaryKey])));
-        }
-    };
+  const toggleSelectAll = () => {
+    if (selectedIds.size === data.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(data.map((i) => i[primaryKey])));
+    }
+  };
 
-    const toggleSelect = (id: any) => {
-        const next = new Set(selectedIds);
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-        setSelectedIds(next);
-    };
+  const toggleSelect = (id: any) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
 
-    const handleDeleteSelected = () => {
-        if (onDeleteIds) {
-            onDeleteIds(Array.from(selectedIds));
-            setSelectedIds(new Set());
-        }
-    };
+  const handleDeleteSelected = () => {
+    if (onDeleteIds) {
+      onDeleteIds(Array.from(selectedIds));
+      setSelectedIds(new Set());
+    }
+  };
 
-    return (
-        <div className="flex flex-col min-h-screen bg-slate-50/20 font-sans">
-            {/* Toolbar Area */}
-            <div className="sticky top-0 z-40 bg-white border-b border-slate-200">
-                <header className="bg-white flex flex-col">
-                    <div className="flex flex-wrap items-center justify-between gap-2 min-h-[48px] px-3 sm:px-4 py-2 sm:py-0">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-[11px] font-black tracking-tight text-slate-950 uppercase leading-none border-l-2 border-blue-600 pl-3">{title}</h1>
-                            <div className="h-3 w-px bg-slate-200 hidden sm:block" />
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] hidden sm:inline">{data.length} RECORDS</span>
-                        </div>
+  return (
+    <div className="flex flex-col h-full bg-background">
+      {/* Toolbar */}
+      <div className="sticky top-0 z-30 bg-card border-b border-gray-200 dark:border-border">
+        <div className="flex items-center justify-between gap-2 h-12 px-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h1 className="text-base font-semibold text-gray-900 dark:text-foreground truncate">
+              {title}
+            </h1>
+            <span className="px-1.5 py-0.5 rounded text-[11px] font-medium text-gray-500 bg-gray-100 dark:bg-accent/40">
+              {data.length}
+            </span>
+          </div>
 
-                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            {selectedIds.size > 0 && onDeleteIds && (
-                                <motion.div
-                                    initial={{ x: 20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    className="flex items-center gap-2 pr-2 mr-2 border-r border-slate-100"
-                                >
-                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{selectedIds.size} SELECTED</span>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={handleDeleteSelected}
-                                        className="h-8 rounded-md text-[9px] font-black uppercase tracking-widest px-3 bg-rose-600 hover:bg-rose-700 active:bg-rose-800"
-                                    >
-                                        <Trash2 className="w-3 h-3 mr-1.5" />
-                                        Batch Delete
-                                    </Button>
-                                </motion.div>
-                            )}
+          <div className="flex items-center gap-1.5">
+            {selectedIds.size > 0 && (
+              <motion.div
+                initial={{ x: 10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="flex items-center gap-2 pr-2 mr-1 border-r border-gray-200 dark:border-border"
+              >
+                <span className="text-xs font-medium text-gray-600 dark:text-foreground">
+                  {selectedIds.size} selected
+                </span>
+                {bulkActions?.(Array.from(selectedIds), () => setSelectedIds(new Set()))}
+                {onDeleteIds && (
+                  <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
+                    <Trash2 className="w-3 h-3" /> Delete
+                  </Button>
+                )}
+              </motion.div>
+            )}
 
-                            {headerActions && (
-                                <div className="flex items-center gap-1.5 mr-1 pr-1 border-r border-slate-100">
-                                    {headerActions}
-                                </div>
-                            )}
+            {headerActions && (
+              <div className="flex items-center gap-1 mr-1 pr-1.5 border-r border-gray-200 dark:border-border">
+                {headerActions}
+              </div>
+            )}
 
-                            <div className="flex items-center gap-1.5">
-                                <Button variant="ghost" size="sm" className="h-8 px-3 text-slate-500 font-bold text-[9px] tracking-widest uppercase border border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 transition-all hidden sm:flex">
-                                    <FileDown className="w-3.5 h-3.5 mr-1" /> EXPORT
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={onRefresh} className="h-8 w-8 text-slate-400 border border-slate-200 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-all">
-                                    <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
-                                </Button>
-                                <Button onClick={onNew} className="h-8 px-4 bg-slate-900 hover:bg-black active:bg-slate-800 text-white text-[10px] font-black shadow-md shadow-slate-900/10 uppercase tracking-[0.15em] transition-all rounded-md">
-                                    <Plus className="w-3.5 h-3.5 mr-1" /> <span className="hidden xs:inline">NEW ENTRY</span><span className="xs:hidden">NEW</span>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                <div className="w-full px-3 sm:px-4 py-1.5 flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-50/80 border-t border-slate-100">
-                    <div className="relative flex-1 min-w-[180px] max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            placeholder={`Quick find...`}
-                            className="w-full h-9 pl-10 pr-4 bg-white border border-slate-200 rounded-lg text-[12px] text-slate-900 font-medium placeholder:text-slate-400 hover:border-blue-400 focus:ring-2 focus:ring-blue-500/15 focus:border-blue-600 transition-all duration-150 outline-none"
-                        />
-                    </div>
-                    <Button variant="ghost" className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:bg-slate-200 transition-all hidden sm:flex">
-                        <Filter className="w-3 h-3 mr-2" /> SMART FILTERS
-                    </Button>
-                </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="w-full p-2 sm:p-3 overflow-x-auto">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <Table>
-                        <TableHeader className="bg-slate-50/50">
-                            <TableRow className="h-10 hover:bg-transparent border-slate-200">
-                                <TableHead className="w-10 pl-5">
-                                    <Checkbox 
-                                        checked={selectedIds.size === data.length && data.length > 0} 
-                                        onCheckedChange={toggleSelectAll}
-                                        className="rounded-sm border-slate-300 data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900"
-                                    />
-                                </TableHead>
-                                {columns.map((col) => (
-                                    <TableHead key={col.key} className={cn("text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]", col.className)}>
-                                        <div className="flex items-center gap-1">
-                                            {col.label}
-                                            {col.sortable !== false && <ArrowUpDown className="w-2.5 h-2.5 opacity-30" />}
-                                        </div>
-                                    </TableHead>
-                                ))}
-                                <TableHead className="w-10"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <AnimatePresence mode="popLayout">
-                                {isLoading ? (
-                                    <TableRow><TableCell colSpan={columns.length + 2} className="h-48 text-center"><RefreshCw className="w-6 h-6 text-blue-500 animate-spin mx-auto opacity-30" /></TableCell></TableRow>
-                                ) : data.length === 0 ? (
-                                    <TableRow><TableCell colSpan={columns.length + 2} className="h-48 text-center text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Zero Records Found</TableCell></TableRow>
-                                ) : (
-                                    data.map((item) => (
-                                        <motion.tr
-                                            key={item[primaryKey]}
-                                            layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            onClick={() => onRowClick && onRowClick(item)}
-                                            className={cn(
-                                                "h-12 border-b border-slate-100 transition-all duration-150 cursor-pointer group hover:bg-blue-50/60 active:bg-blue-100/40",
-                                                selectedIds.has(item[primaryKey]) ? "bg-blue-50/50" : ""
-                                            )}
-                                        >
-                                            <TableCell className="pl-5" onClick={(e) => e.stopPropagation()}>
-                                                <Checkbox 
-                                                    checked={selectedIds.has(item[primaryKey])}
-                                                    onCheckedChange={() => toggleSelect(item[primaryKey])}
-                                                    className="rounded-sm border-slate-300 data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 shadow-none"
-                                                />
-                                            </TableCell>
-                                            {columns.map((col) => (
-                                                <TableCell key={col.key} className={cn("text-[12px] font-semibold text-slate-800 leading-snug", col.className)}>
-                                                    {col.render ? col.render(item) : col.key === statusField ? <StatusBadge status={item[col.key]} /> : item[col.key] || "—"}
-                                                </TableCell>
-                                            ))}
-                                            <TableCell className="pr-3 text-right" onClick={(e) => e.stopPropagation()}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-900 hover:bg-slate-100 border border-transparent shadow-none transition-all duration-150">
-                                                            <MoreHorizontal className="w-4 h-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-44 rounded-xl p-1.5 shadow-2xl border-slate-200 font-sans">
-                                                        <DropdownMenuLabel className="text-[9px] font-black text-slate-400 uppercase px-2 pt-2 pb-1 tracking-widest border-b border-slate-50 mb-1">Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => onRowClick && onRowClick(item)} className="rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-700 focus:bg-slate-50 cursor-pointer flex items-center gap-2">
-                                                            <FileText className="w-3.5 h-3.5 text-slate-400" /> Open Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="rounded-lg px-2 py-1.5 text-[11px] font-bold text-slate-700 focus:bg-slate-50 cursor-pointer flex items-center gap-2">
-                                                            <FileUp className="w-3.5 h-3.5 text-slate-400" /> Duplicate
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator className="bg-slate-50 my-1" />
-                                                        <DropdownMenuItem 
-                                                            onClick={() => onDeleteItem && onDeleteItem(item[primaryKey])}
-                                                            className="rounded-lg px-2 py-1.5 text-[11px] font-bold text-rose-600 focus:bg-rose-50 focus:text-rose-700 cursor-pointer flex items-center gap-2"
-                                                        >
-                                                            <Trash2 className="w-3.5 h-3.5" /> Purge Record
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </motion.tr>
-                                    ))
-                                )}
-                            </AnimatePresence>
-                        </TableBody>
-                    </Table>
-                </div>
-                
-                {/* Status Bar */}
-                <div className="mt-4 flex items-center justify-between px-2">
-                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">
-                        INDEX {data.length > 0 ? '1' : '0'} TO {data.length} OF {data.length} ENTRIES
-                    </div>
-                </div>
-            </div>
+            <Button variant="outline" size="sm">
+              <FileDown className="w-3 h-3" /> <span className="hidden sm:inline">Export</span>
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={onRefresh} title="Refresh">
+              <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
+            </Button>
+            <Button size="sm" onClick={onNew}>
+              <Plus className="w-3 h-3" /> New
+            </Button>
+          </div>
         </div>
-    );
+
+        <div className="flex items-center gap-2 px-4 py-2 border-t border-gray-100 bg-gray-50/50 dark:border-border dark:bg-accent/20">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search…"
+              className="w-full h-7 pl-8 pr-2.5 bg-white border border-gray-200 rounded-md text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none dark:bg-card dark:border-border"
+            />
+          </div>
+          <Button variant="ghost" size="sm" className="text-gray-500">
+            <Filter className="w-3 h-3" />
+            <span className="hidden sm:inline">Filter</span>
+          </Button>
+          {tabs}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="flex-1 w-full p-4 overflow-x-auto">
+        <div className="bg-card rounded-lg border border-gray-200 dark:border-border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="h-8">
+                <TableHead className="w-9 pl-3">
+                  <Checkbox
+                    checked={selectedIds.size === data.length && data.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
+                {columns.map((col) => (
+                  <TableHead key={col.key} className={col.className}>
+                    <div className="flex items-center gap-1">
+                      {col.label}
+                      {col.sortable !== false && <ArrowUpDown className="w-2.5 h-2.5 opacity-30" />}
+                    </div>
+                  </TableHead>
+                ))}
+                <TableHead className="w-9" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <AnimatePresence mode="popLayout">
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length + 2} className="h-40 text-center">
+                      <RefreshCw className="w-4 h-4 text-primary animate-spin mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ) : data.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length + 2} className="h-40 text-center">
+                      <div className="space-y-1">
+                        <FileText className="w-8 h-8 text-gray-200 mx-auto" />
+                        <p className="text-xs font-medium text-gray-400">No records</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  data.map((item) => (
+                    <motion.tr
+                      key={item[primaryKey]}
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={() => onRowClick && onRowClick(item)}
+                      className={cn(
+                        "h-9 border-b border-gray-100 transition-colors cursor-pointer group",
+                        "hover:bg-gray-50 dark:hover:bg-accent/40 dark:border-border",
+                        selectedIds.has(item[primaryKey]) && "bg-primary-50 dark:bg-accent",
+                      )}
+                    >
+                      <TableCell className="pl-3" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedIds.has(item[primaryKey])}
+                          onCheckedChange={() => toggleSelect(item[primaryKey])}
+                        />
+                      </TableCell>
+                      {columns.map((col) => (
+                        <TableCell key={col.key} className={cn("text-sm", col.className)}>
+                          {col.render
+                            ? col.render(item)
+                            : col.key === statusField
+                              ? <StatusBadge status={item[col.key]} />
+                              : item[col.key] || <span className="text-gray-300">—</span>}
+                        </TableCell>
+                      ))}
+                      <TableCell className="pr-2 text-right" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="inline-flex items-center justify-center w-7 h-7 rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition dark:hover:bg-accent">
+                              <MoreHorizontal className="w-3.5 h-3.5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => onRowClick && onRowClick(item)}>
+                              <FileText className="w-3.5 h-3.5" /> Open
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <FileUp className="w-3.5 h-3.5" /> Duplicate
+                            </DropdownMenuItem>
+                            {rowActions && (
+                              <>
+                                <DropdownMenuSeparator />
+                                {rowActions(item)}
+                              </>
+                            )}
+                            {onDeleteItem && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => onDeleteItem(item[primaryKey])}
+                                  className="text-destructive focus:text-destructive focus:bg-destructive-50"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </motion.tr>
+                  ))
+                )}
+              </AnimatePresence>
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between px-1">
+          <p className="text-xs text-gray-500">
+            {data.length > 0 && <>Showing 1–{data.length} of {data.length}</>}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

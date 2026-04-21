@@ -9,29 +9,31 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { 
-  Search, 
-  ShoppingCart, 
-  Users, 
-  Package, 
-  FileText, 
-  CreditCard, 
+import {
+  Search,
+  ShoppingCart,
+  Users,
+  Package,
+  FileText,
   Settings,
-  Plus
+  Plus,
 } from "lucide-react";
 
+/**
+ * ERPNext v16 "Awesome Bar" — global command/search trigger in header.
+ * Ctrl/Cmd+G or Ctrl/Cmd+K opens the palette.
+ */
 export function GlobalSearch() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      if ((e.key === "k" || e.key === "g") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((o) => !o);
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
@@ -45,49 +47,52 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex-1 max-w-md relative group hidden sm:flex items-center text-left"
+        className="group flex items-center gap-2 w-full max-w-[420px] h-8 px-2.5 rounded-md border border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 transition-colors text-left dark:bg-card dark:border-border"
+        title="Search — Ctrl+G"
       >
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500">
-          <Search className="w-4 h-4" />
-        </div>
-        <div className="pl-10 bg-slate-100 hover:bg-slate-200 transition-all h-9 rounded-md w-full text-sm text-slate-500 flex items-center">
-          Search resources... (Ctrl+K)
-        </div>
+        <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+        <span className="flex-1 text-xs text-gray-400 truncate">
+          Search or type a command…
+        </span>
+        <span className="hidden sm:inline-flex items-center gap-0.5 shrink-0">
+          <kbd className="kbd">Ctrl</kbd>
+          <kbd className="kbd">G</kbd>
+        </span>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput placeholder="Type a command or search…" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
+          <CommandGroup heading="Jump to">
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/ecommerce/orders"))}>
-              <ShoppingCart className="mr-2 h-4 w-4" />
+              <ShoppingCart className="mr-2 h-3.5 w-3.5" />
               <span>Orders</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/masters/items"))}>
-              <Package className="mr-2 h-4 w-4" />
+              <Package className="mr-2 h-3.5 w-3.5" />
               <span>Products</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/crm/contacts"))}>
-              <Users className="mr-2 h-4 w-4" />
+              <Users className="mr-2 h-3.5 w-3.5" />
               <span>Contacts</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
-          <CommandGroup heading="Quick Actions">
+          <CommandGroup heading="Create">
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/masters/items"))}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-3.5 w-3.5" />
               <span>New Product</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/sales/invoices/new"))}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-2 h-3.5 w-3.5" />
               <span>New Invoice</span>
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Settings">
             <CommandItem onSelect={() => runCommand(() => navigate("/apps/ecommerce/settings"))}>
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings className="mr-2 h-3.5 w-3.5" />
               <span>System Settings</span>
             </CommandItem>
           </CommandGroup>

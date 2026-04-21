@@ -1,6 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Check, Download, ExternalLink, X, ArrowLeft, Star, Shield, Clock, Zap, ChevronRight, Tag, Package, Globe, Trash2, CreditCard } from "lucide-react";
+import {
+    Search, Check, Download, ExternalLink, ArrowLeft, Shield, Clock, Zap,
+    ChevronRight, Package, Globe, Trash2, CreditCard, Loader2,
+} from "lucide-react";
 import { CATEGORY_LABELS } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
@@ -48,32 +51,33 @@ interface SystemModule {
 
 type CategoryFilter = "all" | string;
 
-const CATEGORY_PILLS: { key: CategoryFilter; label: string; icon: string }[] = [
-    { key: "all", label: "All Apps", icon: "🏪" },
-    { key: "commerce", label: "Commerce", icon: "🛒" },
-    { key: "operations", label: "Operations", icon: "⚙️" },
-    { key: "customer", label: "Customer", icon: "🎯" },
-    { key: "people", label: "People", icon: "👥" },
-    { key: "finance", label: "Finance", icon: "💰" },
-    { key: "analytics", label: "Analytics", icon: "📊" },
-    { key: "collaboration", label: "Collaboration", icon: "🤝" },
+const CATEGORY_PILLS: { key: CategoryFilter; label: string }[] = [
+    { key: "all",           label: "All Apps" },
+    { key: "commerce",      label: "Commerce" },
+    { key: "operations",    label: "Operations" },
+    { key: "customer",      label: "Customer" },
+    { key: "people",        label: "People" },
+    { key: "finance",       label: "Finance" },
+    { key: "analytics",     label: "Analytics" },
+    { key: "collaboration", label: "Collaboration" },
 ];
 
-const CATEGORY_COLORS: Record<string, string> = {
-    commerce: "bg-blue-50 text-blue-700 border-blue-200",
-    operations: "bg-amber-50 text-amber-700 border-amber-200",
-    customer: "bg-red-50 text-red-700 border-red-200",
-    people: "bg-green-50 text-green-700 border-green-200",
-    finance: "bg-teal-50 text-teal-700 border-teal-200",
-    analytics: "bg-purple-50 text-purple-700 border-purple-200",
-    collaboration: "bg-orange-50 text-orange-700 border-orange-200",
+/** Frappe-style indicator tone per category */
+const CATEGORY_TONE: Record<string, string> = {
+    commerce:      "bg-primary-100 text-primary-700",
+    operations:    "bg-warning-100 text-warning-700",
+    customer:      "bg-destructive-100 text-destructive-700",
+    people:        "bg-success-100 text-success-700",
+    finance:       "bg-success-100 text-success-700",
+    analytics:     "bg-purple-100 text-purple-500",
+    collaboration: "bg-warning-100 text-warning-700",
 };
 
 export default function Marketplace() {
     const navigate = useNavigate();
     const { activeCompany } = useTenant();
     const { user } = useAuth();
-    const { hasModule, isSuperAdmin, refreshPermissions } = usePermissions();
+    const { hasModule, refreshPermissions } = usePermissions();
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<CategoryFilter>("all");
     const [installing, setInstalling] = useState(false);
@@ -81,19 +85,14 @@ export default function Marketplace() {
     const [dbModules, setDbModules] = useState<SystemModule[]>([]);
     const [loadingModules, setLoadingModules] = useState(true);
     const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
-
-    // Billing period toggle (monthly / yearly)
     const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
     const [platformSettings, setPlatformSettings] = useState<PlatformSettings | null>(null);
-
-    // Detail view state
     const [selectedApp, setSelectedApp] = useState<SystemModule | null>(null);
 
     useEffect(() => {
         const fetchModules = async () => {
             setLoadingModules(true);
 
-            // Fetch platform settings (Razorpay config, billing mode)
             const { data: psData } = await supabase
                 .from("platform_settings")
                 .select("*")
@@ -101,22 +100,8 @@ export default function Marketplace() {
                 .maybeSingle();
 
             if (psData) {
-                const settings = psData as PlatformSettings;
-                setPlatformSettings({
-                    ...settings,
-                    razorpay_key_id: settings.razorpay_key_id || import.meta.env.VITE_RAZORPAY_KEY_ID || null
-                });
-                // Default billing period based on admin config
+                setPlatformSettings(psData as PlatformSettings);
                 if (psData.billing_mode === "yearly") setBillingPeriod("yearly");
-            } else if (import.meta.env.VITE_RAZORPAY_KEY_ID) {
-                setPlatformSettings({
-                    razorpay_key_id: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                    razorpay_key_secret: import.meta.env.VITE_RAZORPAY_KEY_SECRET || null,
-                    razorpay_test_mode: import.meta.env.VITE_RAZORPAY_KEY_ID.includes("test"),
-                    billing_mode: "monthly",
-                    currency: "INR",
-                    currency_symbol: "₹"
-                });
             }
 
             const { data, error } = await supabase
@@ -125,11 +110,8 @@ export default function Marketplace() {
                 .eq("is_active", true)
                 .order("sort_order", { ascending: true });
 
-            if (!error && data) {
-                setDbModules(data as SystemModule[]);
-            }
+            if (!error && data) setDbModules(data as SystemModule[]);
 
-            // Fetch this company's installed modules
             if (activeCompany) {
                 const { data: cmData } = await supabase
                     .from("company_modules")
@@ -162,18 +144,14 @@ export default function Marketplace() {
     const isInstalled = (mod: SystemModule) =>
         mod.is_core || companySlugs.has(mod.slug) || hasModule(mod.name) || hasModule(mod.slug);
 
-    // ── Helper: get the price based on current billing period ──
     const getModulePrice = (mod: SystemModule) => {
         if (mod.is_core || mod.is_free) return 0;
-        return billingPeriod === "yearly" && mod.price_yearly > 0
-            ? mod.price_yearly
-            : mod.price_monthly || 0;
+        return billingPeriod === "yearly" && mod.price_yearly > 0 ? mod.price_yearly : mod.price_monthly || 0;
     };
 
     const currencySymbol = platformSettings?.currency_symbol || "₹";
     const showBillingToggle = platformSettings?.billing_mode === "both";
 
-    // ── Activate module after successful payment (or free install) ──
     const activateModule = async (mod: SystemModule) => {
         const trialEndsAt = mod.trial_days > 0
             ? new Date(Date.now() + mod.trial_days * 86400000).toISOString()
@@ -186,7 +164,7 @@ export default function Marketplace() {
             is_active: true,
             installed_at: new Date().toISOString(),
             trial_ends_at: trialEndsAt,
-            billing_status: (mod.is_core || mod.is_free) ? "active" : "active",
+            billing_status: "active",
         }, { onConflict: "company_id,module_slug" });
         if (cmErr) throw cmErr;
 
@@ -198,70 +176,47 @@ export default function Marketplace() {
                     company_id: activeCompany!.id,
                 });
             }
-        } catch {
-            // user_modules insert is optional
-        }
+        } catch { /* optional */ }
 
-        // Create ecom_settings if ecommerce module
         if (mod.slug === "ecommerce") {
             await supabase.from("ecom_settings").insert([{
                 company_id: activeCompany!.id,
                 store_name: activeCompany!.name,
-                primary_color: "#2563eb",
+                primary_color: "#2490EF",
             }]).then(() => {});
         }
 
         refreshPermissions();
-        setCompanySlugs(prev => new Set([...prev, mod.slug]));
+        setCompanySlugs((prev) => new Set([...prev, mod.slug]));
     };
 
-    // ── Handle Install with Razorpay payment gate ──
     const handleInstall = async (mod: SystemModule) => {
-        if (!activeCompany) {
-            toast.error("Please select a company first.");
-            return;
-        }
-        if (isInstalled(mod)) {
-            toast.info(`${mod.name} is already installed.`);
-            return;
-        }
+        if (!activeCompany) { toast.error("Please select a company first."); return; }
+        if (isInstalled(mod)) { toast.info(`${mod.name} is already installed.`); return; }
 
         const price = getModulePrice(mod);
         const isFreeModule = mod.is_core || mod.is_free || price <= 0;
 
-        // ── Free / Core modules: install directly ──
         if (isFreeModule) {
             setInstalling(true);
             try {
                 await activateModule(mod);
                 toast.success(`${mod.name} installed successfully!`);
             } catch (err: any) {
-                console.error("Install error:", err);
                 toast.error(err.message || "Failed to install module");
-            } finally {
-                setInstalling(false);
-            }
+            } finally { setInstalling(false); }
             return;
         }
 
-        // ── Paid modules: Razorpay payment required ──
         const keyId = platformSettings?.razorpay_key_id;
-        if (!keyId) {
-            toast.error("Payment gateway is not configured. Please contact the administrator.");
-            return;
-        }
+        if (!keyId) { toast.error("Payment gateway is not configured."); return; }
 
         setInstalling(true);
         const orderNumber = `MOD-${mod.slug}-${Date.now()}`;
-        const periodLabel = billingPeriod === "yearly" ? "/year" : "/month";
 
         try {
-            // Log initiated payment
-            await logPaymentTransaction(
-                activeCompany.id, orderNumber, "razorpay", price, "initiated"
-            ).catch(() => {});
+            await logPaymentTransaction(activeCompany.id, orderNumber, "razorpay", price, "initiated").catch(() => {});
 
-            // Open Razorpay checkout
             const result = await initiateRazorpayPayment({
                 keyId,
                 amount: price,
@@ -274,47 +229,32 @@ export default function Marketplace() {
                 description: `${mod.name} — ${billingPeriod} subscription`,
             });
 
-            // Payment successful — log + activate
             await logPaymentTransaction(
                 activeCompany.id, orderNumber, "razorpay", price, "success",
                 result.razorpay_payment_id,
-                { ...result, module_slug: mod.slug, billing_period: billingPeriod }
+                { ...result, module_slug: mod.slug, billing_period: billingPeriod },
             ).catch(() => {});
 
             await activateModule(mod);
             toast.success(`Payment successful! ${mod.name} has been installed.`);
         } catch (err: any) {
-            // Log failed payment
             await logPaymentTransaction(
                 activeCompany.id, orderNumber, "razorpay", price, "failed",
-                undefined, { error: err.message, module_slug: mod.slug }
+                undefined, { error: err.message, module_slug: mod.slug },
             ).catch(() => {});
 
-            if (err.message?.includes("cancelled")) {
-                toast.info("Payment was cancelled. You can try again anytime.");
-            } else {
-                console.error("Payment error:", err);
-                toast.error(err.message || "Payment failed. Please try again.");
-            }
-        } finally {
-            setInstalling(false);
-        }
+            if (err.message?.includes("cancelled")) toast.info("Payment was cancelled.");
+            else toast.error(err.message || "Payment failed. Please try again.");
+        } finally { setInstalling(false); }
     };
 
     const handleUninstall = async (mod: SystemModule) => {
-        if (!activeCompany) {
-            toast.error("Please select a company first.");
-            return;
-        }
-        if (mod.is_core) {
-            toast.error("Core modules cannot be uninstalled.");
-            return;
-        }
-        if (!confirm(`Uninstall "${mod.name}" from ${activeCompany.name}? This will remove access to this app.`)) return;
+        if (!activeCompany) { toast.error("Please select a company first."); return; }
+        if (mod.is_core) { toast.error("Core modules cannot be uninstalled."); return; }
+        if (!confirm(`Uninstall "${mod.name}" from ${activeCompany.name}?`)) return;
 
         setUninstalling(true);
         try {
-            // Remove from company_modules
             const { error: cmErr } = await supabase
                 .from("company_modules")
                 .delete()
@@ -322,48 +262,40 @@ export default function Marketplace() {
                 .eq("module_slug", mod.slug);
             if (cmErr) throw cmErr;
 
-            // Remove from user_modules
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    await supabase
-                        .from("user_modules")
-                        .delete()
+                const { data: { user: u } } = await supabase.auth.getUser();
+                if (u) {
+                    await supabase.from("user_modules").delete()
                         .eq("company_id", activeCompany.id)
                         .eq("module_slug", mod.slug);
                 }
-            } catch {
-                // user_modules delete is optional
-            }
+            } catch { /* optional */ }
 
             refreshPermissions();
-            setCompanySlugs(prev => { const next = new Set(prev); next.delete(mod.slug); return next; });
+            setCompanySlugs((prev) => { const next = new Set(prev); next.delete(mod.slug); return next; });
             toast.success(`${mod.name} has been uninstalled.`);
             setSelectedApp(null);
         } catch (err: any) {
-            console.error("Uninstall error:", err);
             toast.error(err.message || "Failed to uninstall module");
-        } finally {
-            setUninstalling(false);
-        }
+        } finally { setUninstalling(false); }
     };
 
     const activeCategories = useMemo(() => {
         const cats = new Set(
-            dbModules.filter((m) => m.slug !== "masters" && m.status !== "planned").map((m) => m.category)
+            dbModules.filter((m) => m.slug !== "masters" && m.status !== "planned").map((m) => m.category),
         );
         return CATEGORY_PILLS.filter((p) => p.key === "all" || cats.has(p.key));
     }, [dbModules]);
 
-    const installedCount = useMemo(() => dbModules.filter(m => isInstalled(m) && m.slug !== "masters").length, [dbModules]);
+    const installedCount = useMemo(
+        () => dbModules.filter((m) => isInstalled(m) && m.slug !== "masters").length,
+        [dbModules, companySlugs],
+    );
 
     if (loadingModules) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-sm text-gray-500 font-medium">Loading marketplace...</p>
-                </div>
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <Loader2 className="w-5 h-5 text-primary animate-spin" />
             </div>
         );
     }
@@ -373,285 +305,198 @@ export default function Marketplace() {
         const installed = isInstalled(selectedApp);
         const isAvailable = selectedApp.status === "live" || selectedApp.status === "beta";
         const catLabel = CATEGORY_LABELS[selectedApp.category as keyof typeof CATEGORY_LABELS] || selectedApp.category;
-        const catColor = CATEGORY_COLORS[selectedApp.category] || "bg-gray-50 text-gray-700 border-gray-200";
+        const catTone = CATEGORY_TONE[selectedApp.category] || "bg-gray-100 text-gray-700";
 
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-full bg-background">
                 {/* Top bar */}
-                <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3">
+                <div className="bg-card border-b border-gray-200 sticky top-0 z-10 dark:border-border">
+                    <div className="max-w-5xl mx-auto px-4 h-11 flex items-center gap-2">
                         <button
                             onClick={() => setSelectedApp(null)}
-                            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors dark:hover:text-foreground"
                         >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Marketplace
+                            <ArrowLeft className="w-3.5 h-3.5" /> Marketplace
                         </button>
-                        <ChevronRight className="w-4 h-4 text-gray-300" />
-                        <span className="text-sm font-medium text-gray-900">{selectedApp.name}</span>
+                        <ChevronRight className="w-3 h-3 text-gray-300" />
+                        <span className="text-xs font-medium text-gray-800 dark:text-foreground truncate">{selectedApp.name}</span>
                     </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Main Content */}
-                        <div className="lg:col-span-2 space-y-8">
+                <div className="max-w-5xl mx-auto px-4 py-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* Main */}
+                        <div className="lg:col-span-2 space-y-3">
                             {/* Hero */}
-                            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                                {/* Banner gradient */}
-                                <div className={cn("h-32 bg-gradient-to-br", selectedApp.color_from || "from-blue-500", selectedApp.color_to || "to-blue-700", "relative")}>
-                                    <div className="absolute inset-0 bg-black/10" />
-                                </div>
-
-                                <div className="px-6 pb-6 -mt-10 relative">
-                                    <div className="flex items-end gap-4 mb-4">
-                                        <div className={cn("w-20 h-20 rounded-2xl flex items-center justify-center text-4xl bg-white shadow-lg border border-gray-100 shrink-0")}>
-                                            {selectedApp.icon}
-                                        </div>
-                                        <div className="pb-1 flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <h1 className="text-2xl font-bold text-gray-900">{selectedApp.name}</h1>
-                                                {selectedApp.status === "beta" && (
-                                                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Beta</span>
-                                                )}
-                                                {installed && (
-                                                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 inline-flex items-center gap-1">
-                                                        <Check className="w-3 h-3" /> Installed
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-gray-500 mt-0.5">{selectedApp.tagline}</p>
-                                        </div>
+                            <div className="bg-card rounded-lg border border-gray-200 p-5 dark:border-border">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <div className="w-14 h-14 rounded-md flex items-center justify-center text-2xl bg-primary-50 border border-primary-100 shrink-0 dark:bg-accent/40 dark:border-border">
+                                        {selectedApp.icon}
                                     </div>
-
-                                    {/* Meta row */}
-                                    <div className="flex flex-wrap items-center gap-3 text-xs">
-                                        <span className={cn("px-2.5 py-1 rounded-full font-medium border", catColor)}>
-                                            {catLabel}
-                                        </span>
-                                        <span className="text-gray-400 flex items-center gap-1">
-                                            <Globe className="w-3.5 h-3.5" /> {PLATFORM_CONFIG.name}
-                                        </span>
-                                        {selectedApp.trial_days > 0 && (
-                                            <span className="text-gray-400 flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5" /> {selectedApp.trial_days}-day trial
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h1 className="text-lg font-semibold text-gray-900 dark:text-foreground">{selectedApp.name}</h1>
+                                            {selectedApp.status === "beta" && (
+                                                <span className="erp-pill bg-warning-100 text-warning-700">Beta</span>
+                                            )}
+                                            {installed && (
+                                                <span className="erp-pill bg-success-100 text-success-700">
+                                                    <Check className="w-3 h-3" /> Installed
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-0.5">{selectedApp.tagline}</p>
+                                        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs">
+                                            <span className={cn("erp-pill", catTone)}>{catLabel}</span>
+                                            <span className="text-gray-500 flex items-center gap-1">
+                                                <Globe className="w-3 h-3" /> {PLATFORM_CONFIG.name}
                                             </span>
-                                        )}
+                                            {selectedApp.trial_days > 0 && (
+                                                <span className="text-gray-500 flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" /> {selectedApp.trial_days}-day trial
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Description */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-3">About this app</h2>
-                                <p className="text-sm text-gray-600 leading-relaxed">{selectedApp.description}</p>
+                            {/* About */}
+                            <div className="bg-card rounded-lg border border-gray-200 overflow-hidden dark:border-border">
+                                <div className="px-4 h-10 flex items-center border-b border-gray-200 dark:border-border">
+                                    <span className="erp-section-header text-sm">About this app</span>
+                                </div>
+                                <div className="px-4 py-3">
+                                    <p className="text-sm text-gray-700 leading-relaxed dark:text-foreground">{selectedApp.description}</p>
+                                </div>
                             </div>
 
                             {/* Features */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-4">Features & Capabilities</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="bg-card rounded-lg border border-gray-200 overflow-hidden dark:border-border">
+                                <div className="px-4 h-10 flex items-center border-b border-gray-200 dark:border-border">
+                                    <span className="erp-section-header text-sm">Features & Capabilities</span>
+                                </div>
+                                <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     {(selectedApp.features || []).map((feat, i) => (
-                                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                                            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
-                                                <Check className="w-3.5 h-3.5 text-green-600" />
-                                            </div>
-                                            <span className="text-sm text-gray-700 font-medium">{feat}</span>
+                                        <div key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-foreground">
+                                            <Check className="w-3.5 h-3.5 text-success-500 mt-0.5 shrink-0" />
+                                            <span>{feat}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Specifications */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h2>
-                                <dl className="grid grid-cols-2 gap-x-6 gap-y-4">
-                                    <div>
-                                        <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">Category</dt>
-                                        <dd className="text-sm font-medium text-gray-900 mt-1">{catLabel}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">Status</dt>
-                                        <dd className="text-sm font-medium text-gray-900 mt-1 capitalize">{selectedApp.status}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">Publisher</dt>
-                                        <dd className="text-sm font-medium text-gray-900 mt-1">{PLATFORM_CONFIG.name}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">License</dt>
-                                        <dd className="text-sm font-medium text-gray-900 mt-1">
-                                            {selectedApp.is_core ? "Core (Always Included)" : selectedApp.is_free ? "Free" : "Subscription"}
-                                        </dd>
-                                    </div>
-                                    {selectedApp.trial_days > 0 && (
-                                        <div>
-                                            <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">Trial Period</dt>
-                                            <dd className="text-sm font-medium text-gray-900 mt-1">{selectedApp.trial_days} days</dd>
-                                        </div>
-                                    )}
-                                    <div>
-                                        <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider">Requires</dt>
-                                        <dd className="text-sm font-medium text-gray-900 mt-1">Master Data Hub</dd>
-                                    </div>
-                                </dl>
+                            {/* Specs */}
+                            <div className="bg-card rounded-lg border border-gray-200 overflow-hidden dark:border-border">
+                                <div className="px-4 h-10 flex items-center border-b border-gray-200 dark:border-border">
+                                    <span className="erp-section-header text-sm">Specifications</span>
+                                </div>
+                                <div className="px-4 py-3">
+                                    <dl className="grid grid-cols-2 gap-x-5 gap-y-2.5">
+                                        <Spec label="Category" value={catLabel} />
+                                        <Spec label="Status" value={<span className="capitalize">{selectedApp.status}</span>} />
+                                        <Spec label="Publisher" value={PLATFORM_CONFIG.name} />
+                                        <Spec label="License" value={selectedApp.is_core ? "Core (always included)" : selectedApp.is_free ? "Free" : "Subscription"} />
+                                        {selectedApp.trial_days > 0 && <Spec label="Trial" value={`${selectedApp.trial_days} days`} />}
+                                        <Spec label="Requires" value="Master Data Hub" />
+                                    </dl>
+                                </div>
                             </div>
                         </div>
 
                         {/* Sidebar */}
-                        <div className="space-y-5">
-                            {/* Install / Open Card */}
-                            <div className="bg-white rounded-2xl border border-gray-200 p-5 sticky top-20">
+                        <div className="space-y-3">
+                            <div className="bg-card rounded-lg border border-gray-200 p-4 sticky top-16 dark:border-border">
                                 {/* Pricing */}
-                                <div className="mb-5">
+                                <div className="mb-4">
                                     {selectedApp.is_core ? (
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-2xl font-bold text-gray-900">Included</span>
-                                            <span className="text-sm text-gray-500">with all plans</span>
+                                        <div className="flex items-baseline gap-1.5">
+                                            <span className="text-lg font-semibold text-gray-900 dark:text-foreground">Included</span>
+                                            <span className="text-xs text-gray-500">with all plans</span>
                                         </div>
                                     ) : selectedApp.is_free ? (
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-2xl font-bold text-green-600">Free</span>
-                                        </div>
+                                        <span className="text-lg font-semibold text-success-700">Free</span>
                                     ) : (
-                                        <div className="space-y-3">
-                                            {/* Billing period toggle */}
+                                        <div className="space-y-2">
                                             {showBillingToggle && selectedApp.price_yearly > 0 && (
-                                                <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
-                                                    <button
-                                                        onClick={() => setBillingPeriod("monthly")}
-                                                        className={cn(
-                                                            "flex-1 py-1.5 rounded-md text-xs font-semibold transition-all",
-                                                            billingPeriod === "monthly"
-                                                                ? "bg-white text-gray-900 shadow-sm"
-                                                                : "text-gray-500 hover:text-gray-700"
-                                                        )}
-                                                    >
-                                                        Monthly
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setBillingPeriod("yearly")}
-                                                        className={cn(
-                                                            "flex-1 py-1.5 rounded-md text-xs font-semibold transition-all",
-                                                            billingPeriod === "yearly"
-                                                                ? "bg-white text-gray-900 shadow-sm"
-                                                                : "text-gray-500 hover:text-gray-700"
-                                                        )}
-                                                    >
-                                                        Yearly
-                                                    </button>
-                                                </div>
+                                                <BillingSwitch period={billingPeriod} onChange={setBillingPeriod} />
                                             )}
                                             <div className="flex items-baseline gap-1">
-                                                <span className="text-3xl font-bold text-gray-900">
+                                                <span className="text-2xl font-semibold text-gray-900 dark:text-foreground tabular-nums">
                                                     {currencySymbol}{getModulePrice(selectedApp)}
                                                 </span>
-                                                <span className="text-sm text-gray-500">
+                                                <span className="text-xs text-gray-500">
                                                     /{billingPeriod === "yearly" && selectedApp.price_yearly > 0 ? "year" : "month"}
                                                 </span>
                                             </div>
                                             {billingPeriod === "yearly" && selectedApp.price_yearly > 0 && selectedApp.price_monthly > 0 && (
-                                                <p className="text-xs font-semibold text-green-600">
+                                                <p className="text-xs font-medium text-success-700">
                                                     Save {Math.round((1 - selectedApp.price_yearly / (selectedApp.price_monthly * 12)) * 100)}% vs monthly
-                                                </p>
-                                            )}
-                                            {billingPeriod === "monthly" && selectedApp.price_yearly > 0 && (
-                                                <p className="text-xs text-gray-400">
-                                                    or {currencySymbol}{selectedApp.price_yearly}/year — save {Math.round((1 - selectedApp.price_yearly / (selectedApp.price_monthly * 12)) * 100)}%
                                                 </p>
                                             )}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Action Buttons */}
+                                {/* Action */}
                                 {isAvailable && installed ? (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <button
                                             onClick={() => navigate(selectedApp.dashboard_route || selectedApp.route || "/")}
-                                            className="w-full py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2"
+                                            className="w-full h-9 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary-600 transition-colors inline-flex items-center justify-center gap-1.5"
                                         >
-                                            Open App
-                                            <ExternalLink className="w-4 h-4" />
+                                            Open App <ExternalLink className="w-3.5 h-3.5" />
                                         </button>
-                                        <p className="text-xs text-center text-green-600 font-medium flex items-center justify-center gap-1">
-                                            <Check className="w-3.5 h-3.5" /> Already installed
+                                        <p className="text-xs text-center text-success-700 font-medium inline-flex items-center justify-center w-full gap-1">
+                                            <Check className="w-3 h-3" /> Already installed
                                         </p>
                                         {!selectedApp.is_core && (
                                             <button
                                                 onClick={() => handleUninstall(selectedApp)}
                                                 disabled={uninstalling}
-                                                className="w-full py-2 rounded-xl text-xs font-medium border border-red-200 text-red-600 hover:bg-red-50 transition-colors inline-flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                                className="w-full h-8 px-3 rounded-md text-xs font-medium border border-destructive-100 text-destructive hover:bg-destructive-100 transition-colors inline-flex items-center justify-center gap-1.5 disabled:opacity-50"
                                             >
-                                                {uninstalling ? (
-                                                    <>
-                                                        <span className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
-                                                        Uninstalling...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                        Uninstall App
-                                                    </>
-                                                )}
+                                                {uninstalling
+                                                    ? <><Loader2 className="w-3 h-3 animate-spin" /> Uninstalling…</>
+                                                    : <><Trash2 className="w-3 h-3" /> Uninstall</>}
                                             </button>
                                         )}
                                     </div>
                                 ) : isAvailable ? (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <button
                                             onClick={() => handleInstall(selectedApp)}
                                             disabled={installing}
-                                            className="w-full py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                                            className="w-full h-9 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary-600 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
                                         >
-                                            {installing ? (
-                                                <>
-                                                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                    Processing...
-                                                </>
-                                            ) : getModulePrice(selectedApp) > 0 ? (
-                                                <>
-                                                    <CreditCard className="w-4 h-4" />
-                                                    Pay {currencySymbol}{getModulePrice(selectedApp)} & Install
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Download className="w-4 h-4" />
-                                                    Install App
-                                                </>
-                                            )}
+                                            {installing
+                                                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing…</>
+                                                : getModulePrice(selectedApp) > 0
+                                                    ? <><CreditCard className="w-3.5 h-3.5" /> Pay {currencySymbol}{getModulePrice(selectedApp)} & Install</>
+                                                    : <><Download className="w-3.5 h-3.5" /> Install</>}
                                         </button>
                                         {selectedApp.trial_days > 0 && !selectedApp.is_free && (
-                                            <p className="text-xs text-center text-blue-600 font-medium">
-                                                Start your {selectedApp.trial_days}-day free trial
+                                            <p className="text-xs text-center text-primary font-medium">
+                                                {selectedApp.trial_days}-day free trial
                                             </p>
                                         )}
                                         {getModulePrice(selectedApp) > 0 && (
-                                            <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+                                            <p className="text-[11px] text-center text-gray-400 inline-flex items-center justify-center w-full gap-1">
                                                 <Shield className="w-3 h-3" /> Secured by Razorpay
                                             </p>
                                         )}
                                     </div>
                                 ) : (
-                                    <button disabled className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+                                    <button disabled className="w-full h-9 rounded-md text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-accent/40">
                                         Coming Soon
                                     </button>
                                 )}
 
-                                {/* Quick Info */}
-                                <div className="mt-5 pt-5 border-t border-gray-100 space-y-3">
-                                    <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                                        <Shield className="w-4 h-4 text-green-500 shrink-0" />
-                                        <span>Verified by {PLATFORM_CONFIG.name}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                                        <Zap className="w-4 h-4 text-amber-500 shrink-0" />
-                                        <span>Instant activation, no setup required</span>
-                                    </div>
-                                    <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                                        <Package className="w-4 h-4 text-blue-500 shrink-0" />
-                                        <span>Works with all master data</span>
-                                    </div>
+                                {/* Quick info */}
+                                <div className="mt-4 pt-4 border-t border-gray-200 space-y-2 dark:border-border">
+                                    <InfoRow icon={<Shield className="w-3.5 h-3.5 text-success-500" />} text={`Verified by ${PLATFORM_CONFIG.name}`} />
+                                    <InfoRow icon={<Zap className="w-3.5 h-3.5 text-warning-500" />} text="Instant activation" />
+                                    <InfoRow icon={<Package className="w-3.5 h-3.5 text-primary-500" />} text="Works with all master data" />
                                 </div>
                             </div>
                         </div>
@@ -661,222 +506,188 @@ export default function Marketplace() {
         );
     }
 
-    // ── APP LIST VIEW (Marketplace Grid) ────────────────────────
+    // ── APP LIST VIEW ────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex flex-col gap-6">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <Link to="/apps" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-                                        <ArrowLeft className="w-4 h-4" />
-                                    </Link>
-                                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                                        Marketplace
-                                    </h1>
-                                </div>
-                                <p className="text-gray-500 mt-1.5">
-                                    Discover and install apps to power{" "}
-                                    <span className="font-semibold text-gray-700">
-                                        {activeCompany?.name || "your business"}
+        <div className="min-h-full bg-background">
+            {/* Header toolbar */}
+            <div className="bg-card border-b border-gray-200 sticky top-0 z-20 dark:border-border">
+                <div className="max-w-6xl mx-auto px-4 py-3">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            <Link
+                                to="/apps"
+                                className="inline-flex items-center justify-center w-7 h-7 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors dark:hover:bg-accent"
+                                title="Back to apps"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                            </Link>
+                            <div className="min-w-0">
+                                <h1 className="text-base font-semibold text-gray-900 dark:text-foreground truncate">Marketplace</h1>
+                                <p className="text-xs text-gray-500 truncate">
+                                    Discover apps for{" "}
+                                    <span className="font-medium text-gray-700 dark:text-foreground">
+                                        {activeCompany?.name || "your workspace"}
                                     </span>
                                 </p>
                             </div>
-                            <div className="text-right hidden sm:block">
-                                <div className="text-2xl font-bold text-gray-900">{installedCount}</div>
-                                <div className="text-xs text-gray-500 font-medium">Apps Installed</div>
-                            </div>
                         </div>
+                        <div className="text-right hidden sm:block">
+                            <div className="text-lg font-semibold text-gray-900 tabular-nums dark:text-foreground">{installedCount}</div>
+                            <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Installed</div>
+                        </div>
+                    </div>
 
-                        {/* Search */}
-                        <div className="relative max-w-lg">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    {/* Search + toggle row */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="relative flex-1 max-w-sm">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search apps..."
-                                className="w-full h-12 bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                                placeholder="Search apps…"
+                                className="w-full h-8 pl-8 pr-2.5 bg-white border border-gray-200 rounded-md text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none dark:bg-card dark:border-border"
                             />
                         </div>
 
-                        {/* Category Pills + Billing Toggle */}
-                        <div className="flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex flex-wrap gap-2">
-                                {activeCategories.map((pill) => (
-                                    <button
-                                        key={pill.key}
-                                        onClick={() => setCategory(pill.key)}
-                                        className={cn(
-                                            "rounded-xl px-4 py-2 text-sm font-medium transition-all inline-flex items-center gap-2 border",
-                                            category === pill.key
-                                                ? "bg-gray-900 text-white border-gray-900 shadow-sm"
-                                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                        )}
-                                    >
-                                        <span>{pill.icon}</span>
-                                        {pill.label}
-                                    </button>
-                                ))}
-                            </div>
+                        {showBillingToggle && (
+                            <BillingSwitch period={billingPeriod} onChange={setBillingPeriod} />
+                        )}
+                    </div>
 
-                            {/* Billing period toggle */}
-                            {showBillingToggle && (
-                                <div className="flex items-center gap-2 shrink-0">
-                                    <CreditCard className="w-4 h-4 text-gray-400" />
-                                    <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
-                                        <button
-                                            onClick={() => setBillingPeriod("monthly")}
-                                            className={cn(
-                                                "px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-                                                billingPeriod === "monthly"
-                                                    ? "bg-white text-gray-900 shadow-sm"
-                                                    : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Monthly
-                                        </button>
-                                        <button
-                                            onClick={() => setBillingPeriod("yearly")}
-                                            className={cn(
-                                                "px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
-                                                billingPeriod === "yearly"
-                                                    ? "bg-white text-gray-900 shadow-sm"
-                                                    : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Yearly
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    {/* Category tabs — underline style */}
+                    <div className="mt-2 -mb-3 flex items-stretch gap-1 border-b border-gray-200 overflow-x-auto erp-scrollbar dark:border-border">
+                        {activeCategories.map((pill) => (
+                            <button
+                                key={pill.key}
+                                onClick={() => setCategory(pill.key)}
+                                className={cn(
+                                    "relative px-3 pb-2 pt-1 text-sm font-medium transition-colors whitespace-nowrap",
+                                    category === pill.key
+                                        ? "text-primary after:absolute after:left-0 after:right-0 after:-bottom-px after:h-[2px] after:bg-primary"
+                                        : "text-gray-500 hover:text-gray-800 dark:hover:text-foreground",
+                                )}
+                            >
+                                {pill.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Grid */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-6xl mx-auto px-4 py-5">
                 {modules.length === 0 ? (
-                    <div className="text-center py-24">
-                        <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500 text-sm font-medium">No apps match your search.</p>
-                        <button onClick={() => { setSearch(""); setCategory("all"); }} className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    <div className="text-center py-16">
+                        <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No apps match your search.</p>
+                        <button
+                            onClick={() => { setSearch(""); setCategory("all"); }}
+                            className="mt-2 text-xs text-primary hover:text-primary-700 font-medium"
+                        >
                             Clear filters
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {modules.map((mod) => {
                             const installed = isInstalled(mod);
                             const isAvailable = mod.status === "live" || mod.status === "beta";
-                            const catColor = CATEGORY_COLORS[mod.category] || "bg-gray-50 text-gray-700 border-gray-200";
+                            const catTone = CATEGORY_TONE[mod.category] || "bg-gray-100 text-gray-700";
 
                             return (
                                 <div
                                     key={mod.slug}
                                     onClick={() => setSelectedApp(mod)}
                                     className={cn(
-                                        "relative bg-white rounded-2xl border cursor-pointer group transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5",
+                                        "bg-card rounded-lg border cursor-pointer group transition-colors",
                                         installed
-                                            ? "border-blue-200 ring-1 ring-blue-100"
-                                            : "border-gray-200 hover:border-gray-300",
-                                        !isAvailable && "opacity-60"
+                                            ? "border-primary-200 hover:border-primary-300"
+                                            : "border-gray-200 hover:border-gray-300 dark:border-border",
+                                        !isAvailable && "opacity-60",
                                     )}
                                 >
-                                    {/* Top gradient stripe */}
-                                    <div className={cn("h-1.5 rounded-t-2xl bg-gradient-to-r", mod.color_from || "from-blue-500", mod.color_to || "to-blue-600")} />
-
-                                    <div className="p-5">
-                                        {/* Header: Icon + Name + Badge */}
-                                        <div className="flex items-start gap-3.5 mb-4">
-                                            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br shadow-sm shrink-0", mod.color_from || "from-blue-500", mod.color_to || "to-blue-600")}>
+                                    <div className="p-4">
+                                        {/* Header row */}
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <div className="w-10 h-10 rounded-md flex items-center justify-center text-lg bg-primary-50 border border-primary-100 shrink-0 dark:bg-accent/40 dark:border-border">
                                                 {mod.icon}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                                                        {mod.name}
-                                                    </h3>
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                                                    {mod.tagline}
-                                                </p>
+                                                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground group-hover:text-primary transition-colors truncate">
+                                                    {mod.name}
+                                                </h3>
+                                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{mod.tagline}</p>
                                             </div>
                                         </div>
 
-                                        {/* Category + Status */}
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-medium border", catColor)}>
+                                        {/* Badges */}
+                                        <div className="flex flex-wrap items-center gap-1 mb-3">
+                                            <span className={cn("erp-pill", catTone)}>
                                                 {CATEGORY_LABELS[mod.category as keyof typeof CATEGORY_LABELS] || mod.category}
                                             </span>
                                             {installed && (
-                                                <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-50 text-blue-600 border border-blue-200 inline-flex items-center gap-1">
+                                                <span className="erp-pill bg-primary-100 text-primary-700">
                                                     <Check className="w-3 h-3" /> Installed
                                                 </span>
                                             )}
                                             {mod.status === "beta" && !installed && (
-                                                <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-600 border border-amber-200">
-                                                    Beta
-                                                </span>
+                                                <span className="erp-pill bg-warning-100 text-warning-700">Beta</span>
                                             )}
                                             {mod.status === "coming-soon" && (
-                                                <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-50 text-gray-500 border border-gray-200">
-                                                    Soon
-                                                </span>
+                                                <span className="erp-pill bg-gray-100 text-gray-600">Soon</span>
                                             )}
                                         </div>
 
                                         {/* Features preview */}
-                                        <ul className="space-y-1.5 mb-5">
+                                        <ul className="space-y-1 mb-3 min-h-[54px]">
                                             {(mod.features || []).slice(0, 3).map((f, i) => (
-                                                <li key={i} className="text-xs text-gray-500 flex items-start gap-2">
-                                                    <Check className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                                                <li key={i} className="text-xs text-gray-600 dark:text-foreground/80 flex items-start gap-1.5">
+                                                    <Check className="w-3 h-3 text-success-500 mt-0.5 shrink-0" />
                                                     <span className="line-clamp-1">{f}</span>
                                                 </li>
                                             ))}
                                             {(mod.features || []).length > 3 && (
-                                                <li className="text-xs text-blue-600 font-medium pl-5">
-                                                    +{mod.features.length - 3} more features
+                                                <li className="text-[11px] text-primary font-medium pl-4">
+                                                    +{mod.features.length - 3} more
                                                 </li>
                                             )}
                                         </ul>
 
                                         {/* Footer: Price + Action */}
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-border">
                                             <div>
                                                 {mod.is_core ? (
-                                                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Included</span>
+                                                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Included</span>
                                                 ) : mod.is_free ? (
-                                                    <span className="text-sm font-bold text-green-600">Free</span>
+                                                    <span className="text-sm font-semibold text-success-700">Free</span>
                                                 ) : getModulePrice(mod) > 0 ? (
                                                     <div>
-                                                        <span className="text-lg font-bold text-gray-900">{currencySymbol}{getModulePrice(mod)}</span>
-                                                        <span className="text-xs text-gray-400 ml-0.5">/{billingPeriod === "yearly" && mod.price_yearly > 0 ? "yr" : "mo"}</span>
+                                                        <span className="text-sm font-semibold text-gray-900 dark:text-foreground tabular-nums">
+                                                            {currencySymbol}{getModulePrice(mod)}
+                                                        </span>
+                                                        <span className="text-[11px] text-gray-500 ml-0.5">
+                                                            /{billingPeriod === "yearly" && mod.price_yearly > 0 ? "yr" : "mo"}
+                                                        </span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-sm font-bold text-green-600">Free</span>
+                                                    <span className="text-sm font-semibold text-success-700">Free</span>
                                                 )}
                                             </div>
 
                                             {isAvailable && installed ? (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); navigate(mod.dashboard_route || mod.route || "/"); }}
-                                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
+                                                    className="inline-flex items-center gap-1 h-7 px-2.5 rounded text-xs font-medium bg-primary text-primary-foreground hover:bg-primary-600 transition-colors"
                                                 >
-                                                    Open
-                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                    Open <ExternalLink className="w-3 h-3" />
                                                 </button>
                                             ) : isAvailable ? (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedApp(mod); }}
-                                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                                                    className="inline-flex items-center gap-1 h-7 px-2.5 rounded text-xs font-medium border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                                                 >
-                                                    View Details
-                                                    <ChevronRight className="w-3.5 h-3.5" />
+                                                    Details <ChevronRight className="w-3 h-3" />
                                                 </button>
                                             ) : null}
                                         </div>
@@ -887,6 +698,47 @@ export default function Marketplace() {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+
+function Spec({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div>
+            <dt className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">{label}</dt>
+            <dd className="text-sm font-medium text-gray-800 mt-0.5 dark:text-foreground">{value}</dd>
+        </div>
+    );
+}
+
+function InfoRow({ icon, text }: { icon: React.ReactNode; text: string }) {
+    return (
+        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-foreground/80">
+            <span className="shrink-0">{icon}</span>
+            <span>{text}</span>
+        </div>
+    );
+}
+
+function BillingSwitch({ period, onChange }: { period: "monthly" | "yearly"; onChange: (p: "monthly" | "yearly") => void }) {
+    return (
+        <div className="flex items-center bg-gray-100 rounded-md p-0.5 dark:bg-accent/40">
+            {(["monthly", "yearly"] as const).map((p) => (
+                <button
+                    key={p}
+                    onClick={() => onChange(p)}
+                    className={cn(
+                        "px-2.5 h-6 rounded text-[11px] font-medium transition-colors capitalize",
+                        period === p
+                            ? "bg-white text-gray-900 shadow-sm dark:bg-card dark:text-foreground"
+                            : "text-gray-500 hover:text-gray-700 dark:hover:text-foreground",
+                    )}
+                >
+                    {p}
+                </button>
+            ))}
         </div>
     );
 }

@@ -7,6 +7,7 @@ import {
     Building2, Users, CreditCard, LayoutGrid,
     Eye, Pause, Loader2, AlertTriangle, Clock, ArrowRight
 } from "lucide-react";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 interface DashboardStats {
     totalTenants: number;
@@ -177,130 +178,124 @@ export default function SuperAdminDashboard() {
             value: stats.totalTenants,
             subtitle: `+${stats.tenantsThisMonth} this month`,
             icon: Building2,
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-600",
+            iconBg: "bg-primary-50",
+            iconColor: "text-primary-700",
         },
         {
             label: "Active users",
             value: stats.activeUsers,
             subtitle: "Across all tenants",
             icon: Users,
-            iconBg: "bg-violet-50",
-            iconColor: "text-violet-600",
+            iconBg: "bg-purple-100",
+            iconColor: "text-purple-500",
         },
         {
             label: "Monthly revenue",
             value: `₹${stats.monthlyRevenue.toLocaleString("en-IN")}`,
             subtitle: "From active app subscriptions",
             icon: CreditCard,
-            iconBg: "bg-emerald-50",
-            iconColor: "text-emerald-600",
+            iconBg: "bg-success-100",
+            iconColor: "text-success-700",
         },
         {
             label: "Apps installed",
             value: stats.appsInstalled,
             subtitle: "Active module installs",
             icon: LayoutGrid,
-            iconBg: "bg-amber-50",
-            iconColor: "text-amber-600",
+            iconBg: "bg-warning-100",
+            iconColor: "text-warning-700",
         },
     ];
 
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
             </div>
         );
     }
 
     return (
-        <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
+        <div className="p-4 lg:p-6 space-y-5 max-w-7xl mx-auto">
             {/* Header */}
             <div>
-                <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
-                <p className="text-sm text-slate-500 mt-0.5">
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-foreground">Dashboard</h1>
+                <p className="text-xs text-gray-500 mt-0.5">
                     Platform overview and recent activity
                 </p>
             </div>
 
-            {/* Stat cards — 2x2 grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Stat cards — 4-up grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {statCards.map((card, i) => (
                     <div
                         key={i}
-                        className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
+                        className="bg-card border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors dark:border-border"
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <div className={`p-2 rounded-lg ${card.iconBg}`}>
-                                <card.icon className={`w-4 h-4 ${card.iconColor}`} />
+                            <div className={`p-1.5 rounded-md ${card.iconBg}`}>
+                                <card.icon className={`w-3.5 h-3.5 ${card.iconColor}`} />
                             </div>
                         </div>
-                        <p className="text-2xl font-semibold text-slate-900 tracking-tight">
+                        <p className="text-xl font-semibold text-gray-900 tracking-tight tabular-nums dark:text-foreground">
                             {card.value}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5">{card.label}</p>
-                        <p className="text-xs text-slate-400 mt-1">{card.subtitle}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{card.subtitle}</p>
                     </div>
                 ))}
             </div>
 
             {/* Subscription Expiry Alerts */}
             {expiringSubs.length > 0 && (
-                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div className="bg-card border border-gray-200 rounded-lg overflow-hidden dark:border-border">
+                    <div className="px-4 h-10 border-b border-gray-200 flex items-center justify-between dark:border-border">
                         <div className="flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-amber-500" />
-                            <h2 className="text-sm font-medium text-slate-900">
-                                Subscription Alerts
-                            </h2>
-                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
+                            <AlertTriangle className="w-3.5 h-3.5 text-warning-500" />
+                            <h2 className="erp-section-header text-sm">Subscription Alerts</h2>
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-warning-100 text-warning-700">
                                 {expiringSubs.length}
                             </span>
                         </div>
                         <button
                             onClick={() => navigate("/super-admin/subscriptions")}
-                            className="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1"
+                            className="text-xs text-primary hover:text-primary-700 font-medium inline-flex items-center gap-1"
                         >
                             Manage all
                             <ArrowRight className="w-3 h-3" />
                         </button>
                     </div>
-                    <div className="divide-y divide-slate-50">
+                    <div className="divide-y divide-gray-100 dark:divide-border">
                         {expiringSubs.slice(0, 5).map((sub) => (
                             <div
                                 key={sub.company_id}
-                                className={`px-5 py-3 flex items-center justify-between ${
-                                    sub.days_remaining <= 0 ? "bg-red-50/50" : sub.days_remaining <= 3 ? "bg-amber-50/50" : ""
+                                className={`px-4 py-2.5 flex items-center justify-between ${
+                                    sub.days_remaining <= 0 ? "bg-destructive-100/30" : sub.days_remaining <= 3 ? "bg-warning-100/40" : ""
                                 }`}
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-600 dark:bg-accent dark:text-foreground">
                                         {sub.company_name[0]}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-slate-900">{sub.company_name}</p>
-                                        <p className="text-xs text-slate-400">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-foreground">{sub.company_name}</p>
+                                        <p className="text-[11px] text-gray-400">
                                             Ends {new Date(sub.period_end).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     {sub.days_remaining <= 0 ? (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
-                                            Expired
-                                        </span>
+                                        <span className="erp-pill bg-destructive-100 text-destructive-700">Expired</span>
                                     ) : (
-                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
-                                            sub.days_remaining <= 3 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
-                                        }`}>
+                                        <span className={`erp-pill ${sub.days_remaining <= 3 ? "bg-destructive-100 text-destructive-700" : "bg-warning-100 text-warning-700"}`}>
                                             <Clock className="w-3 h-3" />
                                             {sub.days_remaining}d left
                                         </span>
                                     )}
                                     <button
                                         onClick={() => navigate(`/super-admin/subscriptions`)}
-                                        className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                                        className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors dark:hover:bg-accent"
                                     >
                                         <ArrowRight className="w-3.5 h-3.5" />
                                     </button>
@@ -312,116 +307,71 @@ export default function SuperAdminDashboard() {
             )}
 
             {/* Middle row: Revenue chart + Recent tenants */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Revenue chart placeholder */}
-                <div className="bg-white border border-slate-200 rounded-lg p-5 lg:col-span-1">
-                    <h2 className="text-sm font-medium text-slate-900 mb-4">
-                        Revenue trend
-                    </h2>
-                    <div className="flex items-center justify-center h-48 bg-slate-50 rounded-md border border-dashed border-slate-200">
-                        <p className="text-xs text-slate-400">
-                            Chart coming soon
-                        </p>
+                <div className="bg-card border border-gray-200 rounded-lg p-4 lg:col-span-1 dark:border-border">
+                    <h2 className="erp-section-header text-sm mb-3">Revenue trend</h2>
+                    <div className="flex items-center justify-center h-48 bg-gray-50 rounded-md border border-dashed border-gray-200 dark:bg-accent/30 dark:border-border">
+                        <p className="text-xs text-gray-400">Chart coming soon</p>
                     </div>
                 </div>
 
                 {/* Recent tenants table */}
-                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden lg:col-span-2">
-                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-sm font-medium text-slate-900">
-                            Recent tenants
-                        </h2>
+                <div className="bg-card border border-gray-200 rounded-lg overflow-hidden lg:col-span-2 dark:border-border">
+                    <div className="px-4 h-10 border-b border-gray-200 flex items-center justify-between dark:border-border">
+                        <h2 className="erp-section-header text-sm">Recent tenants</h2>
                         <button
                             onClick={() => navigate("/super-admin/tenants")}
-                            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                            className="text-xs text-primary hover:text-primary-700 font-medium"
                         >
                             View all
                         </button>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                    <div className="overflow-x-auto erp-scrollbar">
+                        <table className="erp-table">
                             <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/60">
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Company
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Industry
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Apps
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Email
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Status
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500">
-                                        Created
-                                    </th>
-                                    <th className="px-4 py-2.5 text-xs font-medium text-slate-500 text-right">
-                                        Actions
-                                    </th>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Industry</th>
+                                    <th>Apps</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th className="text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50">
+                            <tbody>
                                 {recentTenants.map((tenant) => (
-                                    <tr
-                                        key={tenant.id}
-                                        className="hover:bg-slate-50/50 transition-colors"
-                                    >
-                                        <td className="px-4 py-2.5">
-                                            <span className="text-sm font-medium text-slate-900">
-                                                {tenant.name}
-                                            </span>
+                                    <tr key={tenant.id}>
+                                        <td>
+                                            <span className="font-medium text-gray-900 dark:text-foreground">{tenant.name}</span>
                                         </td>
-                                        <td className="px-4 py-2.5 text-sm text-slate-600">
-                                            {tenant.industry_type}
+                                        <td className="text-gray-600 capitalize dark:text-foreground">{tenant.industry_type}</td>
+                                        <td className="text-gray-600 tabular-nums dark:text-foreground">{tenant.apps_count}</td>
+                                        <td className="text-gray-500">{tenant.contact_email}</td>
+                                        <td>
+                                            <StatusBadge status={tenant.is_active ? "active" : "suspended"} />
                                         </td>
-                                        <td className="px-4 py-2.5 text-sm text-slate-600">
-                                            {tenant.apps_count}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-sm text-slate-500">
-                                            {tenant.contact_email}
-                                        </td>
-                                        <td className="px-4 py-2.5">
-                                            {tenant.is_active ? (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                    Active
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-200">
-                                                    Suspended
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-sm text-slate-500">
+                                        <td className="text-gray-500">
                                             {new Date(tenant.created_at).toLocaleDateString("en-IN", {
                                                 day: "2-digit",
                                                 month: "short",
                                                 year: "numeric",
                                             })}
                                         </td>
-                                        <td className="px-4 py-2.5 text-right">
-                                            <div className="flex items-center justify-end gap-1">
+                                        <td className="text-right">
+                                            <div className="flex items-center justify-end gap-0.5">
                                                 <button
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/super-admin/tenants?id=${tenant.id}`
-                                                        )
-                                                    }
-                                                    className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                                                    onClick={() => navigate(`/super-admin/tenants?id=${tenant.id}`)}
+                                                    className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors dark:hover:bg-accent"
                                                     title="View"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
                                                 {tenant.is_active && (
                                                     <button
-                                                        onClick={() =>
-                                                            handleSuspend(tenant.id, tenant.name)
-                                                        }
-                                                        className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors"
+                                                        onClick={() => handleSuspend(tenant.id, tenant.name)}
+                                                        className="p-1 rounded hover:bg-destructive-100 text-gray-400 hover:text-destructive transition-colors"
                                                         title="Suspend"
                                                     >
                                                         <Pause className="w-3.5 h-3.5" />
@@ -433,10 +383,7 @@ export default function SuperAdminDashboard() {
                                 ))}
                                 {recentTenants.length === 0 && (
                                     <tr>
-                                        <td
-                                            colSpan={7}
-                                            className="px-4 py-8 text-center text-sm text-slate-400"
-                                        >
+                                        <td colSpan={7} className="py-8 text-center text-xs text-gray-400">
                                             No tenants found
                                         </td>
                                     </tr>
@@ -448,14 +395,10 @@ export default function SuperAdminDashboard() {
             </div>
 
             {/* Bottom: Recent activity placeholder */}
-            <div className="bg-white border border-slate-200 rounded-lg p-5">
-                <h2 className="text-sm font-medium text-slate-900 mb-4">
-                    Recent activity
-                </h2>
-                <div className="flex items-center justify-center h-32 bg-slate-50 rounded-md border border-dashed border-slate-200">
-                    <p className="text-xs text-slate-400">
-                        Activity feed coming soon
-                    </p>
+            <div className="bg-card border border-gray-200 rounded-lg p-4 dark:border-border">
+                <h2 className="erp-section-header text-sm mb-3">Recent activity</h2>
+                <div className="flex items-center justify-center h-28 bg-gray-50 rounded-md border border-dashed border-gray-200 dark:bg-accent/30 dark:border-border">
+                    <p className="text-xs text-gray-400">Activity feed coming soon</p>
                 </div>
             </div>
         </div>

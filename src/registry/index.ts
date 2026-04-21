@@ -35,10 +35,6 @@ import { masterSkuPattern } from "./doctypes/master-sku-pattern";
 import { masterSubcategory } from "./doctypes/master-subcategory";
 import { masterUser } from "./doctypes/master-user";
 import { masterVariant } from "./doctypes/master-variant";
-import { masterCountry } from "./doctypes/master-country";
-import { masterState } from "./doctypes/master-state";
-import { masterDistrict } from "./doctypes/master-district";
-import { masterPrintFormat } from "./doctypes/master-print-format";
 
 // ── Inventory ──────────────────────────────────────────────────────────────
 import { inventoryItem } from "./doctypes/inventory-item";
@@ -111,6 +107,15 @@ import { printFormat } from "./doctypes/print-format";
 // ── Platform (Super Admin) ────────────────────────────────────────────────
 import { platformPlan } from "./doctypes/platform-plan";
 import { platformModule } from "./doctypes/platform-module";
+import { platformCurrency } from "./doctypes/platform-currency";
+import { platformCountry } from "./doctypes/platform-country";
+import { platformLanguage } from "./doctypes/platform-language";
+import { platformIndustry } from "./doctypes/platform-industry";
+import { platformTaxRate } from "./doctypes/platform-tax-rate";
+import { platformEmailTemplate } from "./doctypes/platform-email-template";
+import { platformAnnouncement } from "./doctypes/platform-announcement";
+import { platformFeatureFlag } from "./doctypes/platform-feature-flag";
+import { platformAuditLog } from "./doctypes/platform-audit-log";
 
 // ── Registry Object ────────────────────────────────────────────────────────
 
@@ -145,12 +150,6 @@ export const REGISTRY: Record<string, DocTypeDef> = {
   masterSubcategory,
   masterUser,
   masterVariant,
-
-  // Global masters (super-admin managed)
-  masterCountry,
-  masterState,
-  masterDistrict,
-  masterPrintFormat,
 
   // Inventory
   inventoryItem,
@@ -223,6 +222,15 @@ export const REGISTRY: Record<string, DocTypeDef> = {
   // Platform (Super Admin)
   platformPlan,
   platformModule,
+  platformCurrency,
+  platformCountry,
+  platformLanguage,
+  platformIndustry,
+  platformTaxRate,
+  platformEmailTemplate,
+  platformAnnouncement,
+  platformFeatureFlag,
+  platformAuditLog,
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────

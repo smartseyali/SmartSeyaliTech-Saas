@@ -30,6 +30,11 @@ interface PrintPreviewProps {
   doctype: string;
   record: any;
   items?: any[];
+  /** Batch mode — if provided, renders every entry in the array with page-breaks between.
+   *  `record` and `items` props are used only as a fallback when `batchRecords` is absent. */
+  batchRecords?: Array<{ record: any; items?: any[] }>;
+  /** Pre-select this print format id (otherwise picks the company's default). */
+  initialFormatId?: string | null;
   onClose: () => void;
 }
 
@@ -123,23 +128,41 @@ function generateDefaultTemplate(record: any, items: any[]): string {
   </div>`;
 }
 
-function buildFullHtml(
+/** Render a single document body (no outer <html>) — used for both single and batch output. */
+function renderDocumentBody(
   selectedFormat: PrintFormat | null,
   record: any,
   items: any[],
-  company: any
+  company: any,
 ): string {
   const template = selectedFormat?.html_template || generateDefaultTemplate(record, items);
   const rendered = renderTemplate(template, record, items, company);
-  const customCss = selectedFormat?.css || "";
   const headerHtml = selectedFormat?.header_html ? renderTemplate(selectedFormat.header_html, record, items, company) : "";
   const footerHtml = selectedFormat?.footer_html ? renderTemplate(selectedFormat.footer_html, record, items, company) : "";
+  return `${headerHtml}${rendered}${footerHtml}`;
+}
+
+function buildFullHtml(
+  selectedFormat: PrintFormat | null,
+  documents: Array<{ record: any; items: any[] }>,
+  company: any,
+): string {
+  const customCss = selectedFormat?.css || "";
   const mt = selectedFormat?.margin_top ?? 20;
   const mb = selectedFormat?.margin_bottom ?? 20;
   const ml = selectedFormat?.margin_left ?? 15;
   const mr = selectedFormat?.margin_right ?? 15;
   const paperSize = selectedFormat?.paper_size || "A4";
   const orientation = selectedFormat?.orientation || "portrait";
+
+  const body = documents
+    .map((doc, idx) => {
+      const rendered = renderDocumentBody(selectedFormat, doc.record, doc.items || [], company);
+      // Last document has no forced page-break — lets print use natural pagination.
+      const breakAfter = idx < documents.length - 1 ? ' style="page-break-after: always; break-after: page;"' : "";
+      return `<section${breakAfter}>${rendered}</section>`;
+    })
+    .join("");
 
   return `<!DOCTYPE html>
 <html><head>
@@ -158,20 +181,20 @@ function buildFullHtml(
   }
   table { border-collapse: collapse; }
   img { max-width: 100%; }
+  section + section { margin-top: ${mt}mm; }
   @media print {
     @page { size: ${paperSize} ${orientation}; margin: ${mt}mm ${mr}mm ${mb}mm ${ml}mm; }
     body { padding: 0; }
+    section + section { margin-top: 0; }
   }
   ${customCss}
 </style>
 </head><body>
-${headerHtml}
-${rendered}
-${footerHtml}
+${body}
 </body></html>`;
 }
 
-export default function PrintPreview({ doctype, record, items = [], onClose }: PrintPreviewProps) {
+export default function PrintPreview({ doctype, record, items = [], batchRecords, initialFormatId, onClose }: PrintPreviewProps) {
   const { activeCompany } = useTenant();
   const [formats, setFormats] = useState<PrintFormat[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<PrintFormat | null>(null);
@@ -193,7 +216,10 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
 
         if (!error && data && data.length > 0) {
           setFormats(data);
-          setSelectedFormat(data.find((f: any) => f.is_default) || data[0]);
+          const preferred = initialFormatId
+            ? data.find((f: any) => f.id === initialFormatId)
+            : undefined;
+          setSelectedFormat(preferred || data.find((f: any) => f.is_default) || data[0]);
         }
       } catch {}
       setLoading(false);
@@ -201,9 +227,16 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
     fetchFormats();
   }, [activeCompany?.id, doctype]);
 
+  const documents = useMemo(
+    () => batchRecords && batchRecords.length > 0
+      ? batchRecords.map((r) => ({ record: r.record, items: r.items || [] }))
+      : [{ record, items }],
+    [batchRecords, record, items],
+  );
+
   const fullHtml = useMemo(
-    () => buildFullHtml(selectedFormat, record, items, activeCompany),
-    [selectedFormat, record, items, activeCompany]
+    () => buildFullHtml(selectedFormat, documents, activeCompany),
+    [selectedFormat, documents, activeCompany],
   );
 
   const handlePrint = () => {
@@ -220,7 +253,12 @@ export default function PrintPreview({ doctype, record, items = [], onClose }: P
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
-            <h3 className="text-sm font-bold text-slate-800">Print Preview</h3>
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-foreground">
+              Print Preview
+              {documents.length > 1 && (
+                <span className="ml-2 erp-pill bg-primary-100 text-primary-700">{documents.length} docs</span>
+              )}
+            </h3>
 
             {formats.length > 0 && (
               <div className="relative">

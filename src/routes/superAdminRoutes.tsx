@@ -9,11 +9,16 @@ const PlatformModules = lazy(() => import("@/pages/super-admin/Modules"));
 const PlatformSubscriptions = lazy(() => import("@/pages/super-admin/Subscriptions"));
 const PlatformSettings = lazy(() => import("@/pages/super-admin/Settings"));
 
-// Global master tables (seeded, managed here, read-only for merchants)
-const PlatformCountries = lazy(() => import("@/pages/super-admin/masters/Countries"));
-const PlatformStates = lazy(() => import("@/pages/super-admin/masters/States"));
-const PlatformDistricts = lazy(() => import("@/pages/super-admin/masters/Districts"));
-const PlatformPrintFormats = lazy(() => import("@/pages/super-admin/masters/PrintFormats"));
+// Master data
+const PlatformCurrencies     = lazy(() => import("@/pages/super-admin/Currencies"));
+const PlatformCountries      = lazy(() => import("@/pages/super-admin/Countries"));
+const PlatformLanguages      = lazy(() => import("@/pages/super-admin/Languages"));
+const PlatformIndustries     = lazy(() => import("@/pages/super-admin/Industries"));
+const PlatformTaxRates       = lazy(() => import("@/pages/super-admin/TaxRates"));
+const PlatformEmailTemplates = lazy(() => import("@/pages/super-admin/EmailTemplates"));
+const PlatformAnnouncements  = lazy(() => import("@/pages/super-admin/Announcements"));
+const PlatformFeatureFlags   = lazy(() => import("@/pages/super-admin/FeatureFlags"));
+const PlatformAuditLogs      = lazy(() => import("@/pages/super-admin/AuditLogs"));
 
 export const superAdminRoutes = [
     { path: "/super-admin", element: <SuperAdminDashboard /> },
@@ -25,9 +30,14 @@ export const superAdminRoutes = [
     { path: "/super-admin/connectors", element: <HeadlessConsole /> },
     { path: "/super-admin/settings", element: <PlatformSettings /> },
 
-    // Global masters
-    { path: "/super-admin/masters/countries", element: <PlatformCountries /> },
-    { path: "/super-admin/masters/states", element: <PlatformStates /> },
-    { path: "/super-admin/masters/districts", element: <PlatformDistricts /> },
-    { path: "/super-admin/masters/print-formats", element: <PlatformPrintFormats /> },
+    // Master data
+    { path: "/super-admin/currencies",      element: <PlatformCurrencies /> },
+    { path: "/super-admin/countries",       element: <PlatformCountries /> },
+    { path: "/super-admin/languages",       element: <PlatformLanguages /> },
+    { path: "/super-admin/industries",      element: <PlatformIndustries /> },
+    { path: "/super-admin/tax-rates",       element: <PlatformTaxRates /> },
+    { path: "/super-admin/email-templates", element: <PlatformEmailTemplates /> },
+    { path: "/super-admin/announcements",   element: <PlatformAnnouncements /> },
+    { path: "/super-admin/feature-flags",   element: <PlatformFeatureFlags /> },
+    { path: "/super-admin/audit-logs",      element: <PlatformAuditLogs /> },
 ];

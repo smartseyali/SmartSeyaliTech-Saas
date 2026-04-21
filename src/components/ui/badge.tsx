@@ -3,15 +3,28 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * ERPNext v16 indicator pill — small, 4px radius, colored tint background.
+ */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium leading-none transition-colors",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+        default:
+          "bg-primary-100 text-primary-700 border border-primary-100",
+        secondary:
+          "bg-gray-100 text-gray-700 border border-gray-100",
+        destructive:
+          "bg-destructive-100 text-destructive-700 border border-destructive-100",
+        success:
+          "bg-success-100 text-success-700 border border-success-100",
+        warning:
+          "bg-warning-100 text-warning-700 border border-warning-100",
+        outline:
+          "bg-transparent text-gray-700 border border-gray-200",
+        solid:
+          "bg-primary text-primary-foreground border border-transparent",
       },
     },
     defaultVariants: {
@@ -27,4 +40,3 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants };
-
