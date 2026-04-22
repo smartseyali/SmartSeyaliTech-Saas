@@ -9,6 +9,7 @@ import {
     PanelLeftClose, PanelLeftOpen,
     LayoutGrid, Globe2, CalendarDays, CreditCard, Users, Zap,
     DollarSign, Languages, Factory, Percent, Mail, Megaphone, ToggleRight, History, Database,
+    FileText,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -29,6 +30,7 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
             { title: "Tenants", url: "/super-admin/tenants", icon: Globe2 },
             { title: "Subscriptions", url: "/super-admin/subscriptions", icon: CalendarDays },
+            { title: "Quotations", url: "/super-admin/quotations", icon: FileText },
             { title: "Plans", url: "/super-admin/plans", icon: CreditCard },
             { title: "Modules", url: "/super-admin/modules", icon: LayoutGrid },
             { title: "Users", url: "/super-admin/users", icon: Users },
