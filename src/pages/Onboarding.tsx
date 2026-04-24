@@ -8,6 +8,9 @@ import { toast } from "sonner";
 import { sendTenantVerificationEmail } from "@/lib/services/emailService";
 import { initiateRazorpayPayment } from "@/lib/services/paymentService";
 import PLATFORM_CONFIG from "@/config/platform";
+import { listTemplates } from "@/lib/services/storefrontTemplateService";
+import { createDeploymentRequest } from "@/lib/services/deploymentRequestService";
+import type { StorefrontTemplate } from "@/types/storefront";
 import {
   Check,
   ArrowRight,
@@ -22,6 +25,8 @@ import {
   AlertCircle,
   LogOut,
   CreditCard,
+  Globe2,
+  Sparkles,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -443,6 +448,23 @@ export default function Onboarding() {
   const [searchQuery, setSearchQuery] = useState("");
   const [detailModule, setDetailModule] = useState<PlatformModule | null>(null);
 
+  // Step 3b: Template + custom-domain picker for modules with needsTemplate=true.
+  // Active only while onTemplateModuleIdx !== null; null means we're on the app-store view.
+  const [onTemplateModuleIdx, setOnTemplateModuleIdx] = useState<number | null>(null);
+  const [templateChoices, setTemplateChoices] = useState<
+    Record<string, { templateId: number; customDomain: string }>
+  >({});
+  const [availableTemplates, setAvailableTemplates] = useState<StorefrontTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const modulesNeedingTemplates = selectedModules.filter(
+    (id) => PLATFORM_MODULES.find((m) => m.id === id)?.needsTemplate,
+  );
+  const currentTemplateModuleId =
+    onTemplateModuleIdx !== null ? modulesNeedingTemplates[onTemplateModuleIdx] : null;
+  const currentTemplateChoice = currentTemplateModuleId
+    ? templateChoices[currentTemplateModuleId]
+    : undefined;
+
   // Step 4 fields (Payment)
   const [platformSettings, setPlatformSettings] = useState<{
     razorpay_key_id: string | null;
@@ -857,11 +879,82 @@ export default function Onboarding() {
       toast.error("Select at least one app to continue.");
       return;
     }
+    // If any selected module needs a template + domain, collect those first.
+    if (modulesNeedingTemplates.length > 0) {
+      loadTemplatesForModule(modulesNeedingTemplates[0]);
+      setOnTemplateModuleIdx(0);
+      return;
+    }
     if (hasNonFreeApps) {
       setStep(4);
     } else {
       handleDeploy();
     }
+  }
+
+  async function loadTemplatesForModule(moduleId: string) {
+    setTemplatesLoading(true);
+    try {
+      const rows = await listTemplates({ moduleId });
+      setAvailableTemplates(rows);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load templates");
+      setAvailableTemplates([]);
+    } finally {
+      setTemplatesLoading(false);
+    }
+  }
+
+  function setTemplateChoice(moduleId: string, patch: Partial<{ templateId: number; customDomain: string }>) {
+    setTemplateChoices((prev) => ({
+      ...prev,
+      [moduleId]: {
+        templateId: patch.templateId ?? prev[moduleId]?.templateId ?? 0,
+        customDomain: patch.customDomain ?? prev[moduleId]?.customDomain ?? "",
+      },
+    }));
+  }
+
+  function isDomainValid(d: string): boolean {
+    const clean = d.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+    return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i.test(clean);
+  }
+
+  async function handleTemplateStepNext() {
+    if (onTemplateModuleIdx === null || !currentTemplateModuleId) return;
+    const choice = templateChoices[currentTemplateModuleId];
+    if (!choice?.templateId) {
+      toast.error("Pick a template to continue.");
+      return;
+    }
+    if (!isDomainValid(choice.customDomain || "")) {
+      toast.error("Enter a valid custom domain (e.g. shop.example.com).");
+      return;
+    }
+    const nextIdx = onTemplateModuleIdx + 1;
+    if (nextIdx < modulesNeedingTemplates.length) {
+      loadTemplatesForModule(modulesNeedingTemplates[nextIdx]);
+      setOnTemplateModuleIdx(nextIdx);
+      return;
+    }
+    // All templates picked → proceed to payment or deploy.
+    setOnTemplateModuleIdx(null);
+    if (hasNonFreeApps) {
+      setStep(4);
+    } else {
+      handleDeploy();
+    }
+  }
+
+  function handleTemplateStepBack() {
+    if (onTemplateModuleIdx === null) return;
+    if (onTemplateModuleIdx === 0) {
+      setOnTemplateModuleIdx(null);
+      return;
+    }
+    const prevIdx = onTemplateModuleIdx - 1;
+    loadTemplatesForModule(modulesNeedingTemplates[prevIdx]);
+    setOnTemplateModuleIdx(prevIdx);
   }
 
   const [launchMode, setLaunchMode] = useState<"trial" | "live" | null>(null);
@@ -989,6 +1082,26 @@ export default function Onboarding() {
           role: "admin",
         },
       ]);
+
+      // ── Template deployment requests ────────────────────────
+      // For each selected module with needsTemplate, create a request row so the
+      // super admin sees it in /super-admin/deployments.
+      for (const moduleId of modulesNeedingTemplates) {
+        const choice = templateChoices[moduleId];
+        if (!choice?.templateId || !choice.customDomain) continue;
+        try {
+          await createDeploymentRequest({
+            companyId: newCompany.id,
+            moduleId,
+            templateId: choice.templateId,
+            customDomain: choice.customDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, ""),
+            configOverrides: {},
+          });
+        } catch (err) {
+          // Non-blocking — tenant can still redo from /apps/:moduleId/setup/template
+          console.warn(`Template request for ${moduleId} failed:`, err);
+        }
+      }
 
       // ── Progress: Installing apps ───────────────────────────
       setSetupIndex(1);
@@ -1391,8 +1504,144 @@ export default function Onboarding() {
         </div>
       )}
 
+      {/* ─── Step 3b: Template + custom domain picker (shown for modules with needsTemplate=true) ─── */}
+      {step === 3 && onTemplateModuleIdx !== null && currentTemplateModuleId && (() => {
+        const mod = PLATFORM_MODULES.find((m) => m.id === currentTemplateModuleId);
+        const cleanDomain = (currentTemplateChoice?.customDomain ?? "").trim();
+        const domainOk = isDomainValid(cleanDomain);
+        return (
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-32">
+            <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
+              <span>Step {onTemplateModuleIdx + 1} of {modulesNeedingTemplates.length}</span>
+              <span>·</span>
+              <span className="capitalize">{mod?.name || currentTemplateModuleId}</span>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-800 mb-1 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Choose a template for {mod?.name || currentTemplateModuleId}
+                </h1>
+                <p className="text-sm text-slate-500">
+                  Pick a storefront design and enter the custom domain where it will live.
+                </p>
+              </div>
+            </div>
+
+            {/* Custom domain */}
+            <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 max-w-xl">
+              <label className="text-xs font-medium text-slate-700 inline-flex items-center gap-1.5 mb-1">
+                <Globe2 className="w-3.5 h-3.5" /> Custom domain <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={cleanDomain}
+                onChange={(e) =>
+                  setTemplateChoice(currentTemplateModuleId, { customDomain: e.target.value })
+                }
+                placeholder="shop.yourcompany.com"
+                className={inputClass}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Point this domain's DNS to our deployment server before launch. No http:// prefix.
+              </p>
+              {!domainOk && cleanDomain.length > 0 && (
+                <p className="text-[11px] text-red-600 mt-1">Enter a valid domain like <code>shop.example.com</code>.</p>
+              )}
+            </div>
+
+            {/* Template grid */}
+            {templatesLoading ? (
+              <div className="py-24 flex justify-center">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              </div>
+            ) : availableTemplates.length === 0 ? (
+              <div className="py-12 text-center text-sm text-slate-500">
+                No templates available for this module yet. Contact support.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {availableTemplates.map((t) => {
+                  const selected = currentTemplateChoice?.templateId === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() =>
+                        setTemplateChoice(currentTemplateModuleId, { templateId: t.id })
+                      }
+                      className={`text-left bg-white rounded-xl border overflow-hidden transition-all ${
+                        selected
+                          ? "border-primary ring-2 ring-primary/30 shadow-md"
+                          : "border-slate-200 hover:border-slate-300 hover:shadow-md"
+                      }`}
+                    >
+                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                        {t.thumbnail_url ? (
+                          <img
+                            src={t.thumbnail_url}
+                            alt={t.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Sparkles className="w-6 h-6 text-slate-300" />
+                          </div>
+                        )}
+                        {selected && (
+                          <div className="absolute top-2 right-2 h-7 px-2.5 rounded-full bg-primary text-white text-xs font-semibold inline-flex items-center gap-1 shadow-sm">
+                            <Check className="w-3 h-3" /> Selected
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3 space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-semibold text-slate-800">{t.name}</h3>
+                        </div>
+                        {t.description && (
+                          <p className="text-xs text-slate-500 leading-snug line-clamp-2">{t.description}</p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Bottom bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 z-50">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+                <button
+                  onClick={handleTemplateStepBack}
+                  className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-50 transition flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
+                <button
+                  onClick={handleTemplateStepNext}
+                  disabled={!currentTemplateChoice?.templateId || !domainOk}
+                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition flex items-center gap-2"
+                >
+                  {onTemplateModuleIdx + 1 < modulesNeedingTemplates.length
+                    ? "Next module"
+                    : hasNonFreeApps
+                      ? "Continue to payment"
+                      : "Continue"}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ─── Step 3: App Store ────────────────────────────────── */}
-      {step === 3 && (
+      {step === 3 && onTemplateModuleIdx === null && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-32">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
