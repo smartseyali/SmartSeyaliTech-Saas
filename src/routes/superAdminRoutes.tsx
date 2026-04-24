@@ -20,6 +20,7 @@ const PlatformEmailTemplates = lazy(() => import("@/pages/super-admin/EmailTempl
 const PlatformAnnouncements  = lazy(() => import("@/pages/super-admin/Announcements"));
 const PlatformFeatureFlags   = lazy(() => import("@/pages/super-admin/FeatureFlags"));
 const PlatformAuditLogs      = lazy(() => import("@/pages/super-admin/AuditLogs"));
+const PlatformTemplates      = lazy(() => import("@/pages/super-admin/Templates"));
 
 export const superAdminRoutes = [
     { path: "/super-admin", element: <SuperAdminDashboard /> },
@@ -42,4 +43,5 @@ export const superAdminRoutes = [
     { path: "/super-admin/announcements",   element: <PlatformAnnouncements /> },
     { path: "/super-admin/feature-flags",   element: <PlatformFeatureFlags /> },
     { path: "/super-admin/audit-logs",      element: <PlatformAuditLogs /> },
+    { path: "/super-admin/templates",       element: <PlatformTemplates /> },
 ];

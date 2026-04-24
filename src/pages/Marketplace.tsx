@@ -4,7 +4,7 @@ import {
     Search, Check, Download, ExternalLink, ArrowLeft, Shield, Clock, Zap,
     ChevronRight, Package, Globe, Trash2, CreditCard, Loader2,
 } from "lucide-react";
-import { CATEGORY_LABELS } from "@/config/modules";
+import { CATEGORY_LABELS, getModule } from "@/config/modules";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -190,6 +190,25 @@ export default function Marketplace() {
         setCompanySlugs((prev) => new Set([...prev, mod.slug]));
     };
 
+    // After a module is activated, redirect to the template picker if the
+    // module requires one and the tenant hasn't picked yet.
+    const maybeRedirectToTemplatePicker = async (mod: SystemModule) => {
+        const cfg = getModule(mod.slug);
+        if (!cfg?.needsTemplate || !activeCompany) return;
+        try {
+            const { data: company } = await supabase
+                .from("companies")
+                .select("active_template_id")
+                .eq("id", activeCompany.id)
+                .maybeSingle();
+            if (!company?.active_template_id) {
+                navigate(`/apps/${mod.slug}/setup/template?return=${encodeURIComponent(mod.dashboard_route || mod.route || "/apps")}`);
+            }
+        } catch {
+            // Non-blocking — user can reach the picker from the module itself.
+        }
+    };
+
     const handleInstall = async (mod: SystemModule) => {
         if (!activeCompany) { toast.error("Please select a company first."); return; }
         if (isInstalled(mod)) { toast.info(`${mod.name} is already installed.`); return; }
@@ -202,6 +221,7 @@ export default function Marketplace() {
             try {
                 await activateModule(mod);
                 toast.success(`${mod.name} installed successfully!`);
+                await maybeRedirectToTemplatePicker(mod);
             } catch (err: any) {
                 toast.error(err.message || "Failed to install module");
             } finally { setInstalling(false); }
@@ -237,6 +257,7 @@ export default function Marketplace() {
 
             await activateModule(mod);
             toast.success(`Payment successful! ${mod.name} has been installed.`);
+            await maybeRedirectToTemplatePicker(mod);
         } catch (err: any) {
             await logPaymentTransaction(
                 activeCompany.id, orderNumber, "razorpay", price, "failed",

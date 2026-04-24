@@ -22,10 +22,8 @@ export interface PlatformModule {
     // Per-app pricing (Odoo-style)
     priceMonthly: number;     // Monthly price in INR (0 = free)
     priceYearly?: number;     // Yearly price in INR (optional discount)
-    priceFree?: boolean;      // Legacy
     isFree: boolean;          // Free app (no charge)
     trialDays: number;        // Trial period in days (0 = no trial)
-    screenshots?: string[];   // Preview images for the app
 }
 
 export type ModuleCategory =
@@ -59,12 +57,11 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Payment gateway integration',
             'Shipping zones & delivery',
         ],
-        needsTemplate: false,
+        needsTemplate: true,
         priceMonthly: 999,
         priceYearly: 9990,
         isFree: false,
         trialDays: 14,
-        screenshots: ['/previews/ecommerce.png'],
     },
     {
         id: 'pos',
@@ -92,7 +89,6 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         priceYearly: 4990,
         isFree: false,
         trialDays: 14,
-        screenshots: ['/previews/pos.png'],
     },
     {
         id: 'crm',
@@ -120,7 +116,6 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         priceYearly: 4990,
         isFree: false,
         trialDays: 14,
-        screenshots: ['/previews/crm.png'],
     },
     {
         id: 'sales',
@@ -315,7 +310,7 @@ export const PLATFORM_MODULES: PlatformModule[] = [
             'Multi-language translations',
             'Automation rules & API keys',
         ],
-        needsTemplate: false,
+        needsTemplate: true,
         priceMonthly: 599,
         priceYearly: 5990,
         isFree: false,

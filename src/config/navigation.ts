@@ -38,6 +38,13 @@ export interface NavGroup {
 export const MODULE_NAV: Record<string, NavGroup[]> = {
   ecommerce: [
     {
+      label: "Storefront",
+      icon: Globe2,
+      items: [
+        { title: "Template", url: "/apps/ecommerce/setup/template", icon: Layout, resource: "settings" },
+      ],
+    },
+    {
       label: "Website & Media",
       icon: Layout,
       items: [
@@ -195,6 +202,13 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
 
   website: [
     {
+      label: "Storefront",
+      icon: Globe2,
+      items: [
+        { title: "Template", url: "/apps/website/setup/template", icon: Layout, resource: "settings" },
+      ],
+    },
+    {
       label: "Content",
       icon: Layout,
       items: [
@@ -340,18 +354,6 @@ export const CORE_NAV: NavGroup[] = [
       { title: "Users", url: "/apps/masters/users", icon: Users, resource: "users" },
       { title: "Roles", url: "/apps/masters/roles", icon: ShieldCheck, resource: "users" },
       { title: "Print Formats", url: "/apps/masters/print-formats", icon: FileText, resource: "settings" },
-      {
-        title: "Global Library",
-        url: "/apps/masters/countries",
-        icon: Database,
-        resource: "settings",
-        subItems: [
-          { title: "Countries", url: "/apps/masters/countries", icon: Database, resource: "settings" },
-          { title: "States", url: "/apps/masters/states", icon: Database, resource: "settings" },
-          { title: "Districts", url: "/apps/masters/districts", icon: Database, resource: "settings" },
-          { title: "Print Format Library", url: "/apps/masters/global-print-formats", icon: FileText, resource: "settings" },
-        ],
-      },
     ],
   },
 ];

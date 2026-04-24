@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { MFASection } from "@/components/auth/MFASection";
 
 /**
  * ERPNext v16-style user profile — identity card + tabs for
@@ -266,7 +267,20 @@ export default function Profile() {
             </TabsContent>
 
             {/* ── Security ── */}
-            <TabsContent value="security" className="mt-0 p-5 space-y-4">
+            <TabsContent value="security" className="mt-0 p-5 space-y-5">
+              <div>
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-foreground mb-2 inline-flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5" /> Two-factor authentication
+                </h3>
+                <MFASection />
+              </div>
+
+              <div className="border-t border-gray-100 dark:border-border pt-4">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-foreground mb-2 inline-flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5" /> Password
+                </h3>
+              </div>
+
               <div className="bg-primary-50 border border-primary-100 rounded-md px-3 py-2 flex items-start gap-2">
                 <Lock className="w-3.5 h-3.5 text-primary-700 mt-0.5" />
                 <div>

@@ -32,6 +32,8 @@ const StorefrontLogin = lazy(() => import("./pages/StorefrontLogin"));
 const OrderTracking = lazy(() => import("./pages/modules/ecommerce/OrderTracking"));
 const MyOrders = lazy(() => import("./pages/modules/ecommerce/MyOrders"));
 const VerifyEmail = lazy(() => import("./pages/modules/ecommerce/VerifyEmail"));
+const Storefront = lazy(() => import("./pages/Storefront"));
+const TemplateSelect = lazy(() => import("./pages/modules/TemplateSelect"));
 
 // ── Lazy-loaded marketing pages ──
 const MarketingIndex = lazy(() => import("./pages/marketing/Index"));
@@ -166,6 +168,10 @@ const App = () => (
                                             {/* ── User Profile ── */}
                                             <Route element={<AppLayout />}>
                                                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                                                <Route
+                                                    path="/apps/:moduleId/setup/template"
+                                                    element={<ProtectedRoute><TemplateSelect /></ProtectedRoute>}
+                                                />
                                             </Route>
 
                                             {/* ── Storefront Customer Pages (public) ── */}
@@ -174,6 +180,8 @@ const App = () => (
                                             <Route path="/store/track/:orderNumber" element={<OrderTracking />} />
                                             <Route path="/store/my-orders" element={<MyOrders />} />
                                             <Route path="/store/verify" element={<VerifyEmail />} />
+                                            {/* Dynamic storefront — resolves tenant by subdomain slug */}
+                                            <Route path="/store/:slug" element={<Storefront />} />
 
                                             {/* Backward compat: /ecommerce → /apps/ecommerce */}
                                             <Route path="/ecommerce" element={<Navigate to="/apps/ecommerce" replace />} />
