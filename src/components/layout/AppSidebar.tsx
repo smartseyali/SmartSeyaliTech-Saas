@@ -34,6 +34,8 @@ const superAdminNavGroups: NavGroup[] = [
             { title: "Plans", url: "/super-admin/plans", icon: CreditCard },
             { title: "Modules", url: "/super-admin/modules", icon: LayoutGrid },
             { title: "Users", url: "/super-admin/users", icon: Users },
+            { title: "Templates", url: "/super-admin/templates", icon: LayoutGrid },
+            { title: "Deployments", url: "/super-admin/deployments", icon: Rocket },
         ],
     },
     {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
-    Download, Loader2, Check, ShieldCheck, ServerCog, FileArchive, FolderOpen, Globe2,
+    Loader2, Check, ShieldCheck, Globe2, Send, ClockAlert,
 } from "lucide-react";
 
 import {
@@ -13,7 +13,10 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { StorefrontTemplate, TemplateConfigOverrides } from "@/types/storefront";
 import { setActiveTemplateForCompany } from "@/lib/services/storefrontTemplateService";
-import { downloadDeployBundle } from "@/lib/services/templateDeployService";
+import {
+    createDeploymentRequest,
+    getActiveDeploymentForCompanyModule,
+} from "@/lib/services/deploymentRequestService";
 
 type Props = {
     open: boolean;
@@ -21,25 +24,32 @@ type Props = {
     template: StorefrontTemplate | null;
     companyId: number | string | null;
     companyName: string;
+    /** Module the request is for — required to key the deployment row. */
+    moduleId: string;
     /** Existing overrides on companies.template_config. */
     initialOverrides?: TemplateConfigOverrides;
-    /** Called after activation + download completes. */
-    onDeployed?: () => void;
+    /** Existing custom_domain from a prior request (prefill). */
+    initialCustomDomain?: string;
+    /** Called after the deployment request is recorded. */
+    onRequested?: () => void;
 };
 
 /**
- * Post-selection dialog: lets the tenant fill in template-specific fields
- * (name, phone, WhatsApp, Razorpay key, …), activates the template against
- * their company, and downloads a ready-to-upload Hostinger ZIP with the
- * values baked into config.js.
+ * Tenant-side request dialog.
+ *
+ * The tenant picks template config + a custom domain. We save the choice
+ * against their company (active_template_id + template_config) and insert
+ * a template_deployments row with status='requested'. The super admin
+ * later generates the zip and deploys it externally.
  */
 export function TemplateDeployDialog({
     open, onOpenChange, template, companyId, companyName,
-    initialOverrides, onDeployed,
+    moduleId, initialOverrides, initialCustomDomain, onRequested,
 }: Props) {
     const [values, setValues] = useState<TemplateConfigOverrides>({});
-    const [building, setBuilding] = useState(false);
-    const [deployed, setDeployed] = useState<{ fileName: string; sizeBytes: number } | null>(null);
+    const [customDomain, setCustomDomain] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState<{ id: number; domain: string } | null>(null);
 
     const schema = useMemo(() => {
         const raw = template?.config_schema;
@@ -50,36 +60,56 @@ export function TemplateDeployDialog({
         if (typeof raw !== "object") return {};
         return raw as Record<string, any>;
     }, [template?.id]);
+
+    type SchemaField = {
+        type?: string;
+        label?: string;
+        required?: boolean;
+        default?: string;
+        placeholder?: string;
+    };
     const fields = useMemo(
-        () => Object.entries(schema).filter(([, f]) => f && typeof f === "object"),
+        () =>
+            Object.entries(schema)
+                .filter(([, f]) => f && typeof f === "object")
+                .map(([k, f]) => [k, f as SchemaField] as const),
         [schema],
     );
 
     useEffect(() => {
         if (!open) {
-            setDeployed(null);
+            setSubmitted(null);
             return;
         }
         const initial: TemplateConfigOverrides = {};
-        for (const [key, field] of Object.entries(schema)) {
+        for (const [key, raw] of Object.entries(schema)) {
+            const field = raw as SchemaField;
             const override = initialOverrides?.[key];
             if (override !== undefined && override !== null) {
                 initial[key] = override;
             } else if (key === "storeName" && companyName) {
                 initial[key] = companyName;
-            } else if (field.default !== undefined) {
+            } else if (field?.default !== undefined) {
                 initial[key] = field.default;
             }
         }
         setValues(initial);
+        setCustomDomain(initialCustomDomain ?? "");
     }, [open, template?.id, companyName]);
 
-    const canDownload = useMemo(() => {
+    const domainValid = useMemo(() => {
+        const d = customDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+        // quick RFC-1035 host check: label.label with at least one dot
+        return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i.test(d);
+    }, [customDomain]);
+
+    const canSubmit = useMemo(() => {
+        if (!domainValid) return false;
         for (const [key, field] of fields) {
             if (field?.required && !String(values[key] ?? "").trim()) return false;
         }
         return true;
-    }, [values, fields]);
+    }, [values, fields, domainValid]);
 
     if (!template) return null;
 
@@ -87,49 +117,45 @@ export function TemplateDeployDialog({
         setValues((v) => ({ ...v, [key]: val }));
     };
 
-    const handleDeploy = async () => {
+    const handleSubmit = async () => {
         if (!companyId) {
             toast.error("No active company selected");
             return;
         }
-        if (!canDownload) {
-            toast.error("Please fill in all required fields");
+        if (!canSubmit) {
+            toast.error(domainValid ? "Please fill in all required fields" : "Enter a valid custom domain");
             return;
         }
-        setBuilding(true);
+        const cleanDomain = customDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+        setSubmitting(true);
         try {
-            await setActiveTemplateForCompany(companyId, template.id, values);
-            const result = await downloadDeployBundle({
-                template,
-                companyId,
-                companyName,
-                overrides: values,
-            });
-            setDeployed(result);
-            toast.success(`${template.name} bundle downloaded`);
-            onDeployed?.();
-        } catch (err: any) {
-            toast.error(err?.message || "Failed to generate deploy bundle");
-        } finally {
-            setBuilding(false);
-        }
-    };
+            // Prevent overwriting an already-deployed row by the tenant.
+            const existing = await getActiveDeploymentForCompanyModule(companyId, moduleId);
+            if (existing && existing.status === "deployed") {
+                const ok = window.confirm(
+                    "Your module is already deployed. Submitting again will replace the current request and require a fresh deployment. Continue?",
+                );
+                if (!ok) {
+                    setSubmitting(false);
+                    return;
+                }
+            }
 
-    const handleReDownload = async () => {
-        if (!companyId) return;
-        setBuilding(true);
-        try {
-            const result = await downloadDeployBundle({
-                template,
+            await setActiveTemplateForCompany(companyId, template.id, values);
+            const req = await createDeploymentRequest({
                 companyId,
-                companyName,
-                overrides: values,
+                moduleId,
+                templateId: template.id,
+                customDomain: cleanDomain,
+                configOverrides: values,
             });
-            setDeployed(result);
+            setSubmitted({ id: req.id, domain: cleanDomain });
+            toast.success("Deployment requested. Super admin will deploy shortly.");
+            onRequested?.();
         } catch (err: any) {
-            toast.error(err?.message || "Failed to regenerate bundle");
+            toast.error(err?.message || "Failed to submit deployment request");
         } finally {
-            setBuilding(false);
+            setSubmitting(false);
         }
     };
 
@@ -138,18 +164,43 @@ export function TemplateDeployDialog({
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <FileArchive className="w-4 h-4 text-primary" />
-                        Deploy {template.name}
+                        <Send className="w-4 h-4 text-primary" />
+                        Request deployment — {template.name}
                     </DialogTitle>
                     <DialogDescription>
-                        Fill in your storefront details. We'll package a Hostinger-ready ZIP with your
-                        Supabase credentials and company ID pre-configured.
+                        Pick your custom domain and fill in the template-specific fields. We'll notify
+                        the super admin to deploy your site to that domain.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-5 py-1 max-h-[60vh] overflow-y-auto pr-1">
                     {/* Form */}
                     <div className="md:col-span-3 space-y-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs inline-flex items-center gap-1.5">
+                                <Globe2 className="w-3.5 h-3.5" />
+                                Custom domain <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                type="text"
+                                value={customDomain}
+                                onChange={(e) => setCustomDomain(e.target.value)}
+                                placeholder="shop.yourcompany.com"
+                                autoComplete="off"
+                                spellCheck={false}
+                            />
+                            <p className="text-[11px] text-muted-foreground">
+                                Point this domain's DNS A/CNAME record to the super admin's server before the final deployment.
+                            </p>
+                            {!domainValid && customDomain.length > 0 && (
+                                <p className="text-[11px] text-destructive">
+                                    Enter a valid domain like <code>shop.example.com</code>
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="h-px bg-border my-3" />
+
                         <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
                             Template configuration
                         </p>
@@ -174,70 +225,55 @@ export function TemplateDeployDialog({
                         )}
                     </div>
 
-                    {/* Right panel — baked-in values + Hostinger steps */}
+                    {/* Right panel */}
                     <div className="md:col-span-2 space-y-3">
                         <div className="bg-muted/40 border border-border rounded-lg p-3 space-y-2">
                             <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold inline-flex items-center gap-1.5">
                                 <ShieldCheck className="w-3 h-3" /> Auto-configured
                             </p>
                             <dl className="text-xs space-y-1">
-                                <Row label="Company ID" value={String(companyId ?? "—")} />
-                                <Row label="Company Name" value={companyName || "—"} />
-                                <Row label="Supabase URL" value="(baked from env)" mono />
-                                <Row label="Anon key" value="(baked from env)" mono />
+                                <Row label="Company" value={`${companyName || `#${companyId}`}`} />
+                                <Row label="Module" value={moduleId} />
                                 <Row label="Template" value={`${template.slug} v${template.version}`} mono />
                             </dl>
                         </div>
 
                         <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-1.5">
                             <p className="text-xs font-semibold text-primary-700 dark:text-primary-300 inline-flex items-center gap-1.5">
-                                <ServerCog className="w-3.5 h-3.5" /> Hostinger deployment
+                                <ClockAlert className="w-3.5 h-3.5" /> What happens next
                             </p>
                             <ol className="text-[11px] text-muted-foreground space-y-0.5 list-decimal list-inside leading-relaxed">
-                                <li>Download the ZIP</li>
-                                <li>hPanel → <strong>File Manager</strong> → open <code className="text-[10px]">public_html</code></li>
-                                <li>Upload &amp; <strong>Extract</strong> the ZIP there</li>
-                                <li>hPanel → <strong>Security</strong> → enable Force HTTPS</li>
-                                <li>Open your domain — done 🎉</li>
+                                <li>Your request enters the super-admin deployment queue.</li>
+                                <li>Super admin generates a ZIP bundle with your settings.</li>
+                                <li>They deploy it to your custom domain.</li>
+                                <li>You'll see the live site in the admin preview.</li>
                             </ol>
-                            <p className="text-[11px] text-muted-foreground pt-1">
-                                Full guide is inside the ZIP as <code className="text-[10px]">deploy-info.md</code>.
-                            </p>
                         </div>
                     </div>
                 </div>
 
-                {deployed && (
+                {submitted && (
                     <div className="mt-2 rounded-lg border border-success/30 bg-success/10 p-3 text-xs">
                         <div className="flex items-center gap-2 text-foreground font-medium">
                             <Check className="w-4 h-4 text-success" />
-                            <span>Bundle generated</span>
+                            <span>Request #{submitted.id} submitted</span>
                         </div>
                         <p className="text-muted-foreground mt-1">
-                            <code className="text-[11px]">{deployed.fileName}</code>
-                            <span className="ml-2">({(deployed.sizeBytes / 1024).toFixed(0)} KB)</span>
-                        </p>
-                        <p className="text-muted-foreground mt-1 inline-flex items-center gap-1.5">
-                            <FolderOpen className="w-3 h-3" />
-                            Check your browser's Downloads folder and follow the steps above.
+                            Target domain: <code className="text-[11px]">{submitted.domain}</code>
                         </p>
                     </div>
                 )}
 
-                <DialogFooter className={cn("gap-2", deployed && "flex-wrap")}>
-                    <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={building}>
-                        Close
+                <DialogFooter className={cn("gap-2", submitted && "flex-wrap")}>
+                    <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={submitting}>
+                        {submitted ? "Close" : "Cancel"}
                     </Button>
-                    {deployed ? (
-                        <Button onClick={handleReDownload} disabled={building}>
-                            {building ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Building…</> : <><Download className="w-3.5 h-3.5" /> Re-download</>}
-                        </Button>
-                    ) : (
-                        <Button onClick={handleDeploy} disabled={building || !canDownload}>
-                            {building ? (
-                                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Building bundle…</>
+                    {!submitted && (
+                        <Button onClick={handleSubmit} disabled={submitting || !canSubmit}>
+                            {submitting ? (
+                                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Submitting…</>
                             ) : (
-                                <><Globe2 className="w-3.5 h-3.5" /> Activate &amp; Download ZIP</>
+                                <><Send className="w-3.5 h-3.5" /> Submit request</>
                             )}
                         </Button>
                     )}

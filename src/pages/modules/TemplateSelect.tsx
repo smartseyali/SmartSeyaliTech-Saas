@@ -17,6 +17,10 @@ import type { StorefrontTemplate, TemplateConfigOverrides } from "@/types/storef
 import { cn } from "@/lib/utils";
 import { TemplateDeployDialog } from "@/components/templates/TemplateDeployDialog";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import {
+    getActiveDeploymentForCompanyModule,
+    type TemplateDeploymentWithJoins,
+} from "@/lib/services/deploymentRequestService";
 
 /**
  * Tenant-facing template picker.
@@ -52,6 +56,7 @@ function TemplateSelectInner() {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [deployFor, setDeployFor] = useState<StorefrontTemplate | null>(null);
     const [initialOverrides, setInitialOverrides] = useState<TemplateConfigOverrides>({});
+    const [activeDeployment, setActiveDeployment] = useState<TemplateDeploymentWithJoins | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -67,6 +72,17 @@ function TemplateSelectInner() {
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
     }, [moduleId, activeCompany?.id]);
+
+    // Load the latest deployment request for this company+module so we can show
+    // its status and prefill the custom domain when the tenant re-opens the dialog.
+    useEffect(() => {
+        if (!activeCompany?.id) return;
+        let cancelled = false;
+        getActiveDeploymentForCompanyModule(activeCompany.id, moduleId)
+            .then((row) => { if (!cancelled) setActiveDeployment(row); })
+            .catch(() => { /* optional — ignore */ });
+        return () => { cancelled = true; };
+    }, [activeCompany?.id, moduleId]);
 
     const categories = useMemo(() => {
         const set = new Set<string>();
@@ -99,6 +115,12 @@ function TemplateSelectInner() {
 
     const handleDeployed = () => {
         if (deployFor) setSelectedId(deployFor.id);
+        // Refresh the active deployment banner after a request is submitted.
+        if (activeCompany?.id) {
+            getActiveDeploymentForCompanyModule(activeCompany.id, moduleId)
+                .then((row) => setActiveDeployment(row))
+                .catch(() => { /* optional */ });
+        }
         if (returnTo) {
             setTimeout(() => navigate(returnTo, { replace: true }), 600);
         }
@@ -141,6 +163,43 @@ function TemplateSelectInner() {
             </div>
 
             <div className="max-w-6xl mx-auto px-5 py-6 space-y-5">
+                {/* Active deployment status banner */}
+                {activeDeployment && (
+                    <div className={cn(
+                        "rounded-lg border p-3 text-xs flex items-start gap-3",
+                        activeDeployment.status === "deployed"
+                            ? "border-success/40 bg-success/10"
+                            : "border-primary/30 bg-primary/5",
+                    )}>
+                        <div className="flex-1">
+                            {activeDeployment.status === "deployed" ? (
+                                <>
+                                    <p className="font-semibold text-foreground">Deployed</p>
+                                    <p className="text-muted-foreground mt-0.5">
+                                        Live at{" "}
+                                        <a
+                                            href={activeDeployment.deployed_url ?? `https://${activeDeployment.custom_domain}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-primary hover:underline"
+                                        >
+                                            {activeDeployment.deployed_url ?? activeDeployment.custom_domain}
+                                        </a>
+                                        {" · template "}<code>{activeDeployment.template?.slug ?? activeDeployment.template_slug}</code>
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="font-semibold text-foreground">Deployment pending</p>
+                                    <p className="text-muted-foreground mt-0.5">
+                                        Requested for <code>{activeDeployment.custom_domain}</code> — super admin will deploy this shortly.
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Filters */}
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="relative flex-1 min-w-[220px] max-w-sm">
@@ -274,10 +333,10 @@ function TemplateSelectInner() {
                                         >
                                             {selected ? (
                                                 <>
-                                                    <Check className="w-3.5 h-3.5" /> Re-deploy
+                                                    <Check className="w-3.5 h-3.5" /> Update request
                                                 </>
                                             ) : (
-                                                "Use this template"
+                                                "Request deployment"
                                             )}
                                         </Button>
                                     </div>
@@ -294,8 +353,10 @@ function TemplateSelectInner() {
                 template={deployFor}
                 companyId={activeCompany?.id ?? null}
                 companyName={activeCompany?.name || ""}
+                moduleId={moduleId}
                 initialOverrides={initialOverrides}
-                onDeployed={handleDeployed}
+                initialCustomDomain={activeDeployment?.custom_domain ?? ""}
+                onRequested={handleDeployed}
             />
         </div>
     );

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { TemplatePreviewIframe } from "@/components/templates/TemplatePreviewIframe";
 
 interface Stats {
     totalOrders: number;
@@ -123,6 +124,13 @@ export default function EcomDashboard() {
                     </Link>
                 </div>
             </div>
+
+            {/* Storefront preview — iframe of the chosen template (local until super admin deploys) */}
+            <TemplatePreviewIframe
+                companyId={activeCompany?.id}
+                moduleId="ecommerce"
+                companySubdomain={(activeCompany as any)?.subdomain ?? (activeCompany as any)?.slug}
+            />
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

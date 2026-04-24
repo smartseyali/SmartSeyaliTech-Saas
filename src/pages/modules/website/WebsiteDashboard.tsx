@@ -6,6 +6,7 @@ import DashboardTemplate from "@/components/modules/DashboardTemplate";
 import type { KPICard } from "@/components/modules/DashboardTemplate";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { TemplatePreviewIframe } from "@/components/templates/TemplatePreviewIframe";
 
 export default function WebsiteDashboard() {
   const { activeCompany } = useTenant();
@@ -58,6 +59,14 @@ export default function WebsiteDashboard() {
         </div>
       }
     >
+      <div className="mb-4">
+        <TemplatePreviewIframe
+          companyId={activeCompany?.id}
+          moduleId="website"
+          companySubdomain={(activeCompany as any)?.subdomain ?? (activeCompany as any)?.slug}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Quick Actions */}
         <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
