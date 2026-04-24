@@ -11,12 +11,14 @@ import {
 } from "lucide-react";
 import PLATFORM_CONFIG from "@/config/platform";
 import { PlatformLoader } from "@/components/PlatformLoader";
+import { MFAChallenge } from "@/components/auth/MFAChallenge";
+import { needsMfaChallenge } from "@/lib/auth/mfa";
 
 /**
  * ERPNext v16 Desk login — centered card, logo, minimal decoration.
  */
 export default function Login() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, aal } = useAuth();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -28,9 +30,11 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [redirecting, setRedirecting] = useState(false);
 
+    const mfaRequired = !!user && needsMfaChallenge(aal);
+
     useEffect(() => {
-        if (user && !authLoading) checkRoleAndRedirect();
-    }, [user?.id, authLoading]);
+        if (user && !authLoading && !mfaRequired) checkRoleAndRedirect();
+    }, [user?.id, authLoading, mfaRequired]);
 
     const checkRoleAndRedirect = async () => {
         if (!user) return;
@@ -52,13 +56,15 @@ export default function Login() {
                 return;
             }
 
-            const { data: profile } = await supabase
+            const { data: profile, error: profileErr } = await supabase
                 .from("users")
                 .select("email_verified")
                 .eq("id", user.id)
                 .maybeSingle();
 
-            if (profile && !profile.email_verified) {
+            // Only gate on verification when the flag is explicitly false.
+            // If the column/row is missing or the query errors, fail-open — consistent with PermissionsContext.
+            if (!profileErr && profile && profile.email_verified === false) {
                 navigate("/verify-email-pending", { replace: true });
                 return;
             }
@@ -111,6 +117,10 @@ export default function Login() {
 
     if (authLoading || redirecting) {
         return <PlatformLoader message="Signing you in" subtext="Please wait" />;
+    }
+
+    if (mfaRequired) {
+        return <MFAChallenge onVerified={checkRoleAndRedirect} />;
     }
 
     return (

@@ -63,20 +63,35 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 // 2. HARDCORE BYPASS for the Primary Super Admin
                 const isSuperAdminByEmail = user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
 
-                // 3. Look up the user in public.users — check for super admin flag
+                // 3. Look up the user in public.users — check for super admin flag.
+                // Fail-open on email_verified: if the column is missing (SQL not yet applied),
+                // the row is missing, or the query errors out, we do NOT gate on verification —
+                // otherwise a legitimately logged-in user gets bounced to /verify-email-pending.
+                // A user who genuinely needs to verify will have an explicit email_verified = false.
                 let localUser = null;
                 try {
-                    const { data } = await supabase
+                    // Query by id (auth user PK) — consistent with Login.tsx; username may not equal email.
+                    const { data, error } = await supabase
                         .from("users")
                         .select("id, is_super_admin, email_verified")
-                        .ilike("username", user.email || "")
+                        .eq("id", user.id)
                         .maybeSingle();
-                    if (data) {
+
+                    if (error) {
+                        // Most common cause: email_verified column missing (SQL not applied yet).
+                        console.warn("Profile lookup error, treating as verified:", error.message);
+                        setEmailVerified(true);
+                    } else if (data) {
                         localUser = data;
-                        setEmailVerified(data.email_verified ?? false);
+                        // Only treat as unverified when the flag is explicitly false.
+                        setEmailVerified(data.email_verified !== false);
+                    } else {
+                        // No row yet (handle_new_user trigger hasn't fired / race). Fail-open.
+                        setEmailVerified(true);
                     }
-                } catch (e) {
-                    console.warn("User lookup failed, ignoring:", e);
+                } catch (e: any) {
+                    console.warn("User lookup threw, treating as verified:", e?.message || e);
+                    setEmailVerified(true);
                 }
 
                 // 4. SUPER ADMIN: Auto-sync modules from config to DB (Odoo-style)
