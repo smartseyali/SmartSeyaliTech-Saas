@@ -116,16 +116,37 @@ async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
         },
     });
     if (error) {
-        // FunctionsHttpError: try to read the body for the real error message
+        // FunctionsHttpError wraps the edge function's Response. The real message
+        // (e.g. "Platform SMTP not configured…") is in the body, not error.message.
+        // We clone the response so json() and text() can both be tried safely.
         let detail: string | undefined;
-        const ctx = (error as any)?.context;
-        if (ctx?.json) {
-            try { detail = (await ctx.json())?.error; } catch { /* ignore */ }
+        let status: number | undefined;
+        const ctx: Response | undefined = (error as any)?.context;
+        if (ctx && typeof ctx.clone === "function") {
+            status = ctx.status;
+            try {
+                const body = await ctx.clone().json();
+                detail = body?.error || body?.message;
+            } catch {
+                try {
+                    const text = await ctx.clone().text();
+                    if (text && text.trim()) detail = text.trim();
+                } catch { /* ignore */ }
+            }
         }
-        if (!detail && ctx?.text) {
-            try { detail = await ctx.text(); } catch { /* ignore */ }
+        // Log full context so dev can see it in the browser console
+        console.error("send-email edge function failed", { status, detail, error });
+
+        if (!detail) {
+            if (status === 404) {
+                detail = "send-email edge function not deployed. Run: supabase functions deploy send-email";
+            } else if (status === 401 || status === 403) {
+                detail = "send-email edge function rejected the request (auth). Check anon key / function permissions.";
+            } else {
+                detail = error.message || "Edge function invocation failed";
+            }
         }
-        throw new Error(detail || error.message || "Edge function invocation failed");
+        throw new Error(detail);
     }
     if (data?.error) {
         throw new Error(data.error);
