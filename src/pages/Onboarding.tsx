@@ -494,7 +494,14 @@ export default function Onboarding() {
             setStep(3); // Verified → app store
           } else if (data && data.email_verified === false) {
             // User exists but not verified → show verification step
-            generateAndSendVerification(user.id, user.email || "", user.user_metadata?.full_name || "");
+            generateAndSendVerification(user.id, user.email || "", user.user_metadata?.full_name || "")
+              .catch((verifyErr: any) => {
+                toast.error(
+                  verifyErr?.message
+                    ? `Couldn't send verification email: ${verifyErr.message}`
+                    : "Couldn't send verification email. You can resend from the next screen."
+                );
+              });
             setResendCooldown(60);
             setStep(2);
           }
@@ -688,7 +695,16 @@ export default function Onboarding() {
           setStep(3);
         } else {
           // Need to verify — generate token & send email
-          await generateAndSendVerification(user.id, user.email || loginEmail, fullName);
+          try {
+            await generateAndSendVerification(user.id, user.email || loginEmail, fullName);
+            toast.success("Verification email sent. Check your inbox.");
+          } catch (verifyErr: any) {
+            toast.error(
+              verifyErr?.message
+                ? `Couldn't send verification email: ${verifyErr.message}`
+                : "Couldn't send verification email. You can resend from the next screen."
+            );
+          }
           setResendCooldown(60);
           setStep(2);
         }
@@ -734,17 +750,33 @@ export default function Onboarding() {
 
       // Ensure user profile exists in public.users (with email_verified = false)
       const signedUpUser = authData.session?.user || authData.user;
-      if (signedUpUser) {
-        await supabase.from("users").upsert({
-          id: signedUpUser.id,
-          username: loginEmail,
-          full_name: fullName || loginEmail.split("@")[0],
-          is_super_admin: false,
-          email_verified: false,
-        }, { onConflict: "id" });
+      if (!signedUpUser) {
+        throw new Error("Sign-up returned no user. Please try again.");
+      }
 
-        // Generate verification token & send email
+      const { error: upsertErr } = await supabase.from("users").upsert({
+        id: signedUpUser.id,
+        username: loginEmail,
+        full_name: fullName || loginEmail.split("@")[0],
+        is_super_admin: false,
+        email_verified: false,
+      }, { onConflict: "id" });
+      if (upsertErr) {
+        // Typically RLS failure when Supabase email-confirm is ON and no session was returned.
+        // The handle_new_user trigger should have already created the row, so this is best-effort.
+        console.warn("users upsert blocked (expected if no session yet):", upsertErr.message);
+      }
+
+      // Generate verification token & send email — surface any failure so the user knows what broke
+      try {
         await generateAndSendVerification(signedUpUser.id, loginEmail, fullName);
+        toast.success("Verification email sent. Check your inbox.");
+      } catch (verifyErr: any) {
+        toast.error(
+          verifyErr?.message
+            ? `Couldn't send verification email: ${verifyErr.message}`
+            : "Couldn't send verification email. You can resend from the next screen."
+        );
       }
 
       // Always go to verification step — regardless of session/confirm-email setting
@@ -759,25 +791,20 @@ export default function Onboarding() {
   }
 
   // ── Generate verification token & send email ────────────────
+  // Throws on failure so the caller can surface the specific reason to the user.
   async function generateAndSendVerification(userId: string, email: string, name: string) {
-    try {
-      const { data, error } = await supabase.rpc("tenant_generate_verification", {
-        p_user_id: userId,
-      });
-      if (error) {
-        console.error("Token generation failed:", error.message);
-        return;
-      }
-      if (data?.already_verified) return;
-      if (data?.token) {
-        const sent = await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
-        if (!sent) {
-          console.warn("Verification email send failed — user can resend from step 2");
-        }
-      }
-    } catch (err) {
-      console.error("Verification setup error:", err);
+    const { data, error } = await supabase.rpc("tenant_generate_verification", {
+      p_user_id: userId,
+    });
+    if (error) {
+      // "permission denied" here usually means Supabase email-confirm is ON and no session exists yet.
+      throw new Error(`Verification setup failed: ${error.message}`);
     }
+    if (data?.already_verified) return;
+    if (!data?.token) {
+      throw new Error("Verification token was not returned. Check that tenant_email_verification.sql has been run.");
+    }
+    await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
   }
 
   // ── Resend verification email ───────────────────────────────
@@ -802,15 +829,15 @@ export default function Onboarding() {
       }
 
       if (data?.token) {
-        const sent = await sendTenantVerificationEmail(
-          data.email || loginEmail,
-          data.full_name || fullName || loginEmail.split("@")[0],
-          data.token
-        );
-        if (sent) {
+        try {
+          await sendTenantVerificationEmail(
+            data.email || loginEmail,
+            data.full_name || fullName || loginEmail.split("@")[0],
+            data.token
+          );
           toast.success("Verification email sent again!");
-        } else {
-          toast.error("Failed to send email. Please check platform SMTP settings.");
+        } catch (sendErr: any) {
+          toast.error(sendErr?.message || "Failed to send email. Please check platform SMTP settings.");
         }
       }
 

@@ -142,6 +142,13 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 -- 5. GRANTS
 -- ========================================================================================
 
+-- tenant_generate_verification must be callable without a session: when Supabase
+-- "Enable Email Confirmations" is ON, signUp() returns no session, so the very first
+-- verification-send after registration runs as anon. SECURITY DEFINER means the
+-- function still runs with owner privileges; anon callers only receive the token
+-- back, which is harmless on its own — to actually verify, the token must be
+-- delivered to the user's inbox.
+GRANT EXECUTE ON FUNCTION public.tenant_generate_verification(UUID) TO anon;
 GRANT EXECUTE ON FUNCTION public.tenant_generate_verification(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.tenant_verify_email(TEXT) TO anon;
 GRANT EXECUTE ON FUNCTION public.tenant_verify_email(TEXT) TO authenticated;

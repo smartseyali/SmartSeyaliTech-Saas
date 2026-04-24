@@ -85,15 +85,15 @@ export default function VerifyEmailPending() {
 
             // Send the verification email
             if (data?.token) {
-                const sent = await sendTenantVerificationEmail(
-                    data.email || user.email || "",
-                    data.full_name || user.user_metadata?.full_name || "",
-                    data.token
-                );
-                if (sent) {
+                try {
+                    await sendTenantVerificationEmail(
+                        data.email || user.email || "",
+                        data.full_name || user.user_metadata?.full_name || "",
+                        data.token
+                    );
                     toast.success("Verification email sent!");
-                } else {
-                    toast.error("Failed to send email. Please check platform SMTP configuration.");
+                } catch (sendErr: any) {
+                    toast.error(sendErr?.message || "Failed to send email. Please check platform SMTP configuration.");
                 }
             }
 

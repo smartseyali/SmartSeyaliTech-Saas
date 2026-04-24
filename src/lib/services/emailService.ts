@@ -104,36 +104,46 @@ export async function sendVerificationEmail(
 
 /**
  * Platform-level email — uses env-var SMTP (no company_id needed)
+ * Throws on failure so callers can surface a specific reason (SMTP not configured, edge fn down, etc.)
  */
-async function sendPlatformEmail(payload: EmailPayload): Promise<boolean> {
-    try {
-        const { data, error } = await supabase.functions.invoke("send-email", {
-            body: {
-                to: payload.to,
-                subject: payload.subject,
-                html: payload.html,
-                // No company_id → edge function uses platform SMTP env vars
-            },
-        });
-        if (error) {
-            console.error("Platform email error:", error);
-            return false;
+async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
+    const { data, error } = await supabase.functions.invoke("send-email", {
+        body: {
+            to: payload.to,
+            subject: payload.subject,
+            html: payload.html,
+            // No company_id → edge function uses platform SMTP env vars
+        },
+    });
+    if (error) {
+        // FunctionsHttpError: try to read the body for the real error message
+        let detail: string | undefined;
+        const ctx = (error as any)?.context;
+        if (ctx?.json) {
+            try { detail = (await ctx.json())?.error; } catch { /* ignore */ }
         }
-        return true;
-    } catch (err) {
-        console.error("Platform email service error:", err);
-        return false;
+        if (!detail && ctx?.text) {
+            try { detail = await ctx.text(); } catch { /* ignore */ }
+        }
+        throw new Error(detail || error.message || "Edge function invocation failed");
+    }
+    if (data?.error) {
+        throw new Error(data.error);
+    }
+    if (data && data.success === false) {
+        throw new Error("Email send returned failure");
     }
 }
 
 /**
- * Send verification email to a tenant (platform) user during onboarding
+ * Send verification email to a tenant (platform) user during onboarding.
+ * Throws Error on failure — callers should surface the message to the user.
  */
 export async function sendTenantVerificationEmail(
     userEmail: string,
     userName: string,
     verificationToken: string
-): Promise<boolean> {
+): Promise<void> {
     const verifyUrl = `${window.location.origin}/verify-tenant-email?token=${verificationToken}`;
 
     const html = `
@@ -169,7 +179,7 @@ export async function sendTenantVerificationEmail(
 </body>
 </html>`;
 
-    return sendPlatformEmail({
+    await sendPlatformEmail({
         to: userEmail,
         subject: "Verify your email — Smartseyali",
         html,
