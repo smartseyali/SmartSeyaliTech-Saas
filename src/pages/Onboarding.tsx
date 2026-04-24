@@ -2042,13 +2042,30 @@ export default function Onboarding() {
 
             {/* Iframe */}
             <div className="flex-1 bg-slate-50 relative">
-              <iframe
-                src={previewTemplate.entry_path}
-                title={`${previewTemplate.name} preview`}
-                className="w-full h-full border-0 bg-white"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                loading="eager"
-              />
+              {previewTemplate.entry_path ? (
+                <iframe
+                  src={previewTemplate.entry_path}
+                  title={`${previewTemplate.name} preview`}
+                  className="w-full h-full border-0 bg-white"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                  loading="eager"
+                  onError={() => {
+                    console.warn("Template preview iframe failed:", previewTemplate.entry_path);
+                  }}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center text-center p-6">
+                  <div className="max-w-md space-y-2">
+                    <p className="text-sm font-semibold text-slate-800">Preview unavailable</p>
+                    <p className="text-xs text-slate-500">
+                      This template has no <code>entry_path</code> set in the database. Seed
+                      <code className="mx-1">database/create_storefront_templates.sql</code>
+                      (and optionally <code>seed_more_templates.sql</code>) against your Supabase
+                      project so the preview can load.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
