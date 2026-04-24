@@ -1014,8 +1014,16 @@ export default function Onboarding() {
     setLoading(true);
 
     try {
-      // Use the already-authenticated user
-      const activeUser = user;
+      // Prefer the context user; if it hasn't populated yet, read from Supabase directly
+      // so a transient context race doesn't nuke the whole deploy.
+      let activeUser = user;
+      if (!activeUser) {
+        const { data, error: getUserErr } = await supabase.auth.getUser();
+        if (getUserErr) {
+          console.warn("getUser() during deploy failed:", getUserErr.message);
+        }
+        activeUser = data?.user ?? null;
+      }
       if (!activeUser) {
         throw new Error("You must be signed in to complete setup. Please refresh and try again.");
       }
