@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Contact — Summit 2026</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">S</span><span data-content="brand_name">Summit 2026</span></a>
+    <ul>
+      <li><a href="about.html">Schedule</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Get in touch</h1>
+    <p data-content="hero_subtitle">We typically reply within a business day.</p>
+  </section>
+  <section class="section">
+    <div class="container">
+      <form class="form" onsubmit="event.preventDefault();alert('Thanks — we\'ll be in touch.');this.reset();">
+        <input type="text" placeholder="Your name" required />
+        <input type="email" placeholder="Your email" required />
+        <textarea rows="5" placeholder="Your message" required></textarea>
+        <button class="cta" type="submit">Send message</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Summit 2026</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About — Maya Iyer</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">M</span><span data-content="brand_name">Maya Iyer</span></a>
+    <ul>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">About me</h1>
+    <p data-content="hero_subtitle">Designer by trade, illustrator by hobby, reader by obsession.</p>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-3">
+        <div class="card"><h3>Section one</h3><p>Edit this from Smartseyali admin → Website → Pages.</p></div>
+          <div class="card"><h3>Section two</h3><p>Content is pulled at runtime from your web_pages table.</p></div>
+          <div class="card"><h3>Section three</h3><p>Add [data-content="key"] on any element to bind it.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Maya Iyer</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

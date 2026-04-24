@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pattikadai - A Brand of Thandatti Foods</title>
+  <meta name="description" content="Authentic Tradition, Crafted by Grandma's Hands. Pure, healthy, preservative-free country foods inspired by traditional cooking.">
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+
+  <!-- Vendor CSS -->
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+
+  <!-- Theme CSS -->
+  <link rel="stylesheet" href="assets/css/style.css?v=2.0">
+  <link rel="stylesheet" href="assets/css/custom.css?v=2.0">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer home-spacer"></div>
+
+  <!-- Hero Banner Carousel -->
+  <section class="section-banner-two">
+    <div class="banner-container" id="hero-banners">
+      <div class="loading-skeleton" style="height: 350px; border-radius: 15px;"></div>
+    </div>
+  </section>
+
+  <!-- Category Slider -->
+  <section class="section-category-slider padding-tb-50" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="section-title text-center mb-30">
+            <div class="section-detail">
+              <h2 class="bb-title">Top <span>Categories</span></h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="category-slider" id="category-slider">
+            <div class="swiper-wrapper">
+              <!-- Loading skeletons -->
+              <div class="swiper-slide"><div class="loading-skeleton" style="height: 160px; border-radius: 50%;"></div></div>
+              <div class="swiper-slide"><div class="loading-skeleton" style="height: 160px; border-radius: 50%;"></div></div>
+              <div class="swiper-slide"><div class="loading-skeleton" style="height: 160px; border-radius: 50%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Banners -->
+  <section class="section-banner-one padding-tb-50" id="section-banners">
+  </section>
+
+  <!-- Products Section -->
+  <section class="section-product-tabs padding-tb-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+          <div class="section-title bb-deal">
+            <div class="section-detail">
+              <h2 class="bb-title">Our <span>Products</span></h2>
+              <p>Shop online and get fresh products!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-minus-24" id="products-grid">
+        <!-- Loading skeletons -->
+        <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+        <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+        <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+        <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+      </div>
+      <div class="text-center mt-4 pb-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+        <a href="shop.html" class="add-to-cart-btn-custom" style="display: inline-flex; width: auto; min-width: 200px; padding: 12px 35px; border-radius: 25px;">View All Products</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shop By Videos Section -->
+  <section class="section-quinn padding-tb-50" id="video-section" style="display: none;" data-aos="fade-up" data-aos-duration="1000">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="section-title text-center mb-30">
+            <h3 class="bb-title">Shop By <span>Videos</span></h3>
+          </div>
+          <div class="quinn-video-slider" id="video-grid">
+            <div class="swiper-wrapper">
+              <!-- Rendered by JS -->
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Modal -->
+  <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-transparent border-0">
+        <div class="modal-body p-0 position-relative">
+          <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 10; filter: invert(1);"></button>
+          <div style="border-radius: 15px; overflow: hidden;">
+            <video id="modal-video-player" src="" controls autoplay style="width: 100%; max-height: 80vh; display: block;"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Heritage Brand Story Section (Moved from Footer) -->
+  <section class="footer-story-section padding-tb-50" style="background-color: #1a472a; color: #fff; text-align: center;" data-aos="fade-up">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <img src="assets/img/logo/ThandattiPatti.png" alt="Grandma Icon" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 20px;">
+          <h3 style="font-family: serif; color: #fff; margin-bottom: 15px;">Inspired by Grandma Eshwari's Hands</h3>
+          <p style="font-style: italic; opacity: 0.9; font-size: 16px; line-height: 1.8;">"In our home, food wasn't just about calories; it was about love, health, and heritage. Pattikadai brings you those same authentic flavors, prepared with the same care and traditional methods used by my grandma."</p>
+          <div style="margin-top: 20px;">
+            <span class="badge bg-white text-success p-2 px-3 m-1">🚫 No Preservatives</span>
+            <span class="badge bg-white text-success p-2 px-3 m-1">🌿 100% Natural</span>
+            <span class="badge bg-white text-success p-2 px-3 m-1">👵 Traditional Methods</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- App JS -->
+  <script src="assets/js/config.js?v=2.6"></script>
+  <script src="assets/js/supabase-client.js?v=2.6"></script>
+  <script src="assets/js/api.js?v=2.6"></script>
+  <script src="assets/js/auth.js?v=2.6"></script>
+  <script src="assets/js/cart.js?v=2.6"></script>
+  <script src="assets/js/main.js?v=2.6"></script>
+
+  <!-- Homepage JS -->
+  <script>
+    onAppReady(async () => {
+      try {
+        await Promise.all([
+          loadHeroBanners(),
+          loadCategorySlider(),
+          loadSectionBanners(),
+          loadShoppableVideos(),
+          loadHomeProducts()
+        ]);
+        
+        // Refresh AOS after all dynamic DOM nodes are fully injected
+        if (typeof AOS !== 'undefined') {
+          setTimeout(() => AOS.refresh(), 100);
+        }
+      } catch (err) {
+        console.error("Error initializing home page:", err);
+      }
+    });
+
+    async function loadHeroBanners() {
+      const container = document.getElementById('hero-banners');
+      const banners = await API.getBanners('main');
+
+      if (banners.length === 0) {
+        // Fallback to original static banners
+        const fallbacks = [
+          { desktop: 'assets/img/banner-two/banner.jpg', mobile: 'assets/img/banner-two/banner_mobile.jpg' },
+          { desktop: 'assets/img/banner-two/banner1.jpg', mobile: 'assets/img/banner-two/banner_mobile1.jpg' },
+          { desktop: 'assets/img/banner-two/banner3.jpg', mobile: 'assets/img/banner-two/banner_mobile2.jpg' }
+        ];
+        
+        container.innerHTML = `
+          <div id="bannerCarousel" class="carousel slide banner-two-slider" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              ${fallbacks.map((_, i) => `<button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="${i}" ${i === 0 ? 'class="active"' : ''}></button>`).join('')}
+            </div>
+            <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
+              ${fallbacks.map((b, i) => `
+                <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                  <a href="shop.html" class="d-block w-100 h-100">
+                    <div class="banner-image-bg banner-desktop-view" style="background-image: url(${b.desktop});"></div>
+                    <div class="banner-image-bg banner-mobile-view" style="background-image: url(${b.mobile}); background-position: center top;"></div>
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>`;
+        initBannerCarousel();
+        return;
+      }
+
+      if (banners.length === 1) {
+        const b = banners[0];
+        container.innerHTML = `
+          <div class="banner-slide-item">
+            <a href="${b.button_link || 'shop.html'}" class="d-block w-100 h-100">
+              <div class="banner-image-bg banner-desktop-view" style="background-image: url(${b.image_url}); border-radius: 15px;"></div>
+              <div class="banner-image-bg banner-mobile-view" style="background-image: url(${b.image_url}); background-position: center top; border-radius: 15px;"></div>
+            </a>
+          </div>`;
+      } else {
+        container.innerHTML = `
+          <div id="bannerCarousel" class="carousel slide banner-two-slider" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              ${banners.map((_, i) => `<button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="${i}" ${i === 0 ? 'class="active"' : ''}></button>`).join('')}
+            </div>
+            <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
+              ${banners.map((b, i) => `
+                <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                  <a href="${b.button_link || 'shop.html'}" class="d-block w-100 h-100">
+                    <div class="banner-image-bg banner-desktop-view" style="background-image: url(${b.image_url});"></div>
+                    <div class="banner-image-bg banner-mobile-view" style="background-image: url(${b.image_url}); background-position: center top;"></div>
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>`;
+        initBannerCarousel();
+      }
+    }
+
+    function initBannerCarousel() {
+      const el = document.getElementById('bannerCarousel');
+      if (el && typeof bootstrap !== 'undefined') {
+        new bootstrap.Carousel(el, {
+          interval: 3000,
+          ride: 'carousel',
+          wrap: true
+        });
+      }
+    }
+
+    async function loadSectionBanners() {
+      const container = document.getElementById('section-banners');
+      const banners = await API.getBanners('section');
+
+      const renderBanner = (img, link, index) => `
+        <div class="col-lg-6 mb-24 col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${400 + (index * 100)}">
+          <a href="${link || 'shop.html'}">
+            <img src="${img}" alt="banner" class="w-100" style="border-radius: 15px;">
+          </a>
+        </div>
+      `;
+
+      if (banners.length === 0) {
+        container.innerHTML = `
+          <div class="container">
+            <div class="row mb-minus-24">
+              ${renderBanner('assets/img/banner-one/one1.png', 'shop.html', 0)}
+              ${renderBanner('assets/img/banner-one/two2.png', 'shop.html', 1)}
+            </div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="container">
+          <div class="row mb-minus-24">
+            ${banners.map((b, i) => renderBanner(b.image_url, b.button_link, i)).join('')}
+          </div>
+        </div>`;
+    }
+
+    async function loadCategorySlider() {
+      const container = document.getElementById('category-slider');
+      const categories = await API.getCategories();
+
+      if (categories.length === 0) {
+        container.innerHTML = '<div class="swiper-wrapper"><div class="swiper-slide text-center text-muted">No categories yet</div></div>';
+        return;
+      }
+
+      const wrapper = container.querySelector('.swiper-wrapper');
+      wrapper.innerHTML = categories.map((cat, index) => {
+        const fallbackId = (index % 6) + 1;
+        const fallbackImg = `assets/img/category/category-${fallbackId}.jpg`;
+        const imgUrl = cat.image_url || fallbackImg;
+
+        return `
+        <div class="swiper-slide">
+          <div class="category-slide-item">
+            <a href="shop.html?category=${encodeURIComponent(cat.name)}" class="d-block text-start">
+              <div class="category-image-circle">
+                <img src="${imgUrl}" alt="${cat.name}">
+              </div>
+              <h4 class="category-name">${cat.name}</h4>
+            </a>
+          </div>
+        </div>
+      `;}).join('');
+
+      // Initialize Swiper
+      const catCount = categories.length;
+      new Swiper('#category-slider', {
+        loop: catCount >= 6,
+        autoplay: catCount >= 3 ? { delay: 3000, disableOnInteraction: false } : false,
+        slidesPerView: 'auto',
+        spaceBetween: 30,
+        centerInsufficientSlides: false,
+        watchOverflow: true,
+        breakpoints: {
+          0:    { slidesPerView: 2, spaceBetween: 15 },
+          480:  { slidesPerView: 3, spaceBetween: 15 },
+          768:  { slidesPerView: 4, spaceBetween: 20 },
+          991:  { slidesPerView: 5, spaceBetween: 25 },
+          1200: { slidesPerView: 6, spaceBetween: 30 },
+        }
+      });
+    }
+
+    async function loadShoppableVideos() {
+      const section = document.getElementById('video-section');
+      const grid = document.getElementById('video-grid');
+
+      // Try to get videos from API (ecom_banners position='video')
+      let videos = await API.getBanners('video');
+
+      // Fallback to static videos if none in DB
+      if (videos.length === 0) {
+        videos = [
+          { image_url: 'assets/videos/IMG_0814.MP4' },
+          { image_url: 'assets/videos/IMG_0815.MP4' },
+          { image_url: 'assets/videos/IMG_0816.MP4' }
+        ];
+      }
+
+      if (videos.length === 0) return;
+
+      section.style.display = 'block';
+      const wrapper = grid.querySelector('.swiper-wrapper');
+      wrapper.innerHTML = videos.map(v => `
+        <div class="swiper-slide">
+          <div class="video-card" onclick="openVideoModal('${v.image_url}')">
+            <video src="${v.image_url}" muted loop autoplay playsinline></video>
+            <div class="play-overlay">
+              <i class="ri-play-fill"></i>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Initialize Swiper — only enable loop if enough slides
+      const vidCount = videos.length;
+      new Swiper('#video-grid', {
+        spaceBetween: 15,
+        slidesPerView: 4,
+        navigation: {
+          nextEl: '.quinn-video-slider .swiper-button-next',
+          prevEl: '.quinn-video-slider .swiper-button-prev',
+        },
+        centerInsufficientSlides: true,
+        breakpoints: {
+          320:  { slidesPerView: 1.5, spaceBetween: 10 },
+          576:  { slidesPerView: 2.2, spaceBetween: 10 },
+          992:  { slidesPerView: 3.2, spaceBetween: 15 },
+          1200: { slidesPerView: 4, spaceBetween: 15 },
+        }
+      });
+    }
+
+    function openVideoModal(src) {
+      const video = document.getElementById('modal-video-player');
+      video.src = src;
+      const modal = new bootstrap.Modal(document.getElementById('videoModal'));
+      modal.show();
+      
+      document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+        video.src = '';
+      });
+    }
+
+    async function loadHomeProducts() {
+      const container = document.getElementById('products-grid');
+      const products = await API.getProducts({ limit: 12 });
+
+      if (products.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center text-muted py-5">No products available yet</div>';
+        return;
+      }
+
+      container.innerHTML = products.map((p, i) => renderProductCard(p, { aos: true, aosDelay: 200 })).join('');
+    }
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- AOS (Animate On Scroll) -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>

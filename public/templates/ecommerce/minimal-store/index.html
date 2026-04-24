@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title data-content="title">Your Shop</title>
+<meta name="description" content="A minimal storefront powered by Smartseyali" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">M</span><span data-content="brand_name">Your Shop</span></a>
+    <ul>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Good products, no fluff.</h1>
+    <p data-content="hero_subtitle">A lightweight storefront for small catalogs. Browse, add to cart, and check out in seconds.</p>
+    <div class="hero-actions">
+      <a class="cta" href="shop.html">Shop now</a>
+      <a class="cta-outline" href="contact.html">Get in touch</a>
+    </div>
+  </section>
+  <section class="section"><div class="container">
+    <div class="section-head"><h2>Featured</h2></div>
+    <div class="grid grid-3" id="featured-products">
+      <div class="card"><h3>Sample product</h3><p>Lightweight, minimal, ready to rebrand.</p></div>
+      <div class="card"><h3>Fast checkout</h3><p>WhatsApp or Razorpay — your choice.</p></div>
+      <div class="card"><h3>Own your data</h3><p>Your catalog, your orders, your customers.</p></div>
+    </div>
+  </div></section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Shop</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

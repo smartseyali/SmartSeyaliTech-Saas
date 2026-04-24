@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+  <style>
+    /* ─── Modern Dashboard Styles ───────────────────────── */
+    .account-sidebar-card {
+      border: none; border-radius: 20px; background: #fff;
+      overflow: hidden;
+    }
+    .account-side-menu { list-style: none; padding: 0; margin: 0; }
+    .account-side-menu li { border-bottom: 1px solid #f8f9fa; }
+    .account-side-menu li:last-child { border-bottom: none; }
+    .account-side-menu a {
+      display: flex; align-items: center; gap: 15px; padding: 16px 20px;
+      color: #555; font-weight: 500; font-size: 15px; text-decoration: none;
+      transition: all 0.3s;
+    }
+    .account-side-menu a i { font-size: 20px; color: #1a472a; width: 24px; text-align: center; }
+    .account-side-menu a:hover, .account-side-menu a.active {
+      background: rgba(26, 71, 42, 0.05); color: #1a472a;
+    }
+    .account-side-menu a.active { border-left: 4px solid #1a472a; font-weight: 700; }
+    .account-side-menu a.logout-btn { color: #dc3545; }
+    .account-side-menu a.logout-btn i { color: #dc3545; }
+
+    .user-cover-section {
+      background: linear-gradient(135deg, #1a472a 0%, #2e5a3c 100%);
+      border-radius: 20px; position: relative; overflow: hidden;
+      display: flex; align-items: flex-end; padding: 30px;
+    }
+    .user-cover-section::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: url('assets/img/logo/logo.gif') no-repeat center;
+      background-size: contain; opacity: 0.05; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <!-- Breadcrumb -->
+  <section class="section-breadcrumb margin-b-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row bb-breadcrumb-inner">
+            <div class="col-md-6 col-12">
+              <h2 class="bb-breadcrumb-title">User Profile</h2>
+            </div>
+            <div class="col-md-6 col-12 text-md-end">
+              <ul class="bb-breadcrumb-list">
+                <li class="bb-breadcrumb-item"><a href="/">Home</a></li>
+                <li><i class="ri-arrow-right-double-fill"></i></li>
+                <li class="bb-breadcrumb-item active">User Profile</li>
+              </ul>
+            </div>
+          </div>
+    <!-- User Dashboard Section -->
+  <section class="padding-tb-50">
+    <div class="container">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-12 mb-4">
+          <div class="account-sidebar-card shadow-sm border-0" style="border-radius: 20px;">
+            <ul class="account-side-menu">
+              <li><a href="user-profile.html" class="active"><i class="ri-user-line"></i> User Profile</a></li>
+              <li><a href="my-addresses.html"><i class="ri-map-pin-line"></i> My Addresses</a></li>
+              <li><a href="admin-login.html" id="admin-panel-link" style="display:none;"><i class="ri-dashboard-line"></i> Admin Panel</a></li>
+              <li><a href="my-orders.html"><i class="ri-shopping-basket-line"></i> My Orders</a></li>
+              <li><a href="javascript:void(0)" onclick="Auth.logout()" class="logout-btn" style="color: #dc3545 !important;"><i class="ri-logout-box-line"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-12">
+          <!-- Dashboard Header -->
+          <div class="user-cover-section shadow-sm mb-4" style="background: #1a472a; border-radius: 24px; padding: 40px; position: relative; overflow: hidden; display: flex; align-items: center; min-height: 200px;">
+            <div style="z-index: 2; position: relative;">
+               <h1 id="user-display-name" style="font-size: 38px; font-weight: 800; color: #fff; margin-bottom: 5px;">Loading...</h1>
+               <p id="user-display-email" style="font-size: 18px; opacity: 0.9; color: #fff; font-weight: 500;">Loading...</p>
+            </div>
+            <!-- Patti Illustration Background -->
+            <img src="assets/img/logo/logo.gif" style="position: absolute; right: 20%; top: 50%; transform: translateY(-50%); height: 120%; opacity: 0.08; filter: brightness(0) invert(1); z-index: 1; pointer-events: none;">
+            
+            <!-- Member Badge -->
+            <div style="position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 10px 25px; border-radius: 50px; color: #fff; border: 1px solid rgba(255,255,255,0.25); font-weight: 700; font-size: 14px; z-index: 2; display: flex; align-items: center; gap: 8px;">
+              <i class="ri-vip-crown-2-line" style="color: #ffd700;"></i> Loyal Member
+            </div>
+          </div>
+ 
+          <!-- Stats Overview -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm rounded-4 p-4 h-100 text-center position-relative overflow-hidden" style="transition: transform 0.3s;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(26, 71, 42, 0.06); color: #1a472a;">
+                   <i class="ri-shopping-basket-line fs-3"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="stat-orders-count" style="font-size: 36px; color: #333;">0</h2>
+                <p class="text-muted small text-uppercase mb-0 fw-bold" style="letter-spacing: 1px;">Orders Placed</p>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: #1a472a;"></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm rounded-4 p-4 h-100 text-center position-relative overflow-hidden" style="transition: transform 0.3s;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(108, 127, 216, 0.06); color: #6c7fd8;">
+                   <i class="ri-heart-line fs-3"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="stat-wishlist-count" style="font-size: 36px; color: #333;">0</h2>
+                <p class="text-muted small text-uppercase mb-0 fw-bold" style="letter-spacing: 1px;">Wishlist Items</p>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: #6c7fd8;"></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm rounded-4 p-4 h-100 text-center position-relative overflow-hidden" style="transition: transform 0.3s;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(142, 68, 173, 0.06); color: #8e44ad;">
+                   <i class="ri-map-pin-line fs-3"></i>
+                </div>
+                <h2 class="fw-bold mb-1" id="stat-address-count" style="font-size: 36px; color: #333;">0</h2>
+                <p class="text-muted small text-uppercase mb-0 fw-bold" style="letter-spacing: 1px;">Saved Addresses</p>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: #8e44ad;"></div>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- Account Details Card -->
+          <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+            <div class="d-flex align-items-center mb-5">
+              <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: #1a472a; color: #fff; box-shadow: 0 4px 12px rgba(26, 71, 42, 0.2);">
+                <i class="ri-settings-4-line" style="font-size: 24px;"></i>
+              </div>
+              <h3 class="mb-0 fw-bold" style="color: #1a472a;">Edit Account Details</h3>
+            </div>
+            
+            <form id="profile-form">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;"><i class="ri-user-line me-1"></i> First Name</label>
+                    <input type="text" class="form-control form-control-lg border-0 shadow-sm bg-light" id="form-fname" placeholder="First Name" style="border-radius: 12px;">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;"><i class="ri-user-line me-1"></i> Last Name</label>
+                    <input type="text" class="form-control form-control-lg border-0 shadow-sm bg-light" id="form-lname" placeholder="Last Name" style="border-radius: 12px;">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;"><i class="ri-mail-line me-1"></i> Email Address</label>
+                    <input type="email" class="form-control form-control-lg border-0 shadow-sm" id="form-email" readonly disabled style="background: #f8f9fa; border-radius: 12px;">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;"><i class="ri-phone-line me-1"></i> Contact Number</label>
+                    <input type="tel" class="form-control form-control-lg border-0 shadow-sm bg-light" id="form-phone" placeholder="Phone Number" style="border-radius: 12px;">
+                  </div>
+                </div>
+                <div class="col-12 mt-5 text-end">
+                  <button type="submit" class="bb-btn-2 shadow-sm" style="width: auto; padding: 15px 50px; border-radius: 50px; font-weight: 700; transition: all 0.3s;">
+                    <i class="ri-save-line me-2"></i> Update Profile Information
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js?v=2.6"></script>
+  <script src="assets/js/supabase-client.js?v=2.6"></script>
+  <script src="assets/js/api.js?v=2.6"></script>
+  <script src="assets/js/auth.js?v=2.6"></script>
+  <script src="assets/js/cart.js?v=2.6"></script>
+  <script src="assets/js/main.js?v=2.6"></script>
+
+  <script>
+    onAppReady(async () => {
+      const user = await Auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html?redirect=user-profile.html';
+        return;
+      }
+
+      // Show Admin Panel link if metadata indicates
+      if (user.user_metadata && (user.user_metadata.role === 'admin' || user.user_metadata.is_admin)) {
+        document.getElementById('admin-panel-link').style.display = 'block';
+      }
+
+      // Prefill fields
+      document.getElementById('user-display-name').textContent = (user.user_metadata.full_name || user.user_metadata.first_name || 'Valued Member');
+      document.getElementById('user-display-email').textContent = user.email;
+      
+      document.getElementById('form-fname').value = user.user_metadata.first_name || '';
+      document.getElementById('form-lname').value = user.user_metadata.last_name || '';
+      document.getElementById('form-email').value = user.email;
+      document.getElementById('form-phone').value = user.user_metadata.phone || '';
+
+      // Fetch stats for visualization
+      const [orders, addresses] = await Promise.all([
+        API.getUserOrders(),
+        API.getUserAddresses()
+      ]);
+      const wishlist = API.getWishlist();
+
+      document.getElementById('stat-orders-count').textContent = orders.length;
+      document.getElementById('stat-wishlist-count').textContent = wishlist.length;
+      document.getElementById('stat-address-count').textContent = addresses.length;
+
+      // Handle form submission
+      document.getElementById('profile-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const fname = document.getElementById('form-fname').value;
+        const lname = document.getElementById('form-lname').value;
+        const phone = document.getElementById('form-phone').value;
+
+        try {
+          const { data, error } = await supabase.auth.updateUser({
+            data: { 
+              first_name: fname, 
+              last_name: lname, 
+              full_name: `${fname} ${lname}`.trim(),
+              phone: phone 
+            }
+          });
+
+          if (error) throw error;
+          showToast('Profile updated successfully!', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } catch (err) {
+          console.error(err);
+          showToast('Error updating profile: ' + err.message, 'error');
+        }
+      };
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

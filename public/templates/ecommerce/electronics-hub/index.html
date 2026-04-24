@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title data-content="title">Volt — Gear for builders, makers, and nerds</title>
+<meta name="description" content="Gear for builders, makers, and nerds" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">V</span><span data-content="brand_name">Volt</span></a>
+    <ul>
+      <li><a href="shop.html">Catalog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <span class="badge">Pre-order · Ships April</span>
+    <h1 data-content="hero_title">Tools that keep up with you.</h1>
+    <p data-content="hero_subtitle">High-performance gadgets, dev gear, and the obscure accessories that make work feel good.</p>
+    <div class="hero-actions">
+      <a class="cta" href="shop.html">Learn more</a>
+      <a class="cta-outline" href="contact.html">Contact us</a>
+    </div>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Featured</h2><p>Hand-picked selection.</p></div>
+      <div class="product-grid">
+        <div class="product"><div class="img">①</div><div class="body"><h4>Mechanical Keyboard</h4><p class="desc">75% hot-swap · Gateron</p><div class="price">₹ 14,900 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">②</div><div class="body"><h4>USB-C Hub 8-in-1</h4><p class="desc">PD 100W · 4K HDMI</p><div class="price">₹ 3,800 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">③</div><div class="body"><h4>Ergonomic Mouse</h4><p class="desc">Silent clicks · 2.4G</p><div class="price">₹ 2,400 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">④</div><div class="body"><h4>27" 4K Monitor</h4><p class="desc">USB-C · HDR400</p><div class="price">₹ 42,500 <button class="buy">Add</button></div></div></div>
+      </div>
+      <div style="text-align:center;margin-top:2rem"><a class="cta-outline" href="shop.html">View full catalog →</a></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Our philosophy</h2></div>
+      <div class="grid grid-3">
+          <div class="card"><h3>Hand-tested</h3><p>Every product we list has been used daily by our team for at least 30 days.</p></div>
+          <div class="card"><h3>30-day returns</h3><p>If it doesn't work for you, send it back. No restocking fees, ever.</p></div>
+          <div class="card"><h3>Expert support</h3><p>Talk to someone who actually knows the spec sheet.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Stay in the loop</h2><p>Drops, stories, and occasional notes from the team.</p></div>
+      <form class="newsletter" onsubmit="event.preventDefault();alert('Thanks for subscribing!');this.reset();">
+        <input type="email" placeholder="your@email.com" required /><button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Volt</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "slug": "podcast-show",
+  "category": "dynamic",
+  "entry": "index.html",
+  "generated_at": "2026-04-23T14:37:13.885Z",
+  "file_count": 7,
+  "files": [
+    {
+      "path": ".htaccess",
+      "size": 511
+    },
+    {
+      "path": "about.html",
+      "size": 2331
+    },
+    {
+      "path": "assets/css/style.css",
+      "size": 12699
+    },
+    {
+      "path": "assets/js/config.js",
+      "size": 1190
+    },
+    {
+      "path": "assets/thumbnail.svg",
+      "size": 1126
+    },
+    {
+      "path": "contact.html",
+      "size": 1550
+    },
+    {
+      "path": "index.html",
+      "size": 3297
+    }
+  ]
+}

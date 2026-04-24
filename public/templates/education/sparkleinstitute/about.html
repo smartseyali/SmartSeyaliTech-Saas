@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Sparkle Allied Health Science | Mission &amp; Faculty</title>
+    <meta name="description" content="Learn about Sparkle Allied Health Science history, mission, expert faculty, and student stories. A trusted institute dedicated to quality healthcare education.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sparkleahs.com/about">
+    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sparkleahs.com/about">
+    <meta property="og:title" content="About Sparkle Allied Health Science | Mission &amp; Faculty">
+    <meta property="og:description" content="Learn about Sparkle Allied Health Science history, mission, expert faculty, and student stories. A trusted institute dedicated to quality healthcare education.">
+    <meta property="og:image" content="https://sparkleahs.com/logo.jpg">
+    <meta property="og:site_name" content="Sparkle Allied Health Science Institute">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/assets/tailwind.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Sparkle Config -->    <script src="assets/sparkle-config.js"></script>
+
+    <style>
+    header.scrolled { background: hsl(var(--card) / 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow-soft); border-bottom: 1px solid hsl(var(--border) / 0.5); }
+    header.scrolled .nav-link { color: hsl(var(--foreground) / 0.7); }
+    header.scrolled .nav-link:hover, header.scrolled .nav-link.active { color: hsl(var(--primary)); }
+    header.scrolled .logo-title { color: hsl(var(--foreground)); }
+    header.scrolled .logo-sub { color: hsl(var(--foreground) / 0.8); }
+    header.scrolled .btn-nav-outline { border-color: hsl(var(--primary)); color: hsl(var(--primary)); }
+    header.scrolled .btn-nav-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+    .mobile-menu.show { display: block; }
+    </style>
+</head>
+<body>
+
+<main class="min-h-screen bg-background">
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent" id="navbar">
+      <div class="container mx-auto px-4">
+        <nav class="flex items-center justify-between h-20">
+          <a href="/" class="flex items-center gap-2 group">
+            <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-soft group-hover:shadow-elevated transition-all duration-300 overflow-hidden">
+              <img src="/logo.jpg" alt="Sparkle Logo" class="w-full h-full object-contain p-1">
+            </div>
+            <div class="flex flex-col leading-tight">
+              <span class="text-xl font-display font-bold text-primary-foreground transition-colors duration-300 logo-title">Sparkle</span>
+              <span class="text-xs font-display font-medium text-primary-foreground/70 transition-colors duration-300 logo-sub">Allied Health Science</span>
+            </div>
+          </a>
+          <div class="hidden md:flex items-center gap-8">
+            <a href="/" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Home</a>
+            <a href="/programs" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Programs</a>
+            <a href="/gallery" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Gallery</a>
+            <a href="/about" class="nav-link text-sm font-medium transition-colors duration-300 text-primary hover:text-primary active">About</a>
+            <a href="/contact" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Contact</a>
+          </div>
+          <div class="hidden md:flex items-center gap-3">
+            <a href="/apply" class="btn-nav-outline inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground transition-colors">Talk to Counsellor</a>
+            <a href="/apply" class="btn-nav-primary inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-accent text-accent-foreground font-bold transition-all">Apply Now</a>
+          </div>
+          <button class="md:hidden p-2 rounded-lg text-primary-foreground transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </nav>
+      </div>
+      <div class="md:hidden bg-card border-t border-border hidden mobile-menu" id="mobile-menu">
+        <div class="container mx-auto px-4 py-6 flex flex-col gap-4">
+          <a href="/" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Home</a>
+          <a href="/programs" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Programs</a>
+          <a href="/gallery" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Gallery</a>
+          <a href="/about" class="text-base font-medium py-2 text-primary">About</a>
+          <a href="/contact" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Contact</a>
+          <div class="flex flex-col gap-3 pt-4 border-t border-border">
+            <a href="/apply" class="inline-flex items-center justify-center rounded-md font-medium px-4 py-2 border border-primary text-primary w-full">Talk to Counsellor</a>
+            <a href="/apply" class="inline-flex items-center justify-center rounded-md font-medium px-4 py-2 bg-primary text-primary-foreground w-full">Apply Now</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="pt-32 pb-16 bg-hero-gradient relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-20 right-20 w-96 h-96 bg-accent rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-10 left-10 w-64 h-64 bg-primary-foreground/20 rounded-full blur-2xl"></div>
+        </div>
+        <div class="container mx-auto px-4 relative">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl font-display font-bold text-primary-foreground mb-6 animate-fade-up">
+                    Empowering Careers Through
+                    <span class="block text-accent mt-2">Specialized Education</span>
+                </h1>
+                <p class="text-xl text-primary-foreground/80 animate-fade-up delay-100">
+                    Sparkle is India's leading platform for industry-ready certifications in Medical Science and Advanced Management.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MISSION & VISION SECTION ===== -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Mission -->
+                <div class="bg-card p-10 rounded-3xl shadow-card border border-border/50 animate-fade-up delay-200">
+                    <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                        <i data-lucide="target" class="w-8 h-8 text-primary"></i>
+                    </div>
+                    <h2 class="text-3xl font-display font-bold text-foreground mb-4">Our Mission</h2>
+                    <p class="text-muted-foreground leading-relaxed text-lg">
+                        To bridge the gap between academic learning and industry requirements by providing high-quality, clinical, and management education that empowers students to excel in their professional journeys.
+                    </p>
+                </div>
+
+                <!-- Vision -->
+                <div class="bg-card p-10 rounded-3xl shadow-card border border-border/50 animate-fade-up delay-300">
+                    <div class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
+                        <i data-lucide="eye" class="w-8 h-8 text-accent"></i>
+                    </div>
+                    <h2 class="text-3xl font-display font-bold text-foreground mb-4">Our Vision</h2>
+                    <p class="text-muted-foreground leading-relaxed text-lg">
+                        To become the most trusted global destination for specialized vocational training, recognized for creating a skilled workforce that drives innovation in healthcare and corporate operations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STATS SECTION ===== -->
+    <section class="py-16 bg-secondary/50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center animate-fade-up" style="animation-delay: 0ms">
+                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">50,000+</div>
+                    <div class="text-sm text-muted-foreground uppercase tracking-wider">Successful Placements</div>
+                </div>
+                <div class="text-center animate-fade-up" style="animation-delay: 100ms">
+                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">300+</div>
+                    <div class="text-sm text-muted-foreground uppercase tracking-wider">Industry Partners</div>
+                </div>
+                <div class="text-center animate-fade-up" style="animation-delay: 200ms">
+                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">150+</div>
+                    <div class="text-sm text-muted-foreground uppercase tracking-wider">Expert Mentors</div>
+                </div>
+                <div class="text-center animate-fade-up" style="animation-delay: 300ms">
+                    <div class="text-3xl md:text-4xl font-bold text-primary mb-2">25+</div>
+                    <div class="text-sm text-muted-foreground uppercase tracking-wider">Course Offerings</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== UNIVERSITY AFFILIATION ===== -->
+    <section class="py-16 bg-accent/5 border-y border-border/50">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-4xl mx-auto">
+                <span class="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-6">
+                    Official Accreditation
+                </span>
+                <h2 class="text-3xl font-display font-bold text-foreground mb-8">
+                    Certified by <span class="text-primary">Bharathiyar University</span>
+                </h2>
+                <div class="bg-card p-8 md:p-12 rounded-3xl shadow-lg border border-border flex flex-col md:flex-row items-center gap-8 animate-fade-up">
+                    <div class="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="award" class="w-12 h-12 text-primary"></i>
+                    </div>
+                    <div class="text-left space-y-3">
+                        <p class="text-lg text-foreground font-medium">
+                            We are proud to be officially certified to conduct specialized courses and award professional certificates in partnership with Bharathiyar University.
+                        </p>
+                        <p class="text-muted-foreground">
+                            This affiliation ensures that our curriculum meets rigorous academic standards and that your certification is recognized and valued across the industry.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== OUR STORY / EXPERTISE ===== -->
+    <section class="py-24 overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2 relative">
+                    <div class="relative z-10 rounded-3xl overflow-hidden shadow-elevated animate-scale-in">
+                        <img
+                            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop"
+                            alt="Team Collaboration"
+                            title="Sparkle Campus - Team Collaboration"
+                            class="w-full h-auto"
+                        >
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-accent/20 rounded-full blur-2xl -z-10"></div>
+                    <div class="absolute -top-6 -left-6 w-48 h-48 bg-primary/20 rounded-full blur-2xl -z-10"></div>
+                </div>
+
+                <div class="lg:w-1/2 space-y-6 animate-fade-up">
+                    <span class="text-primary font-bold tracking-widest uppercase text-sm">Our Story</span>
+                    <h2 class="text-3xl md:text-5xl font-display font-bold text-foreground leading-tight">
+                        A Decade of Excellence in
+                        <span class="text-primary"> Practical Training</span>
+                    </h2>
+                    <p class="text-muted-foreground text-lg">
+                        Founded with a vision to transform vocational education in India, Sparkle has evolved from a small training center to a comprehensive learning platform. We specialize in areas that matter most — Healthcare and Management.
+                    </p>
+                    <p class="text-muted-foreground text-lg">
+                        Our approach combines rigorous theoretical knowledge with mandatory clinical rotations. Backed by Bharathiyar University certification, our graduates possess the verified competency to lead in their fields.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 pt-4">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="shield-check" class="text-primary w-6 h-6"></i>
+                            <span class="font-medium">Bharathiyar Univ. Certified</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="book-open" class="text-primary w-6 h-6"></i>
+                            <span class="font-medium">Modern Curriculum</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="users" class="text-primary w-6 h-6"></i>
+                            <span class="font-medium">Industry Faculty</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="award" class="text-primary w-6 h-6"></i>
+                            <span class="font-medium">Placement Guarantee</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CALL TO ACTION ===== -->
+    <section class="py-20">
+        <div class="container mx-auto px-4 text-center bg-primary rounded-[3rem] p-12 md:p-20 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+            <div class="relative z-10 max-w-2xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-display font-bold text-primary-foreground mb-8">
+                    Ready to Spark Your Career?
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/programs" class="bg-accent text-accent-foreground px-8 py-4 rounded-xl font-bold hover:scale-105 transition-transform shadow-glow-accent">
+                        View Our Courses
+                    </a>
+                    <a href="/apply" class="bg-primary-foreground/10 text-primary-foreground border border-primary-foreground/20 px-8 py-4 rounded-xl font-bold hover:bg-primary-foreground/20 transition-all">
+                        Speak with a Counsellor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-foreground text-primary-foreground">
+      <div class="container mx-auto px-4 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+          <!-- Brand Column -->
+          <div class="lg:col-span-2">
+            <a href="/" class="flex items-center gap-2 mb-6">
+              <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                <img src="/logo.jpg" alt="Sparkle Logo" title="Sparkle Logo" class="w-full h-full object-contain p-1">
+              </div>
+              <div class="flex flex-col leading-tight">
+                <span class="text-xl font-display font-bold">Sparkle</span>
+                <span class="text-xs font-display font-medium text-primary-foreground/70">Allied Health Science</span>
+              </div>
+            </a>
+            <p class="text-primary-foreground/70 mb-6 max-w-sm">
+              Empowering careers through world-class education. Join 10,000+ learners who transformed their lives with Sparkle.
+            </p>
+            <div class="space-y-3">
+              <a href="mailto:hello@sparkle.edu" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors">
+                <i data-lucide="mail" class="w-5 h-5"></i>
+                <span>hello@sparkle.edu</span>
+              </a>
+              <div class="flex flex-col gap-2">
+                <a href="tel:+918220928732" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors">
+                  <i data-lucide="phone" class="w-5 h-5"></i>
+                  <span>+91 82209 28732</span>
+                </a>
+                <a href="tel:+919363882960" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors">
+                  <i data-lucide="phone" class="w-5 h-5"></i>
+                  <span>+91 93638 82960</span>
+                </a>
+              </div>
+              <div class="flex items-start gap-3 text-primary-foreground/70">
+                <i data-lucide="map-pin" class="w-5 h-5 mt-0.5 shrink-0"></i>
+                <span>Near Sri Chaitanya Techno School, Avinashi Road,<br>Neelambur, Coimbatore - 641062</span>
+              </div>
+            </div>
+            <div class="mt-4 w-full h-40 rounded-xl overflow-hidden border border-white/10 shadow-sm">
+              <iframe
+                src="https://maps.google.com/maps?q=11.068538,77.081520&t=k&z=15&ie=UTF8&iwloc=&output=embed"
+                title="Campus Location"
+                class="w-full h-full border-0"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
+          <!-- Programs -->
+          <div>
+            <h4 class="font-display font-semibold mb-4">Programs</h4>
+            <ul class="space-y-3">
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Medical Lab Technology</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Patient Care Management</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Hospital Administration</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Phlebotomy Course</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">HR Management</a></li>
+            </ul>
+          </div>
+
+          <!-- Company -->
+          <div>
+            <h4 class="font-display font-semibold mb-4">Company</h4>
+            <ul class="space-y-3">
+              <li><a href="/about" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">About Us</a></li>
+              <li><a href="/careers" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Careers</a></li>
+              <li><a href="/apply" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Support -->
+          <div>
+            <h4 class="font-display font-semibold mb-4">Support</h4>
+            <ul class="space-y-3">
+              <li><a href="/faqs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">FAQs</a></li>
+              <li><a href="/terms" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Terms &amp; Conditions</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-primary-foreground/50 text-sm">
+            &copy; 2026 Sparkle Educational Institute. All rights reserved.
+          </p>
+          <div class="flex items-center gap-4">
+            <a href="https://facebook.com/sparkleahs" target="_blank" rel="noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300">
+              <i data-lucide="facebook" class="w-5 h-5"></i>
+            </a>
+            <a href="https://www.instagram.com/sparkleinstitute_ahs?igsh=Nmx3emYzZDhianFs" target="_blank" rel="noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300">
+              <i data-lucide="instagram" class="w-5 h-5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+</main>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="/assets/supabase.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+  // Trigger scroll check on load
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('show');
+  document.getElementById('mobile-menu').classList.toggle('hidden');
+}
+</script>
+
+</body>
+</html>

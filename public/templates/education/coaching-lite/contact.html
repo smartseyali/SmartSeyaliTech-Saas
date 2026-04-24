@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Contact — Coaching Center</title><link rel="stylesheet" href="assets/css/style.css" /></head>
+<body>
+<header><div class="container nav">
+  <a href="index.html" class="brand"><span class="mark">C</span><span data-content="brand_name">Coaching Center</span></a>
+  <ul><li><a href="programs.html">Programs</a></li><li><a href="about.html">About</a></li></ul>
+</div></header>
+<main>
+  <section class="container hero"><h1>Contact us</h1><p data-content="intro">Questions about admissions, fees, or scheduling? Drop a message and we'll get back within a day.</p></section>
+  <section class="section"><div class="container">
+    <form class="form" onsubmit="event.preventDefault();alert('Thanks! A counselor will call you shortly.');this.reset();">
+      <input type="text" placeholder="Student name" required />
+      <input type="tel" placeholder="Contact number" required />
+      <input type="email" placeholder="Email" required />
+      <textarea rows="4" placeholder="Question"></textarea>
+      <button class="cta" type="submit">Send enquiry</button>
+    </form>
+  </div></section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Coaching Center</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body></html>

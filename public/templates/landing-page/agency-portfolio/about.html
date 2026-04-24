@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About — Studio Brick</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">B</span><span data-content="brand_name">Studio Brick</span></a>
+    <ul>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Our approach</h1>
+    <p data-content="hero_subtitle">Strategy first, then craft. Always in that order.</p>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-3">
+        <div class="card"><h3>Strategy</h3><p>Brand positioning, naming, and tone of voice — the foundation everything else sits on.</p></div>
+          <div class="card"><h3>Identity</h3><p>Logo systems, type, and visual language that scales across every medium.</p></div>
+          <div class="card"><h3>Launch</h3><p>Campaigns, websites, and rollout playbooks to take your brand to market.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Studio Brick</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

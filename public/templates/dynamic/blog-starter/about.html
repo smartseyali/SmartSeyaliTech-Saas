@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About — Your Journal</title><link rel="stylesheet" href="assets/css/style.css" /></head>
+<body>
+<header><div class="container nav">
+  <a href="index.html" class="brand"><span class="mark">J</span><span data-content="brand_name">Your Journal</span></a>
+  <ul><li><a href="index.html">Home</a></li><li><a href="contact.html">Contact</a></li></ul>
+</div></header>
+<main>
+  <section class="container hero">
+    <h1>About the journal</h1>
+    <div data-content="body">
+      <p>We're a small team writing about the web, product, and craft. Our goal is to help builders ship better things.</p>
+      <p>Subscribe via the contact page to get new posts in your inbox.</p>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Journal</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body></html>

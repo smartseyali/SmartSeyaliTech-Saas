@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Addresses - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+  <style>
+    /* ─── Modern Dashboard Styles ───────────────────────── */
+    .account-sidebar-card {
+      border: none; border-radius: 20px; background: #fff;
+      overflow: hidden;
+    }
+    .account-side-menu { list-style: none; padding: 0; margin: 0; }
+    .account-side-menu li { border-bottom: 1px solid #f8f9fa; }
+    .account-side-menu li:last-child { border-bottom: none; }
+    .account-side-menu a {
+      display: flex; align-items: center; gap: 15px; padding: 16px 20px;
+      color: #555; font-weight: 500; font-size: 15px; text-decoration: none;
+      transition: all 0.3s;
+    }
+    .account-side-menu a i { font-size: 20px; color: #1a472a; width: 24px; text-align: center; }
+    .account-side-menu a:hover, .account-side-menu a.active {
+      background: rgba(26, 71, 42, 0.05); color: #1a472a;
+    }
+    .account-side-menu a.active { border-left: 4px solid #1a472a; font-weight: 700; }
+    .account-side-menu a.logout-btn { color: #dc3545; }
+    .account-side-menu a.logout-btn i { color: #dc3545; }
+
+    .address-card {
+      background: #fff; border: 1px solid #eee; border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    .address-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: #1a472a;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <!-- Breadcrumb -->
+  <section class="section-breadcrumb margin-b-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row bb-breadcrumb-inner">
+            <div class="col-md-6 col-12">
+              <h2 class="bb-breadcrumb-title">My Addresses</h2>
+            </div>
+            <div class="col-md-6 col-12 text-md-end">
+              <ul class="bb-breadcrumb-list">
+                <li class="bb-breadcrumb-item"><a href="/">Home</a></li>
+                <li><i class="ri-arrow-right-double-fill"></i></li>
+                <li class="bb-breadcrumb-item active">My Addresses</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Dashboard Section -->
+  <section class="padding-tb-50">
+    <div class="container">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-12 mb-4">
+          <div class="account-sidebar-card shadow-sm border-0" style="border-radius: 20px;">
+            <ul class="account-side-menu">
+              <li><a href="user-profile.html"><i class="ri-user-line"></i> User Profile</a></li>
+              <li><a href="my-addresses.html" class="active"><i class="ri-map-pin-line"></i> My Addresses</a></li>
+              <li><a href="admin-login.html" id="admin-panel-link" style="display:none;"><i class="ri-dashboard-line"></i> Admin Panel</a></li>
+              <li><a href="my-orders.html"><i class="ri-shopping-basket-line"></i> My Orders</a></li>
+              <li><a href="javascript:void(0)" onclick="Auth.logout()" class="logout-btn" style="color: #dc3545 !important;"><i class="ri-logout-box-line"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-12">
+          <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0 fw-bold" style="color: #1a472a;">Saved Addresses</h4>
+              <button onclick="openAddressModal('add')" class="bb-btn-2" style="width: auto; padding: 8px 20px;">
+                <i class="ri-add-line me-1"></i> Add New Address
+              </button>
+            </div>
+            
+            <div id="addresses-container">
+              <!-- Loaded by JS -->
+              <div class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Address Modal (Add/Edit) -->
+  <div class="modal fade" id="addressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+        <div class="modal-header border-0 pb-0 pt-4 px-4">
+          <h5 class="modal-title fw-bold" id="addressModalLabel" style="color: #1a472a; font-size: 24px;">Add Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="address-form">
+            <input type="hidden" id="addr-id">
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold text-uppercase">Label (e.g. Home, Office)</label>
+              <input type="text" class="form-control border-0 bg-light rounded-3" id="addr-label" value="Home" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold text-uppercase">Full Name</label>
+              <input type="text" class="form-control border-0 bg-light rounded-3" id="addr-name" placeholder="Contact Person" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold text-uppercase">Shipping Address</label>
+              <textarea class="form-control border-0 bg-light rounded-3" id="addr-line1" rows="3" placeholder="Flat, Street, Area..." required></textarea>
+            </div>
+            <div class="row g-3">
+              <div class="col-6 mb-3">
+                <label class="form-label text-muted small fw-bold text-uppercase">City</label>
+                <input type="text" class="form-control border-0 bg-light rounded-3" id="addr-city" required>
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label text-muted small fw-bold text-uppercase">Pincode</label>
+                <input type="text" class="form-control border-0 bg-light rounded-3" id="addr-pincode" required>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-muted small fw-bold text-uppercase">Phone Number</label>
+              <input type="tel" class="form-control border-0 bg-light rounded-3" id="addr-phone" required>
+            </div>
+            <button type="submit" id="save-addr-btn" class="bb-btn-2 w-100 rounded-pill py-3 fw-bold">Save Address Information</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js?v=2.6"></script>
+  <script src="assets/js/supabase-client.js?v=2.6"></script>
+  <script src="assets/js/api.js?v=2.6"></script>
+  <script src="assets/js/auth.js?v=2.6"></script>
+  <script src="assets/js/cart.js?v=2.6"></script>
+  <script src="assets/js/main.js?v=2.6"></script>
+
+  <script>
+    let myAddresses = [];
+    let addressModal;
+
+    onAppReady(async () => {
+      addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
+      const user = await Auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html?redirect=my-addresses.html';
+        return;
+      }
+
+      // Show Admin Panel link if metadata indicates
+      if (user.user_metadata && (user.user_metadata.role === 'admin' || user.user_metadata.is_admin)) {
+        const adminLink = document.getElementById('admin-panel-link');
+        if (adminLink) adminLink.style.display = 'block';
+      }
+
+      loadAddresses();
+
+      // Handle Form Submit
+      document.getElementById('address-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const saveBtn = document.getElementById('save-addr-btn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+        const id = document.getElementById('addr-id').value;
+        const data = {
+          name: document.getElementById('addr-name').value,
+          address: document.getElementById('addr-line1').value,
+          city: document.getElementById('addr-city').value,
+          pincode: document.getElementById('addr-pincode').value,
+          phone: document.getElementById('addr-phone').value,
+          label: document.getElementById('addr-label').value,
+          state: 'Tamil Nadu' // Default or fetch if needed
+        };
+
+        try {
+          let success = false;
+          if (id) {
+            success = await API.updateAddress(id, data);
+          } else {
+            const result = await API.saveAddress(data);
+            success = !!result;
+          }
+
+          if (success) {
+            showToast(id ? 'Address updated successfully' : 'Address added successfully', 'success');
+            addressModal.hide();
+            loadAddresses();
+          } else {
+            showToast('Failed to save address. Please try again.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('An unexpected error occurred.', 'error');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = originalText;
+        }
+      });
+    });
+
+    async function loadAddresses() {
+      const container = document.getElementById('addresses-container');
+      try {
+        myAddresses = await API.getUserAddresses();
+        
+        if (myAddresses.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-5">
+              <div class="mb-3" style="font-size: 48px; color: #ccc;"><i class="ri-map-pin-line"></i></div>
+              <p class="text-muted">You haven't saved any addresses yet.</p>
+              <button onclick="openAddressModal('add')" class="btn btn-outline-success mt-2">Add your first address</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="row g-3">
+            ${myAddresses.map(addr => `
+              <div class="col-md-6">
+                <div class="address-card p-4 border rounded-4 position-relative h-100 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold mb-0" style="color: #1a472a;">${addr.full_name || 'Saved Address'}</h6>
+                    <span class="badge bg-light text-dark border small fw-normal">${addr.label || 'Home'}</span>
+                  </div>
+                  <p class="small text-muted flex-grow-1" style="line-height: 1.6;">${addr.address_line1}<br>${addr.city} - ${addr.pincode}</p>
+                  ${addr.phone ? `<p class="small mb-0 text-muted d-flex align-items-center"><i class="ri-phone-line me-2 text-success"></i>${addr.phone}</p>` : ''}
+                  <div class="mt-4 pt-3 border-top d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="openAddressModal('edit', '${addr.id}')"><i class="ri-edit-line me-1"></i> Edit</button>
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteAddr('${addr.id}')"><i class="ri-delete-bin-line me-1"></i> Delete</button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<div class="alert alert-danger">Error loading addresses.</div>';
+      }
+    }
+
+    function openAddressModal(mode, id = null) {
+      const modalLabel = document.getElementById('addressModalLabel');
+      const form = document.getElementById('address-form');
+      form.reset();
+      document.getElementById('addr-id').value = '';
+
+      if (mode === 'edit' && id) {
+        const addr = myAddresses.find(a => a.id === id);
+        if (!addr) return;
+        modalLabel.textContent = 'Edit Address';
+        document.getElementById('addr-id').value = addr.id;
+        document.getElementById('addr-label').value = addr.label || 'Home';
+        document.getElementById('addr-name').value = addr.full_name || '';
+        document.getElementById('addr-line1').value = addr.address_line1 || '';
+        document.getElementById('addr-city').value = addr.city || '';
+        document.getElementById('addr-pincode').value = addr.pincode || '';
+        document.getElementById('addr-phone').value = addr.phone || '';
+      } else {
+        modalLabel.textContent = 'Add New Address';
+      }
+
+      addressModal.show();
+    }
+
+    async function deleteAddr(id) {
+      if (!confirm('Are you sure you want to delete this address?')) return;
+      try {
+        const success = await API.deleteAddress(id);
+        if (success) {
+          showToast('Address deleted', 'success');
+          loadAddresses();
+        }
+      } catch (err) {
+        showToast('Error deleting address', 'error');
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

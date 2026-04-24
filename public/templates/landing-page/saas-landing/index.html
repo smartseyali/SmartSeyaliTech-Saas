@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title data-content="title">Your Product — Modern SaaS</title>
+<meta name="description" content="A modern product built for teams" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">S</span><span data-content="brand_name">Your Product</span></a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="pricing.html" class="cta">Get Started</a>
+  </div>
+</header>
+
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Ship products your customers love</h1>
+    <p data-content="hero_subtitle">A clean, fast landing page for SaaS launches and product reveals. Pre-wired to Smartseyali so you can edit content from your dashboard.</p>
+    <div class="hero-actions">
+      <a class="cta" href="pricing.html" data-content="cta_primary">See pricing</a>
+      <a class="cta-outline" href="contact.html" data-content="cta_secondary">Talk to us</a>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Why teams choose us</h2>
+        <p>Three good reasons to start today.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card"><h3>Fast setup</h3><p>Deploy to Hostinger in minutes. No backend to manage.</p></div>
+        <div class="card"><h3>Edit anywhere</h3><p>Update content from Smartseyali admin; changes are live instantly.</p></div>
+        <div class="card"><h3>Secure by default</h3><p>Supabase RLS keeps your data scoped per tenant automatically.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Trusted by modern teams</h2>
+        <p>Pick the plan that fits. Switch any time.</p>
+      </div>
+      <div class="pricing">
+        <div class="tier">
+          <div><h3>Starter</h3><div class="price">$0<small>/mo</small></div></div>
+          <ul><li>Up to 3 users</li><li>Email support</li><li>Community access</li></ul>
+          <a href="pricing.html" class="cta-outline">Start free</a>
+        </div>
+        <div class="tier featured">
+          <div><h3>Pro</h3><div class="price">$29<small>/mo</small></div></div>
+          <ul><li>Unlimited users</li><li>Priority support</li><li>Integrations</li></ul>
+          <a href="pricing.html" class="cta">Start Pro</a>
+        </div>
+        <div class="tier">
+          <div><h3>Business</h3><div class="price">$99<small>/mo</small></div></div>
+          <ul><li>SSO + SAML</li><li>Dedicated CSM</li><li>Audit log + SLA</li></ul>
+          <a href="contact.html" class="cta-outline">Contact sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; <span id="yr"></span> <span data-content="brand_name">Your Product</span>. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

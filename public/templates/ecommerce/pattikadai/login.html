@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <section class="section-login padding-tb-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="section-title bb-center">
+            <div class="section-detail">
+              <h2 class="bb-title">Log <span>In</span></h2>
+              <p>Best place to buy authentic country foods</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <div class="bb-login-contact">
+            <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+              <div class="bb-login-wrap">
+                <label for="login-email">Email *</label>
+                <div class="form-group">
+                  <div class="input-group">
+                    <input type="email" class="form-control" id="login-email" placeholder="Enter Your Email" required>
+                  </div>
+                </div>
+              </div>
+              <div class="bb-login-wrap">
+                <label for="login-password">Password *</label>
+                <div class="form-group">
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="login-password" placeholder="Enter Your Password" required>
+                  </div>
+                </div>
+              </div>
+              <div class="bb-login-wrap">
+                <a href="javascript:void(0)" onclick="showForgotPassword()">Forgot Password?</a>
+              </div>
+              <div id="login-error" class="alert alert-danger d-none"></div>
+              <div class="bb-login-button">
+                <button class="bb-btn-2" type="submit" id="login-btn">Login</button>
+                <a href="register.html">Register</a>
+              </div>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgot-form" class="d-none" onsubmit="handleForgotPassword(event)">
+              <div class="bb-login-wrap">
+                <label for="forgot-email">Email *</label>
+                <div class="form-group">
+                  <div class="input-group">
+                    <input type="email" class="form-control" id="forgot-email" placeholder="Enter Your Email" required>
+                  </div>
+                </div>
+              </div>
+              <div id="forgot-message"></div>
+              <div class="bb-login-button">
+                <button class="bb-btn-2" type="submit">Send Reset Link</button>
+                <a href="javascript:void(0)" onclick="showLoginForm()">Back to Login</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js?v=2.1"></script>
+  <script src="assets/js/supabase-client.js?v=2.1"></script>
+  <script src="assets/js/api.js?v=2.1"></script>
+  <script src="assets/js/auth.js?v=2.1"></script>
+  <script src="assets/js/cart.js?v=2.1"></script>
+  <script src="assets/js/main.js?v=2.1"></script>
+
+  <script>
+    // Redirect if already logged in
+    onAppReady(async () => {
+      const loggedIn = await Auth.isLoggedIn();
+      if (loggedIn) {
+        const redirect = getUrlParam('redirect');
+        window.location.href = redirect || 'user-profile.html';
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const errorEl = document.getElementById('login-error');
+      errorEl.classList.add('d-none');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
+
+      try {
+        await Auth.login(
+          document.getElementById('login-email').value,
+          document.getElementById('login-password').value
+        );
+        showToast('Login successful!', 'success');
+        const redirect = getUrlParam('redirect');
+        window.location.href = redirect || 'user-profile.html';
+      } catch (err) {
+        errorEl.textContent = err.message || 'Invalid email or password';
+        errorEl.classList.remove('d-none');
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    }
+
+    function showForgotPassword() {
+      document.getElementById('login-form').classList.add('d-none');
+      document.getElementById('forgot-form').classList.remove('d-none');
+    }
+
+    function showLoginForm() {
+      document.getElementById('login-form').classList.remove('d-none');
+      document.getElementById('forgot-form').classList.add('d-none');
+    }
+
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const msg = document.getElementById('forgot-message');
+      try {
+        await Auth.resetPassword(document.getElementById('forgot-email').value);
+        msg.innerHTML = '<div class="alert alert-success">Reset link sent to your email!</div>';
+      } catch (err) {
+        msg.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,1561 @@
+{
+  "slug": "pattikadai",
+  "category": "ecommerce",
+  "entry": "index.html",
+  "generated_at": "2026-04-23T14:37:13.937Z",
+  "file_count": 388,
+  "files": [
+    {
+      "path": ".htaccess",
+      "size": 425
+    },
+    {
+      "path": "about.html",
+      "size": 4219
+    },
+    {
+      "path": "assets/css/box-1.css",
+      "size": 9253
+    },
+    {
+      "path": "assets/css/color-1.css",
+      "size": 5922
+    },
+    {
+      "path": "assets/css/color-2.css",
+      "size": 5846
+    },
+    {
+      "path": "assets/css/color-3.css",
+      "size": 5846
+    },
+    {
+      "path": "assets/css/color-4.css",
+      "size": 5846
+    },
+    {
+      "path": "assets/css/color-5.css",
+      "size": 5894
+    },
+    {
+      "path": "assets/css/color-6.css",
+      "size": 5894
+    },
+    {
+      "path": "assets/css/color-7.css",
+      "size": 5894
+    },
+    {
+      "path": "assets/css/color-8.css",
+      "size": 5894
+    },
+    {
+      "path": "assets/css/color-9.css",
+      "size": 5894
+    },
+    {
+      "path": "assets/css/custom.css",
+      "size": 29339
+    },
+    {
+      "path": "assets/css/dark.css",
+      "size": 28371
+    },
+    {
+      "path": "assets/css/rtl.css",
+      "size": 12805
+    },
+    {
+      "path": "assets/css/style.css",
+      "size": 204985
+    },
+    {
+      "path": "assets/css/vendor/animate.min.css",
+      "size": 71750
+    },
+    {
+      "path": "assets/css/vendor/aos.css",
+      "size": 26053
+    },
+    {
+      "path": "assets/css/vendor/bootstrap.min.css",
+      "size": 232803
+    },
+    {
+      "path": "assets/css/vendor/jquery-range-ui.css",
+      "size": 35973
+    },
+    {
+      "path": "assets/css/vendor/owl.carousel.min.css",
+      "size": 3351
+    },
+    {
+      "path": "assets/css/vendor/remixicon.css",
+      "size": 138863
+    },
+    {
+      "path": "assets/css/vendor/slick.min.css",
+      "size": 1369
+    },
+    {
+      "path": "assets/css/vendor/swiper-bundle.min.css",
+      "size": 18436
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.css",
+      "size": 138761
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.styl",
+      "size": 138000
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.svg",
+      "size": 2460531
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.symbol.svg",
+      "size": 1582046
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.ttf",
+      "size": 525572
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.woff",
+      "size": 224116
+    },
+    {
+      "path": "assets/fonts/icon/remixicon.woff2",
+      "size": 163200
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Black.ttf",
+      "size": 151396
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-BlackItalic.ttf",
+      "size": 171604
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Bold.ttf",
+      "size": 153944
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-BoldItalic.ttf",
+      "size": 176588
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-ExtraBold.ttf",
+      "size": 152764
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-ExtraBoldItalic.ttf",
+      "size": 173916
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-ExtraLight.ttf",
+      "size": 161456
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-ExtraLightItalic.ttf",
+      "size": 186168
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Italic.ttf",
+      "size": 182012
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Light.ttf",
+      "size": 159892
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-LightItalic.ttf",
+      "size": 184460
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Medium.ttf",
+      "size": 156520
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-MediumItalic.ttf",
+      "size": 180444
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Regular.ttf",
+      "size": 158240
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-SemiBold.ttf",
+      "size": 155232
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-SemiBoldItalic.ttf",
+      "size": 178584
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-Thin.ttf",
+      "size": 161652
+    },
+    {
+      "path": "assets/fonts/poppins/Poppins-ThinItalic.ttf",
+      "size": 187044
+    },
+    {
+      "path": "assets/fonts/quicksand/Quicksand-Bold.ttf",
+      "size": 78596
+    },
+    {
+      "path": "assets/fonts/quicksand/Quicksand-Light.ttf",
+      "size": 78660
+    },
+    {
+      "path": "assets/fonts/quicksand/Quicksand-Medium.ttf",
+      "size": 78948
+    },
+    {
+      "path": "assets/fonts/quicksand/Quicksand-Regular.ttf",
+      "size": 78936
+    },
+    {
+      "path": "assets/fonts/quicksand/Quicksand-SemiBold.ttf",
+      "size": 78820
+    },
+    {
+      "path": "assets/img/about/one.png",
+      "size": 5659
+    },
+    {
+      "path": "assets/img/app/1.png",
+      "size": 3028
+    },
+    {
+      "path": "assets/img/app/2.png",
+      "size": 5312
+    },
+    {
+      "path": "assets/img/app/3.png",
+      "size": 4626
+    },
+    {
+      "path": "assets/img/app/android.png",
+      "size": 1262
+    },
+    {
+      "path": "assets/img/app/apple.png",
+      "size": 1297
+    },
+    {
+      "path": "assets/img/banner-four/1.png",
+      "size": 1593
+    },
+    {
+      "path": "assets/img/banner-four/banner-4.jpg",
+      "size": 14535
+    },
+    {
+      "path": "assets/img/banner-four/banner.jpg",
+      "size": 14304
+    },
+    {
+      "path": "assets/img/banner-four/left-shape-dark.png",
+      "size": 1821
+    },
+    {
+      "path": "assets/img/banner-four/left-shape.png",
+      "size": 2095
+    },
+    {
+      "path": "assets/img/banner-four/right-shape-dark.png",
+      "size": 2059
+    },
+    {
+      "path": "assets/img/banner-four/right-shape.png",
+      "size": 2047
+    },
+    {
+      "path": "assets/img/banner-one/one.png",
+      "size": 234065
+    },
+    {
+      "path": "assets/img/banner-one/one1.png",
+      "size": 296821
+    },
+    {
+      "path": "assets/img/banner-one/two.png",
+      "size": 149084
+    },
+    {
+      "path": "assets/img/banner-one/two2.png",
+      "size": 373246
+    },
+    {
+      "path": "assets/img/banner-three/lines.png",
+      "size": 191576
+    },
+    {
+      "path": "assets/img/banner-three/one.png",
+      "size": 5352
+    },
+    {
+      "path": "assets/img/banner-three/two.png",
+      "size": 5571
+    },
+    {
+      "path": "assets/img/banner-two/banner_mobile.jpg",
+      "size": 170634
+    },
+    {
+      "path": "assets/img/banner-two/banner_mobile1.jpg",
+      "size": 163366
+    },
+    {
+      "path": "assets/img/banner-two/banner_mobile2.jpg",
+      "size": 413902
+    },
+    {
+      "path": "assets/img/banner-two/banner.jpg",
+      "size": 348187
+    },
+    {
+      "path": "assets/img/banner-two/banner1.jpg",
+      "size": 486435
+    },
+    {
+      "path": "assets/img/banner-two/banner2.jpg",
+      "size": 18290
+    },
+    {
+      "path": "assets/img/banner-two/banner3.jpg",
+      "size": 384344
+    },
+    {
+      "path": "assets/img/banner-two/left-shape-dark.png",
+      "size": 1821
+    },
+    {
+      "path": "assets/img/banner-two/left-shape.png",
+      "size": 2095
+    },
+    {
+      "path": "assets/img/banner-two/right-shape-dark.png",
+      "size": 2059
+    },
+    {
+      "path": "assets/img/banner-two/right-shape.png",
+      "size": 2047
+    },
+    {
+      "path": "assets/img/blog-details/one.jpg",
+      "size": 23331
+    },
+    {
+      "path": "assets/img/blog/1.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/10.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/11.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/12.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/13.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/14.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/2.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/3.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/4.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/5.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/6.jpg",
+      "size": 13176
+    },
+    {
+      "path": "assets/img/blog/7.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/8.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/blog/9.jpg",
+      "size": 18106
+    },
+    {
+      "path": "assets/img/category/1.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/1.svg",
+      "size": 2498
+    },
+    {
+      "path": "assets/img/category/2.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/2.svg",
+      "size": 3535
+    },
+    {
+      "path": "assets/img/category/3.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/3.svg",
+      "size": 2656
+    },
+    {
+      "path": "assets/img/category/4.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/4.svg",
+      "size": 4928
+    },
+    {
+      "path": "assets/img/category/5.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/5.svg",
+      "size": 1919
+    },
+    {
+      "path": "assets/img/category/6.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/6.svg",
+      "size": 3674
+    },
+    {
+      "path": "assets/img/category/7.jpg",
+      "size": 21149
+    },
+    {
+      "path": "assets/img/category/cart-banner-2.jpg",
+      "size": 29406
+    },
+    {
+      "path": "assets/img/category/cart-banner.jpg",
+      "size": 29412
+    },
+    {
+      "path": "assets/img/category/category-1.jpg",
+      "size": 40157
+    },
+    {
+      "path": "assets/img/category/category-2.jpg",
+      "size": 44693
+    },
+    {
+      "path": "assets/img/category/category-3.jpg",
+      "size": 42994
+    },
+    {
+      "path": "assets/img/category/category-4.jpg",
+      "size": 325873
+    },
+    {
+      "path": "assets/img/category/category-5.jpg",
+      "size": 45234
+    },
+    {
+      "path": "assets/img/category/category-6.jpg",
+      "size": 57412
+    },
+    {
+      "path": "assets/img/category/category-bak.jpg",
+      "size": 39729
+    },
+    {
+      "path": "assets/img/category/category.jpg",
+      "size": 18109
+    },
+    {
+      "path": "assets/img/category/menu.jpg",
+      "size": 16069
+    },
+    {
+      "path": "assets/img/category/top-shape-dark.png",
+      "size": 1821
+    },
+    {
+      "path": "assets/img/category/top-shape.png",
+      "size": 1846
+    },
+    {
+      "path": "assets/img/category/VegeBanner.jpg",
+      "size": 499941
+    },
+    {
+      "path": "assets/img/faq/faq.jpg",
+      "size": 13974
+    },
+    {
+      "path": "assets/img/favicon/favicon.png",
+      "size": 77099
+    },
+    {
+      "path": "assets/img/favicon/favicon1 (2).png",
+      "size": 75458
+    },
+    {
+      "path": "assets/img/favicon/favicon1.png",
+      "size": 4093
+    },
+    {
+      "path": "assets/img/hero/1.jpg",
+      "size": 37522
+    },
+    {
+      "path": "assets/img/hero/2.jpg",
+      "size": 37522
+    },
+    {
+      "path": "assets/img/hero/3.jpg",
+      "size": 37522
+    },
+    {
+      "path": "assets/img/hero/4.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/5.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/6.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/7.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/8.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/9.jpg",
+      "size": 20999
+    },
+    {
+      "path": "assets/img/hero/ABC-Malt.jpg",
+      "size": 183744
+    },
+    {
+      "path": "assets/img/hero/BananaLeaf.jpg",
+      "size": 116809
+    },
+    {
+      "path": "assets/img/hero/hero-1.png",
+      "size": 8659
+    },
+    {
+      "path": "assets/img/hero/hero-2.png",
+      "size": 8673
+    },
+    {
+      "path": "assets/img/hero/hero-3.png",
+      "size": 8673
+    },
+    {
+      "path": "assets/img/hero/hero-4.png",
+      "size": 8673
+    },
+    {
+      "path": "assets/img/hero/left-shape-dark.png",
+      "size": 1821
+    },
+    {
+      "path": "assets/img/hero/Podi.jpg",
+      "size": 130677
+    },
+    {
+      "path": "assets/img/hero/shape-1.png",
+      "size": 2534
+    },
+    {
+      "path": "assets/img/hero/top-shape.png",
+      "size": 1846
+    },
+    {
+      "path": "assets/img/instagram/1.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/10.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/11.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/12.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/13.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/2.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/3.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/4.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/5.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/6.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/7.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/8.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/instagram/9.jpg",
+      "size": 14220
+    },
+    {
+      "path": "assets/img/login/login.jpg",
+      "size": 17186
+    },
+    {
+      "path": "assets/img/logo/loader.png",
+      "size": 2388
+    },
+    {
+      "path": "assets/img/logo/logo-dark.png",
+      "size": 6610
+    },
+    {
+      "path": "assets/img/logo/logo.gif",
+      "size": 9659
+    },
+    {
+      "path": "assets/img/logo/logo.png",
+      "size": 6540
+    },
+    {
+      "path": "assets/img/logo/Thandatti.png",
+      "size": 75458
+    },
+    {
+      "path": "assets/img/logo/Thandatti1.png",
+      "size": 13754
+    },
+    {
+      "path": "assets/img/logo/ThandattiPatti.png",
+      "size": 77648
+    },
+    {
+      "path": "assets/img/new-product/1.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/10.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/11.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/12.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/13.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/14.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/15.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/16.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/17.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/18.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/19.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/2.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/20.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/21.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/22.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/23.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/24.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/3.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/4.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/5.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/6.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/7.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/8.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/9.jpg",
+      "size": 17182
+    },
+    {
+      "path": "assets/img/new-product/back-1.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-2.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-3.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-4.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-5.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-6.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-7.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/new-product/back-8.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/newsletter/newsletter-2.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/newsletter/newsletter.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/pages/1.jpg",
+      "size": 31334
+    },
+    {
+      "path": "assets/img/pages/2.jpg",
+      "size": 39326
+    },
+    {
+      "path": "assets/img/payment/payment.png",
+      "size": 3222
+    },
+    {
+      "path": "assets/img/product/1.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/10.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/11.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/12.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/13.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/14.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/15.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/16.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/17.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/18.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/19.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/2-podi-1765213393543-839176202.jpg",
+      "size": 166911
+    },
+    {
+      "path": "assets/img/product/2.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/20.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/21.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/22.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/23.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/24.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/25.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/26.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/27.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/28.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/29.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/3.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/30.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/31.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/4.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/5.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/6.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/7.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/8.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/9.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/abc-malt.jpg",
+      "size": 194685
+    },
+    {
+      "path": "assets/img/product/back-1.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/back-10.jpg",
+      "size": 20865
+    },
+    {
+      "path": "assets/img/product/back-11.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-12.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-13.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-14.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-15.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-16.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-17.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-18.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-19.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-2.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/back-20.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-21.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-22.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-23.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-24.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-25.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-26.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-27.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-28.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-29.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-3.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/back-30.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-31.jpg",
+      "size": 20867
+    },
+    {
+      "path": "assets/img/product/back-4.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/back-5.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/back-6.jpg",
+      "size": 21042
+    },
+    {
+      "path": "assets/img/product/back-7.jpg",
+      "size": 20855
+    },
+    {
+      "path": "assets/img/product/back-8.jpg",
+      "size": 20865
+    },
+    {
+      "path": "assets/img/product/back-9.jpg",
+      "size": 20865
+    },
+    {
+      "path": "assets/img/product/banner_bkp-1765892281375-46685660.jpg",
+      "size": 111448
+    },
+    {
+      "path": "assets/img/product/banner1-1765891801390-183469120.jpg",
+      "size": 526969
+    },
+    {
+      "path": "assets/img/product/banner1-1765892168446-737344593.jpg",
+      "size": 526969
+    },
+    {
+      "path": "assets/img/product/banner3-1765894234218-813581414.jpg",
+      "size": 384344
+    },
+    {
+      "path": "assets/img/product/custom_apps-1762876615976-731253350.png",
+      "size": 776825
+    },
+    {
+      "path": "assets/img/product/default.jpg",
+      "size": 17413
+    },
+    {
+      "path": "assets/img/product/fig-malt.jpg",
+      "size": 100600
+    },
+    {
+      "path": "assets/img/product/garlic-thokku.jpg",
+      "size": 129331
+    },
+    {
+      "path": "assets/img/product/nendram-banana-malt.jpg",
+      "size": 99642
+    },
+    {
+      "path": "assets/img/product/one1-1765892883769-227813310.png",
+      "size": 121572
+    },
+    {
+      "path": "assets/img/product/onion-thokku.jpg",
+      "size": 130404
+    },
+    {
+      "path": "assets/img/product/pirandai-thokku.jpg",
+      "size": 115476
+    },
+    {
+      "path": "assets/img/product/ragi-choco-malt-1763364424137-903069925.jpeg",
+      "size": 1543190
+    },
+    {
+      "path": "assets/img/product/ragi-malt-choco-1763364436344-484350697.jpeg",
+      "size": 1906312
+    },
+    {
+      "path": "assets/img/product/red-banana-malt.jpg",
+      "size": 126456
+    },
+    {
+      "path": "assets/img/product/tomato-thokku.jpg",
+      "size": 140183
+    },
+    {
+      "path": "assets/img/product/two2-1765892913700-775136348.png",
+      "size": 32190
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-1-1764659252054-803506494.jpeg",
+      "size": 407789
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-10-1764659481509-139126173.jpeg",
+      "size": 270886
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-11-1764659279518-453767825.jpeg",
+      "size": 382577
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-12-1764658751820-894582860.jpeg",
+      "size": 286785
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-13-1764658815657-704848820.jpeg",
+      "size": 649460
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-14-1764658716910-457394946.jpeg",
+      "size": 317358
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-15-1764658789715-133799994.jpeg",
+      "size": 339844
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-16-1764658852522-880381640.jpeg",
+      "size": 341087
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-17-1764659700897-302668249.jpeg",
+      "size": 249708
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-17-1764659870023-780430679.jpeg",
+      "size": 249708
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-1764658940997-817890529.jpeg",
+      "size": 331683
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-18-1764659638709-887776667.jpeg",
+      "size": 269476
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-18-1764659890325-112983507.jpeg",
+      "size": 269476
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-19-1764659675472-884752524.jpeg",
+      "size": 263991
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-19-1764659797581-515157244.jpeg",
+      "size": 263991
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-2-1764658905851-110281256.jpeg",
+      "size": 365639
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-5-1764658884312-772455402.jpeg",
+      "size": 351502
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-5-1764659332555-682408224.jpeg",
+      "size": 351502
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-6-1764659606841-93825185.jpeg",
+      "size": 373573
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-7-1764659407184-376525448.jpeg",
+      "size": 679709
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-8-1764659561226-531634545.jpeg",
+      "size": 408118
+    },
+    {
+      "path": "assets/img/product/whatsapp-image-2025-11-28-at-23130-pm-9-1764659377722-684398110.jpeg",
+      "size": 349800
+    },
+    {
+      "path": "assets/img/reviews/1.jpg",
+      "size": 14261
+    },
+    {
+      "path": "assets/img/reviews/2.jpg",
+      "size": 14261
+    },
+    {
+      "path": "assets/img/services/1.png",
+      "size": 2498
+    },
+    {
+      "path": "assets/img/services/2.png",
+      "size": 3252
+    },
+    {
+      "path": "assets/img/services/3.png",
+      "size": 2666
+    },
+    {
+      "path": "assets/img/services/4.png",
+      "size": 2686
+    },
+    {
+      "path": "assets/img/shop-bnr/one.jpg",
+      "size": 22909
+    },
+    {
+      "path": "assets/img/shop-bnr/two.jpg",
+      "size": 22923
+    },
+    {
+      "path": "assets/img/team/1.jpg",
+      "size": 12440
+    },
+    {
+      "path": "assets/img/team/2.jpg",
+      "size": 12440
+    },
+    {
+      "path": "assets/img/team/3.jpg",
+      "size": 12440
+    },
+    {
+      "path": "assets/img/team/4.jpg",
+      "size": 12440
+    },
+    {
+      "path": "assets/img/team/bottom-shape-dark.png",
+      "size": 1885
+    },
+    {
+      "path": "assets/img/team/bottom-shape.png",
+      "size": 1707
+    },
+    {
+      "path": "assets/img/team/top-shape-dark.png",
+      "size": 1906
+    },
+    {
+      "path": "assets/img/team/top-shape.png",
+      "size": 1670
+    },
+    {
+      "path": "assets/img/testimonials/1.jpg",
+      "size": 14231
+    },
+    {
+      "path": "assets/img/testimonials/2.jpg",
+      "size": 14231
+    },
+    {
+      "path": "assets/img/testimonials/3.jpg",
+      "size": 14231
+    },
+    {
+      "path": "assets/img/testimonials/img-1.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/testimonials/img-2.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/testimonials/img-3.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/testimonials/img-4.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/testimonials/img-5.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/testimonials/img-6.png",
+      "size": 3882
+    },
+    {
+      "path": "assets/img/tools/box-0.png",
+      "size": 5876
+    },
+    {
+      "path": "assets/img/tools/box-1.png",
+      "size": 4072
+    },
+    {
+      "path": "assets/img/tools/dark.png",
+      "size": 4729
+    },
+    {
+      "path": "assets/img/tools/light.png",
+      "size": 4895
+    },
+    {
+      "path": "assets/img/tools/ltr.png",
+      "size": 4895
+    },
+    {
+      "path": "assets/img/tools/rtl.png",
+      "size": 4886
+    },
+    {
+      "path": "assets/img/user-photo/placeholder.jpg",
+      "size": 5359
+    },
+    {
+      "path": "assets/img/vendors/15.jpg",
+      "size": 42558
+    },
+    {
+      "path": "assets/img/vendors/3.jpg",
+      "size": 13613
+    },
+    {
+      "path": "assets/img/vendors/img-1.jpg",
+      "size": 17345
+    },
+    {
+      "path": "assets/img/vendors/img-2.jpg",
+      "size": 17345
+    },
+    {
+      "path": "assets/img/vendors/img-3.jpg",
+      "size": 17345
+    },
+    {
+      "path": "assets/img/vendors/img-4.jpg",
+      "size": 17345
+    },
+    {
+      "path": "assets/img/vendors/left-shape.png",
+      "size": 274
+    },
+    {
+      "path": "assets/img/vendors/vendor-1.jpg",
+      "size": 16380
+    },
+    {
+      "path": "assets/img/vendors/vendor-2.jpg",
+      "size": 16380
+    },
+    {
+      "path": "assets/img/vendors/vendor-3.jpg",
+      "size": 16380
+    },
+    {
+      "path": "assets/img/vendors/vendor-4.jpg",
+      "size": 16380
+    },
+    {
+      "path": "assets/js/api_v2.js",
+      "size": 19629
+    },
+    {
+      "path": "assets/js/api.js",
+      "size": 18705
+    },
+    {
+      "path": "assets/js/auth.js",
+      "size": 8983
+    },
+    {
+      "path": "assets/js/cart.js",
+      "size": 5393
+    },
+    {
+      "path": "assets/js/config.js",
+      "size": 3018
+    },
+    {
+      "path": "assets/js/main.js",
+      "size": 18956
+    },
+    {
+      "path": "assets/js/supabase-client.js",
+      "size": 462
+    },
+    {
+      "path": "assets/videos/IMG_0814.MP4",
+      "size": 45470172
+    },
+    {
+      "path": "assets/videos/IMG_0815.MP4",
+      "size": 18623841
+    },
+    {
+      "path": "assets/videos/img_0816-1765893055555-426123681.mp4",
+      "size": 34365509
+    },
+    {
+      "path": "assets/videos/IMG_0816.MP4",
+      "size": 34365509
+    },
+    {
+      "path": "assets/videos/whatsapp-video-2025-11-26-at-41545-pm-1765892968381-185066560.mp4",
+      "size": 1598450
+    },
+    {
+      "path": "cart.html",
+      "size": 10236
+    },
+    {
+      "path": "checkout.html",
+      "size": 33830
+    },
+    {
+      "path": "components/footer.html",
+      "size": 6292
+    },
+    {
+      "path": "components/header.html",
+      "size": 13356
+    },
+    {
+      "path": "contact.html",
+      "size": 6270
+    },
+    {
+      "path": "faq.html",
+      "size": 5266
+    },
+    {
+      "path": "index.html",
+      "size": 18533
+    },
+    {
+      "path": "login.html",
+      "size": 6192
+    },
+    {
+      "path": "my-addresses.html",
+      "size": 14024
+    },
+    {
+      "path": "my-orders.html",
+      "size": 36654
+    },
+    {
+      "path": "privacy.html",
+      "size": 3479
+    },
+    {
+      "path": "product.html",
+      "size": 30589
+    },
+    {
+      "path": "register.html",
+      "size": 5286
+    },
+    {
+      "path": "scratch/all_products.json",
+      "size": 2634
+    },
+    {
+      "path": "scratch/check_tables.js",
+      "size": 990
+    },
+    {
+      "path": "scratch/company16_products.json",
+      "size": 226
+    },
+    {
+      "path": "scratch/product_data_utf8.json",
+      "size": 2767
+    },
+    {
+      "path": "scratch/product_data.json",
+      "size": 5530
+    },
+    {
+      "path": "shop.html",
+      "size": 12117
+    },
+    {
+      "path": "terms.html",
+      "size": 3541
+    },
+    {
+      "path": "user-profile.html",
+      "size": 14302
+    },
+    {
+      "path": "wishlist.html",
+      "size": 4736
+    }
+  ]
+}

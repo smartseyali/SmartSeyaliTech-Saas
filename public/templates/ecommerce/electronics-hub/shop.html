@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Catalog — Volt</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">V</span><span data-content="brand_name">Volt</span></a>
+    <ul>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Browse the catalog</h1>
+    <p data-content="hero_subtitle">Updated weekly with new drops.</p>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="filters">
+        <a class="filter active" href="#">All</a><a class="filter" href="#">New</a><a class="filter" href="#">Bestsellers</a><a class="filter" href="#">Sale</a>
+      </div>
+      <div class="product-grid">
+        <div class="product"><div class="img">①</div><div class="body"><h4>Mechanical Keyboard</h4><p class="desc">75% hot-swap · Gateron</p><div class="price">₹ 14,900 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">②</div><div class="body"><h4>USB-C Hub 8-in-1</h4><p class="desc">PD 100W · 4K HDMI</p><div class="price">₹ 3,800 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">③</div><div class="body"><h4>Ergonomic Mouse</h4><p class="desc">Silent clicks · 2.4G</p><div class="price">₹ 2,400 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">④</div><div class="body"><h4>27" 4K Monitor</h4><p class="desc">USB-C · HDR400</p><div class="price">₹ 42,500 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">⑤</div><div class="body"><h4>Fast Charger 65W</h4><p class="desc">GaN · dual-port</p><div class="price">₹ 2,100 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">⑥</div><div class="body"><h4>Lavalier Mic</h4><p class="desc">USB-C · plug-and-play</p><div class="price">₹ 1,800 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">⑦</div><div class="body"><h4>Mini LED Desk Lamp</h4><p class="desc">CRI 95+ · dimmable</p><div class="price">₹ 3,400 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">⑧</div><div class="body"><h4>SSD 2TB NVMe</h4><p class="desc">PCIe 4.0 · 7000MB/s</p><div class="price">₹ 12,900 <button class="buy">Add</button></div></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Volt</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post | Sparkle Insights</title>
+    <meta name="description" content="Read insightful articles on allied health science careers, education, and opportunities at Sparkle Institute.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sparkleahs.com/blog-post">
+    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://sparkleahs.com/blog-post">
+    <meta property="og:title" content="Blog Post | Sparkle Insights">
+    <meta property="og:description" content="Read insightful articles on allied health science careers, education, and opportunities at Sparkle Institute.">
+    <meta property="og:image" content="https://sparkleahs.com/logo.jpg">
+    <meta property="og:site_name" content="Sparkle Allied Health Science Institute">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/tailwind.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/sparkle-config.js"></script>
+    <style>
+    header.scrolled { background: hsl(var(--card) / 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow-soft); border-bottom: 1px solid hsl(var(--border) / 0.5); }
+    header.scrolled .nav-link { color: hsl(var(--foreground) / 0.7); }
+    header.scrolled .nav-link:hover, header.scrolled .nav-link.active { color: hsl(var(--primary)); }
+    header.scrolled .logo-title { color: hsl(var(--foreground)); }
+    header.scrolled .logo-sub { color: hsl(var(--foreground) / 0.8); }
+    header.scrolled .btn-nav-outline { border-color: hsl(var(--primary)); color: hsl(var(--primary)); }
+    header.scrolled .btn-nav-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+    .mobile-menu.show { display: block; }
+    .skeleton { background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: hsl(var(--foreground)); margin-top: 1.5em; margin-bottom: 0.5em; }
+    .blog-content h1 { font-size: 2rem; }
+    .blog-content h2 { font-size: 1.5rem; }
+    .blog-content h3 { font-size: 1.25rem; }
+    .blog-content p { margin-bottom: 1em; line-height: 1.8; color: hsl(var(--muted-foreground)); }
+    .blog-content ul, .blog-content ol { margin-bottom: 1em; padding-left: 1.5em; color: hsl(var(--muted-foreground)); }
+    .blog-content li { margin-bottom: 0.5em; line-height: 1.7; }
+    .blog-content img { border-radius: 0.75rem; margin: 1.5em 0; max-width: 100%; }
+    .blog-content blockquote { border-left: 4px solid hsl(var(--primary)); padding-left: 1em; margin: 1.5em 0; font-style: italic; color: hsl(var(--muted-foreground)); }
+    .blog-content a { color: hsl(var(--primary)); text-decoration: underline; }
+    </style>
+</head>
+<body class="min-h-screen bg-background font-body antialiased">
+
+    <!-- ========== NAVBAR ========== -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent" id="navbar">
+      <div class="container mx-auto px-4">
+        <nav class="flex items-center justify-between h-20">
+          <a href="/" class="flex items-center gap-2 group">
+            <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-soft group-hover:shadow-elevated transition-all duration-300 overflow-hidden">
+              <img src="/logo.jpg" alt="Sparkle Logo" class="w-full h-full object-contain p-1">
+            </div>
+            <div class="flex flex-col leading-tight">
+              <span class="text-xl font-display font-bold text-primary-foreground transition-colors duration-300 logo-title">Sparkle</span>
+              <span class="text-xs font-display font-medium text-primary-foreground/70 transition-colors duration-300 logo-sub">Allied Health Science</span>
+            </div>
+          </a>
+          <div class="hidden md:flex items-center gap-8">
+            <a href="/" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Home</a>
+            <a href="/programs" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Programs</a>
+            <a href="/gallery" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Gallery</a>
+            <a href="/about" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">About</a>
+            <a href="/contact" class="nav-link text-sm font-medium transition-colors duration-300 text-primary-foreground/80 hover:text-primary">Contact</a>
+          </div>
+          <div class="hidden md:flex items-center gap-3">
+            <a href="/apply" class="btn-nav-outline inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground transition-colors">Talk to Counsellor</a>
+            <a href="/apply" class="btn-nav-primary inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-accent text-accent-foreground font-bold transition-all">Apply Now</a>
+          </div>
+          <button class="md:hidden p-2 rounded-lg text-primary-foreground transition-colors" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </nav>
+      </div>
+      <div class="md:hidden bg-card border-t border-border hidden mobile-menu" id="mobile-menu">
+        <div class="container mx-auto px-4 py-6 flex flex-col gap-4">
+          <a href="/" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Home</a>
+          <a href="/programs" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Programs</a>
+          <a href="/gallery" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Gallery</a>
+          <a href="/about" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">About</a>
+          <a href="/contact" class="text-base font-medium py-2 text-foreground/70 hover:text-primary">Contact</a>
+          <div class="flex flex-col gap-3 pt-4 border-t border-border">
+            <a href="/apply" class="inline-flex items-center justify-center rounded-md font-medium px-4 py-2 border border-primary text-primary w-full">Talk to Counsellor</a>
+            <a href="/apply" class="inline-flex items-center justify-center rounded-md font-medium px-4 py-2 bg-primary text-primary-foreground w-full">Apply Now</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========== LOADING STATE ========== -->
+    <div id="loading-state" class="pt-32 pb-20">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="skeleton h-6 w-64 mb-6"></div>
+        <div class="skeleton h-12 w-full mb-4"></div>
+        <div class="skeleton h-6 w-48 mb-8"></div>
+        <div class="skeleton h-80 w-full mb-8"></div>
+        <div class="space-y-4">
+          <div class="skeleton h-4 w-full"></div>
+          <div class="skeleton h-4 w-5/6"></div>
+          <div class="skeleton h-4 w-4/6"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== NOT FOUND STATE ========== -->
+    <div id="not-found-state" class="hidden pt-32 pb-20">
+      <div class="container mx-auto px-4 text-center py-20">
+        <div class="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="file-x" class="w-10 h-10 text-muted-foreground"></i>
+        </div>
+        <h1 class="text-3xl font-display font-bold text-foreground mb-4">Post Not Found</h1>
+        <p class="text-muted-foreground mb-8 max-w-md mx-auto">The blog post you are looking for may have been removed or is no longer available.</p>
+        <a href="/blog" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-all">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Blog
+        </a>
+      </div>
+    </div>
+
+    <!-- ========== BLOG POST CONTENT ========== -->
+    <div id="post-content" class="hidden">
+
+      <!-- Hero Section -->
+      <section class="relative pt-28 pb-16 bg-gradient-to-br from-primary/90 to-primary overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
+        <div class="container mx-auto px-4 max-w-4xl relative z-10">
+          <!-- Breadcrumbs -->
+          <nav class="flex items-center gap-2 text-sm text-primary-foreground/60 mb-6">
+            <a href="/" class="hover:text-primary-foreground transition-colors">Home</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <a href="/blog" class="hover:text-primary-foreground transition-colors">Blog</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span class="text-primary-foreground truncate max-w-xs" id="breadcrumb-title">...</span>
+          </nav>
+          <h1 id="post-title" class="text-3xl md:text-5xl font-display font-bold text-primary-foreground mb-6"></h1>
+          <div class="flex flex-wrap items-center gap-6 text-primary-foreground/70 text-sm">
+            <span class="flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> <span id="post-author">Sparkle Team</span></span>
+            <span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> <span id="post-date"></span></span>
+            <span class="flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> <span id="post-readtime"></span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Image -->
+      <div id="featured-image-wrapper" class="hidden">
+        <div class="container mx-auto px-4 max-w-4xl -mt-8 relative z-20 mb-10">
+          <img id="featured-image" src="" alt="" class="w-full rounded-2xl shadow-elevated object-cover max-h-[480px]">
+        </div>
+      </div>
+
+      <!-- Article Content -->
+      <section class="py-12">
+        <div class="container mx-auto px-4 max-w-4xl">
+          <article id="article-body" class="blog-content"></article>
+
+          <!-- Tags -->
+          <div id="tags-section" class="hidden mt-10 pt-8 border-t border-border">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-sm font-semibold text-foreground mr-2">Tags:</span>
+              <div id="tags-list" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Author Bio -->
+          <div class="mt-10 pt-8 border-t border-border">
+            <div class="flex items-start gap-4 bg-muted/50 rounded-2xl p-6">
+              <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <i data-lucide="user" class="w-7 h-7 text-primary"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-foreground mb-1" id="author-name">Sparkle Team</h3>
+                <p class="text-muted-foreground text-sm">The Sparkle team is dedicated to sharing knowledge, insights, and career guidance in the allied health science domain. Our experts bring years of industry experience to help students make informed decisions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Block -->
+      <section class="py-16 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+          <h2 class="text-3xl md:text-4xl font-display font-bold text-primary-foreground mb-4">Ready to Start Your Healthcare Career?</h2>
+          <p class="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">Explore our industry-leading programs and take the first step towards a rewarding career in allied health science.</p>
+          <div class="flex flex-wrap justify-center gap-4">
+            <a href="/programs" class="inline-flex items-center gap-2 px-8 py-4 bg-accent text-accent-foreground font-bold rounded-xl text-lg hover:opacity-90 transition-all shadow-glow-accent">
+              <i data-lucide="graduation-cap" class="w-5 h-5"></i> Explore Programs
+            </a>
+            <a href="/apply" class="inline-flex items-center gap-2 px-8 py-4 bg-primary-foreground/10 text-primary-foreground font-bold rounded-xl text-lg border border-primary-foreground/20 hover:bg-primary-foreground/20 transition-all">
+              Apply Now
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-foreground text-primary-foreground">
+      <div class="container mx-auto px-4 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+          <div class="lg:col-span-2">
+            <a href="/" class="flex items-center gap-2 mb-6">
+              <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                <img src="/logo.jpg" alt="Sparkle Logo" title="Sparkle Logo" class="w-full h-full object-contain p-1">
+              </div>
+              <div class="flex flex-col leading-tight">
+                <span class="text-xl font-display font-bold">Sparkle</span>
+                <span class="text-xs font-display font-medium text-primary-foreground/70">Allied Health Science</span>
+              </div>
+            </a>
+            <p class="text-primary-foreground/70 mb-6 max-w-sm">Empowering careers through world-class education. Join 10,000+ learners who transformed their lives with Sparkle.</p>
+            <div class="space-y-3">
+              <a href="mailto:hello@sparkle.edu" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors"><i data-lucide="mail" class="w-5 h-5"></i><span>hello@sparkle.edu</span></a>
+              <div class="flex flex-col gap-2">
+                <a href="tel:+918220928732" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors"><i data-lucide="phone" class="w-5 h-5"></i><span>+91 82209 28732</span></a>
+                <a href="tel:+919363882960" class="flex items-center gap-3 text-primary-foreground/70 hover:text-accent transition-colors"><i data-lucide="phone" class="w-5 h-5"></i><span>+91 93638 82960</span></a>
+              </div>
+              <div class="flex items-start gap-3 text-primary-foreground/70"><i data-lucide="map-pin" class="w-5 h-5 mt-0.5 shrink-0"></i><span>Near Sri Chaitanya Techno School, Avinashi Road,<br>Neelambur, Coimbatore - 641062</span></div>
+            </div>
+            <div class="mt-4 w-full h-40 rounded-xl overflow-hidden border border-white/10 shadow-sm">
+              <iframe src="https://maps.google.com/maps?q=11.068538,77.081520&t=k&z=15&ie=UTF8&iwloc=&output=embed" title="Campus Location" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div>
+            <h4 class="font-display font-semibold mb-4">Programs</h4>
+            <ul class="space-y-3">
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Medical Lab Technology</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Patient Care Management</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Hospital Administration</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Phlebotomy Course</a></li>
+              <li><a href="/programs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">HR Management</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-display font-semibold mb-4">Company</h4>
+            <ul class="space-y-3">
+              <li><a href="/about" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">About Us</a></li>
+              <li><a href="/careers" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Careers</a></li>
+              <li><a href="/apply" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-display font-semibold mb-4">Support</h4>
+            <ul class="space-y-3">
+              <li><a href="/faqs" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">FAQs</a></li>
+              <li><a href="/terms" class="text-primary-foreground/70 hover:text-accent transition-colors text-sm">Terms &amp; Conditions</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-primary-foreground/50 text-sm">&copy; 2026 Sparkle Educational Institute. All rights reserved.</p>
+          <div class="flex items-center gap-4">
+            <a href="https://facebook.com/sparkleahs" target="_blank" rel="noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+            <a href="https://www.instagram.com/sparkleinstitute_ahs?igsh=Nmx3emYzZDhianFs" target="_blank" rel="noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script src="/assets/supabase.js"></script>
+    <script>
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('show');
+    }
+    window.addEventListener('scroll', function() {
+      var navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    }, { passive: true });
+
+    function estimateReadTime(html) {
+      var text = html.replace(/<[^>]*>/g, '');
+      var words = text.trim().split(/\s+/).length;
+      var minutes = Math.max(1, Math.round(words / 200));
+      return minutes + ' min read';
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      var d = new Date(dateStr);
+      return d.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    (async function() {
+      var params = new URLSearchParams(window.location.search);
+      var slug = params.get('id');
+
+      if (!slug) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('not-found-state').classList.remove('hidden');
+        lucide.createIcons();
+        return;
+      }
+
+      try {
+        var posts = await SparkleAPI.fetchBlogPosts();
+        var post = posts.find(function(p) {
+          return p.slug === slug || p.id === slug;
+        });
+
+        document.getElementById('loading-state').classList.add('hidden');
+
+        if (!post) {
+          document.getElementById('not-found-state').classList.remove('hidden');
+          lucide.createIcons();
+          return;
+        }
+
+        // Update page meta
+        document.title = (post.title || 'Blog Post') + ' | Sparkle Insights';
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', post.excerpt || post.meta_description || '');
+
+        // Hero
+        document.getElementById('breadcrumb-title').textContent = post.title;
+        document.getElementById('post-title').textContent = post.title;
+        document.getElementById('post-author').textContent = post.author || 'Sparkle Team';
+        document.getElementById('post-date').textContent = formatDate(post.published_at || post.created_at);
+        document.getElementById('post-readtime').textContent = estimateReadTime(post.content || '');
+
+        // Author bio
+        document.getElementById('author-name').textContent = post.author || 'Sparkle Team';
+
+        // Featured image
+        if (post.featured_image || post.cover_image) {
+          var imgSrc = post.featured_image || post.cover_image;
+          document.getElementById('featured-image').src = imgSrc;
+          document.getElementById('featured-image').alt = post.title;
+          document.getElementById('featured-image-wrapper').classList.remove('hidden');
+        }
+
+        // Article content
+        document.getElementById('article-body').innerHTML = post.content || '<p>Content not available.</p>';
+
+        // Tags
+        var tags = post.tags;
+        if (typeof tags === 'string') {
+          try { tags = JSON.parse(tags); } catch(e) { tags = tags.split(',').map(function(s) { return s.trim(); }); }
+        }
+        if (Array.isArray(tags) && tags.length > 0) {
+          document.getElementById('tags-section').classList.remove('hidden');
+          document.getElementById('tags-list').innerHTML = tags.map(function(tag) {
+            return '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">' + tag + '</span>';
+          }).join('');
+        }
+
+        // Show content
+        document.getElementById('post-content').classList.remove('hidden');
+        lucide.createIcons();
+
+      } catch (err) {
+        console.error('Error loading blog post:', err);
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('not-found-state').classList.remove('hidden');
+        lucide.createIcons();
+      }
+    })();
+    </script>
+</body>
+</html>

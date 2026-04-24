@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About — Orbit</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">O</span><span data-content="brand_name">Orbit</span></a>
+    <ul>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Join the waitlist</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">We build the tools we wanted</h1>
+    <p data-content="hero_subtitle">A small team from Bangalore and Berlin, shipping one feature at a time.</p>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-3">
+        <div class="card"><h3>Daily prompts</h3><p>Three quick questions to start your day. Takes under a minute.</p></div>
+          <div class="card"><h3>Mood tracking</h3><p>Tag how you feel — we'll surface patterns over time.</p></div>
+          <div class="card"><h3>Encrypted vault</h3><p>Your journal is encrypted on-device. Not even we can read it.</p></div>
+          <div class="card"><h3>Cross-device sync</h3><p>iPhone → iPad → Mac, all in sync. Offline first.</p></div>
+          <div class="card"><h3>Export anytime</h3><p>PDF or markdown. No lock-in, ever.</p></div>
+          <div class="card"><h3>No ads, no algorithm</h3><p>Just a clean space. Pay once a month or don't.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Orbit</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

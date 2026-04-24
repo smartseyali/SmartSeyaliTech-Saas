@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+
+  <style>
+    /* ─── Modern Dashboard Styles ───────────────────────── */
+    .dashboard-container { padding: 0; }
+    .account-sidebar-card {
+      border: none; border-radius: 20px; background: #fff;
+      overflow: hidden;
+    }
+    .account-side-menu { list-style: none; padding: 0; margin: 0; }
+    .account-side-menu li { border-bottom: 1px solid #f8f9fa; }
+    .account-side-menu li:last-child { border-bottom: none; }
+    .account-side-menu a {
+      display: flex; align-items: center; gap: 15px; padding: 16px 20px;
+      color: #555; font-weight: 500; font-size: 15px; text-decoration: none;
+      transition: all 0.3s;
+    }
+    .account-side-menu a i { font-size: 20px; color: #1a472a; width: 24px; text-align: center; }
+    .account-side-menu a:hover, .account-side-menu a.active {
+      background: rgba(26, 71, 42, 0.05); color: #1a472a;
+    }
+    .account-side-menu a.active { border-left: 4px solid #1a472a; font-weight: 700; }
+    .account-side-menu a.logout-btn { color: #dc3545; }
+    .account-side-menu a.logout-btn i { color: #dc3545; }
+
+    /* Order History Cards (Modern Style) */
+    .orders-card-body { padding: 0; }
+    .order-item-row {
+      background: #fff; border: 1px solid #eee; border-radius: 16px;
+      padding: 20px; margin-bottom: 16px; transition: all 0.3s ease;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .order-item-row:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #1a472a; }
+    
+    .o-main-info { display: flex; flex-direction: column; gap: 4px; }
+    .o-number { font-size: 16px; font-weight: 800; color: #1a472a; margin-bottom: 2px; }
+    .o-date { font-size: 13px; color: #888; }
+    .o-status { margin-top: 8px; }
+    
+    .o-side-info { text-align: right; display: flex; flex-direction: column; gap: 12px; }
+    .o-total { font-size: 18px; font-weight: 800; color: #333; }
+    .o-btn {
+      background: #1a472a; color: #fff; padding: 8px 20px; border-radius: 50px;
+      font-size: 13px; font-weight: 600; text-decoration: none; border: none;
+      transition: transform 0.2s; display: inline-block; cursor: pointer;
+    }
+    .o-btn:hover { background: #153d23; color: #fff; transform: translateY(-2px); }
+
+    /* Mobile Specific Overrides */
+    @media (max-width: 991px) {
+      .bb-orders-table-card { border: none !important; background: transparent !important; box-shadow: none !important; }
+      .orders-table { display: none !important; }
+      .mobile-orders-container { display: block !important; }
+    }
+
+    @media (max-width: 576px) {
+      .order-item-row { padding: 15px; border-radius: 12px; }
+      .o-number { font-size: 14px; }
+      .o-total { font-size: 16px; }
+      .o-btn { padding: 6px 15px; font-size: 12px; }
+    }
+
+    /* ─── Status Pills (Enhanced) ────────────────────── */
+    .status-pill {
+      padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-delivered { background: #dcfce7; color: #166534; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-processing { background: #e0f2fe; color: #075985; }
+
+    /* ─── Modal Detail ───────────────────────────────── */
+    #orderDetailModal .modal-content { border: none; border-radius: 16px; overflow: hidden; }
+    #orderDetailModal .modal-header {
+      background: #1a472a; color: #fff;
+      border: none; padding: 16px 24px;
+    }
+    #orderDetailModal .modal-header .btn-close { filter: invert(1); }
+    #orderDetailModal .modal-title { font-size: 16px; font-weight: 700; color: #fff !important; }
+    #orderDetailModal .modal-body { padding: 0; max-height: 75vh; overflow-y: auto; }
+    #orderDetailModal .modal-footer { border-top: 1px solid #eee; padding: 12px 24px; }
+
+    .od-top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 24px; background: #f8faf8; flex-wrap: wrap; gap: 10px;
+    }
+    .od-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-od-action {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 16px; background: #fff; color: #555; border: 1px solid #ddd;
+      border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-od-action:hover { border-color: var(--bb-main-color); color: var(--bb-main-color); }
+
+    .od-section { padding: 16px 24px; border-bottom: 1px solid #f0f0f0; }
+    .od-section:last-child { border-bottom: none; }
+    .od-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: #999; margin-bottom: 10px;
+    }
+
+    /* Info Columns */
+    .od-info-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .od-info-item label {
+      display: block; font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.3px; color: #aaa; margin-bottom: 3px;
+    }
+    .od-info-item span { font-size: 14px; color: #333; line-height: 1.4; }
+
+    /* Items Table */
+    .od-items-table { width: 100%; border-collapse: collapse; }
+    .od-items-table thead th {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #999; padding: 8px 0; border-bottom: 2px solid #eee;
+    }
+    .od-items-table thead th:last-child,
+    .od-items-table tbody td:last-child { text-align: right; }
+    .od-items-table tbody td { padding: 12px 0; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    .od-items-table tbody tr:last-child td { border-bottom: none; }
+
+    .od-item-cell { display: flex; align-items: center; gap: 12px; }
+    .od-item-thumb {
+      width: 48px; height: 48px; border-radius: 8px; overflow: hidden;
+      flex-shrink: 0; background: #f5f5f5;
+    }
+    .od-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .od-item-name { font-size: 14px; font-weight: 600; color: #333; }
+    .od-item-variant { font-size: 12px; color: #888; }
+    .od-item-price { font-size: 13px; color: #555; }
+    .od-item-qty { font-size: 13px; color: #555; text-align: center; }
+    .od-item-total { font-size: 14px; font-weight: 600; color: #333; }
+
+    /* Mobile Items */
+    .od-items-mobile { display: none; }
+    .od-mobile-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .od-mobile-item:last-child { border-bottom: none; }
+    .od-mobile-thumb {
+      width: 48px; height: 48px; border-radius: 8px; overflow: hidden;
+      flex-shrink: 0; background: #f5f5f5;
+    }
+    .od-mobile-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .od-mobile-info { flex: 1; min-width: 0; }
+    .od-mobile-name { font-size: 13px; font-weight: 600; color: #333; }
+    .od-mobile-meta { font-size: 12px; color: #888; }
+    .od-mobile-amount { font-size: 14px; font-weight: 700; color: #333; white-space: nowrap; }
+
+    /* Totals */
+    .od-totals { max-width: 280px; margin-left: auto; }
+    .od-total-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; color: #555; }
+    .od-total-row.grand {
+      font-size: 16px; font-weight: 700; color: #333;
+      padding-top: 10px; margin-top: 6px; border-top: 2px solid #eee;
+    }
+    .od-total-row .discount { color: #28a745; }
+
+    /* Tracking */
+    .od-tracking-box {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+    }
+    .od-tracking-box i { font-size: 20px; color: #16a34a; }
+
+    /* ─── Horizontal Timeline ────────────────────────── */
+    .od-timeline {
+      display: flex; align-items: flex-start; position: relative;
+      padding: 0; overflow-x: auto; gap: 0;
+    }
+    .od-timeline::before {
+      content: ''; position: absolute;
+      top: 14px; left: 20px; right: 20px; height: 2px;
+      background: #e0e0e0; z-index: 0;
+    }
+    .od-tl-entry {
+      flex: 1; min-width: 110px; text-align: center;
+      position: relative; padding-top: 36px; z-index: 1;
+    }
+    .od-tl-entry::before {
+      content: ''; position: absolute;
+      top: 8px; left: 50%; transform: translateX(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #ccc; border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #ccc; z-index: 2;
+    }
+    .od-tl-entry.tl-done::before {
+      background: var(--bb-main-color, #1a472a);
+      box-shadow: 0 0 0 2px var(--bb-main-color, #1a472a);
+    }
+    .od-tl-entry.tl-current::before {
+      background: var(--bb-main-color, #1a472a);
+      box-shadow: 0 0 0 2px var(--bb-main-color, #1a472a), 0 0 0 6px rgba(26, 71, 42, 0.15);
+    }
+    .od-tl-progress {
+      position: absolute; top: 14px; left: 20px; height: 2px;
+      background: var(--bb-main-color, #1a472a); z-index: 1;
+    }
+    .od-tl-status { font-size: 11px; font-weight: 700; color: #333; text-transform: capitalize; margin-bottom: 2px; }
+    .od-tl-entry:not(.tl-done):not(.tl-current) .od-tl-status { color: #bbb; }
+    .od-tl-note { font-size: 10px; color: #888; line-height: 1.3; }
+    .od-tl-date { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+    /* ─── Empty State ────────────────────────────────── */
+    .orders-empty { text-align: center; padding: 60px 20px; }
+    .orders-empty i { font-size: 64px; color: #ddd; display: block; margin-bottom: 16px; }
+    .orders-empty h4 { color: #555; margin-bottom: 8px; }
+    .orders-empty p { color: #999; margin-bottom: 20px; }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 768px) {
+      .od-info-cols { grid-template-columns: 1fr 1fr; }
+      .od-items-table { display: none; }
+      .od-items-mobile { display: block; }
+      .od-totals { max-width: none; }
+      .od-section { padding: 14px 18px; }
+      .od-top-bar { padding: 12px 18px; }
+    }
+    @media (max-width: 576px) {
+      .order-card { padding: 14px 16px; gap: 10px; }
+      .oc-actions { width: 100%; }
+      .btn-view-detail, .btn-pay-now { flex: 1; justify-content: center; }
+      .od-info-cols { grid-template-columns: 1fr; gap: 10px; }
+      .od-tl-entry { min-width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <div class="bb-breadcrumb">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="mb-0">My Orders</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <nav aria-label="breadcrumb d-inline-block">
+            <ol class="breadcrumb mb-0 justify-content-md-end">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item active">My Orders</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Dashboard Section -->
+  <section class="padding-tb-50">
+    <div class="container">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-12 mb-4">
+          <div class="account-sidebar-card shadow-sm border-0" style="border-radius: 20px;">
+            <ul class="account-side-menu">
+              <li><a href="user-profile.html"><i class="ri-user-line"></i> User Profile</a></li>
+              <li><a href="my-addresses.html"><i class="ri-map-pin-line"></i> My Addresses</a></li>
+              <li><a href="admin-login.html" id="admin-panel-link" style="display:none;"><i class="ri-dashboard-line"></i> Admin Panel</a></li>
+              <li><a href="my-orders.html" class="active"><i class="ri-shopping-basket-line"></i> My Orders</a></li>
+              <li><a href="javascript:void(0)" onclick="Auth.logout()" class="logout-btn" style="color: #dc3545 !important;"><i class="ri-logout-box-line"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-12">
+          <div class="bb-orders-table-card">
+            <!-- Header for Desktop -->
+            <div class="d-none d-lg-block mb-4">
+               <h3 class="fw-bold" style="color: #1a472a;">Order History</h3>
+               <p class="text-muted">Manage and track your recent orders with Pattikadai.</p>
+            </div>
+
+            <!-- Desktop View (Table maintained for large screens but styled better) -->
+            <div class="table-responsive d-none d-lg-block shadow-sm rounded-4 bg-white overflow-hidden">
+              <table class="table orders-table mb-0" id="orders-table-element">
+                <thead class="bg-light">
+                  <tr style="border-bottom: 2px solid #f0f0f0;">
+                    <th class="py-3 ps-4">Order #</th>
+                    <th class="py-3">Date</th>
+                    <th class="py-3">Status</th>
+                    <th class="py-3">Total</th>
+                    <th class="py-3 pe-4 text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-container">
+                  <!-- Rendered by JS template -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile View (Card listing as requested) -->
+            <div class="mobile-orders-container d-lg-none" id="orders-container-mobile">
+               <!-- Rendered by JS -->
+               <div class="text-center py-5">
+                 <div class="spinner-border text-success" role="status"></div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Detail Modal -->
+  <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalOrderTitle">Order Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalOrderBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-od-action" data-bs-dismiss="modal"><i class="ri-close-line"></i> Close</button>
+          <button type="button" class="btn-od-action" id="modalDownloadBtn"><i class="ri-download-2-line"></i> Download Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js?v=2.1"></script>
+  <script src="assets/js/supabase-client.js?v=2.1"></script>
+  <script src="assets/js/api.js?v=2.1"></script>
+  <script src="assets/js/auth.js?v=2.1"></script>
+  <script src="assets/js/cart.js?v=2.1"></script>
+  <script src="assets/js/main.js?v=2.1"></script>
+
+  <script>
+    let _ordersCache = {};
+    let _detailModal = null;
+
+    onAppReady(async () => {
+      const user = await Auth.getUser();
+      if (!user) { window.location.href = 'login.html?redirect=my-orders.html'; return; }
+      
+      // Admin link
+      if (user.user_metadata && (user.user_metadata.role === 'admin' || user.user_metadata.is_admin)) {
+        const adminLink = document.getElementById('admin-panel-link');
+        if (adminLink) adminLink.style.display = 'block';
+      }
+
+      handlePaymentCallback();
+      loadOrders();
+    });
+
+    function handlePaymentCallback() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('razorpay_payment_id') && params.get('razorpay_payment_link_status') === 'paid') {
+        showToast('Payment successful! Your order is being processed.', 'success');
+        window.history.replaceState({}, '', 'my-orders');
+      }
+    }
+
+    function getStatusClass(s) {
+      if (!s) return 'status-pending'; s = s.toLowerCase();
+      if (['delivered','completed'].includes(s)) return 'status-delivered';
+      if (s === 'shipped') return 'status-shipped';
+      if (s === 'processing') return 'status-processing';
+      if (s === 'confirmed') return 'status-confirmed';
+      if (s === 'cancelled') return 'status-cancelled';
+      return 'status-pending';
+    }
+    function getPaymentClass(s) {
+      if (!s) return 'payment-pending'; s = s.toLowerCase();
+      return s === 'paid' ? 'payment-paid' : s === 'failed' ? 'payment-failed' : 'payment-pending';
+    }
+    function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' }); }
+    function fmtDateTime(d) { return new Date(d).toLocaleString('en-IN', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
+    function fmtAddr(a) { if (!a) return 'N/A'; if (typeof a === 'string') return a; return [a.line1, a.city, a.state, a.pincode].filter(Boolean).join(', '); }
+    function needsPayment(o) {
+      const ps = (o.payment_status||'').toLowerCase(), os = (o.status||'').toLowerCase(), pm = (o.payment_method||'').toLowerCase();
+      return (ps === 'pending' || ps === 'pending_payment') && os !== 'cancelled' && pm !== 'cod';
+    }
+
+    // ─── Horizontal Timeline ────────────────────────────
+    function renderTimeline(order, timeline) {
+      const STEPS = ['pending','confirmed','processing','shipped','delivered'];
+      const LABELS = { pending:'Ordered', confirmed:'Confirmed', processing:'Processing', shipped:'Shipped', delivered:'Delivered' };
+      const currentStatus = (order.status || 'pending').toLowerCase();
+      const isCancelled = currentStatus === 'cancelled';
+      const tlMap = {};
+      (timeline || []).forEach(t => { tlMap[(t.status||'').toLowerCase()] = t; });
+      let currentIdx = STEPS.indexOf(currentStatus);
+      if (currentIdx === -1) currentIdx = 0;
+      const progressPct = STEPS.length > 1 ? Math.round((currentIdx / (STEPS.length - 1)) * 100) : 0;
+
+      const stepsHtml = STEPS.map((step, i) => {
+        let cls = i < currentIdx ? 'tl-done' : i === currentIdx ? 'tl-current' : '';
+        const entry = tlMap[step];
+        const dateStr = entry ? fmtDateTime(entry.created_at) : (step === 'pending' ? fmtDateTime(order.created_at) : '');
+        return `<div class="od-tl-entry ${cls}"><div class="od-tl-status">${LABELS[step]}</div>${dateStr ? '<div class="od-tl-date">' + dateStr + '</div>' : ''}</div>`;
+      }).join('');
+
+      const cancelHtml = isCancelled ? `<div style="text-align:center;margin-top:10px;"><span class="status-pill status-cancelled" style="font-size:13px;padding:6px 16px;"><i class="ri-close-circle-line"></i> Order Cancelled</span></div>` : '';
+
+      return `<div class="od-section"><div class="od-section-title">Order Progress</div><div class="od-timeline" style="${isCancelled ? 'opacity:0.4;' : ''}"><div class="od-tl-progress" style="width:${progressPct}%;"></div>${stepsHtml}</div>${cancelHtml}</div>`;
+    }
+
+    // ─── Order List ─────────────────────────────────────
+    async function loadOrders() {
+      const containerDesktop = document.getElementById('orders-container');
+      const containerMobile = document.getElementById('orders-container-mobile');
+      const orders = await API.getUserOrders();
+
+      const emptyHtml = `<div class="orders-empty"><i class="ri-file-list-3-line"></i><h4>No orders yet</h4><p>Start shopping to see your orders here</p><a href="shop.html" class="bb-btn-2" style="display:inline-flex;width:auto;padding:10px 30px;border-radius:25px;">Start Shopping</a></div>`;
+      
+      if (orders.length === 0) {
+        if(containerDesktop) containerDesktop.innerHTML = `<tr><td colspan="5" class="text-center py-5">${emptyHtml}</td></tr>`;
+        if(containerMobile) containerMobile.innerHTML = emptyHtml;
+        return;
+      }
+
+      orders.forEach(o => { _ordersCache[o.id] = o; });
+
+      // Render Desktop Table
+      if (containerDesktop) {
+        containerDesktop.innerHTML = orders.map(order => {
+          const showPay = needsPayment(order);
+          const payLink = order.payment_link || order.paymentLink;
+
+          return `
+          <tr>
+            <td class="py-3 ps-4 fw-bold text-dark">${order.order_number}</td>
+            <td class="py-3 text-muted">${fmtDate(order.created_at)}</td>
+            <td class="py-3"><span class="status-pill ${getStatusClass(order.status)}">${order.status || 'pending'}</span></td>
+            <td class="py-3 fw-bold">${formatPrice(order.grand_total)}</td>
+            <td class="py-3 pe-4 text-end">
+              <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-outline-success btn-sm px-3 rounded-pill" onclick="viewOrder('${order.id}')">View Details</button>
+                ${showPay && payLink ? `<a href="${payLink}" class="btn btn-success btn-sm px-3 rounded-pill" target="_blank" rel="noopener noreferrer">Pay Now</a>` : ''}
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Render Mobile Cards (ONLY 3 fields: Number, Total, View Details)
+      if (containerMobile) {
+        containerMobile.innerHTML = orders.map(order => `
+          <div class="order-item-row shadow-sm" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="o-main-info">
+              <div class="o-number" style="font-size: 16px; font-weight: 800; color: #1a472a;">${order.order_number}</div>
+            </div>
+            <div class="o-side-info" style="text-align: right;">
+              <div class="o-total" style="font-size: 18px; font-weight: 800; color: #333; margin-bottom: 8px;">${formatPrice(order.grand_total)}</div>
+              <button class="o-btn" onclick="viewOrder('${order.id}')" style="background: #1a472a; color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 600; border: none;">View Details</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ─── View Order Detail (Modal) ──────────────────────
+    function viewOrder(orderId) {
+      const order = _ordersCache[orderId];
+      if (!order) return;
+
+      const items = order.ecom_order_items || [];
+      const timeline = order.ecom_order_timeline || [];
+      const addr = order.shipping_address;
+      const showPay = needsPayment(order);
+      const payLink = order.payment_link || order.paymentLink;
+
+      document.getElementById('modalOrderTitle').textContent = 'Order: ' + order.order_number;
+      document.getElementById('modalDownloadBtn').onclick = () => downloadOrderPDF(orderId);
+
+      document.getElementById('modalOrderBody').innerHTML = `
+        <!-- Actions bar -->
+        <div class="od-top-bar">
+          <div style="font-size:13px;color:#666;">Placed on <strong>${fmtDateTime(order.created_at)}</strong></div>
+          <div class="od-actions">
+            ${showPay && payLink ? `<a href="${payLink}" class="btn-pay-now" target="_blank" rel="noopener noreferrer"><i class="ri-secure-payment-line"></i> Pay Now</a>` : ''}
+            ${showPay && !payLink ? `<span class="btn-od-action" style="background:#fff3cd;border-color:#ffc107;color:#856404;cursor:default;"><i class="ri-time-line"></i> Payment Link Pending</span>` : ''}
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        ${renderTimeline(order, timeline)}
+
+        <!-- Order Info -->
+        <div class="od-section">
+          <div class="od-info-cols">
+            <div class="od-info-item"><label>Payment Method</label><span>${(order.payment_method || 'N/A').toUpperCase()}</span></div>
+            <div class="od-info-item"><label>Payment Status</label><span class="payment-pill ${getPaymentClass(order.payment_status)}">${order.payment_status || 'pending'}</span></div>
+            <div class="od-info-item"><label>Order Status</label><span class="status-pill ${getStatusClass(order.status)}">${order.status || 'pending'}</span></div>
+            ${order.customer_name ? `<div class="od-info-item"><label>Customer</label><span>${escapeHtml(order.customer_name)}</span></div>` : ''}
+            ${order.customer_phone ? `<div class="od-info-item"><label>Phone</label><span>${order.customer_phone}</span></div>` : ''}
+            ${addr ? `<div class="od-info-item"><label>Shipping Address</label><span>${fmtAddr(addr)}</span></div>` : ''}
+          </div>
+        </div>
+
+        <!-- Tracking -->
+        ${order.tracking_number ? `
+          <div class="od-section">
+            <div class="od-tracking-box">
+              <i class="ri-truck-line"></i>
+              <div><div style="font-weight:600;">${order.tracking_number}</div>${order.courier_name ? '<div style="font-size:12px;color:#666;">' + order.courier_name + '</div>' : ''}</div>
+            </div>
+          </div>` : ''}
+
+        <!-- Items -->
+        <div class="od-section">
+          <div class="od-section-title">Items Ordered (${items.length})</div>
+          <table class="od-items-table">
+            <thead><tr><th style="width:50%">Product</th><th>Price</th><th style="text-align:center">Qty</th><th>Total</th></tr></thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td><div class="od-item-cell"><div class="od-item-thumb"><img src="${item.image_url || 'assets/img/product/default.jpg'}" alt=""></div><div><div class="od-item-name">${escapeHtml(item.product_name || '')}</div>${item.variant_name ? '<div class="od-item-variant">' + escapeHtml(item.variant_name) + '</div>' : ''}</div></div></td>
+                  <td class="od-item-price">${formatPrice(item.unit_price || item.price_at_time || 0)}</td>
+                  <td class="od-item-qty">${item.quantity}</td>
+                  <td class="od-item-total">${formatPrice(item.amount || item.total_price || 0)}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+          <div class="od-items-mobile">
+            ${items.map(item => `
+              <div class="od-mobile-item">
+                <div class="od-mobile-thumb"><img src="${item.image_url || 'assets/img/product/default.jpg'}" alt=""></div>
+                <div class="od-mobile-info"><div class="od-mobile-name">${escapeHtml(item.product_name || '')}</div><div class="od-mobile-meta">${item.variant_name ? escapeHtml(item.variant_name) + ' &middot; ' : ''}${formatPrice(item.unit_price || 0)} x ${item.quantity}</div></div>
+                <div class="od-mobile-amount">${formatPrice(item.amount || item.total_price || 0)}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="od-section">
+          <div class="od-totals">
+            <div class="od-total-row"><span>Subtotal</span><span>${formatPrice(order.subtotal || 0)}</span></div>
+            ${order.shipping_amount != null ? `<div class="od-total-row"><span>Shipping</span><span>${order.shipping_amount > 0 ? formatPrice(order.shipping_amount) : 'Free'}</span></div>` : ''}
+            ${order.discount_amount > 0 ? `<div class="od-total-row"><span>Discount${order.coupon_code ? ' (' + order.coupon_code + ')' : ''}</span><span class="discount">-${formatPrice(order.discount_amount)}</span></div>` : ''}
+            ${order.tax_amount > 0 ? `<div class="od-total-row"><span>Tax</span><span>${formatPrice(order.tax_amount)}</span></div>` : ''}
+            <div class="od-total-row grand"><span>Grand Total</span><span>${formatPrice(order.grand_total)}</span></div>
+          </div>
+        </div>
+
+        ${order.notes ? `<div class="od-section"><div class="od-section-title">Notes</div><p style="font-size:14px;color:#555;margin:0;">${escapeHtml(order.notes)}</p></div>` : ''}
+      `;
+
+      if (!_detailModal) _detailModal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+      _detailModal.show();
+    }
+
+    // ─── PDF Invoice Generator ──────────────────────────
+    function downloadOrderPDF(orderId) {
+      const order = _ordersCache[orderId];
+      if (!order) { showToast('Order data not available', 'error'); return; }
+      const items = order.ecom_order_items || [];
+      const addr = order.shipping_address;
+      const cur = STORE_CONFIG.currency;
+
+      const itemRows = items.map((item, i) => `
+        <tr>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;text-align:center;">${i + 1}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;">${esc(item.product_name || '')}${item.variant_name ? '<br><span style="font-size:11px;color:#888;">' + esc(item.variant_name) + '</span>' : ''}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;text-align:right;">${cur}${num(item.unit_price || item.price_at_time || 0)}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;text-align:right;">${cur}${num(item.amount || item.total_price || 0)}</td>
+        </tr>`).join('');
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice - ${order.order_number}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',Arial,sans-serif;color:#333;font-size:13px;}.invoice{max-width:800px;margin:0 auto;padding:40px;}@media print{body{padding:0;}.invoice{padding:20px;max-width:100%;}.no-print{display:none!important;}}</style>
+</head><body><div class="invoice">
+<table style="width:100%;margin-bottom:30px;"><tr>
+<td style="vertical-align:top;"><div style="font-size:22px;font-weight:800;color:#1a472a;">${esc(STORE_CONFIG.storeName)}</div><div style="font-size:12px;color:#888;margin-top:2px;">${esc(STORE_CONFIG.storeTagline)}</div><div style="font-size:11px;color:#999;margin-top:6px;max-width:260px;line-height:1.5;">${esc(STORE_CONFIG.contactAddress)}<br>${STORE_CONFIG.contactPhone} &middot; ${STORE_CONFIG.contactEmail}</div></td>
+<td style="vertical-align:top;text-align:right;"><div style="font-size:28px;font-weight:800;color:#1a472a;letter-spacing:1px;">INVOICE</div><table style="margin-left:auto;margin-top:10px;font-size:12px;"><tr><td style="color:#999;padding:2px 10px 2px 0;">Order No</td><td style="font-weight:600;">${order.order_number}</td></tr><tr><td style="color:#999;padding:2px 10px 2px 0;">Date</td><td>${fmtDate(order.created_at)}</td></tr><tr><td style="color:#999;padding:2px 10px 2px 0;">Status</td><td style="text-transform:capitalize;">${order.status||'pending'}</td></tr><tr><td style="color:#999;padding:2px 10px 2px 0;">Payment</td><td style="text-transform:capitalize;">${order.payment_status||'pending'}</td></tr></table></td>
+</tr></table>
+<table style="width:100%;margin-bottom:24px;background:#f8f9fa;border-radius:8px;padding:16px;"><tr>
+<td style="vertical-align:top;padding:10px;width:50%;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#999;margin-bottom:6px;">Bill To</div><div style="font-weight:600;">${esc(order.customer_name||'Customer')}</div>${order.customer_email?'<div style="font-size:12px;color:#666;">'+order.customer_email+'</div>':''}${order.customer_phone?'<div style="font-size:12px;color:#666;">'+order.customer_phone+'</div>':''}</td>
+<td style="vertical-align:top;padding:10px;width:50%;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#999;margin-bottom:6px;">Ship To</div><div style="font-size:12px;line-height:1.5;">${fmtAddr(addr)}</div></td>
+</tr></table>
+<table style="width:100%;border-collapse:collapse;margin-bottom:20px;"><thead><tr style="background:#1a472a;color:#fff;"><th style="padding:10px;text-align:center;font-size:11px;font-weight:600;width:40px;">#</th><th style="padding:10px;text-align:left;font-size:11px;font-weight:600;">Product</th><th style="padding:10px;text-align:center;font-size:11px;font-weight:600;width:60px;">Qty</th><th style="padding:10px;text-align:right;font-size:11px;font-weight:600;width:100px;">Unit Price</th><th style="padding:10px;text-align:right;font-size:11px;font-weight:600;width:100px;">Amount</th></tr></thead><tbody>${itemRows}</tbody></table>
+<table style="width:260px;margin-left:auto;margin-bottom:30px;">
+<tr><td style="padding:4px 0;color:#666;">Subtotal</td><td style="padding:4px 0;text-align:right;">${cur}${num(order.subtotal||0)}</td></tr>
+${order.shipping_amount!=null?'<tr><td style="padding:4px 0;color:#666;">Shipping</td><td style="padding:4px 0;text-align:right;">'+(order.shipping_amount>0?cur+num(order.shipping_amount):'Free')+'</td></tr>':''}
+${order.discount_amount>0?'<tr><td style="padding:4px 0;color:#666;">Discount'+(order.coupon_code?' ('+order.coupon_code+')':'')+'</td><td style="padding:4px 0;text-align:right;color:#28a745;">-'+cur+num(order.discount_amount)+'</td></tr>':''}
+${order.tax_amount>0?'<tr><td style="padding:4px 0;color:#666;">Tax</td><td style="padding:4px 0;text-align:right;">'+cur+num(order.tax_amount)+'</td></tr>':''}
+<tr style="border-top:2px solid #1a472a;"><td style="padding:10px 0 4px;font-size:16px;font-weight:700;">Grand Total</td><td style="padding:10px 0 4px;text-align:right;font-size:16px;font-weight:700;">${cur}${num(order.grand_total)}</td></tr>
+</table>
+${order.payment_method?'<div style="font-size:12px;color:#888;margin-bottom:4px;"><strong>Payment Method:</strong> '+order.payment_method.toUpperCase()+'</div>':''}
+${order.tracking_number?'<div style="font-size:12px;color:#888;margin-bottom:4px;"><strong>Tracking:</strong> '+order.tracking_number+(order.courier_name?' ('+order.courier_name+')':'')+'</div>':''}
+<div style="margin-top:40px;padding-top:16px;border-top:1px solid #eee;text-align:center;"><div style="font-size:12px;color:#999;">Thank you for shopping with ${esc(STORE_CONFIG.storeName)}!</div><div style="font-size:11px;color:#bbb;margin-top:4px;">${STORE_CONFIG.contactEmail} &middot; ${STORE_CONFIG.contactPhone}</div></div>
+<div class="no-print" style="text-align:center;margin-top:30px;"><button onclick="window.print()" style="padding:10px 30px;background:#1a472a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Print / Save as PDF</button></div>
+</div></body></html>`;
+
+      const win = window.open('', '_blank');
+      if (!win) { showToast('Please allow popups to download the invoice', 'error'); return; }
+      win.document.write(html);
+      win.document.close();
+    }
+
+    function esc(s) { return escapeHtml(s); }
+    function num(v) { return parseFloat(v || 0).toFixed(2); }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

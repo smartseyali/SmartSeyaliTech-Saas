@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop - Pattikadai</title>
+  <meta name="description" content="Browse our range of authentic country foods, organic products, and traditional delicacies.">
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <!-- Breadcrumb -->
+  <section class="section-breadcrumb margin-b-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row bb-breadcrumb-inner">
+            <div class="col-md-6 col-12">
+              <h2 class="bb-breadcrumb-title" id="page-title">Shop</h2>
+            </div>
+            <div class="col-md-6 col-12">
+              <ul class="bb-breadcrumb-list">
+                <li class="bb-breadcrumb-item"><a href="/">Home</a></li>
+                <li><i class="ri-arrow-right-double-fill"></i></li>
+                <li class="bb-breadcrumb-item active" id="breadcrumb-current">Shop</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shop Section (Blueberry template layout) -->
+  <section class="section-shop padding-b-50">
+    <div class="container">
+      <div class="row">
+
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 col-12 bb-shop-sidebar" id="filter-sidebar-wrapper">
+
+          <!-- Mobile filter toggle -->
+          <div class="d-lg-none mb-3">
+            <button class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2" onclick="toggleFilterSidebar()">
+              <i class="ri-filter-3-line"></i> Filters
+            </button>
+          </div>
+
+          <div class="bb-shop-sidebar-inner" id="filter-sidebar">
+            <!-- Filter Title (mobile close) -->
+            <div class="sidebar-filter-title d-lg-none">
+              <h5>Filters</h5>
+              <a class="filter-close" onclick="toggleFilterSidebar()">&times;</a>
+            </div>
+
+            <!-- Categories -->
+            <div class="bb-sidebar-block">
+              <h5 class="bb-sidebar-title">Categories</h5>
+              <div class="bb-sidebar-content" id="filter-categories">
+                <div class="loading-skeleton" style="height: 150px;"></div>
+              </div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="bb-sidebar-block">
+              <h5 class="bb-sidebar-title">Price Range</h5>
+              <div class="bb-sidebar-content">
+                <div class="bb-price-range">
+                  <div class="d-flex gap-2 align-items-center">
+                    <div class="price-input">
+                      <label>Min</label>
+                      <input type="number" class="form-control form-control-sm" id="filter-min-price" placeholder="₹0" min="0">
+                    </div>
+                    <span class="price-separator">-</span>
+                    <div class="price-input">
+                      <label>Max</label>
+                      <input type="number" class="form-control form-control-sm" id="filter-max-price" placeholder="₹999" min="0">
+                    </div>
+                  </div>
+                  <button class="bb-btn-1 w-100 mt-3" onclick="applyFilters()">Apply</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clear -->
+            <div class="bb-sidebar-block">
+              <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                <i class="ri-refresh-line me-1"></i> Clear All Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-lg-9 col-12">
+          <div class="bb-shop-pro-inner">
+
+            <!-- Product Grid -->
+            <div class="row mb-minus-24" id="shop-products">
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+              <div class="col-xl-3 col-md-4 col-6 mb-24"><div class="loading-skeleton" style="height: 350px;"></div></div>
+            </div>
+          </div>
+          <!-- Pagination -->
+          <div class="col-sm-12">
+            <div class="bb-pro-pagination" id="shop-pagination"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/api.js?v=2.5"></script>
+  <script src="assets/js/auth.js?v=2.5"></script>
+  <script src="assets/js/cart.js?v=2.5"></script>
+  <script src="assets/js/main.js?v=2.5"></script>
+
+  <script>
+    let allProducts = [];
+    let filteredProducts = [];
+    let currentPage = 1;
+    let selectedCategories = [];
+    const perPage = STORE_CONFIG.productsPerPage;
+
+    function toggleFilterSidebar() {
+      var sidebar = document.getElementById('filter-sidebar');
+      sidebar.classList.toggle('active');
+      document.body.classList.toggle('filter-open');
+    }
+
+    onAppReady(async () => {
+      const search = getUrlParam('search');
+      const category = getUrlParam('category');
+      const filter = getUrlParam('filter');
+
+      if (search) {
+        document.getElementById('page-title').textContent = 'Search: "' + search + '"';
+        document.getElementById('breadcrumb-current').textContent = 'Search Results';
+      } else if (category) {
+        document.getElementById('page-title').textContent = category;
+        document.getElementById('breadcrumb-current').textContent = category;
+      } else if (filter === 'bestselling') {
+        document.getElementById('page-title').textContent = 'Best Selling';
+        document.getElementById('breadcrumb-current').textContent = 'Best Selling';
+      } else if (filter === 'featured') {
+        document.getElementById('page-title').textContent = 'Pattikadai Special';
+        document.getElementById('breadcrumb-current').textContent = 'Pattikadai Special';
+      } else if (filter === 'combo') {
+        document.getElementById('page-title').textContent = 'Special Combos';
+        document.getElementById('breadcrumb-current').textContent = 'Combos';
+      }
+
+      loadFilterCategories(category);
+
+      if (search) {
+        allProducts = await API.searchProducts(search);
+      } else {
+        const options = {};
+        if (filter === 'featured') options.isFeatured = true;
+        if (filter === 'bestselling') options.isBestSeller = true;
+        allProducts = await API.getProducts(options);
+      }
+
+      if (filter === 'combo') {
+        allProducts = allProducts.filter(function(p) {
+          return (p.item_name || '').toLowerCase().includes('combo') ||
+            (Array.isArray(p.tags) ? p.tags.join(' ') : (p.tags || '')).toLowerCase().includes('combo') ||
+            (p.is_combo === true);
+        });
+      }
+
+      if (category) {
+        selectedCategories = [category];
+      }
+
+      applyFilters();
+    });
+
+    async function loadFilterCategories(preselected) {
+      var container = document.getElementById('filter-categories');
+      var categories = await API.getCategories();
+
+      container.innerHTML = '<ul class="bb-check-box">' + categories.map(function(cat) {
+        return '<li class="bb-check-item">' +
+          '<div class="form-check">' +
+          '<input class="form-check-input" type="checkbox" id="cat-' + cat.id + '" value="' + cat.name + '"' +
+          (preselected === cat.name ? ' checked' : '') +
+          ' onchange="toggleCategory(\'' + cat.name + '\')">' +
+          '<label class="form-check-label" for="cat-' + cat.id + '">' + cat.name + '</label>' +
+          '</div></li>';
+      }).join('') + '</ul>';
+    }
+
+    function toggleCategory(name) {
+      var idx = selectedCategories.indexOf(name);
+      if (idx >= 0) selectedCategories.splice(idx, 1);
+      else selectedCategories.push(name);
+      currentPage = 1;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      var minPrice = parseFloat(document.getElementById('filter-min-price').value) || 0;
+      var maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
+
+      filteredProducts = allProducts.filter(function(p) {
+        var price = p.selling_price || 0;
+        if (selectedCategories.length > 0) {
+          var catName = p.master_categories?.name || '';
+          if (!selectedCategories.includes(catName)) return false;
+        }
+        if (price < minPrice || price > maxPrice) return false;
+        return true;
+      });
+
+      filteredProducts.sort(function(a, b) {
+        var filterParam = getUrlParam('filter');
+        if (filterParam === 'bestselling') {
+          var aSales = a.sales_count || a.total_sold || a.sold_quantity || a.order_count || a.total_orders || 0;
+          var bSales = b.sales_count || b.total_sold || b.sold_quantity || b.order_count || b.total_orders || 0;
+          if (bSales !== aSales) {
+            return bSales - aSales;
+          }
+        }
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      renderProducts();
+    }
+
+    function clearFilters() {
+      selectedCategories = [];
+      document.querySelectorAll('#filter-categories .form-check-input').forEach(function(cb) { cb.checked = false; });
+      document.getElementById('filter-min-price').value = '';
+      document.getElementById('filter-max-price').value = '';
+      currentPage = 1;
+      applyFilters();
+    }
+
+    function renderProducts() {
+      var container = document.getElementById('shop-products');
+      var paginationContainer = document.getElementById('shop-pagination');
+
+      var start = (currentPage - 1) * perPage;
+      var pageProducts = filteredProducts.slice(start, start + perPage);
+
+      if (pageProducts.length === 0) {
+        container.innerHTML = '<div class="col-12 empty-state"><i class="ri-search-line"></i><h4>No products found</h4><p>Try adjusting your filters or search criteria</p><a href="shop.html" class="bb-btn-2">View All Products</a></div>';
+        paginationContainer.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = pageProducts.map(function(p) { return renderProductCard(p); }).join('');
+      paginationContainer.innerHTML = renderPagination(filteredProducts.length, currentPage, perPage, 'goToPage');
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderProducts();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

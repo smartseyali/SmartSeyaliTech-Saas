@@ -1,0 +1,1005 @@
+{
+  "slug": "sparkleinstitute",
+  "category": "education",
+  "entry": "index.html",
+  "generated_at": "2026-04-23T14:37:13.956Z",
+  "file_count": 249,
+  "files": [
+    {
+      "path": "_redirects",
+      "size": 25
+    },
+    {
+      "path": ".htaccess",
+      "size": 1621
+    },
+    {
+      "path": "404.html",
+      "size": 2139
+    },
+    {
+      "path": "about.html",
+      "size": 23785
+    },
+    {
+      "path": "apply.html",
+      "size": 29326
+    },
+    {
+      "path": "assets/AbandonedCarts-Qnz7yP8a.js",
+      "size": 6716
+    },
+    {
+      "path": "assets/About-BrO_mwfM.js",
+      "size": 9030
+    },
+    {
+      "path": "assets/About-NpdMrvg1.js",
+      "size": 8711
+    },
+    {
+      "path": "assets/accordion-DYTFEUBd.js",
+      "size": 1009
+    },
+    {
+      "path": "assets/Accounts-B-Ktnqxp.js",
+      "size": 668
+    },
+    {
+      "path": "assets/Accounts-NryirGvZ.js",
+      "size": 673
+    },
+    {
+      "path": "assets/Analytics-DIcbyd9B.js",
+      "size": 3250
+    },
+    {
+      "path": "assets/api--0fR4JDv.js",
+      "size": 196540
+    },
+    {
+      "path": "assets/APIIntegrations-iNTW-ZHr.js",
+      "size": 4456
+    },
+    {
+      "path": "assets/ApiKeys-Cfv0qZUx.js",
+      "size": 667
+    },
+    {
+      "path": "assets/AppLauncher-DfFrWbpH.js",
+      "size": 8321
+    },
+    {
+      "path": "assets/Apply-BOTaf2VS.js",
+      "size": 10416
+    },
+    {
+      "path": "assets/Appraisals-DV0F1pz7.js",
+      "size": 1687
+    },
+    {
+      "path": "assets/arrow-left-BvKMu-Al.js",
+      "size": 333
+    },
+    {
+      "path": "assets/arrow-right-left-6yNKczgU.js",
+      "size": 415
+    },
+    {
+      "path": "assets/arrow-up-right-BvaeHG8G.js",
+      "size": 334
+    },
+    {
+      "path": "assets/Attendance-vXNRzeiN.js",
+      "size": 1814
+    },
+    {
+      "path": "assets/AutomationRules-Cvf76sL6.js",
+      "size": 675
+    },
+    {
+      "path": "assets/BalanceSheet-CWLF9QFf.js",
+      "size": 5062
+    },
+    {
+      "path": "assets/BankAccounts-BzbVhcmc.js",
+      "size": 4079
+    },
+    {
+      "path": "assets/banknote-Cortoylr.js",
+      "size": 414
+    },
+    {
+      "path": "assets/BankReconciliation-B9ARVRgv.js",
+      "size": 5594
+    },
+    {
+      "path": "assets/Banners-CaKQxVBA.js",
+      "size": 8492
+    },
+    {
+      "path": "assets/BatchTracking-a8wfHk8y.js",
+      "size": 1619
+    },
+    {
+      "path": "assets/Billing-D4Zuvug8.js",
+      "size": 10280
+    },
+    {
+      "path": "assets/BlogPosts-Dw9Jr4oO.js",
+      "size": 666
+    },
+    {
+      "path": "assets/briefcase-eT3x80zc.js",
+      "size": 389
+    },
+    {
+      "path": "assets/building-2-FsVlphhy.js",
+      "size": 607
+    },
+    {
+      "path": "assets/calendar-CNAEBCm6.js",
+      "size": 426
+    },
+    {
+      "path": "assets/Campaigns-DHvdXHpJ.js",
+      "size": 5407
+    },
+    {
+      "path": "assets/card-BzPJatu4.js",
+      "size": 1047
+    },
+    {
+      "path": "assets/Categories-BCxsjhHI.js",
+      "size": 2379
+    },
+    {
+      "path": "assets/ChartOfAccounts-DqdaqRoX.js",
+      "size": 679
+    },
+    {
+      "path": "assets/circle-alert-C44jlH_2.js",
+      "size": 418
+    },
+    {
+      "path": "assets/circle-check-big-BsDt5wdl.js",
+      "size": 361
+    },
+    {
+      "path": "assets/circle-check-DKBZ-U7b.js",
+      "size": 346
+    },
+    {
+      "path": "assets/circle-x-w28KpI28.js",
+      "size": 375
+    },
+    {
+      "path": "assets/Claims-1sQZ8vx1.js",
+      "size": 1689
+    },
+    {
+      "path": "assets/Components-DrEftKWD.js",
+      "size": 670
+    },
+    {
+      "path": "assets/Contact-Be6VWr2D.js",
+      "size": 11081
+    },
+    {
+      "path": "assets/Contact-BLC9kfFu.js",
+      "size": 8937
+    },
+    {
+      "path": "assets/Contacts-BYDa8sBr.js",
+      "size": 668
+    },
+    {
+      "path": "assets/ContentVersions-D5Fuvo2D.js",
+      "size": 675
+    },
+    {
+      "path": "assets/copy-CQikTZVA.js",
+      "size": 405
+    },
+    {
+      "path": "assets/Coupons-HlApS3rD.js",
+      "size": 9995
+    },
+    {
+      "path": "assets/cpu-Cciv8kYc.js",
+      "size": 665
+    },
+    {
+      "path": "assets/Credentials-XVlBjMLD.js",
+      "size": 671
+    },
+    {
+      "path": "assets/CRMDashboard-CD5YkzEV.js",
+      "size": 8061
+    },
+    {
+      "path": "assets/CTASection-CacTDrob.js",
+      "size": 2089
+    },
+    {
+      "path": "assets/Customers-D_GmevFw.js",
+      "size": 671
+    },
+    {
+      "path": "assets/Customers-DBPSSxMF.js",
+      "size": 3024
+    },
+    {
+      "path": "assets/CustomFields-CagzTU_4.js",
+      "size": 675
+    },
+    {
+      "path": "assets/Dashboard-Bu7ANj_6.js",
+      "size": 7703
+    },
+    {
+      "path": "assets/DashboardTemplate-BsPP5l-q.js",
+      "size": 1828
+    },
+    {
+      "path": "assets/Deals-CvZClESa.js",
+      "size": 665
+    },
+    {
+      "path": "assets/Deliveries-Cqq-mnl7.js",
+      "size": 3373
+    },
+    {
+      "path": "assets/Deliveries-DKTW4opM.js",
+      "size": 2592
+    },
+    {
+      "path": "assets/Departments-wjlBj6Sa.js",
+      "size": 1650
+    },
+    {
+      "path": "assets/DocForm-B4R-5SWY.js",
+      "size": 13551
+    },
+    {
+      "path": "assets/DocList-DPWt7a2F.js",
+      "size": 105406
+    },
+    {
+      "path": "assets/DocPage-xpv3mzyX.js",
+      "size": 6211
+    },
+    {
+      "path": "assets/download-RDYHxH5k.js",
+      "size": 431
+    },
+    {
+      "path": "assets/EcommerceDashboard-L0YQBGwc.js",
+      "size": 11517
+    },
+    {
+      "path": "assets/EcomOrderDetail-CmMKMpVc.js",
+      "size": 23462
+    },
+    {
+      "path": "assets/EcomOrders-BfDX9zha.js",
+      "size": 5201
+    },
+    {
+      "path": "assets/ellipsis-B5It57i1.js",
+      "size": 395
+    },
+    {
+      "path": "assets/Employees-2fGMGVoF.js",
+      "size": 670
+    },
+    {
+      "path": "assets/Enquiries-DSKnWMoE.js",
+      "size": 668
+    },
+    {
+      "path": "assets/ERPEntryForm-Y3P_KkE4.js",
+      "size": 642
+    },
+    {
+      "path": "assets/ERPListView-2H5mzSfy.js",
+      "size": 7915
+    },
+    {
+      "path": "assets/EventRegistrations-CCU2G0U2.js",
+      "size": 678
+    },
+    {
+      "path": "assets/Events-Dlg3KGbq.js",
+      "size": 666
+    },
+    {
+      "path": "assets/eye-nyJRGt6h.js",
+      "size": 425
+    },
+    {
+      "path": "assets/eye-off-FrgM1BzR.js",
+      "size": 598
+    },
+    {
+      "path": "assets/FAQs-CbyJXE59.js",
+      "size": 664
+    },
+    {
+      "path": "assets/Faqs-FDisJDHI.js",
+      "size": 6692
+    },
+    {
+      "path": "assets/FeaturedPrograms-E_NyW1yC.js",
+      "size": 3266
+    },
+    {
+      "path": "assets/filter-BSY-lLz5.js",
+      "size": 330
+    },
+    {
+      "path": "assets/FinanceDashboard-CF7-d58k.js",
+      "size": 9402
+    },
+    {
+      "path": "assets/flame-5goAVKXl.js",
+      "size": 447
+    },
+    {
+      "path": "assets/Footer-BpNjj9rT.js",
+      "size": 10468
+    },
+    {
+      "path": "assets/Forecast-Dn6BaGtr.js",
+      "size": 1704
+    },
+    {
+      "path": "assets/FormBuilder-CqqILZLJ.js",
+      "size": 665
+    },
+    {
+      "path": "assets/FormSubmissions-BL6btYg5.js",
+      "size": 675
+    },
+    {
+      "path": "assets/Gallery-DKxtGOA3.js",
+      "size": 35890
+    },
+    {
+      "path": "assets/Gallery-jL9gFUn_.js",
+      "size": 18071
+    },
+    {
+      "path": "assets/GalleryManager-jAyB1lCt.js",
+      "size": 669
+    },
+    {
+      "path": "assets/GeneralLedger-DbeDOtiO.js",
+      "size": 7941
+    },
+    {
+      "path": "assets/GoodsReceipts-D6PPrOon.js",
+      "size": 1758
+    },
+    {
+      "path": "assets/Groups-CUeO8e-9.js",
+      "size": 666
+    },
+    {
+      "path": "assets/HeadlessConsole-DOFzPSAF.js",
+      "size": 8956
+    },
+    {
+      "path": "assets/HRMSDashboard-B2x-KSEY.js",
+      "size": 8846
+    },
+    {
+      "path": "assets/index-BxQGF5Z9.css",
+      "size": 158574
+    },
+    {
+      "path": "assets/Index-CTgx6I2W.js",
+      "size": 7828
+    },
+    {
+      "path": "assets/index-CvMoWh14.js",
+      "size": 151495
+    },
+    {
+      "path": "assets/index-DfcbQmd8.js",
+      "size": 299269
+    },
+    {
+      "path": "assets/Index-GvoOlOh3.js",
+      "size": 7987
+    },
+    {
+      "path": "assets/index-W1Ewpdqh.css",
+      "size": 87269
+    },
+    {
+      "path": "assets/Induction-BMKOrq2L.js",
+      "size": 4418
+    },
+    {
+      "path": "assets/info-hFwvh_uI.js",
+      "size": 373
+    },
+    {
+      "path": "assets/input-7kRXzSxe.js",
+      "size": 724
+    },
+    {
+      "path": "assets/input-D9iMBKq3.js",
+      "size": 617
+    },
+    {
+      "path": "assets/InventoryDashboard-CGRIuf6m.js",
+      "size": 8896
+    },
+    {
+      "path": "assets/Invoices-BcuVN4XB.js",
+      "size": 670
+    },
+    {
+      "path": "assets/Items-BPNXgZ8m.js",
+      "size": 671
+    },
+    {
+      "path": "assets/JournalEntries-BSSKBukb.js",
+      "size": 4507
+    },
+    {
+      "path": "assets/label-Bj3bkSvm.js",
+      "size": 985
+    },
+    {
+      "path": "assets/Leads-YPiKw03v.js",
+      "size": 665
+    },
+    {
+      "path": "assets/LeaveManagement-CeqppEaT.js",
+      "size": 3374
+    },
+    {
+      "path": "assets/License-rnUwO9QL.js",
+      "size": 5405
+    },
+    {
+      "path": "assets/link-BVPbhFy8.js",
+      "size": 425
+    },
+    {
+      "path": "assets/LocalLanding-BawtHFab.js",
+      "size": 6104
+    },
+    {
+      "path": "assets/lock-CmA2aaR-.js",
+      "size": 375
+    },
+    {
+      "path": "assets/Login-9uYcS6vz.js",
+      "size": 8735
+    },
+    {
+      "path": "assets/MasterDashboard-ir8c_O6t.js",
+      "size": 9577
+    },
+    {
+      "path": "assets/MediaLibrary-Df_8WbqI.js",
+      "size": 666
+    },
+    {
+      "path": "assets/MediaUpload-CxBbFIJR.js",
+      "size": 5048
+    },
+    {
+      "path": "assets/MenuManager-D9zPX2rq.js",
+      "size": 660
+    },
+    {
+      "path": "assets/message-circle-oJYIyKLZ.js",
+      "size": 316
+    },
+    {
+      "path": "assets/ModuleDetail-DqGmBVdM.js",
+      "size": 9087
+    },
+    {
+      "path": "assets/ModuleListPage-BpwzGaeY.js",
+      "size": 7314
+    },
+    {
+      "path": "assets/Modules-COlS2llv.js",
+      "size": 3982
+    },
+    {
+      "path": "assets/motion-CfaRLYt9.js",
+      "size": 124310
+    },
+    {
+      "path": "assets/network-WVR3u1At.js",
+      "size": 553
+    },
+    {
+      "path": "assets/NotFound-BcrqNjZC.js",
+      "size": 669
+    },
+    {
+      "path": "assets/NotFound-BHmX-ahQ.js",
+      "size": 691
+    },
+    {
+      "path": "assets/Offers-l9S5Dbbq.js",
+      "size": 11666
+    },
+    {
+      "path": "assets/OfficeGallery-BldfEXmQ.js",
+      "size": 29284
+    },
+    {
+      "path": "assets/Onboarding-DvfiYSwv.js",
+      "size": 27588
+    },
+    {
+      "path": "assets/Orders-CWERzEAL.js",
+      "size": 1116
+    },
+    {
+      "path": "assets/PageSections-D2jwbABw.js",
+      "size": 672
+    },
+    {
+      "path": "assets/pause-DiV1f9Z8.js",
+      "size": 380
+    },
+    {
+      "path": "assets/PaymentGateways-CqYg5Y5e.js",
+      "size": 675
+    },
+    {
+      "path": "assets/PaymentGateways-D_NpIHg9.js",
+      "size": 11570
+    },
+    {
+      "path": "assets/PaymentOrders-m108eejN.js",
+      "size": 673
+    },
+    {
+      "path": "assets/Payments-bnMZdhaH.js",
+      "size": 668
+    },
+    {
+      "path": "assets/Payroll-DyMqa3TR.js",
+      "size": 5605
+    },
+    {
+      "path": "assets/pencil-DKVoNgB0.js",
+      "size": 445
+    },
+    {
+      "path": "assets/Pipelines-B61Q7H6I.js",
+      "size": 3421
+    },
+    {
+      "path": "assets/Plans-fdpe0_th.js",
+      "size": 2113
+    },
+    {
+      "path": "assets/POSDashboard-DQ1Se2P5.js",
+      "size": 7502
+    },
+    {
+      "path": "assets/POSOrders-B5UxJzQ8.js",
+      "size": 1688
+    },
+    {
+      "path": "assets/Pricing-yeSFQiHL.js",
+      "size": 668
+    },
+    {
+      "path": "assets/printer-D1R6kR0X.js",
+      "size": 488
+    },
+    {
+      "path": "assets/Products-DDIaqftG.js",
+      "size": 7429
+    },
+    {
+      "path": "assets/ProfitLoss-C4q7-Wfz.js",
+      "size": 5868
+    },
+    {
+      "path": "assets/ProgramDetail-N-jrqDPd.js",
+      "size": 15219
+    },
+    {
+      "path": "assets/Programs-MyyMcN2b.js",
+      "size": 35701
+    },
+    {
+      "path": "assets/PurchaseBills-BO4LwnLr.js",
+      "size": 670
+    },
+    {
+      "path": "assets/PurchaseDashboard-CyirmDdn.js",
+      "size": 7521
+    },
+    {
+      "path": "assets/PurchaseOrders-cell-FnU.js",
+      "size": 671
+    },
+    {
+      "path": "assets/PurchaseRequests-BYhjIPce.js",
+      "size": 3060
+    },
+    {
+      "path": "assets/Quotations-BhkaJefN.js",
+      "size": 1111
+    },
+    {
+      "path": "assets/ReceiptVouchers-T5Sm8KQj.js",
+      "size": 672
+    },
+    {
+      "path": "assets/refresh-cw-BSIcbInG.js",
+      "size": 489
+    },
+    {
+      "path": "assets/Refunds-0qTaRj_1.js",
+      "size": 10692
+    },
+    {
+      "path": "assets/Register-HPFQ6zUP.js",
+      "size": 1686
+    },
+    {
+      "path": "assets/Registrations-DoWkhK4K.js",
+      "size": 673
+    },
+    {
+      "path": "assets/Reports-Dx5PqOEq.js",
+      "size": 1686
+    },
+    {
+      "path": "assets/ResetPassword-Dlf3ztRu.js",
+      "size": 5964
+    },
+    {
+      "path": "assets/Reviews-DGQout2Q.js",
+      "size": 9598
+    },
+    {
+      "path": "assets/SalesDashboard-BTQD_Qzh.js",
+      "size": 8964
+    },
+    {
+      "path": "assets/save-BNNFQIc7.js",
+      "size": 496
+    },
+    {
+      "path": "assets/Schedules-hkJsyS2S.js",
+      "size": 669
+    },
+    {
+      "path": "assets/Segments-BQyvepWX.js",
+      "size": 668
+    },
+    {
+      "path": "assets/send-IuXR6knK.js",
+      "size": 459
+    },
+    {
+      "path": "assets/SEO-oNH8IBaK.js",
+      "size": 464
+    },
+    {
+      "path": "assets/SEOContent-WZ01CqaP.js",
+      "size": 3693
+    },
+    {
+      "path": "assets/SEOManager-BOhEpZHX.js",
+      "size": 668
+    },
+    {
+      "path": "assets/Services-gxStWuCm.js",
+      "size": 8105
+    },
+    {
+      "path": "assets/Settings-CQ3gzMut.js",
+      "size": 5378
+    },
+    {
+      "path": "assets/shield-DIi2Gi11.js",
+      "size": 441
+    },
+    {
+      "path": "assets/ShippingZones-B3xNEbvj.js",
+      "size": 3561
+    },
+    {
+      "path": "assets/sparkle-config.js",
+      "size": 1523
+    },
+    {
+      "path": "assets/Stats-DAbMlgbN.js",
+      "size": 807
+    },
+    {
+      "path": "assets/status-badge-BgoB1CQk.js",
+      "size": 2030
+    },
+    {
+      "path": "assets/StockAudits-C5kNBQ3y.js",
+      "size": 1641
+    },
+    {
+      "path": "assets/StockLevels-B33LoqaP.js",
+      "size": 668
+    },
+    {
+      "path": "assets/StockTransfers-CAra_lu5.js",
+      "size": 1728
+    },
+    {
+      "path": "assets/style.css",
+      "size": 61778
+    },
+    {
+      "path": "assets/supabase-D-vHfFRB.js",
+      "size": 173695
+    },
+    {
+      "path": "assets/supabase.js",
+      "size": 16137
+    },
+    {
+      "path": "assets/table-BwmLwmPT.js",
+      "size": 6130
+    },
+    {
+      "path": "assets/tailwind.css",
+      "size": 87269
+    },
+    {
+      "path": "assets/target-DUUU86WV.js",
+      "size": 395
+    },
+    {
+      "path": "assets/TaxConfiguration-VQbhQiUh.js",
+      "size": 3572
+    },
+    {
+      "path": "assets/Team-CfCr_DI5.js",
+      "size": 10098
+    },
+    {
+      "path": "assets/Templates-BTPnn5KJ.js",
+      "size": 669
+    },
+    {
+      "path": "assets/Templates-DsvnufJ3.js",
+      "size": 674
+    },
+    {
+      "path": "assets/Tenants-CAG0QR0U.js",
+      "size": 16552
+    },
+    {
+      "path": "assets/Terminal-Btuipt6B.js",
+      "size": 5324
+    },
+    {
+      "path": "assets/Terms-CUQlywB4.js",
+      "size": 4767
+    },
+    {
+      "path": "assets/Testimonials-BhfNvkLK.js",
+      "size": 672
+    },
+    {
+      "path": "assets/toggle-right-DQyYutf3.js",
+      "size": 701
+    },
+    {
+      "path": "assets/Translations-BsPlkLe9.js",
+      "size": 672
+    },
+    {
+      "path": "assets/trash-2-j9yAgav-.js",
+      "size": 526
+    },
+    {
+      "path": "assets/trending-down-DL_KyylN.js",
+      "size": 376
+    },
+    {
+      "path": "assets/TrialBalance-BOCQwVM_.js",
+      "size": 6302
+    },
+    {
+      "path": "assets/triangle-alert-H1IJ4_im.js",
+      "size": 433
+    },
+    {
+      "path": "assets/ui-DlkV3l3E.js",
+      "size": 87270
+    },
+    {
+      "path": "assets/useCrud-CZM7yda1.js",
+      "size": 2289
+    },
+    {
+      "path": "assets/useDictionary-ctV8-bzF.js",
+      "size": 1292
+    },
+    {
+      "path": "assets/usePrograms-zWXe-4SK.js",
+      "size": 12080
+    },
+    {
+      "path": "assets/Users-CaaNSljT.js",
+      "size": 11905
+    },
+    {
+      "path": "assets/vendor-1qGptndg.js",
+      "size": 164727
+    },
+    {
+      "path": "assets/vendor-icons-6SnmZ5Ut.js",
+      "size": 20219
+    },
+    {
+      "path": "assets/vendor-react-B6lx-JmZ.js",
+      "size": 69
+    },
+    {
+      "path": "assets/vendor-router-DqMAmxmS.js",
+      "size": 155074
+    },
+    {
+      "path": "assets/vendor-ui-DNyxS8bh.js",
+      "size": 48340
+    },
+    {
+      "path": "assets/Vendors-kkmiLXow.js",
+      "size": 664
+    },
+    {
+      "path": "assets/Warehouses-Bfv4FnFU.js",
+      "size": 3781
+    },
+    {
+      "path": "assets/WebPages-BH1H_wEQ.js",
+      "size": 665
+    },
+    {
+      "path": "assets/Website-CquQpMy7.js",
+      "size": 53395
+    },
+    {
+      "path": "assets/WebsiteDashboard-CsjV6DGG.js",
+      "size": 3512
+    },
+    {
+      "path": "assets/WebsiteSettings-D1lGXy9c.js",
+      "size": 660
+    },
+    {
+      "path": "assets/WhatsAppDashboard-C1P13Pre.js",
+      "size": 7925
+    },
+    {
+      "path": "assets/WhySparkle-Bwae4sFi.js",
+      "size": 2236
+    },
+    {
+      "path": "blog-post.html",
+      "size": 23698
+    },
+    {
+      "path": "blog.html",
+      "size": 23702
+    },
+    {
+      "path": "contact.html",
+      "size": 29623
+    },
+    {
+      "path": "faqs.html",
+      "size": 36569
+    },
+    {
+      "path": "favicon.ico",
+      "size": 20373
+    },
+    {
+      "path": "gallery.html",
+      "size": 28287
+    },
+    {
+      "path": "googlebe6b5439afe6412d.html",
+      "size": 53
+    },
+    {
+      "path": "index.html",
+      "size": 62108
+    },
+    {
+      "path": "local-landing.html",
+      "size": 30791
+    },
+    {
+      "path": "logo.jpg",
+      "size": 145588
+    },
+    {
+      "path": "placeholder.svg",
+      "size": 3253
+    },
+    {
+      "path": "products.html",
+      "size": 34314
+    },
+    {
+      "path": "program-detail.html",
+      "size": 31690
+    },
+    {
+      "path": "programs.html",
+      "size": 32627
+    },
+    {
+      "path": "robots.txt",
+      "size": 72
+    },
+    {
+      "path": "sitemap.xml",
+      "size": 1611
+    },
+    {
+      "path": "sparkle image/BioMedical Waste Management.webp",
+      "size": 103488
+    },
+    {
+      "path": "sparkle image/Blood Bank.jpg",
+      "size": 162562
+    },
+    {
+      "path": "sparkle image/Diet & Nutrition.jpg",
+      "size": 76597
+    },
+    {
+      "path": "sparkle image/Health Care Inspector.jpg",
+      "size": 198596
+    },
+    {
+      "path": "sparkle image/Hospital Administrative Management.png",
+      "size": 246882
+    },
+    {
+      "path": "sparkle image/Hospital Executive Management.jpg",
+      "size": 8304
+    },
+    {
+      "path": "sparkle image/hrm.jpg",
+      "size": 17525
+    },
+    {
+      "path": "sparkle image/Medical Lab Image.jpg",
+      "size": 27048
+    },
+    {
+      "path": "sparkle image/Patient Care Management.png",
+      "size": 1447324
+    },
+    {
+      "path": "sparkle image/Phlebotomy.jpg",
+      "size": 8413
+    },
+    {
+      "path": "terms.html",
+      "size": 23893
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <!-- Breadcrumb -->
+  <section class="section-breadcrumb margin-b-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row bb-breadcrumb-inner">
+            <div class="col-md-6 col-12">
+              <h2 class="bb-breadcrumb-title">Cart</h2>
+            </div>
+            <div class="col-md-6 col-12">
+              <ul class="bb-breadcrumb-list">
+                <li class="bb-breadcrumb-item"><a href="/">Home</a></li>
+                <li><i class="ri-arrow-right-double-fill"></i></li>
+                <li class="bb-breadcrumb-item active">Cart</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-cart padding-tb-50">
+    <div class="container">
+      <div class="row mb-minus-24">
+        <!-- Cart Summary (Left in Blueberry template) -->
+        <div class="col-lg-4 mb-24">
+          <div class="bb-cart-sidebar-block">
+          <div class="bb-sb-title">
+              <h3>Summary</h3>
+            </div>
+            <div class="bb-sb-blok-contact">
+              <div class="mb-3">
+                <label>Coupon Code</label>
+                <div class="d-flex gap-2 mt-1">
+                  <input type="text" class="form-control" id="coupon-input" placeholder="Enter coupon">
+                  <button class="bb-btn-2" onclick="applyCoupon()">Apply</button>
+                </div>
+                <div id="coupon-message" class="mt-1 small"></div>
+              </div>
+              <div class="bb-cart-summary">
+                <div class="inner-summary">
+                  <ul>
+                    <li>
+                      <span class="text-left">Sub-Total</span>
+                      <span class="text-right" id="cart-subtotal">₹0</span>
+                    </li>
+                    <li id="discount-row" style="display: none;">
+                      <span class="text-left">Coupon Discount</span>
+                      <span class="text-right" id="cart-discount">-₹0</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="summary-total">
+                  <ul>
+                    <li>
+                      <span class="text-left">Total Amount</span>
+                      <span class="text-right" id="cart-total">₹0</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Table (Right in Blueberry template) -->
+        <div class="col-lg-8 mb-24">
+          <div id="cart-items-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    let couponDiscount = 0;
+    let couponData = null;
+
+    onAppReady(() => {
+      renderCartPage();
+      document.addEventListener('cart-updated', renderCartPage);
+    });
+
+    function renderCartPage() {
+      const container = document.getElementById('cart-items-container');
+      const items = Cart.getItems();
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="ri-shopping-bag-line"></i>
+            <h4>Your cart is empty</h4>
+            <p>Looks like you haven't added anything yet</p>
+            <a href="shop.html" class="bb-btn-2">Start Shopping</a>
+          </div>`;
+        document.getElementById('cart-subtotal').textContent = '₹0';
+        document.getElementById('cart-total').textContent = '₹0';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="bb-cart-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td>
+                    <a href="product.html?id=${item.product_id}">
+                      <div class="Product-cart">
+                        <img src="${item.image_url || 'assets/img/product/default.jpg'}" alt="${item.name}">
+                        <span>${item.name}${item.variant_name ? ' <small>(' + item.variant_name + ')</small>' : ''}</span>
+                      </div>
+                    </a>
+                  </td>
+                  <td>
+                    <span class="price">${formatPrice(item.price)}</span>
+                    ${item.mrp && item.mrp > item.price ? `<br><span class="old-price">${formatPrice(item.mrp)}</span>` : ''}
+                  </td>
+                  <td>
+                    <div class="qty-selector qty-selector-sm">
+                      <button class="qty-btn qty-minus" onclick="updateCartItem('${item.key}', ${item.quantity - 1})"><i class="ri-subtract-line"></i></button>
+                      <span class="qty-value">${item.quantity}</span>
+                      <button class="qty-btn qty-plus" onclick="updateCartItem('${item.key}', ${item.quantity + 1})"><i class="ri-add-line"></i></button>
+                    </div>
+                  </td>
+                  <td><span class="price">${formatPrice(item.price * item.quantity)}</span></td>
+                  <td>
+                    <div class="pro-remove">
+                      <a onclick="removeCartItem('${item.key}')"><i class="ri-delete-bin-line"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <button onclick="proceedToCheckout()" class="bb-btn-2 check-btn w-100">Proceed to Checkout <i class="ri-arrow-right-line"></i></button>`;
+
+      updateCartSummary();
+    }
+
+    async function proceedToCheckout() {
+      const loggedIn = await Auth.isLoggedIn();
+      if (!loggedIn) {
+        showToast('Please login to proceed to checkout', 'info');
+        setTimeout(() => {
+          window.location.href = 'login.html?redirect=checkout.html';
+        }, 1000);
+        return;
+      }
+      window.location.href = 'checkout.html';
+    }
+
+    function updateCartItem(key, qty) {
+      if (qty < 1) {
+        removeCartItem(key);
+        return;
+      }
+      Cart.updateQuantity(key, qty);
+      renderCartPage();
+    }
+
+    function removeCartItem(key) {
+      Cart.removeItem(key);
+      renderCartPage();
+    }
+
+    function updateCartSummary() {
+      const subtotal = Cart.getSubtotal();
+      let discount = 0;
+
+      if (couponData) {
+        if (couponData.discount_type === 'percentage') {
+          discount = subtotal * (couponData.discount_value / 100);
+          if (couponData.max_discount_amount) discount = Math.min(discount, couponData.max_discount_amount);
+        } else {
+          discount = couponData.discount_value;
+        }
+      }
+
+      couponDiscount = discount;
+      const total = Math.max(0, subtotal - discount);
+
+      document.getElementById('cart-subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('cart-total').textContent = formatPrice(total);
+
+      const discountRow = document.getElementById('discount-row');
+      if (discount > 0) {
+        discountRow.style.display = '';
+        document.getElementById('cart-discount').textContent = '-' + formatPrice(discount);
+      } else {
+        discountRow.style.display = 'none';
+      }
+    }
+
+    async function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim();
+      const msg = document.getElementById('coupon-message');
+
+      if (!code) { msg.innerHTML = '<span class="text-danger">Enter a coupon code</span>'; return; }
+
+      const coupon = await API.validateCoupon(code);
+      if (!coupon) {
+        msg.innerHTML = '<span class="text-danger">Invalid or expired coupon</span>';
+        couponData = null;
+        couponDiscount = 0;
+        updateCartSummary();
+        return;
+      }
+
+      // Check minimum order
+      if (coupon.min_order_amount && Cart.getSubtotal() < coupon.min_order_amount) {
+        msg.innerHTML = `<span class="text-danger">Minimum order ₹${coupon.min_order_amount} required</span>`;
+        return;
+      }
+
+      couponData = coupon;
+      msg.innerHTML = `<span class="text-success">Coupon applied! ${coupon.discount_type === 'percentage' ? coupon.discount_value + '% off' : '₹' + coupon.discount_value + ' off'}</span>`;
+      updateCartSummary();
+
+      // Store coupon for checkout
+      sessionStorage.setItem('applied_coupon', JSON.stringify(coupon));
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

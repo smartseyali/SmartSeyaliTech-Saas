@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title data-content="title">Your Journal</title>
+<meta name="description" content="A modern editorial blog" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">J</span><span data-content="brand_name">Your Journal</span></a>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section class="container hero">
+    <h1 data-content="hero_title">Stories worth reading.</h1>
+    <p data-content="hero_subtitle">A home for thoughtful writing on product, design, and the craft of building for the web.</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Latest posts</h2>
+        <p>Fresh reads from our writers.</p>
+      </div>
+      <div id="posts" class="grid grid-3">
+        <div class="card"><h3>Why we chose Hostinger</h3><p>Hosting, domains, and the pragmatic path to shipping fast.</p></div>
+        <div class="card"><h3>Writing for the web in 2026</h3><p>Short paragraphs, strong hooks, real signals.</p></div>
+        <div class="card"><h3>The editorial stack</h3><p>From Smartseyali to your readers in three clicks.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Journal</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

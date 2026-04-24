@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Contact — Your Shop</title><link rel="stylesheet" href="assets/css/style.css" /></head>
+<body>
+<header><div class="container nav">
+  <a href="index.html" class="brand"><span class="mark">M</span><span data-content="brand_name">Your Shop</span></a>
+  <ul><li><a href="shop.html">Shop</a></li><li><a href="cart.html">Cart</a></li></ul>
+</div></header>
+<main>
+  <section class="container hero"><h1>Contact us</h1><p data-content="intro">Questions about your order? Drop us a line.</p></section>
+  <section class="section"><div class="container">
+    <form class="form" onsubmit="event.preventDefault();alert('Thanks! We\'ll reply soon.');this.reset();">
+      <input type="text" placeholder="Name" required />
+      <input type="email" placeholder="Email" required />
+      <textarea rows="4" placeholder="Message" required></textarea>
+      <button class="cta" type="submit">Send</button>
+    </form>
+  </div></section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Shop</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body></html>

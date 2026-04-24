@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Shop — Your Shop</title><link rel="stylesheet" href="assets/css/style.css" /></head>
+<body>
+<header><div class="container nav">
+  <a href="index.html" class="brand"><span class="mark">M</span><span data-content="brand_name">Your Shop</span></a>
+  <ul><li><a href="index.html">Home</a></li><li><a href="cart.html">Cart</a></li></ul>
+</div></header>
+<main>
+  <section class="container hero"><h1>All products</h1><p>Browse the full catalog.</p></section>
+  <section class="section"><div class="container">
+    <div class="grid grid-3" id="product-list">
+      <div class="card"><h3>Loading catalog…</h3><p>Products will appear here once connected to your Smartseyali catalog.</p></div>
+    </div>
+  </div></section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Shop</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body></html>

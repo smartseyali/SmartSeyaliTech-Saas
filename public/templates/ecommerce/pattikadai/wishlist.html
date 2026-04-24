@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishlist - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <div class="bb-breadcrumb">
+    <div class="container">
+      <h1>Wishlist</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item active">Wishlist</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <section class="container mt-4 mb-5">
+    <div id="wishlist-container">
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase-client.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    onAppReady(() => {
+      renderWishlist();
+    });
+
+    function renderWishlist() {
+      const container = document.getElementById('wishlist-container');
+      const items = API.getWishlist();
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="ri-heart-line"></i>
+            <h4>Your wishlist is empty</h4>
+            <p>Save items you love for later</p>
+            <a href="shop.html" class="bb-btn-2">Browse Products</a>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="row">
+          ${items.map(item => `
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <div class="bb-pro-box">
+                <div class="bb-pro-img">
+                  <a href="product.html?id=${item.id}">
+                    <div class="inner-img">
+                      <img class="main-img" src="${item.image_url || 'assets/img/product/default.jpg'}" alt="${item.item_name || item.name || ''}">
+                    </div>
+                  </a>
+                </div>
+                <div class="bb-pro-contact">
+                  <h4 class="bb-pro-title"><a href="product.html?id=${item.id}">${item.item_name || item.name || ''}</a></h4>
+                  <div class="bb-price">
+                    <span class="new-price">${formatPrice(item.selling_price || 0)}</span>
+                    ${item.mrp && item.mrp > (item.selling_price || 0) ? `<span class="old-price">${formatPrice(item.mrp)}</span>` : ''}
+                  </div>
+                  <div class="mt-2 d-flex gap-2">
+                    <button class="bb-btn-1 flex-grow-1" onclick="moveToCart('${item.id}')">
+                      <i class="ri-shopping-bag-line"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromWishlist('${item.id}')">
+                      <i class="ri-delete-bin-line"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    async function moveToCart(productId) {
+      const product = await API.getProductById(productId);
+      if (product) {
+        Cart.addItem(product);
+        API.removeFromWishlist(productId);
+        renderWishlist();
+        updateWishlistBadge();
+      }
+    }
+
+    function removeFromWishlist(productId) {
+      API.removeFromWishlist(productId);
+      renderWishlist();
+      updateWishlistBadge();
+      showToast('Removed from wishlist', 'info');
+    }
+
+    function updateWishlistBadge() {
+      const count = API.getWishlist().length;
+      document.querySelectorAll('.wishlist-count-badge').forEach(el => el.textContent = count);
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

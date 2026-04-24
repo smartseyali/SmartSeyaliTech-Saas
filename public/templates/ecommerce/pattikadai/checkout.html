@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Pattikadai</title>
+  <link rel="icon" href="assets/img/favicon/favicon.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
+  <link rel="stylesheet" href="assets/css/vendor/aos.css">
+  <link rel="stylesheet" href="assets/css/vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/owl.carousel.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/animate.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+
+<body>
+
+  <header class="bb-header" id="header-placeholder"></header>
+  <div class="header-spacer"></div>
+
+  <!-- Breadcrumb -->
+  <section class="section-breadcrumb margin-b-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="row bb-breadcrumb-inner">
+            <div class="col-md-6 col-12">
+              <h2 class="bb-breadcrumb-title">Checkout</h2>
+            </div>
+            <div class="col-md-6 col-12">
+              <ul class="bb-breadcrumb-list">
+                <li class="bb-breadcrumb-item"><a href="/">Home</a></li>
+                <li><i class="ri-arrow-right-double-fill"></i></li>
+                <li class="bb-breadcrumb-item active">Checkout</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-checkout padding-tb-50">
+    <div class="container">
+      <div class="row mb-minus-24">
+        
+        <!-- Order Summary (Left sidebar) -->
+        <div class="col-lg-4 col-sm-12 mb-24 order-2 order-lg-1">
+          <div class="bb-checkout-sidebar">
+            <div class="checkout-items shadow-sm border-0 rounded-4 p-4">
+              <div class="sub-title mb-3">
+                <h4 class="fw-bold" style="color: #1a472a;">Order Summary</h4>
+              </div>
+              <div class="checkout-summary">
+                <ul class="list-unstyled">
+                  <li class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Sub-Total</span>
+                    <span id="checkout-subtotal" class="fw-bold">₹0</span>
+                  </li>
+                  <li id="checkout-discount-row" class="d-flex justify-content-between mb-2" style="display: none !important;">
+                    <span class="text-muted">Coupon Discount</span>
+                    <span id="checkout-discount" class="text-success fw-bold">-₹0</span>
+                  </li>
+                  <li class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                    <span class="text-muted">Delivery Charge</span>
+                    <span id="checkout-shipping" class="fw-bold">Free</span>
+                  </li>
+                  <li class="d-flex justify-content-between">
+                    <span class="h5 mb-0 fw-bold">Total Amount</span>
+                    <span class="h5 mb-0 fw-bold text-success" id="checkout-total">₹0</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Policy Section -->
+            <div class="checkout-items mt-4 shadow-sm border-0 rounded-4 p-4" style="background: #f0f7ff; border: 1px solid #e0efff !important;">
+              <h5 class="mb-3 fw-bold" style="color: #1a472a;">All India shipping Available</h5>
+              <ul class="list-unstyled mb-0 m-0 p-0">
+                <li class="d-flex align-items-start mb-3">
+                  <i class="ri-checkbox-circle-line me-2 mt-1 text-success fs-5"></i>
+                  <span class="text-muted small">The product will be delivered within 6 working days</span>
+                </li>
+                <li class="d-flex align-items-start mb-3">
+                  <i class="ri-checkbox-circle-line me-2 mt-1 text-success fs-5"></i>
+                  <span class="text-muted small">In case of valid damage claims, they must be reported within 24 Hours of product delivery. At our discretion, we may offer a replacement, which will be delivered within 4–5 working days.</span>
+                </li>
+                <li class="d-flex align-items-start">
+                  <i class="ri-checkbox-circle-line me-2 mt-1 text-success fs-5"></i>
+                  <span class="text-muted small fw-bold">No returns, No Refunds</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout Form (Right) -->
+        <div class="col-lg-8 col-sm-12 mb-24 order-1 order-lg-2">
+          <div class="bb-checkout-contact shadow-sm border-0 rounded-4 p-4 bg-white">
+            <div class="main-title mb-4">
+              <h3 class="fw-bold" style="color: #1a472a;">Checkout</h3>
+            </div>
+
+            <!-- Address Selection Mode -->
+            <div class="address-mode-selector d-flex gap-4 mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="addressMode" id="mode-existing" value="existing" checked onclick="toggleAddressMode('existing')">
+                <label class="form-check-label fw-bold" for="mode-existing">I want to use an existing address</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="addressMode" id="mode-new" value="new" onclick="toggleAddressMode('new')">
+                <label class="form-check-label fw-bold" for="mode-new">I want to use a new address</label>
+              </div>
+            </div>
+
+            <!-- Existing Addresses List -->
+            <div id="existing-address-section">
+              <div id="saved-addresses-list">
+                <!-- Loaded by JS -->
+                <div class="text-center py-4 text-muted"><i class="ri-loader-4-line ri-spin"></i> Loading saved addresses...</div>
+              </div>
+            </div>
+
+            <!-- New Address Form -->
+            <div id="new-address-section" style="display: none;">
+              <form id="new-address-form" class="row g-3">
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">First Name *</label>
+                  <input type="text" class="form-control" id="checkout-fname" required>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Last Name</label>
+                  <input type="text" class="form-control" id="checkout-lname">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Email *</label>
+                  <input type="email" class="form-control" id="checkout-email" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Phone *</label>
+                  <input type="tel" class="form-control" id="checkout-phone" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Address *</label>
+                  <input type="text" class="form-control" id="checkout-address" required placeholder="Street address, apartment, etc.">
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Country *</label>
+                  <select class="form-select" id="checkout-country">
+                    <option value="India">India</option>
+                  </select>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Region State *</label>
+                  <select class="form-select" id="checkout-state" onchange="recalcDelivery()"></select>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">City *</label>
+                  <input type="text" class="form-control" id="checkout-city" required>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <label class="form-label small fw-bold text-uppercase text-muted">Post Code *</label>
+                  <input type="text" class="form-control" id="checkout-pincode" required maxlength="6" onblur="checkPincode(); recalcDelivery();">
+                  <div id="pincode-msg"></div>
+                </div>
+                <div class="col-12 mt-3">
+                  <button type="button" class="btn btn-primary" onclick="saveNewAddress()" id="btn-add-address">Add Address</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="final-step-section mt-5 pt-4 border-top">
+              <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                  <h5 class="fw-bold mb-3">Payment Method</h5>
+                  <div class="d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="payment" id="pay-upi" value="upi" checked>
+                      <label class="form-check-label" for="pay-upi">Online Payment</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                  <button type="button" class="bb-btn-2 py-3 px-5 fs-5" id="place-order-btn" onclick="placeOrder(event)">Place Order</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+  </section>
+      </div>
+  </section>
+
+  <!-- Order Success Modal -->
+  <div class="modal fade" id="orderSuccessModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <div style="font-size: 64px; color: #1a472a;"><i class="ri-check-double-line"></i></div>
+        <h3 class="fw-bold mt-2">Order Placed!</h3>
+        <p class="text-muted">Thank you for your order. You will receive a confirmation soon.</p>
+        <p>Order Number: <strong id="order-number"></strong></p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+          <a href="my-orders.html" class="bb-btn-2">View Orders</a>
+          <a href="shop.html" class="btn btn-outline-dark">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js?v=2.4"></script>
+  <script src="assets/js/supabase-client.js?v=2.4"></script>
+  <script src="assets/js/api.js?v=2.4"></script>
+  <script src="assets/js/auth.js?v=2.4"></script>
+  <script src="assets/js/cart.js?v=2.4"></script>
+  <script src="assets/js/main.js?v=2.4"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js" crossorigin="anonymous" referrerpolicy="no-referrer-when-downgrade"></script>
+
+  <script>
+    onAppReady(async () => {
+      // Mandatory login check
+      const user = await Auth.getUser();
+      if (!user) {
+        window.location.href = `login.html?redirect=checkout.html`;
+        return;
+      }
+
+      const items = Cart.getItems();
+      if (items.length === 0) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      renderCheckoutSummary();
+      loadSavedAddresses();
+      populateStates();
+      prefillNewAddressFields(user);
+    });
+
+    let currentDeliveryCharge = 0;
+    let savedAddresses = [];
+    let selectedAddressId = null;
+
+    function toggleAddressMode(mode) {
+      if (mode === 'existing') {
+        document.getElementById('existing-address-section').style.display = 'block';
+        document.getElementById('new-address-section').style.display = 'none';
+        document.getElementById('btn-add-address').style.display = 'none';
+      } else {
+        document.getElementById('existing-address-section').style.display = 'none';
+        document.getElementById('new-address-section').style.display = 'block';
+        document.getElementById('btn-add-address').style.display = 'inline-block';
+        selectedAddressId = null;
+        recalcDelivery(); // Reset charge since no state selected yet
+      }
+    }
+
+    async function loadSavedAddresses() {
+      const container = document.getElementById('saved-addresses-list');
+      
+      try {
+        savedAddresses = await API.getUserAddresses();
+        
+        if (savedAddresses.length === 0) {
+           // Fallback check to master_contacts
+           const user = await Auth.getUser();
+           const { data: contact } = await getSupabase()
+             .from('master_contacts')
+             .select('*')
+             .eq('email', user.email)
+             .eq('company_id', STORE_CONFIG.companyId)
+             .maybeSingle();
+           
+           if (contact && contact.shipping_address) {
+             savedAddresses = [{
+               id: contact.id,
+               name: contact.full_name,
+               email: contact.email,
+               phone: contact.phone,
+               address: contact.shipping_address,
+               is_fallback: true
+             }];
+           }
+        }
+
+        if (savedAddresses.length === 0) {
+          container.innerHTML = '<div class="alert alert-info py-2 small">No saved addresses found. Please add a new one.</div>';
+          document.getElementById('mode-new').click();
+          return;
+        }
+
+        container.innerHTML = savedAddresses.map(addr => `
+          <div class="address-selector-box ${selectedAddressId === addr.id ? 'active' : ''}" onclick="selectAddress('${addr.id}')">
+            <input type="radio" name="selectedSavedAddr" value="${addr.id}" ${selectedAddressId === addr.id ? 'checked' : ''}>
+            <div class="address-selector-info">
+              <span class="address-selector-name">${addr.full_name || 'Saved Address'}</span>
+              <span class="address-selector-detail">${addr.address_line1}</span>
+              ${addr.phone ? `<span class="address-selector-detail"><i class="ri-phone-line me-1"></i>${addr.phone}</span>` : ''}
+            </div>
+            ${!addr.is_fallback ? `<div class="address-delete-btn" onclick="deleteAddress(event, '${addr.id}')"><i class="ri-delete-bin-line"></i></div>` : ''}
+          </div>
+        `).join('');
+
+        if (savedAddresses.length > 0 && !selectedAddressId) {
+          selectAddress(savedAddresses[0].id);
+        }
+      } catch (err) {
+        console.error('Error loading addresses:', err);
+        container.innerHTML = '<div class="alert alert-danger py-2 small">Error loading addresses.</div>';
+      }
+    }
+
+    async function selectAddress(id) {
+      selectedAddressId = id;
+      const boxes = document.querySelectorAll('.address-selector-box');
+      boxes.forEach(b => b.classList.remove('active'));
+
+      const activeBox = document.querySelector(`.address-selector-box input[value="${id}"]`)?.closest('.address-selector-box');
+      if (activeBox) {
+        activeBox.classList.add('active');
+        activeBox.querySelector('input').checked = true;
+      }
+
+      const addr = savedAddresses.find(a => a.id === id);
+      if (addr) {
+        const state = addr.state || '';
+        const pincode = addr.pincode || '';
+        const items = Cart.getItems();
+        const result = await API.calculateDelivery(state, items, pincode);
+        currentDeliveryCharge = result.charge;
+        updateCheckoutTotals();
+      }
+    }
+
+    async function saveNewAddress() {
+      const btn = document.getElementById('btn-add-address');
+      const form = document.getElementById('new-address-form');
+      if (!form.reportValidity()) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Adding...';
+
+      try {
+        const addrData = {
+          name: (document.getElementById('checkout-fname').value + ' ' + document.getElementById('checkout-lname').value).trim(),
+          email: document.getElementById('checkout-email').value,
+          phone: document.getElementById('checkout-phone').value,
+          address: document.getElementById('checkout-address').value,
+          city: document.getElementById('checkout-city').value,
+          state: document.getElementById('checkout-state').value,
+          pincode: document.getElementById('checkout-pincode').value,
+          country: document.getElementById('checkout-country').value
+        };
+
+        const success = await API.saveAddress(addrData);
+        if (!success) throw new Error('Failed to save address');
+
+        showToast('Address added successfully!', 'success');
+        
+        // Short delay for toast, then refresh UI
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (err) {
+        console.error(err);
+        showToast('Error saving address: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add Address';
+      }
+    }
+
+    async function deleteAddress(e, id) {
+      e.stopPropagation();
+      if (!confirm('Are you sure you want to delete this address?')) return;
+
+      try {
+        const success = await API.deleteAddress(id);
+        if (!success) throw new Error('Delete failed');
+        showToast('Address deleted', 'success');
+        loadSavedAddresses();
+      } catch (err) {
+        showToast('Error deleting address', 'error');
+      }
+    }
+
+    async function populateStates() {
+      const stateSelect = document.getElementById('checkout-state');
+      stateSelect.innerHTML = '<option value="" disabled selected>Loading Zones...</option>';
+
+      try {
+        const zones = await API.getShippingZones();
+        let allStates = [];
+
+        if (zones && zones.length > 0) {
+          zones.forEach(z => {
+            // Aggressively hunt for the states list across all known and potential column names
+            const val = z.states || z.state_list || z.region_states || z.locations || z.state_names || z.shipping_states || z.name;
+            
+            if (Array.isArray(val)) {
+              val.forEach(item => {
+                const s = typeof item === 'string' ? item : (item.state || item.name || item.state_name);
+                if (s) allStates.push(s.trim());
+              });
+            } else if (typeof val === 'string' && val.length > 0) {
+              // Handle comma separated strings or JSON array strings
+              if (val.trim().startsWith('[') || val.trim().startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(val);
+                  if (Array.isArray(parsed)) {
+                    parsed.forEach(i => allStates.push((typeof i === 'string' ? i : (i.state || i.name || i.state_name || '')).trim()));
+                  }
+                } catch(e) {}
+              } else {
+                allStates.push(...val.split(',').map(s => s.trim()));
+              }
+            }
+          });
+        }
+
+        // Clean and sort the dynamic list
+        allStates = [...new Set(allStates.filter(s => s && s.length > 1))].sort();
+
+        // Fallback list (will be merged with items from DB, but DB takes priority)
+        const defaults = [
+          "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
+          "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+          "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
+          "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Pondycherry", "Delhi", "Jammu and Kashmir", "Ladakh"
+        ];
+
+        // Merge DB states with defaults to ensure complete list, but prioritizing exact naming from DB for Pondycherry etc.
+        const finalStates = allStates.length > 0 ? allStates : defaults.sort();
+
+        stateSelect.innerHTML = '<option value="" disabled selected>Select State</option>' + 
+          finalStates.map(s => `<option value="${s}">${s}</option>`).join('');
+          
+      } catch (err) {
+        console.error('Failed to load dynamic zones', err);
+        // Silent fallback as usual
+        const states = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana", "Maharashtra", "Gujarat", "Delhi", "Pondycherry"].sort();
+        stateSelect.innerHTML = '<option value="" disabled selected>Select State</option>' + 
+          states.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+    }
+
+    function prefillNewAddressFields(user) {
+      const meta = user.user_metadata || {};
+      document.getElementById('checkout-fname').value = meta.first_name || '';
+      document.getElementById('checkout-lname').value = meta.last_name || '';
+      document.getElementById('checkout-email').value = user.email || '';
+      document.getElementById('checkout-phone').value = meta.phone || '';
+    }
+
+    function updateCheckoutTotals() {
+      const subtotal = Cart.getSubtotal();
+      const discount = getCheckoutDiscount();
+      const total = Math.max(0, subtotal - discount + currentDeliveryCharge);
+
+      document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('checkout-total').textContent = formatPrice(total);
+
+      if (discount > 0) {
+        document.getElementById('checkout-discount-row').style.display = '';
+        document.getElementById('checkout-discount').textContent = '-' + formatPrice(discount);
+      } else {
+        document.getElementById('checkout-discount-row').style.display = 'none';
+      }
+
+      const shippingEl = document.getElementById('checkout-shipping');
+      if (currentDeliveryCharge > 0) {
+        shippingEl.textContent = formatPrice(currentDeliveryCharge);
+      } else {
+        shippingEl.textContent = 'Free';
+      }
+    }
+
+    async function recalcDelivery() {
+      const state = document.getElementById('checkout-state').value;
+      if (!state) return;
+      const pincode = document.getElementById('checkout-pincode').value.trim();
+
+      const items = Cart.getItems();
+      const result = await API.calculateDelivery(state, items, pincode);
+      currentDeliveryCharge = result.charge;
+
+      const shippingEl = document.getElementById('checkout-shipping');
+      if (result.freeDelivery) {
+        shippingEl.innerHTML = '<span class="text-success">Free</span>';
+      } else if (result.charge > 0) {
+        shippingEl.textContent = formatPrice(result.charge);
+      } else {
+        shippingEl.textContent = 'Free';
+      }
+
+      updateCheckoutTotals();
+    }
+
+    function checkPincode() {
+      const pincode = document.getElementById('checkout-pincode').value.trim();
+      const msg = document.getElementById('pincode-msg');
+      if (!pincode || pincode.length !== 6) {
+        msg.innerHTML = '';
+        return;
+      }
+
+      const serviceable = API.checkPincodeServiceability(pincode);
+      if (serviceable) {
+        msg.innerHTML = '<span class="text-success"><i class="ri-checkbox-circle-line"></i> Delivery available</span>';
+      } else {
+        msg.innerHTML = '<span class="text-danger"><i class="ri-close-circle-line"></i> Delivery not available to this pincode</span>';
+      }
+    }
+
+    async function prefillUserData() {
+      const user = await Auth.getUser();
+      if (user) {
+        const meta = user.user_metadata || {};
+        if (meta.first_name) document.getElementById('checkout-fname').value = meta.first_name;
+        if (meta.last_name) document.getElementById('checkout-lname').value = meta.last_name;
+        document.getElementById('checkout-email').value = user.email || '';
+        if (meta.phone) document.getElementById('checkout-phone').value = meta.phone;
+      }
+    }
+
+    function getCheckoutDiscount() {
+      const subtotal = Cart.getSubtotal();
+      let discount = 0;
+      const couponStr = sessionStorage.getItem('applied_coupon');
+      if (couponStr) {
+        const coupon = JSON.parse(couponStr);
+        if (coupon.discount_type === 'percentage') {
+          discount = subtotal * (coupon.discount_value / 100);
+          if (coupon.max_discount_amount) discount = Math.min(discount, coupon.max_discount_amount);
+        } else {
+          discount = coupon.discount_value;
+        }
+      }
+      return discount;
+    }
+
+    function renderCheckoutSummary() {
+      const items = Cart.getItems();
+      const container = document.getElementById('checkout-items');
+      if (!container) return;
+
+      container.innerHTML = items.map(item => `
+        <div class="pro-items mb-3 d-flex align-items-center gap-3">
+          <div class="image flex-shrink-0" style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #eee;">
+            <img src="${item.image_url || 'assets/img/product/default.jpg'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div class="items-contact">
+            <h6 class="mb-0 fw-bold"><a href="product.html?id=${item.product_id}" class="text-dark text-decoration-none">${item.name}</a></h6>
+            ${item.variant_name ? `<div class="small text-muted">${item.variant_name}</div>` : ''}
+            <div class="inner-price small">
+              <span class="fw-bold">${formatPrice(item.price)}</span>
+              <span class="text-muted ms-1"> x ${item.quantity}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      updateCheckoutTotals();
+    }
+
+    async function placeOrder(e) {
+      if (e) e.preventDefault();
+
+      const btn = document.getElementById('place-order-btn');
+      const addressMode = document.querySelector('input[name="addressMode"]:checked').value;
+      
+      let finalAddress = null;
+
+      if (addressMode === 'existing') {
+        if (!selectedAddressId) {
+          showToast('Please select a saved address', 'error');
+          return;
+        }
+        const addr = savedAddresses.find(a => a.id === selectedAddressId);
+        finalAddress = {
+          name: addr.name,
+          email: addr.email,
+          phone: addr.phone,
+          address: typeof addr.address === 'object' ? addr.address : { line1: addr.address },
+          city: addr.city || '',
+          state: addr.state || '',
+          pincode: addr.pincode || ''
+        };
+      } else {
+        const form = document.getElementById('new-address-form');
+        if (!form.reportValidity()) return;
+
+        // Final pincode check
+        const pincode = document.getElementById('checkout-pincode').value.trim();
+        if (pincode && !API.checkPincodeServiceability(pincode)) {
+          showToast('Delivery is not available to this pincode', 'error');
+          return;
+        }
+
+        finalAddress = {
+          name: (document.getElementById('checkout-fname').value + ' ' + document.getElementById('checkout-lname').value).trim(),
+          email: document.getElementById('checkout-email').value,
+          phone: document.getElementById('checkout-phone').value,
+          address: { line1: document.getElementById('checkout-address').value },
+          city: document.getElementById('checkout-city').value,
+          state: document.getElementById('checkout-state').value,
+          pincode: pincode
+        };
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+      try {
+        const items = Cart.getItems();
+        const subtotal = Cart.getSubtotal();
+        const discount = getCheckoutDiscount();
+        
+        // Ensure currentDeliveryCharge is updated for the selection
+        const result = await API.calculateDelivery(finalAddress.state, items, finalAddress.pincode);
+        currentDeliveryCharge = result.charge;
+
+        const grandTotal = Math.max(0, subtotal - discount + currentDeliveryCharge);
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+        // Razorpay Check
+        if (paymentMethod === 'upi') {
+          if (!STORE_CONFIG.razorpayKey) {
+             STORE_CONFIG.razorpayKey = 'rzp_live_RoLvblmUbp7xAe'; // Hard fallback
+          }
+
+          // Normalize phone: strip spaces and non-digits for Razorpay
+          const cleanPhone = finalAddress.phone.replace(/[^\d]/g, '');
+
+          const options = {
+            "key": STORE_CONFIG.razorpayKey,
+            "amount": Math.round(grandTotal * 100),
+            "currency": "INR",
+            "name": STORE_CONFIG.storeName,
+            "description": "Order Payment",
+            "image": (STORE_CONFIG.logoUrl && STORE_CONFIG.logoUrl.startsWith('http')) ? STORE_CONFIG.logoUrl : window.location.origin + '/' + (STORE_CONFIG.logoUrl || 'assets/img/logo/logo.gif'),
+            "handler": async function (response) {
+              const order = await completeOrderPlacement(finalAddress, {
+                payment_id: response.razorpay_payment_id,
+                payment_status: 'paid',
+                payment_method: 'upi',
+                grand_total: grandTotal
+              });
+              if (order) showOrderSuccess(order);
+            },
+            "prefill": {
+              "name": finalAddress.name,
+              "email": finalAddress.email,
+              "contact": cleanPhone
+            },
+            "readonly": {
+              "contact": true,
+              "email": true,
+              "name": true
+            },
+            "theme": { "color": "#1a472a" },
+            "modal": { 
+              "ondismiss": () => { btn.disabled = false; btn.textContent = 'Place Order'; },
+              "backdropclose": false,
+              "escape": false
+            }
+          };
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', (r) => { 
+            showToast('Payment Failed: ' + r.error.description, 'error'); 
+            btn.disabled = false; 
+            btn.textContent = 'Place Order'; 
+          });
+          rzp1.open();
+          return;
+        }
+
+        // COD Flow
+        const order = await completeOrderPlacement(finalAddress, {
+          payment_status: 'pending',
+          payment_method: 'cod',
+          grand_total: grandTotal
+        });
+        if (order) showOrderSuccess(order);
+
+      } catch (err) {
+        console.error('Order error:', err);
+        showToast('Error placing order.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
+      }
+    }
+
+    async function completeOrderPlacement(addr, finalData) {
+      try {
+        const items = Cart.getItems();
+        const order = await API.createOrder({
+          customer_name: addr.full_name || addr.name,
+          customer_email: addr.email,
+          customer_phone: addr.phone,
+          shipping_address: {
+            line1: addr.address_line1 || addr.address,
+            city: addr.city,
+            state: addr.state,
+            pincode: addr.pincode,
+          },
+          subtotal: Cart.getSubtotal(),
+          discount_amount: getCheckoutDiscount(),
+          coupon_code: (JSON.parse(sessionStorage.getItem('applied_coupon') || '{}')).code || '',
+          shipping_amount: currentDeliveryCharge,
+          tax_amount: 0,
+          grand_total: finalData.grand_total,
+          payment_method: finalData.payment_method,
+          payment_status: finalData.payment_status,
+          payment_id: finalData.payment_id || null,
+        });
+
+        if (!order) throw new Error('Order creation failed');
+
+        await API.createOrderItems(items.map(item => ({
+          order_id: order.id,
+          product_id: item.product_id,
+          variant_id: item.variant_id,
+          product_name: item.name,
+          variant_name: item.variant_name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          mrp: item.mrp || item.price,
+          amount: item.price * item.quantity,
+        })));
+
+        await API.createOrderTimeline({
+          order_id: order.id,
+          status: 'pending',
+          note: finalData.payment_status === 'paid' ? 'Paid via UPI' : 'Cash on delivery',
+        });
+
+        return order;
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    }
+
+    function showOrderSuccess(order) {
+      Cart.clear();
+      sessionStorage.removeItem('applied_coupon');
+      const orderNumEl = document.getElementById('order-number');
+      if (orderNumEl) orderNumEl.textContent = order.order_number;
+      var modal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+      modal.show();
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

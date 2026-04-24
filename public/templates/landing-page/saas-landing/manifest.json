@@ -1,0 +1,37 @@
+{
+  "slug": "saas-landing",
+  "category": "landing-page",
+  "entry": "index.html",
+  "generated_at": "2026-04-23T14:37:13.967Z",
+  "file_count": 7,
+  "files": [
+    {
+      "path": ".htaccess",
+      "size": 598
+    },
+    {
+      "path": "assets/css/style.css",
+      "size": 3908
+    },
+    {
+      "path": "assets/js/config.js",
+      "size": 1256
+    },
+    {
+      "path": "assets/thumbnail.svg",
+      "size": 1167
+    },
+    {
+      "path": "contact.html",
+      "size": 1493
+    },
+    {
+      "path": "index.html",
+      "size": 3394
+    },
+    {
+      "path": "pricing.html",
+      "size": 1929
+    }
+  ]
+}

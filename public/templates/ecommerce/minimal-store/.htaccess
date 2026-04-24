@@ -1,0 +1,22 @@
+# Smartseyali — clean URLs + basic caching
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Strip .html for clean URLs (optional)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Cache static assets
+<FilesMatch "\.(css|js|woff2|svg|png|jpg|jpeg|webp|gif|ico)$">
+  Header set Cache-Control "public, max-age=2592000"
+</FilesMatch>
+
+# Security headers
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# 404
+ErrorDocument 404 /404.html

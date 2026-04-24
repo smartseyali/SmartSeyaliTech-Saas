@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title data-content="title">Atelier — Curated fashion for the thoughtful closet</title>
+<meta name="description" content="Curated fashion for the thoughtful closet" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">A</span><span data-content="brand_name">Atelier</span></a>
+    <ul>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="cta">Get started</a>
+  </div>
+</header>
+<main>
+  <section class="container hero">
+    <span class="badge">New Collection · SS26</span>
+    <h1 data-content="hero_title">Timeless pieces, thoughtfully curated.</h1>
+    <p data-content="hero_subtitle">Independent designers, ethical materials, pieces that last beyond the season.</p>
+    <div class="hero-actions">
+      <a class="cta" href="shop.html">Learn more</a>
+      <a class="cta-outline" href="contact.html">Contact us</a>
+    </div>
+  </section>
+  
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Featured</h2><p>Hand-picked selection.</p></div>
+      <div class="product-grid">
+        <div class="product"><div class="img">①</div><div class="body"><h4>Linen Wrap Dress</h4><p class="desc">Handwoven in Ponduru</p><div class="price">₹ 4,800 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">②</div><div class="body"><h4>Cashmere Cardigan</h4><p class="desc">Nepalese highland wool</p><div class="price">₹ 12,400 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">③</div><div class="body"><h4>Silk Scarf Set</h4><p class="desc">Hand-block printed</p><div class="price">₹ 2,200 <button class="buy">Add</button></div></div></div>
+        <div class="product"><div class="img">④</div><div class="body"><h4>Cotton Shirt Dress</h4><p class="desc">GOTS-certified</p><div class="price">₹ 3,600 <button class="buy">Add</button></div></div></div>
+      </div>
+      <div style="text-align:center;margin-top:2rem"><a class="cta-outline" href="shop.html">View full catalog →</a></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Our philosophy</h2></div>
+      <div class="grid grid-3">
+          <div class="card"><h3>Sustainable sourcing</h3><p>Every piece traced back to its maker — no fast fashion here.</p></div>
+          <div class="card"><h3>Made to last</h3><p>Investment pieces engineered for decades of wear, not seasons.</p></div>
+          <div class="card"><h3>Ethical craft</h3><p>Fair wages and transparent supply chains at every step.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Stay in the loop</h2><p>Drops, stories, and occasional notes from the team.</p></div>
+      <form class="newsletter" onsubmit="event.preventDefault();alert('Thanks for subscribing!');this.reset();">
+        <input type="email" placeholder="your@email.com" required /><button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Atelier</span> · All rights reserved.</div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>

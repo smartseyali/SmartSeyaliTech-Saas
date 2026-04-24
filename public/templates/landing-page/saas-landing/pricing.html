@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pricing — Your Product</title>
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a href="index.html" class="brand"><span class="mark">S</span><span data-content="brand_name">Your Product</span></a>
+    <ul><li><a href="index.html">Home</a></li><li><a href="contact.html">Contact</a></li></ul>
+  </div>
+</header>
+
+<main>
+  <section class="container hero">
+    <h1>Simple, transparent pricing</h1>
+    <p data-content="intro">Pick the plan that fits your team. Cancel any time.</p>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="pricing">
+        <div class="tier">
+          <h3>Starter</h3><div class="price">$0<small>/mo</small></div>
+          <ul><li>Up to 3 users</li><li>Email support</li></ul>
+          <a href="contact.html" class="cta-outline">Start free</a>
+        </div>
+        <div class="tier featured">
+          <h3>Pro</h3><div class="price">$29<small>/mo</small></div>
+          <ul><li>Unlimited users</li><li>Priority support</li><li>Integrations</li></ul>
+          <a href="contact.html" class="cta">Start Pro</a>
+        </div>
+        <div class="tier">
+          <h3>Business</h3><div class="price">$99<small>/mo</small></div>
+          <ul><li>SSO</li><li>Dedicated support</li><li>SLA</li></ul>
+          <a href="contact.html" class="cta-outline">Contact sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="container">&copy; <span id="yr"></span> <span data-content="brand_name">Your Product</span></div></footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/content-loader.js"></script>
+</body>
+</html>
