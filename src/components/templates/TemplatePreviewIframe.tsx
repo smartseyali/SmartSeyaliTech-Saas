@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowUpRight, ExternalLink, Loader2, Rocket, Sparkles } from "lucide-react";
+import { ExternalLink, Loader2, Mail, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+// Template picker was removed from the tenant sidebar — only the super admin manages templates.
 import {
     getActiveDeploymentForCompanyModule,
     type TemplateDeploymentWithJoins,
@@ -82,20 +82,16 @@ export function TemplatePreviewIframe({
     if (!deployment) {
         return (
             <div className={cn(containerClass, "p-8 text-center space-y-3")}>
-                <div className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-primary/10 mx-auto">
-                    <Sparkles className="w-5 h-5 text-primary" />
+                <div className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-muted mx-auto">
+                    <Sparkles className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-foreground">Pick a template to get started</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Choose a storefront, enter your custom domain, and the super admin will deploy it for you.
+                    <p className="text-sm font-semibold text-foreground">No template assigned yet</p>
+                    <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1.5">
+                        <Mail className="w-3 h-3" />
+                        Contact the super admin to set up your storefront template.
                     </p>
                 </div>
-                <Button asChild size="sm">
-                    <Link to={`/apps/${moduleId}/setup/template`}>
-                        <Rocket className="w-3.5 h-3.5" /> Pick a template
-                    </Link>
-                </Button>
             </div>
         );
     }
@@ -122,11 +118,6 @@ export function TemplatePreviewIframe({
                         </code>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                        <Button asChild size="sm" variant="ghost">
-                            <Link to={`/apps/${moduleId}/setup/template`}>
-                                Change template
-                            </Link>
-                        </Button>
                         {previewUrl && (
                             <Button asChild size="sm" variant="outline">
                                 <a href={previewUrl} target="_blank" rel="noreferrer">
@@ -150,12 +141,7 @@ export function TemplatePreviewIframe({
                     />
                 ) : (
                     <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-                        Preview unavailable.
-                        <Button asChild size="sm" variant="link" className="ml-2">
-                            <Link to={`/apps/${moduleId}/setup/template`}>
-                                Pick a template <ArrowUpRight className="w-3 h-3" />
-                            </Link>
-                        </Button>
+                        Preview unavailable — contact the super admin.
                     </div>
                 )}
             </div>

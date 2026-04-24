@@ -37,13 +37,9 @@ export interface NavGroup {
 
 export const MODULE_NAV: Record<string, NavGroup[]> = {
   ecommerce: [
-    {
-      label: "Storefront",
-      icon: Globe2,
-      items: [
-        { title: "Template", url: "/apps/ecommerce/setup/template", icon: Layout, resource: "settings" },
-      ],
-    },
+    // Template selection happens once during onboarding registration and is handled
+    // by the super admin via /super-admin/deployments. Tenants don't manage templates
+    // directly — so no "Storefront → Template" sidebar item here.
     {
       label: "Website & Media",
       icon: Layout,
@@ -201,13 +197,8 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
   ],
 
   website: [
-    {
-      label: "Storefront",
-      icon: Globe2,
-      items: [
-        { title: "Template", url: "/apps/website/setup/template", icon: Layout, resource: "settings" },
-      ],
-    },
+    // Template selection is a super-admin-managed flow — tenants pick once during
+    // onboarding, so no "Storefront → Template" sidebar item for them.
     {
       label: "Content",
       icon: Layout,

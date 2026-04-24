@@ -175,8 +175,8 @@ export default function Deployments() {
                                         <TableCell className="text-xs font-mono text-muted-foreground">{r.id}</TableCell>
                                         <TableCell className="text-xs">
                                             <div className="font-medium text-foreground">{r.company?.name ?? `#${r.company_id}`}</div>
-                                            {r.company?.slug && (
-                                                <div className="text-[10px] text-muted-foreground">{r.company.slug}</div>
+                                            {r.company?.subdomain && (
+                                                <div className="text-[10px] text-muted-foreground">{r.company.subdomain}</div>
                                             )}
                                         </TableCell>
                                         <TableCell className="text-xs capitalize">{r.module_id}</TableCell>

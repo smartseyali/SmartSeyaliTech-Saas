@@ -26,7 +26,7 @@ export interface TemplateDeployment {
 }
 
 export interface TemplateDeploymentWithJoins extends TemplateDeployment {
-    company?: { id: number; name: string | null; slug: string | null } | null;
+    company?: { id: number; name: string | null; subdomain: string | null } | null;
     template?: Pick<StorefrontTemplate, "id" | "slug" | "name" | "category" | "entry_path" | "module_id"> | null;
 }
 
@@ -102,7 +102,7 @@ export async function listAllDeployments(filter?: {
 }): Promise<TemplateDeploymentWithJoins[]> {
     let q = supabase
         .from("template_deployments")
-        .select("*, company:companies(id,name,slug), template:storefront_templates(id,slug,name,category,entry_path,module_id)")
+        .select("*, company:companies(id,name,subdomain), template:storefront_templates(id,slug,name,category,entry_path,module_id)")
         .order("created_at", { ascending: false });
     if (filter?.status) q = q.eq("status", filter.status);
     const { data, error } = await q;
@@ -147,7 +147,7 @@ export async function buildDeploymentZip(
 
     const { data: company, error: cErr } = await supabase
         .from("companies")
-        .select("id, name, slug")
+        .select("id, name, subdomain")
         .eq("id", deployment.company_id)
         .maybeSingle();
     if (cErr) throw cErr;
