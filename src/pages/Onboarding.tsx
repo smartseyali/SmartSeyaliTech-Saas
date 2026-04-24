@@ -27,6 +27,7 @@ import {
   CreditCard,
   Globe2,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────
@@ -456,6 +457,7 @@ export default function Onboarding() {
   >({});
   const [availableTemplates, setAvailableTemplates] = useState<StorefrontTemplate[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<StorefrontTemplate | null>(null);
   const modulesNeedingTemplates = selectedModules.filter(
     (id) => PLATFORM_MODULES.find((m) => m.id === id)?.needsTemplate,
   );
@@ -1566,24 +1568,26 @@ export default function Onboarding() {
                 {availableTemplates.map((t) => {
                   const selected = currentTemplateChoice?.templateId === t.id;
                   return (
-                    <button
+                    <div
                       key={t.id}
-                      type="button"
-                      onClick={() =>
-                        setTemplateChoice(currentTemplateModuleId, { templateId: t.id })
-                      }
-                      className={`text-left bg-white rounded-xl border overflow-hidden transition-all ${
+                      className={`group bg-white rounded-xl border overflow-hidden transition-all ${
                         selected
                           ? "border-primary ring-2 ring-primary/30 shadow-md"
                           : "border-slate-200 hover:border-slate-300 hover:shadow-md"
                       }`}
                     >
-                      <div className="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+                      {/* Thumbnail — clicking it previews */}
+                      <button
+                        type="button"
+                        onClick={() => setPreviewTemplate(t)}
+                        className="block w-full aspect-[16/10] bg-slate-100 relative overflow-hidden cursor-zoom-in"
+                        title="Preview template"
+                      >
                         {t.thumbnail_url ? (
                           <img
                             src={t.thumbnail_url}
                             alt={t.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                             onError={(e) => {
                               (e.currentTarget as HTMLImageElement).style.display = "none";
                             }}
@@ -1598,16 +1602,48 @@ export default function Onboarding() {
                             <Check className="w-3 h-3" /> Selected
                           </div>
                         )}
-                      </div>
-                      <div className="p-3 space-y-1">
+                        <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
+                          <span className="h-7 px-2.5 rounded-full bg-white/95 text-slate-700 text-[11px] font-semibold inline-flex items-center gap-1 shadow-sm">
+                            <Eye className="w-3 h-3" /> Preview
+                          </span>
+                        </div>
+                      </button>
+
+                      <div className="p-3 space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-sm font-semibold text-slate-800">{t.name}</h3>
                         </div>
                         {t.description && (
                           <p className="text-xs text-slate-500 leading-snug line-clamp-2">{t.description}</p>
                         )}
+                        <div className="flex items-center gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewTemplate(t)}
+                            className="flex-1 h-8 px-3 text-xs font-medium rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-1.5"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> Preview
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setTemplateChoice(currentTemplateModuleId, { templateId: t.id })
+                            }
+                            className={`flex-1 h-8 px-3 text-xs font-semibold rounded-md transition inline-flex items-center justify-center gap-1.5 ${
+                              selected
+                                ? "bg-primary/10 text-primary border border-primary/30"
+                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                            }`}
+                          >
+                            {selected ? (
+                              <><Check className="w-3.5 h-3.5" /> Selected</>
+                            ) : (
+                              "Select"
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -1950,6 +1986,70 @@ export default function Onboarding() {
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Template preview modal (onboarding step 3b) ─────── */}
+      {previewTemplate && (
+        <div
+          className="fixed inset-0 z-[60] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPreviewTemplate(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="h-12 px-4 border-b border-slate-200 flex items-center gap-3 shrink-0">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-slate-800 truncate inline-flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-primary" />
+                  {previewTemplate.name}
+                  <span className="text-[11px] font-normal text-slate-400">· preview</span>
+                </h3>
+              </div>
+              <a
+                href={previewTemplate.entry_path}
+                target="_blank"
+                rel="noreferrer"
+                className="h-8 px-3 text-xs font-medium rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center gap-1.5"
+                title="Open in new tab"
+              >
+                Open <ExternalLink className="w-3 h-3" />
+              </a>
+              {currentTemplateModuleId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTemplateChoice(currentTemplateModuleId, { templateId: previewTemplate.id });
+                    setPreviewTemplate(null);
+                  }}
+                  className="h-8 px-3 text-xs font-semibold rounded-md bg-blue-600 hover:bg-blue-700 text-white transition inline-flex items-center gap-1.5"
+                >
+                  <Check className="w-3.5 h-3.5" /> Use this
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setPreviewTemplate(null)}
+                className="h-8 w-8 inline-flex items-center justify-center rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"
+                aria-label="Close preview"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Iframe */}
+            <div className="flex-1 bg-slate-50 relative">
+              <iframe
+                src={previewTemplate.entry_path}
+                title={`${previewTemplate.name} preview`}
+                className="w-full h-full border-0 bg-white"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                loading="eager"
+              />
+            </div>
           </div>
         </div>
       )}
