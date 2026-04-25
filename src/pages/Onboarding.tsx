@@ -443,6 +443,9 @@ export default function Onboarding() {
   // Step 2 (verification) fields
   const [resendCooldown, setResendCooldown] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Latch so the "Email verified successfully" toast and step transition
+  // happen exactly once even if multiple effects race (polling + redirect-detect).
+  const verifiedLatchRef = useRef(false);
   // Fallback when SMTP delivery fails: stash the verification link so the user
   // can click it directly from the UI to finish signup. Cleared on success.
   const [pendingVerifyUrl, setPendingVerifyUrl] = useState<string | null>(null);
@@ -576,7 +579,10 @@ export default function Onboarding() {
             .maybeSingle();
 
           if (profile?.email_verified) {
-            toast.success("Email verified successfully!");
+            if (!verifiedLatchRef.current) {
+              verifiedLatchRef.current = true;
+              toast.success("Email verified successfully!");
+            }
             setStep(3);
             return;
           }
@@ -601,14 +607,15 @@ export default function Onboarding() {
 
     pollRef.current = setInterval(async () => {
       try {
-        if (!user) return;
+        if (!user || verifiedLatchRef.current) return;
         const { data } = await supabase
           .from("users")
           .select("email_verified")
           .eq("id", user.id)
           .maybeSingle();
 
-        if (data?.email_verified) {
+        if (data?.email_verified && !verifiedLatchRef.current) {
+          verifiedLatchRef.current = true;
           clearInterval(pollRef.current!);
           pollRef.current = null;
           toast.success("Email verified successfully!");

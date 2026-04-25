@@ -149,9 +149,10 @@ async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
     }
 
     if (!res.ok) {
-        // Prefer the function's own error message in the body
+        // Self-hosted Supabase edge runtime returns boot failures as {"msg":"…"};
+        // Cloud / our function code returns {"error":"…"}. Try both.
         let detail: string | undefined =
-            parsedBody?.error || parsedBody?.message || (rawText && rawText.trim()) || undefined;
+            parsedBody?.error || parsedBody?.msg || parsedBody?.message || (rawText && rawText.trim()) || undefined;
 
         if (!detail) {
             if (res.status === 404) {

@@ -12,6 +12,10 @@ export default function VerifyEmailPending() {
     const navigate = useNavigate();
     const [resendCooldown, setResendCooldown] = useState(0);
     const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    // Latch — once verification is detected we navigate exactly once, even if
+    // the user lands back here (e.g. ProtectedRoute bouncing while
+    // PermissionsContext catches up). Prevents repeated toasts + nav loops.
+    const handledRef = useRef(false);
 
     // If no user → login
     useEffect(() => {
@@ -28,22 +32,28 @@ export default function VerifyEmailPending() {
 
     // Poll for email_verified in users table
     useEffect(() => {
-        if (!user) return;
+        if (!user || handledRef.current) return;
 
         const checkVerification = async () => {
+            if (handledRef.current) return;
             const { data } = await supabase
                 .from("users")
                 .select("email_verified")
                 .eq("id", user.id)
                 .maybeSingle();
 
-            if (data?.email_verified) {
+            if (data?.email_verified && !handledRef.current) {
+                handledRef.current = true;
                 if (pollRef.current) {
                     clearInterval(pollRef.current);
                     pollRef.current = null;
                 }
                 toast.success("Email verified successfully!");
-                navigate("/apps", { replace: true });
+                // Navigate to /onboarding (unprotected) instead of /apps so we
+                // don't bounce off ProtectedRoute while PermissionsContext is
+                // still re-fetching emailVerified. Onboarding's own redirect
+                // logic routes returning users (with a company) to /apps.
+                navigate("/onboarding", { replace: true });
             }
         };
 
