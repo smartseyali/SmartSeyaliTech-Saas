@@ -115,10 +115,11 @@ async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error("Supabase URL/anon key not configured (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).");
+        throw new Error("[send-email] Supabase URL/anon key not configured (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).");
     }
 
     const url = `${supabaseUrl.replace(/\/+$/, "")}/functions/v1/send-email`;
+    console.info("[send-email] POST", url, "to:", payload.to);
 
     let res: Response;
     try {
@@ -137,7 +138,7 @@ async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
             }),
         });
     } catch (netErr: any) {
-        throw new Error(`Could not reach send-email edge function: ${netErr?.message || netErr}`);
+        throw new Error(`[send-email] Network error reaching edge function: ${netErr?.message || netErr}`);
     }
 
     // Read body once, regardless of status, so we can surface the real reason.
@@ -154,19 +155,19 @@ async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
 
         if (!detail) {
             if (res.status === 404) {
-                detail = "send-email edge function not deployed. Run: supabase functions deploy send-email";
+                detail = "edge function not deployed. Run: supabase functions deploy send-email --no-verify-jwt";
             } else if (res.status === 401 || res.status === 403) {
-                detail = "send-email edge function rejected the request (auth). Check anon key / function permissions.";
+                detail = "edge function rejected the request (auth). Redeploy with --no-verify-jwt or check anon key.";
             } else {
-                detail = `Edge function returned HTTP ${res.status}`;
+                detail = `edge function returned HTTP ${res.status} with empty body`;
             }
         }
-        console.error("send-email failed", { status: res.status, body: parsedBody ?? rawText });
-        throw new Error(detail);
+        console.error("[send-email] failed", { status: res.status, body: parsedBody ?? rawText });
+        throw new Error(`[send-email HTTP ${res.status}] ${detail}`);
     }
 
-    if (parsedBody?.error) throw new Error(parsedBody.error);
-    if (parsedBody && parsedBody.success === false) throw new Error("Email send returned failure");
+    if (parsedBody?.error) throw new Error(`[send-email] ${parsedBody.error}`);
+    if (parsedBody && parsedBody.success === false) throw new Error("[send-email] Email send returned failure");
 }
 
 /**
