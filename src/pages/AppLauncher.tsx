@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X, LogOut } from "lucide-react";
+import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X, LogOut, Clock } from "lucide-react";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +32,7 @@ export default function AppLauncher() {
     const [search, setSearch] = useState("");
     const [dbModules, setDbModules] = useState<InstalledModule[]>([]);
     const [companySlugs, setCompanySlugs] = useState<Set<string>>(new Set());
+    const [trialBySlug, setTrialBySlug] = useState<Record<string, { endsAt: string | null; daysLeft: number; isTrial: boolean }>>({});
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
     const [uninstalling, setUninstalling] = useState(false);
@@ -51,16 +52,28 @@ export default function AppLauncher() {
                 setDbModules(data as InstalledModule[]);
             }
 
-            // Fetch this company's installed modules
+            // Fetch this company's installed modules (with trial info)
             if (activeCompany) {
                 const { data: cmData } = await supabase
                     .from("company_modules")
-                    .select("module_slug")
+                    .select("module_slug, billing_status, trial_ends_at")
                     .eq("company_id", activeCompany.id)
                     .eq("is_active", true);
                 setCompanySlugs(new Set((cmData || []).map((cm: any) => cm.module_slug)));
+
+                const now = Date.now();
+                const trialMap: Record<string, { endsAt: string | null; daysLeft: number; isTrial: boolean }> = {};
+                (cmData || []).forEach((cm: any) => {
+                    const endsAt = cm.trial_ends_at as string | null;
+                    const endMs = endsAt ? new Date(endsAt).getTime() : null;
+                    const daysLeft = endMs !== null ? Math.max(0, Math.ceil((endMs - now) / 86400000)) : 0;
+                    const isTrial = cm.billing_status === "trial" && endMs !== null && endMs > now;
+                    if (cm.module_slug) trialMap[cm.module_slug] = { endsAt, daysLeft, isTrial };
+                });
+                setTrialBySlug(trialMap);
             } else {
                 setCompanySlugs(new Set());
+                setTrialBySlug({});
             }
 
             setLoading(false);
@@ -220,7 +233,10 @@ export default function AppLauncher() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {installedModules.map((mod) => (
+                        {installedModules.map((mod) => {
+                            const trial = trialBySlug[mod.slug];
+                            const onTrial = !!trial?.isTrial;
+                            return (
                             <div key={mod.slug} className="relative group">
                                 <button
                                     onClick={() => navigate(mod.dashboard_route || mod.route || "/")}
@@ -237,6 +253,15 @@ export default function AppLauncher() {
                                         {mod.name}
                                     </h3>
                                     <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{mod.tagline}</p>
+                                    {onTrial && (
+                                        <div
+                                            className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold"
+                                            title={trial?.endsAt ? `Trial ends on ${new Date(trial.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : undefined}
+                                        >
+                                            <Clock className="w-2.5 h-2.5" />
+                                            Trial · {trial?.daysLeft ?? 0}d left
+                                        </div>
+                                    )}
                                 </button>
 
                                 {/* Uninstall menu - only for non-core modules */}
@@ -270,7 +295,8 @@ export default function AppLauncher() {
                                     </div>
                                 )}
                             </div>
-                        ))}
+                            );
+                        })}
 
                         {/* Add more apps tile */}
                         <Link

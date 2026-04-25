@@ -14,6 +14,8 @@ interface CompanyApp {
     module_name: string;
     module_icon: string;
     installed_at: string;
+    billing_status: string;
+    trial_ends_at: string | null;
 }
 
 interface Company {
@@ -99,10 +101,10 @@ export default function Tenants() {
                 sysModuleBySlug[sm.slug] = { name: sm.name, icon: sm.icon || "📦" };
             });
 
-            // Fetch all active company modules
+            // Fetch all active company modules (incl. trial info)
             const { data: modules, error: modErr } = await supabase
                 .from("company_modules")
-                .select("company_id, module_slug, is_active, installed_at, created_at")
+                .select("company_id, module_slug, is_active, installed_at, created_at, billing_status, trial_ends_at")
                 .eq("is_active", true);
 
             if (modErr) throw modErr;
@@ -124,6 +126,8 @@ export default function Tenants() {
                     module_name: sm.name,
                     module_icon: sm.icon,
                     installed_at: m.installed_at || m.created_at,
+                    billing_status: m.billing_status || "active",
+                    trial_ends_at: m.trial_ends_at || null,
                 });
             });
 
@@ -630,30 +634,40 @@ export default function Tenants() {
                                                         </h3>
                                                         {company.modules.length > 0 ? (
                                                             <div className="space-y-1.5">
-                                                                {company.modules.map((mod, i) => (
+                                                                {company.modules.map((mod, i) => {
+                                                                    const endMs = mod.trial_ends_at ? new Date(mod.trial_ends_at).getTime() : null;
+                                                                    const onTrial = mod.billing_status === "trial" && endMs !== null && endMs > Date.now();
+                                                                    return (
                                                                     <div
                                                                         key={i}
                                                                         className="flex items-center justify-between bg-white border border-slate-200 rounded-md px-3 py-2"
                                                                     >
-                                                                        <div className="flex items-center gap-2">
+                                                                        <div className="flex items-center gap-2 min-w-0">
                                                                             <span className="text-base">{mod.module_icon}</span>
-                                                                            <span className="text-sm font-medium text-slate-700">
+                                                                            <span className="text-sm font-medium text-slate-700 truncate">
                                                                                 {mod.module_name}
                                                                             </span>
-                                                                        </div>
-                                                                        <span className="text-xs text-slate-400">
-                                                                            {new Date(
-                                                                                mod.installed_at
-                                                                            ).toLocaleDateString(
-                                                                                "en-IN",
-                                                                                {
-                                                                                    day: "2-digit",
-                                                                                    month: "short",
-                                                                                }
+                                                                            {onTrial && (
+                                                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                                                    Trial
+                                                                                </span>
                                                                             )}
-                                                                        </span>
+                                                                        </div>
+                                                                        <div className="flex flex-col items-end gap-0.5 shrink-0">
+                                                                            <span className="text-[10px] text-slate-400">
+                                                                                Installed{" "}
+                                                                                {new Date(mod.installed_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                                                                            </span>
+                                                                            {mod.trial_ends_at && (
+                                                                                <span className={`text-[10px] font-medium ${onTrial ? "text-amber-700" : "text-slate-400"}`}>
+                                                                                    Ends{" "}
+                                                                                    {new Date(mod.trial_ends_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
-                                                                ))}
+                                                                    );
+                                                                })}
                                                             </div>
                                                         ) : (
                                                             <p className="text-sm text-slate-400">

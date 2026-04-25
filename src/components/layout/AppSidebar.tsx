@@ -9,7 +9,7 @@ import {
     PanelLeftClose, PanelLeftOpen,
     LayoutGrid, Globe2, CalendarDays, CreditCard, Users, Zap,
     DollarSign, Languages, Factory, Percent, Mail, Megaphone, ToggleRight, History, Database,
-    FileText,
+    FileText, Clock,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -92,7 +92,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const location = useLocation();
-    const { hasModule, isSuperAdmin } = usePermissions();
+    const { hasModule, isSuperAdmin, getModuleTrial } = usePermissions();
     const { activeCompany, companies, setCompany } = useTenant();
     const { settings } = useStoreSettings();
     const [showCompanySwitcher, setShowCompanySwitcher] = useState(false);
@@ -167,6 +167,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     const activeGroupsToRender = isSuperAdminView
         ? superAdminNavGroups
         : [...navGroups, ...CORE_NAV];
+
+    // Trial info for the currently active module (e.g. "ecommerce")
+    const activeTrial = !isSuperAdminView ? getModuleTrial(activeModule) : null;
+    const showTrialPill = !!activeTrial?.isTrial && (activeTrial?.daysLeft ?? 0) >= 0;
 
     return (
         <aside
@@ -268,6 +272,22 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                             ))}
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* ── Trial Status Pill (current module on trial) ───────── */}
+            {!collapsed && showTrialPill && (
+                <div className="px-2 pb-2 shrink-0">
+                    <div
+                        className="w-full flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-700"
+                        title={activeTrial?.endsAt ? `Trial ends on ${new Date(activeTrial.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : undefined}
+                    >
+                        <Clock className="w-3 h-3 shrink-0" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wider">Trial</span>
+                        <span className="ml-auto text-[10px] font-semibold tabular-nums">
+                            {activeTrial?.daysLeft ?? 0}d left
+                        </span>
+                    </div>
                 </div>
             )}
 

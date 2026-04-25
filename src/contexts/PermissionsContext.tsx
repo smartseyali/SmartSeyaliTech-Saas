@@ -10,11 +10,23 @@ export interface Permission {
     action: string;
 }
 
+export interface ModuleTrial {
+    /** Raw billing_status from company_modules ("trial" | "active" | "expired" | …). */
+    status: string;
+    /** ISO timestamp of trial end, or null if no trial. */
+    endsAt: string | null;
+    /** Whole days left until endsAt (>=0). null if not on trial. */
+    daysLeft: number | null;
+    /** True when status === "trial" and endsAt is still in the future. */
+    isTrial: boolean;
+}
+
 interface PermissionsContextType {
     availableModules: string[];
     permissions: Permission[];
     can: (action: string, resource: string) => boolean;
     hasModule: (moduleName: string) => boolean;
+    getModuleTrial: (slug: string) => ModuleTrial | null;
     isAdmin: boolean;
     isSuperAdmin: boolean;
     emailVerified: boolean;
@@ -28,6 +40,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
     const { activeCompany } = useTenant();
     const { user } = useAuth();
     const [availableModules, setAvailableModules] = useState<string[]>([]);
+    const [moduleTrials, setModuleTrials] = useState<Record<string, ModuleTrial>>({});
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -48,6 +61,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 setEmailVerified(false);
                 setPermissions([]);
                 setAvailableModules([]);
+                setModuleTrials({});
                 return;
             }
 
@@ -107,6 +121,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     setIsSuperAdmin(true);
                     setEmailVerified(true);
                     setAvailableModules(refreshedIdentifiers.filter(Boolean) as string[]);
+                    setModuleTrials({});
                     setPermissions([]);
                     setLoading(false);
                     return;
@@ -122,6 +137,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     const coreModules = systemModules?.filter(sm => sm.is_core).flatMap(sm => [sm.name, sm.slug]) || [];
                     const finalModules = Array.from(new Set([...coreModules])).filter(Boolean) as string[];
                     setAvailableModules(finalModules);
+                    setModuleTrials({});
                     setPermissions([]);
                     setLoading(false);
                     return;
@@ -139,14 +155,15 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     companyMapping = data;
                 }
 
-                // 7. Fetch the subscribed modules for this company
+                // 7. Fetch the subscribed modules for this company (incl. trial info)
                 let { data: companyModules, error: mErr } = await supabase
                     .from("company_modules")
-                    .select("module_slug")
+                    .select("module_slug, billing_status, trial_ends_at")
                     .eq("company_id", activeCompany.id)
                     .eq("is_active", true);
 
                 let finalSubscribedModules: string[] = [];
+                const trialsMap: Record<string, ModuleTrial> = {};
 
                 // Resilience Fallback: If module_slug fails (legacy DB), try module_id
                 if (mErr) {
@@ -155,7 +172,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                         .select("module_id")
                         .eq("company_id", activeCompany.id)
                         .eq("is_active", true);
-                    
+
                     const purchasedIds = new Set(legacyModules?.map(tm => tm.module_id));
                     finalSubscribedModules = systemModules
                         ?.filter(sm => sm.is_core || purchasedIds.has(sm.id))
@@ -165,8 +182,27 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                     finalSubscribedModules = systemModules
                         ?.filter(sm => sm.is_core || purchasedModuleSlugs.has(sm.slug))
                         .flatMap(sm => [sm.name, sm.slug]) || [];
+
+                    // Build trial info, indexed by both slug and human name for easy lookup
+                    const slugToName: Record<string, string> = {};
+                    (systemModules || []).forEach((sm: any) => { slugToName[sm.slug] = sm.name; });
+                    const now = Date.now();
+                    (companyModules || []).forEach((cm: any) => {
+                        const status = (cm.billing_status || "active") as string;
+                        const endsAt = cm.trial_ends_at as string | null;
+                        const endMs = endsAt ? new Date(endsAt).getTime() : null;
+                        const daysLeft = endMs !== null
+                            ? Math.max(0, Math.ceil((endMs - now) / 86400000))
+                            : null;
+                        const isTrial = status === "trial" && endMs !== null && endMs > now;
+                        const entry: ModuleTrial = { status, endsAt, daysLeft, isTrial };
+                        if (cm.module_slug) trialsMap[cm.module_slug] = entry;
+                        const name = slugToName[cm.module_slug];
+                        if (name) trialsMap[name] = entry;
+                    });
                 }
                 setAvailableModules(finalSubscribedModules);
+                setModuleTrials(trialsMap);
                 const subscribedModules = finalSubscribedModules; // For backwards compatibility in subsequent logic
 
                 // 8. Determine tenant role
@@ -207,6 +243,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
                 // Fail-closed: don't grant admin on error
                 setIsAdmin(false);
                 setAvailableModules(["Masters"]); // Only basic fallback
+                setModuleTrials({});
                 setPermissions([]);
             } finally {
                 setLoading(false);
@@ -233,8 +270,18 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
         return availableModules.some(m => m.toLowerCase() === normalized);
     };
 
+    const getModuleTrial = (slug: string): ModuleTrial | null => {
+        if (!slug) return null;
+        // Try exact key, then case-insensitive match against any indexed key.
+        const direct = moduleTrials[slug];
+        if (direct) return direct;
+        const lower = slug.toLowerCase();
+        const key = Object.keys(moduleTrials).find(k => k.toLowerCase() === lower);
+        return key ? moduleTrials[key] : null;
+    };
+
     return (
-        <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, isAdmin, isSuperAdmin, emailVerified, loading, refreshPermissions }}>
+        <PermissionsContext.Provider value={{ availableModules, permissions, can, hasModule, getModuleTrial, isAdmin, isSuperAdmin, emailVerified, loading, refreshPermissions }}>
             {children}
         </PermissionsContext.Provider>
     );
