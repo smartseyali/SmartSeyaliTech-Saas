@@ -152,8 +152,9 @@ export default function Marketplace() {
     const currencySymbol = platformSettings?.currency_symbol || "₹";
     const showBillingToggle = platformSettings?.billing_mode === "both";
 
-    const activateModule = async (mod: SystemModule) => {
-        const trialEndsAt = mod.trial_days > 0
+    const activateModule = async (mod: SystemModule, mode: "trial" | "paid" = "paid") => {
+        const startsTrial = mode === "trial" && mod.trial_days > 0 && !mod.is_core && !mod.is_free;
+        const trialEndsAt = startsTrial
             ? new Date(Date.now() + mod.trial_days * 86400000).toISOString()
             : null;
 
@@ -164,7 +165,7 @@ export default function Marketplace() {
             is_active: true,
             installed_at: new Date().toISOString(),
             trial_ends_at: trialEndsAt,
-            billing_status: "active",
+            billing_status: startsTrial ? "trial" : "active",
         }, { onConflict: "company_id,module_slug" });
         if (cmErr) throw cmErr;
 
@@ -209,6 +210,21 @@ export default function Marketplace() {
         }
     };
 
+    const handleStartTrial = async (mod: SystemModule) => {
+        if (!activeCompany) { toast.error("Please select a company first."); return; }
+        if (isInstalled(mod)) { toast.info(`${mod.name} is already installed.`); return; }
+        if (mod.trial_days <= 0) { toast.error("This app does not offer a free trial."); return; }
+
+        setInstalling(true);
+        try {
+            await activateModule(mod, "trial");
+            toast.success(`${mod.name} trial started — ${mod.trial_days} days free.`);
+            await maybeRedirectToTemplatePicker(mod);
+        } catch (err: any) {
+            toast.error(err.message || "Failed to start trial");
+        } finally { setInstalling(false); }
+    };
+
     const handleInstall = async (mod: SystemModule) => {
         if (!activeCompany) { toast.error("Please select a company first."); return; }
         if (isInstalled(mod)) { toast.info(`${mod.name} is already installed.`); return; }
@@ -219,7 +235,7 @@ export default function Marketplace() {
         if (isFreeModule) {
             setInstalling(true);
             try {
-                await activateModule(mod);
+                await activateModule(mod, "paid");
                 toast.success(`${mod.name} installed successfully!`);
                 await maybeRedirectToTemplatePicker(mod);
             } catch (err: any) {
@@ -255,7 +271,7 @@ export default function Marketplace() {
                 { ...result, module_slug: mod.slug, billing_period: billingPeriod },
             ).catch(() => {});
 
-            await activateModule(mod);
+            await activateModule(mod, "paid");
             toast.success(`Payment successful! ${mod.name} has been installed.`);
             await maybeRedirectToTemplatePicker(mod);
         } catch (err: any) {
@@ -496,7 +512,16 @@ export default function Marketplace() {
                                                     ? <><CreditCard className="w-3.5 h-3.5" /> Pay {currencySymbol}{getModulePrice(selectedApp)} & Install</>
                                                     : <><Download className="w-3.5 h-3.5" /> Install</>}
                                         </button>
-                                        {selectedApp.trial_days > 0 && !selectedApp.is_free && (
+                                        {selectedApp.trial_days > 0 && !selectedApp.is_free && !selectedApp.is_core && getModulePrice(selectedApp) > 0 && (
+                                            <button
+                                                onClick={() => handleStartTrial(selectedApp)}
+                                                disabled={installing}
+                                                className="w-full h-9 px-3 rounded-md text-sm font-medium border border-primary text-primary hover:bg-primary-50 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+                                            >
+                                                <Clock className="w-3.5 h-3.5" /> Start {selectedApp.trial_days}-day free trial
+                                            </button>
+                                        )}
+                                        {selectedApp.trial_days > 0 && !selectedApp.is_free && getModulePrice(selectedApp) <= 0 && (
                                             <p className="text-xs text-center text-primary font-medium">
                                                 {selectedApp.trial_days}-day free trial
                                             </p>

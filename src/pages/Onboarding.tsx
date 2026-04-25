@@ -1119,18 +1119,35 @@ export default function Onboarding() {
 
       const allModuleSlugs = [...new Set([...selectedModules, "masters"])];
 
-      const companyModulesPayload = allModuleSlugs.map((s) => ({
-        company_id: newCompany.id,
-        module_slug: s,
-        is_active: true,
-        installed_at: new Date().toISOString(),
-      }));
+      // Compute trial_ends_at + billing_status per module.
+      // - Core/free modules → "active", no trial.
+      // - Paid modules on "trial" launch mode → "trial" + trial_ends_at = now + trialDays.
+      // - Paid modules on "live" launch mode (already paid) → "active", no trial.
+      const nowMs = Date.now();
+      const buildModuleRow = (slug: string) => {
+        const cfg = PLATFORM_MODULES.find((m) => m.id === slug);
+        const isPaid = !!cfg && !cfg.isCore && !cfg.isFree;
+        const startsTrial = isPaid && launchMode !== "live" && (cfg?.trialDays ?? 0) > 0;
+        return {
+          company_id: newCompany.id,
+          module_slug: slug,
+          is_active: true,
+          installed_at: new Date(nowMs).toISOString(),
+          billing_status: startsTrial ? "trial" : "active",
+          trial_ends_at: startsTrial
+            ? new Date(nowMs + (cfg!.trialDays * 86400000)).toISOString()
+            : null,
+        };
+      };
+
+      const companyModulesPayload = allModuleSlugs.map(buildModuleRow);
 
       const { error: cmErr } = await supabase
         .from("company_modules")
         .insert(companyModulesPayload);
 
       if (cmErr) {
+        // Fallback for older schemas that don't have trial_ends_at / billing_status columns
         await supabase.from("company_modules").insert(
           allModuleSlugs.map((s) => ({
             company_id: newCompany.id,
