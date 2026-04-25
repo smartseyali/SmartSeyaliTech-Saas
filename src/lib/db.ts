@@ -24,7 +24,57 @@ const provider = PLATFORM_CONFIG.dbProvider;
 let internalClient: any;
 
 if (provider === 'supabase') {
-    internalClient = createClient(supabaseUrl, supabaseAnonKey);
+    // Custom lock fallback: navigator.locks is flaky in mobile WebViews,
+    // Gmail's in-app browser, and some Android Chrome custom-tab embeddings,
+    // causing "Navigator LockManager lock timed out" errors during signup /
+    // verification flows. We try navigator.locks first, but fall back to a
+    // simple in-memory mutex per lock-name when it's unavailable or hangs.
+    const memoryLocks: Record<string, Promise<unknown>> = {};
+    const safeLock = async <R,>(name: string, acquireTimeout: number, fn: () => Promise<R>): Promise<R> => {
+        const useNavigatorLocks =
+            typeof navigator !== "undefined" &&
+            typeof (navigator as any).locks?.request === "function";
+
+        if (useNavigatorLocks) {
+            try {
+                // Race the lock against a timeout slightly shorter than supabase-js's
+                // own internal timeout, so we degrade to memory lock instead of throwing.
+                const timeoutMs = Math.max(1000, Math.min(acquireTimeout, 8000));
+                const acquire = (navigator as any).locks.request(name, { mode: "exclusive" }, fn);
+                const timeout = new Promise<R>((_, reject) =>
+                    setTimeout(() => reject(new Error("nav-lock-timeout")), timeoutMs),
+                );
+                return (await Promise.race([acquire, timeout])) as R;
+            } catch {
+                // Fall through to memory lock
+            }
+        }
+
+        // Memory mutex per lock name (single-tab safe; multi-tab will run sequentially within this tab)
+        const previous = memoryLocks[name] || Promise.resolve();
+        let release!: () => void;
+        const current = new Promise<void>((res) => { release = res; });
+        memoryLocks[name] = previous.then(() => current);
+        try {
+            await previous;
+            return await fn();
+        } finally {
+            release();
+            if (memoryLocks[name] === current) delete memoryLocks[name];
+        }
+    };
+
+    internalClient = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            // NOTE: not overriding storageKey or flowType so existing sessions
+            // and password-reset/OAuth flows keep working.
+            // Safe lock implementation (handles WebView / in-app browser cases)
+            lock: safeLock,
+        },
+    });
 } else {
     // [ADAPTER] Custom / VPS Implementation
     class QueryBuilder {
