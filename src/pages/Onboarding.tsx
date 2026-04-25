@@ -443,6 +443,10 @@ export default function Onboarding() {
   // Step 2 (verification) fields
   const [resendCooldown, setResendCooldown] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Fallback when SMTP delivery fails: stash the verification link so the user
+  // can click it directly from the UI to finish signup. Cleared on success.
+  const [pendingVerifyUrl, setPendingVerifyUrl] = useState<string | null>(null);
+  const [emailSendError, setEmailSendError] = useState<string | null>(null);
 
   // Step 3 fields (App Store)
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
@@ -816,6 +820,8 @@ export default function Onboarding() {
 
   // ── Generate verification token & send email ────────────────
   // Throws on failure so the caller can surface the specific reason to the user.
+  // Always stashes the resulting verify URL in state so the UI can offer a
+  // "click to verify" fallback when SMTP delivery is down.
   async function generateAndSendVerification(userId: string, email: string, name: string) {
     const { data, error } = await supabase.rpc("tenant_generate_verification", {
       p_user_id: userId,
@@ -824,11 +830,25 @@ export default function Onboarding() {
       // "permission denied" here usually means Supabase email-confirm is ON and no session exists yet.
       throw new Error(`Verification setup failed: ${error.message}`);
     }
-    if (data?.already_verified) return;
+    if (data?.already_verified) {
+      setPendingVerifyUrl(null);
+      setEmailSendError(null);
+      return;
+    }
     if (!data?.token) {
       throw new Error("Verification token was not returned. Check that tenant_email_verification.sql has been run.");
     }
-    await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
+
+    const verifyUrl = `${window.location.origin}/verify-tenant-email?token=${data.token}`;
+    setPendingVerifyUrl(verifyUrl);
+
+    try {
+      await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
+      setEmailSendError(null);
+    } catch (sendErr: any) {
+      setEmailSendError(sendErr?.message || "Email could not be sent");
+      throw sendErr;
+    }
   }
 
   // ── Resend verification email ───────────────────────────────
@@ -853,15 +873,20 @@ export default function Onboarding() {
       }
 
       if (data?.token) {
+        const verifyUrl = `${window.location.origin}/verify-tenant-email?token=${data.token}`;
+        setPendingVerifyUrl(verifyUrl);
         try {
           await sendTenantVerificationEmail(
             data.email || loginEmail,
             data.full_name || fullName || loginEmail.split("@")[0],
             data.token
           );
+          setEmailSendError(null);
           toast.success("Verification email sent again!");
         } catch (sendErr: any) {
-          toast.error(sendErr?.message || "Failed to send email. Please check platform SMTP settings.");
+          const msg = sendErr?.message || "Failed to send email. Please check platform SMTP settings.";
+          setEmailSendError(msg);
+          toast.error(msg);
         }
       }
 
@@ -1489,6 +1514,36 @@ export default function Onboarding() {
                   Click the link in your email to verify your account and continue setting up your workspace.
                 </p>
               </div>
+
+              {/* Email-send failure fallback — show the verification link directly so the user can finish signup */}
+              {emailSendError && pendingVerifyUrl && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-left">
+                  <div className="flex items-start gap-2 mb-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-amber-800">
+                        Email could not be sent
+                      </p>
+                      <p className="text-xs text-amber-700 mt-1 break-words">
+                        {emailSendError}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-amber-700 mb-2">
+                    You can verify directly using the link below while we look into the email setup:
+                  </p>
+                  <a
+                    href={pendingVerifyUrl}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-md transition"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Verify my email
+                  </a>
+                  <p className="text-[10px] text-amber-600 mt-2 break-all font-mono">
+                    {pendingVerifyUrl}
+                  </p>
+                </div>
+              )}
 
               {/* Polling indicator */}
               <div className="flex items-center justify-center gap-2 text-sm text-slate-400 mb-6">

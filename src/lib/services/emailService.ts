@@ -104,56 +104,69 @@ export async function sendVerificationEmail(
 
 /**
  * Platform-level email — uses env-var SMTP (no company_id needed)
- * Throws on failure so callers can surface a specific reason (SMTP not configured, edge fn down, etc.)
+ * Throws on failure with the actual reason (SMTP not configured, edge fn down, etc.)
+ *
+ * Uses a direct fetch() instead of supabase.functions.invoke() because the
+ * SDK's FunctionsHttpError swallows the response body in some versions, leaving
+ * callers with the generic "Edge Function returned a non-2xx status code".
  */
 async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
-    const { data, error } = await supabase.functions.invoke("send-email", {
-        body: {
-            to: payload.to,
-            subject: payload.subject,
-            html: payload.html,
-            // No company_id → edge function uses platform SMTP env vars
-        },
-    });
-    if (error) {
-        // FunctionsHttpError wraps the edge function's Response. The real message
-        // (e.g. "Platform SMTP not configured…") is in the body, not error.message.
-        // We clone the response so json() and text() can both be tried safely.
-        let detail: string | undefined;
-        let status: number | undefined;
-        const ctx: Response | undefined = (error as any)?.context;
-        if (ctx && typeof ctx.clone === "function") {
-            status = ctx.status;
-            try {
-                const body = await ctx.clone().json();
-                detail = body?.error || body?.message;
-            } catch {
-                try {
-                    const text = await ctx.clone().text();
-                    if (text && text.trim()) detail = text.trim();
-                } catch { /* ignore */ }
-            }
-        }
-        // Log full context so dev can see it in the browser console
-        console.error("send-email edge function failed", { status, detail, error });
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error("Supabase URL/anon key not configured (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).");
+    }
+
+    const url = `${supabaseUrl.replace(/\/+$/, "")}/functions/v1/send-email`;
+
+    let res: Response;
+    try {
+        res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseAnonKey}`,
+                "apikey": supabaseAnonKey,
+            },
+            body: JSON.stringify({
+                to: payload.to,
+                subject: payload.subject,
+                html: payload.html,
+                // No company_id → edge function uses platform SMTP env vars
+            }),
+        });
+    } catch (netErr: any) {
+        throw new Error(`Could not reach send-email edge function: ${netErr?.message || netErr}`);
+    }
+
+    // Read body once, regardless of status, so we can surface the real reason.
+    const rawText = await res.text().catch(() => "");
+    let parsedBody: any = null;
+    if (rawText) {
+        try { parsedBody = JSON.parse(rawText); } catch { /* not JSON */ }
+    }
+
+    if (!res.ok) {
+        // Prefer the function's own error message in the body
+        let detail: string | undefined =
+            parsedBody?.error || parsedBody?.message || (rawText && rawText.trim()) || undefined;
 
         if (!detail) {
-            if (status === 404) {
+            if (res.status === 404) {
                 detail = "send-email edge function not deployed. Run: supabase functions deploy send-email";
-            } else if (status === 401 || status === 403) {
+            } else if (res.status === 401 || res.status === 403) {
                 detail = "send-email edge function rejected the request (auth). Check anon key / function permissions.";
             } else {
-                detail = error.message || "Edge function invocation failed";
+                detail = `Edge function returned HTTP ${res.status}`;
             }
         }
+        console.error("send-email failed", { status: res.status, body: parsedBody ?? rawText });
         throw new Error(detail);
     }
-    if (data?.error) {
-        throw new Error(data.error);
-    }
-    if (data && data.success === false) {
-        throw new Error("Email send returned failure");
-    }
+
+    if (parsedBody?.error) throw new Error(parsedBody.error);
+    if (parsedBody && parsedBody.success === false) throw new Error("Email send returned failure");
 }
 
 /**
