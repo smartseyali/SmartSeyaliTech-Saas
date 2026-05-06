@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pattikadai - A Brand of Thandatti Foods</title>
+  <title>Organic Store — Fresh & Natural Products</title>
   <meta name="description" content="Authentic Tradition, Crafted by Grandma's Hands. Pure, healthy, preservative-free country foods inspired by traditional cooking.">
   <link rel="icon" href="assets/img/favicon/favicon.png">
 
@@ -126,13 +126,13 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-8">
-          <img src="assets/img/logo/ThandattiPatti.png" alt="Grandma Icon" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 20px;">
-          <h3 style="font-family: serif; color: #fff; margin-bottom: 15px;">Inspired by Grandma Eshwari's Hands</h3>
-          <p style="font-style: italic; opacity: 0.9; font-size: 16px; line-height: 1.8;">"In our home, food wasn't just about calories; it was about love, health, and heritage. Pattikadai brings you those same authentic flavors, prepared with the same care and traditional methods used by my grandma."</p>
+          <div style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; margin: 0 auto 20px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 32px;">🌿</div>
+          <h3 style="font-family: serif; color: #fff; margin-bottom: 15px;">Pure, Natural & Handcrafted with Care</h3>
+          <p style="font-style: italic; opacity: 0.9; font-size: 16px; line-height: 1.8;">"Our products are made with love, using time-honoured recipes and the finest natural ingredients — no shortcuts, no preservatives, just wholesome goodness from nature to your table."</p>
           <div style="margin-top: 20px;">
             <span class="badge bg-white text-success p-2 px-3 m-1">🚫 No Preservatives</span>
             <span class="badge bg-white text-success p-2 px-3 m-1">🌿 100% Natural</span>
-            <span class="badge bg-white text-success p-2 px-3 m-1">👵 Traditional Methods</span>
+            <span class="badge bg-white text-success p-2 px-3 m-1">✨ Handcrafted Quality</span>
           </div>
         </div>
       </div>
@@ -147,6 +147,8 @@
 
   <!-- App JS -->
   <script src="assets/js/config.js?v=2.6"></script>
+  <script src="/templates/shared/analytics.js"></script>
+  <script src="/templates/shared/events.js"></script>
   <script src="assets/js/supabase-client.js?v=2.6"></script>
   <script src="assets/js/api.js?v=2.6"></script>
   <script src="assets/js/auth.js?v=2.6"></script>
@@ -179,24 +181,26 @@
       const banners = await API.getBanners('main');
 
       if (banners.length === 0) {
-        // Fallback to original static banners
-        const fallbacks = [
-          { desktop: 'assets/img/banner-two/banner.jpg', mobile: 'assets/img/banner-two/banner_mobile.jpg' },
-          { desktop: 'assets/img/banner-two/banner1.jpg', mobile: 'assets/img/banner-two/banner_mobile1.jpg' },
-          { desktop: 'assets/img/banner-two/banner3.jpg', mobile: 'assets/img/banner-two/banner_mobile2.jpg' }
+        // Fallback placeholder banner — replace by uploading banners in the admin panel
+        const placeholders = [
+          { bg: '#1a472a', text: 'Your Banner Here — Upload in Admin Panel', sub: 'Fresh & Natural Products' },
+          { bg: '#2d6a4f', text: 'Showcase Your Best Products', sub: 'Pure • Organic • Handcrafted' },
+          { bg: '#40916c', text: 'Add Your Promotional Banner', sub: 'Shop Now' }
         ];
-        
+
         container.innerHTML = `
           <div id="bannerCarousel" class="carousel slide banner-two-slider" data-bs-ride="carousel">
             <div class="carousel-indicators">
-              ${fallbacks.map((_, i) => `<button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="${i}" ${i === 0 ? 'class="active"' : ''}></button>`).join('')}
+              ${placeholders.map((_, i) => `<button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="${i}" ${i === 0 ? 'class="active"' : ''}></button>`).join('')}
             </div>
             <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
-              ${fallbacks.map((b, i) => `
+              ${placeholders.map((p, i) => `
                 <div class="carousel-item ${i === 0 ? 'active' : ''}">
                   <a href="shop.html" class="d-block w-100 h-100">
-                    <div class="banner-image-bg banner-desktop-view" style="background-image: url(${b.desktop});"></div>
-                    <div class="banner-image-bg banner-mobile-view" style="background-image: url(${b.mobile}); background-position: center top;"></div>
+                    <div class="banner-image-bg banner-desktop-view d-flex align-items-center justify-content-center" style="background:${p.bg}; min-height:350px; flex-direction:column; text-align:center;">
+                      <h2 style="color:#fff; font-size:clamp(1.2rem,3vw,2rem); font-weight:700; margin-bottom:10px;">${p.text}</h2>
+                      <p style="color:rgba(255,255,255,0.8); font-size:1rem;">${p.sub}</p>
+                    </div>
                   </a>
                 </div>
               `).join('')}
@@ -272,11 +276,22 @@
       `;
 
       if (banners.length === 0) {
+        const placeholderBanner = (bg, title, sub, index) => `
+          <div class="col-lg-6 mb-24 col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${400 + index * 100}">
+            <a href="shop.html" style="display:block; border-radius:15px; overflow:hidden; text-decoration:none;">
+              <div style="background:${bg}; border-radius:15px; min-height:220px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:35px 40px;">
+                <span style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.7); margin-bottom:10px;">Organic Store</span>
+                <h3 style="font-size:clamp(1.2rem,2.5vw,1.8rem); font-weight:800; color:#fff; margin:0 0 10px; line-height:1.2;">${title}</h3>
+                <p style="font-size:14px; color:rgba(255,255,255,0.8); margin:0 0 20px;">${sub}</p>
+                <span style="display:inline-block; background:#fff; color:${bg}; font-weight:700; font-size:13px; padding:8px 22px; border-radius:25px;">Shop Now →</span>
+              </div>
+            </a>
+          </div>`;
         container.innerHTML = `
           <div class="container">
             <div class="row mb-minus-24">
-              ${renderBanner('assets/img/banner-one/one1.png', 'shop.html', 0)}
-              ${renderBanner('assets/img/banner-one/two2.png', 'shop.html', 1)}
+              ${placeholderBanner('#2d6a4f', 'Fresh Arrivals This Week', 'Handpicked organic products, straight from the source.', 0)}
+              ${placeholderBanner('#40916c', 'Special Combo Offers', 'Bundle & save on our bestselling natural products.', 1)}
             </div>
           </div>`;
         return;
@@ -295,7 +310,30 @@
       const categories = await API.getCategories();
 
       if (categories.length === 0) {
-        container.innerHTML = '<div class="swiper-wrapper"><div class="swiper-slide text-center text-muted">No categories yet</div></div>';
+        const sampleCats = [
+          { name: 'Spices & Masalas', emoji: '🌶️', bg: '#e8f5e9' },
+          { name: 'Cold-pressed Oils', emoji: '🫙', bg: '#fff8e1' },
+          { name: 'Rice & Grains',     emoji: '🌾', bg: '#f3e5f5' },
+          { name: 'Pickles & Jams',    emoji: '🥒', bg: '#fce4ec' },
+          { name: 'Herbal Powders',    emoji: '🌿', bg: '#e0f2f1' },
+          { name: 'Snacks & Sweets',   emoji: '🍯', bg: '#fff3e0' },
+        ];
+        const wrapper = container.querySelector('.swiper-wrapper');
+        wrapper.innerHTML = sampleCats.map(cat => `
+          <div class="swiper-slide">
+            <div class="category-slide-item">
+              <a href="shop.html" class="d-block text-start">
+                <div class="category-image-circle" style="background:${cat.bg}; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+                  ${cat.emoji}
+                </div>
+                <h4 class="category-name">${cat.name}</h4>
+              </a>
+            </div>
+          </div>`).join('');
+        new Swiper('#category-slider', {
+          loop: false, slidesPerView: 2, spaceBetween: 15,
+          breakpoints: { 480:{slidesPerView:3,spaceBetween:15}, 768:{slidesPerView:4,spaceBetween:20}, 991:{slidesPerView:5,spaceBetween:25}, 1200:{slidesPerView:6,spaceBetween:30} }
+        });
         return;
       }
 
@@ -343,15 +381,6 @@
 
       // Try to get videos from API (ecom_banners position='video')
       let videos = await API.getBanners('video');
-
-      // Fallback to static videos if none in DB
-      if (videos.length === 0) {
-        videos = [
-          { image_url: 'assets/videos/IMG_0814.MP4' },
-          { image_url: 'assets/videos/IMG_0815.MP4' },
-          { image_url: 'assets/videos/IMG_0816.MP4' }
-        ];
-      }
 
       if (videos.length === 0) return;
 
@@ -403,7 +432,50 @@
       const products = await API.getProducts({ limit: 12 });
 
       if (products.length === 0) {
-        container.innerHTML = '<div class="col-12 text-center text-muted py-5">No products available yet</div>';
+        const sampleProducts = [
+          { name: 'Garlic Pickle',        price: 149, mrp: 199, img: 'https://placehold.co/300x300/e8f5e9/2d6a4f?text=🥒', badge: '25% Off' },
+          { name: 'Cold-pressed Gingelly Oil', price: 299, mrp: 349, img: 'https://placehold.co/300x300/fff8e1/795548?text=🫙', badge: '14% Off' },
+          { name: 'Turmeric Powder',      price: 89,  mrp: 120, img: 'https://placehold.co/300x300/fff3e0/e65100?text=🌿', badge: '26% Off' },
+          { name: 'Red Rice (1 Kg)',      price: 179, mrp: 220, img: 'https://placehold.co/300x300/f3e5f5/6a1b9a?text=🌾', badge: '19% Off' },
+          { name: 'Mango Thokku',         price: 129, mrp: 160, img: 'https://placehold.co/300x300/fce4ec/880e4f?text=🥭', badge: '19% Off' },
+          { name: 'Herbal Tulsi Tea',     price: 199, mrp: 249, img: 'https://placehold.co/300x300/e0f2f1/00695c?text=🍃', badge: '20% Off' },
+          { name: 'Jaggery Balls (500g)', price: 99,  mrp: 130, img: 'https://placehold.co/300x300/fff8e1/5d4037?text=🍯', badge: '24% Off' },
+          { name: 'Sesame Seeds',         price: 79,  mrp: 99,  img: 'https://placehold.co/300x300/f1f8e9/33691e?text=🌱', badge: '20% Off' },
+        ];
+        container.innerHTML = sampleProducts.map((p, i) => `
+          <div class="col-xl-3 col-md-4 col-6 mb-24" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="${200 + (i % 4) * 100}">
+            <div class="bb-pro-box">
+              <div class="bb-pro-img">
+                <span class="flags"><span class="sale">${p.badge}</span></span>
+                <a href="shop.html">
+                  <div class="inner-img">
+                    <img class="main-img" src="${p.img}" alt="${p.name}" style="object-fit:contain; background:#fafafa;">
+                  </div>
+                </a>
+              </div>
+              <div class="bb-pro-contact">
+                <h4 class="bb-pro-title"><a href="shop.html">${p.name}</a></h4>
+                <div class="pc-meta">
+                  <div class="pc-rating-stars" style="color:#ffb400;font-size:10px;display:flex;align-items:center;">
+                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-half-fill"></i>
+                    <span style="color:#999;margin-left:3px;">(${Math.floor(Math.random()*40)+10})</span>
+                  </div>
+                </div>
+                <div class="bb-price">
+                  <div class="inner-price">
+                    <span class="new-price">₹${p.price}</span>
+                    <span class="old-price">₹${p.mrp}</span>
+                  </div>
+                </div>
+                <div class="bb-add-to-cart-btn" style="margin-top:8px;">
+                  <button class="add-to-cart-btn-custom">
+                    <i class="ri-shopping-cart-line" style="margin-right:6px;font-size:15px;"></i>
+                    <span>Add to cart</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>`).join('');
         return;
       }
 

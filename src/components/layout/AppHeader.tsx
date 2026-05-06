@@ -2,7 +2,23 @@ import { useState } from "react";
 import {
     Bell, User, LogOut, Settings as SettingsIcon, ChevronDown, Grid3X3, ExternalLink,
     Building2, Check, Menu, Plus, HelpCircle,
+    ShoppingCart, Monitor, Target, TrendingUp, Package, ShoppingBag, Users,
+    BarChart3, MessageCircle, Globe, Database, type LucideIcon,
 } from "lucide-react";
+
+const MODULE_ICONS: Record<string, LucideIcon> = {
+    ecommerce: ShoppingCart,
+    pos:       Monitor,
+    crm:       Target,
+    sales:     TrendingUp,
+    inventory: Package,
+    purchase:  ShoppingBag,
+    hrms:      Users,
+    finance:   BarChart3,
+    whatsapp:  MessageCircle,
+    website:   Globe,
+    masters:   Database,
+};
 import { GlobalSearch } from "../GlobalSearch";
 import { Breadcrumbs } from "./Breadcrumbs";
 import {
@@ -199,8 +215,8 @@ export function AppHeader({ onMobileMenuToggle }: { onMobileMenuToggle?: () => v
                                                     ok ? "hover:bg-gray-50 dark:hover:bg-accent" : "opacity-40 cursor-not-allowed"
                                                 }`}
                                             >
-                                                <div className={`w-8 h-8 rounded-md flex items-center justify-center text-base bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo}`}>
-                                                    {mod.icon}
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm ${mod.colorFrom} ${mod.colorTo}`}>
+                                                    {(() => { const Icon = MODULE_ICONS[mod.id]; return Icon ? <Icon className="w-5 h-5 text-white" strokeWidth={1.75} /> : <span className="text-base">{mod.icon}</span>; })()}
                                                 </div>
                                                 <span className={`text-[10px] font-medium text-center leading-tight ${ok ? "text-gray-600 dark:text-foreground" : "text-gray-400"}`}>
                                                     {mod.name}
@@ -209,8 +225,8 @@ export function AppHeader({ onMobileMenuToggle }: { onMobileMenuToggle?: () => v
                                         );
                                     })}
                                 <Link to="/marketplace" className="flex flex-col items-center gap-1 p-2 rounded-md hover:bg-gray-50 transition-colors dark:hover:bg-accent">
-                                    <div className="w-8 h-8 rounded-md flex items-center justify-center bg-gray-100 dark:bg-accent/40">
-                                        <Grid3X3 className="w-3.5 h-3.5 text-gray-500" />
+                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-accent/40 shadow-sm">
+                                        <Grid3X3 className="w-5 h-5 text-gray-500" />
                                     </div>
                                     <span className="text-[10px] font-medium text-gray-400">Marketplace</span>
                                 </Link>

@@ -34,8 +34,8 @@ const cartSlice = createSlice({
             const newItem = action.payload;
             const existingItem = state.items.find((item) => item.id === newItem.id);
             state.totalQuantity += newItem.quantity;
-            state.totalAmount += newItem.price * newItem.quantity;
-            
+            state.totalAmount = Math.round((state.totalAmount + newItem.price * newItem.quantity) * 100) / 100;
+
             if (!existingItem) {
                 state.items.push(newItem);
             } else {
@@ -47,18 +47,19 @@ const cartSlice = createSlice({
             const existingItem = state.items.find((item) => item.id === id);
             if (existingItem) {
                 state.totalQuantity -= existingItem.quantity;
-                state.totalAmount -= existingItem.price * existingItem.quantity;
+                state.totalAmount = Math.round((state.totalAmount - existingItem.price * existingItem.quantity) * 100) / 100;
                 state.items = state.items.filter((item) => item.id !== id);
             }
         },
         updateQuantity: (state, action: PayloadAction<{ id: string; quantity: number }>) => {
             const { id, quantity } = action.payload;
+            if (!Number.isInteger(quantity) || quantity < 1) return;
             const existingItem = state.items.find((item) => item.id === id);
-            if (existingItem && quantity > 0) {
+            if (existingItem) {
                 const quantityDifference = quantity - existingItem.quantity;
                 existingItem.quantity = quantity;
                 state.totalQuantity += quantityDifference;
-                state.totalAmount += existingItem.price * quantityDifference;
+                state.totalAmount = Math.round((state.totalAmount + existingItem.price * quantityDifference) * 100) / 100;
             }
         },
         applyCoupon: (state, action: PayloadAction<{ code: string; amount: number }>) => {

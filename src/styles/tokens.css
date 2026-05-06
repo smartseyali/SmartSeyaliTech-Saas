@@ -17,13 +17,17 @@
   --gray-800: #232629;
   --gray-900: #1F272E;
 
-  /* ── Brand (Frappe blue) ── */
-  --blue-50:  #F0F7FF;
-  --blue-100: #ECF5FF;
-  --blue-300: #7AB8F5;
-  --blue-500: #2490EF;
-  --blue-600: #1F7CCD;
-  --blue-700: #1868AC;
+  /* ── Brand (Enterprise blue #2563EB) ── */
+  --blue-50:  #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-300: #93C5FD;
+  --blue-400: #60A5FA;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+  --blue-800: #1E40AF;
+  --blue-900: #1E3A8A;
 
   /* ── Status ── */
   --green-100: #E4F5EC;
@@ -99,7 +103,7 @@
   --shadow-md:  0 2px 6px 0 rgba(31,39,46,0.06), 0 1px 2px 0 rgba(31,39,46,0.04);
   --shadow-lg:  0 4px 12px 0 rgba(31,39,46,0.08), 0 2px 4px 0 rgba(31,39,46,0.05);
   --shadow-xl:  0 10px 24px 0 rgba(31,39,46,0.10);
-  --shadow-focus: 0 0 0 2px rgba(36,144,239,0.20);
+  --shadow-focus: 0 0 0 2px rgba(37,99,235,0.20);
 
   /* ── Border Radius (ERPNext uses smaller radii) ── */
   --radius-xs: 0.1875rem;  /* 3px */
@@ -117,8 +121,8 @@
   --form-input-bg:       var(--gray-0);
   --form-input-border:   var(--gray-200);
   --form-input-border-hover: var(--gray-300);
-  --form-input-border-focus: var(--blue-500);
-  --form-input-focus-ring: rgba(36,144,239,0.20);
+  --form-input-border-focus: var(--blue-600);
+  --form-input-focus-ring: rgba(37,99,235,0.20);
   --form-input-radius:   var(--radius-md);
   --form-input-color:    var(--gray-800);
   --form-input-placeholder: var(--gray-400);
@@ -136,7 +140,7 @@
   --sidebar-border: var(--gray-200);
   --sidebar-item-color: var(--gray-600);
   --sidebar-item-hover-bg: var(--gray-100);
-  --sidebar-item-active-bg: var(--blue-100);
+  --sidebar-item-active-bg: var(--blue-50);
   --sidebar-item-active-color: var(--blue-700);
   --sidebar-section-label-color: var(--gray-400);
 
@@ -160,10 +164,12 @@
   --gray-800: #E4E7EB;
   --gray-900: #F2F4F6;
 
-  --blue-100: #1A3555;
-  --blue-500: #2490EF;
-  --blue-600: #4AA6F2;
-  --blue-700: #7AB8F5;
+  --blue-50:  #172554;
+  --blue-100: #1e3a8a;
+  --blue-400: #60A5FA;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #93C5FD;
 
   --bg-page: #18191C;
   --bg-default: #1C1F23;
@@ -188,8 +194,8 @@
   --sidebar-border: #2A2F36;
   --sidebar-item-color: #A7ADB3;
   --sidebar-item-hover-bg: #20242A;
-  --sidebar-item-active-bg: #1A3555;
-  --sidebar-item-active-color: #7AB8F5;
+  --sidebar-item-active-bg: #1e3a8a;
+  --sidebar-item-active-color: #93C5FD;
   --sidebar-section-label-color: #525962;
 
   --header-bg: #1C1F23;

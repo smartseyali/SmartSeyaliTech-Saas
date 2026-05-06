@@ -6,7 +6,7 @@
  */
 import {
   LayoutDashboard, BarChart3, Boxes, LayoutGrid, Star, Library, Truck, MapPin,
-  Tag, Zap, RotateCcw, ShoppingBag, ImageIcon, Check, Globe2,
+  Tag, Zap, RotateCcw, ShoppingBag, ImageIcon, Check, Globe2, Globe,
   ShoppingCart as EcomCart, CreditCard, Settings, ShieldCheck, Users,
   Layout, Rocket, Box, FileInput, Building2, Database,
   Key, Flag, Hash, Scale, Activity, MessageSquare, Smartphone,
@@ -81,6 +81,7 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
       icon: Settings,
       items: [
         { title: "Website Settings", url: "/apps/ecommerce/website", icon: Globe2, resource: "settings" },
+        { title: "Domain & Hosting", url: "/apps/ecommerce/domain", icon: Globe, resource: "settings" },
         { title: "Billing & GST", url: "/apps/ecommerce/billing", icon: CreditCard, resource: "settings" },
         { title: "Team", url: "/apps/ecommerce/team", icon: Users, resource: "team" },
         { title: "Payments", url: "/apps/ecommerce/payment-gateways", icon: ShieldCheck, resource: "settings" },

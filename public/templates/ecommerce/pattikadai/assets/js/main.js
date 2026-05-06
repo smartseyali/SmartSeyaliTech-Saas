@@ -155,7 +155,7 @@ function renderProductCard(product, opts) {
         '</div>' +
         '<div class="bb-add-to-cart-btn" style="margin-top: 8px;">' +
           '<button class="add-to-cart-btn-custom ' + (isOutOfStock ? 'disabled' : '') + '" data-pid="' + pid + '" onclick="addCartFromCard(this)" ' + (isOutOfStock ? 'disabled' : '') + '>' +
-            '<img src="assets/img/logo/ThandattiPatti.png" alt="logo" style="width: 18px; height: 18px; border-radius: 50%; margin-right: 6px; background: white;">' + 
+            '<i class="ri-shopping-cart-line" style="margin-right: 6px; font-size: 15px;"></i>' +
             '<span>' + (isOutOfStock ? 'Out of Stock' : 'Add to cart') + '</span>' +
           '</button>' +
         '</div>' +

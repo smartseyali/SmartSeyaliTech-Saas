@@ -39,8 +39,8 @@ body {
     --popover: 0 0% 100%;
     --popover-foreground: 210 20% 15%;
 
-    /* ── Brand — Frappe blue #2490EF ── */
-    --primary: 209 86% 54%;
+    /* ── Brand — Enterprise blue #2563EB ── */
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary (subtle surface) ── */
@@ -53,7 +53,7 @@ body {
 
     /* ── Accent (hover surface) ── */
     --accent: 210 7% 96%;
-    --accent-foreground: 209 73% 46%;   /* blue-600 */
+    --accent-foreground: 221 83% 44%;   /* blue-700 #1D4ED8 */
 
     /* ── Destructive #E24C4C ── */
     --destructive: 0 73% 59%;
@@ -67,14 +67,14 @@ body {
     --warning: 36 92% 55%;
     --warning-foreground: 0 0% 100%;
 
-    /* ── Info #2490EF ── */
-    --info: 209 86% 54%;
+    /* ── Info #2563EB ── */
+    --info: 221 83% 53%;
     --info-foreground: 0 0% 100%;
 
     /* ── Borders & focus ── */
     --border: 210 10% 90%;              /* gray-200 #E2E6E9 */
     --input: 210 10% 90%;
-    --ring: 209 86% 54%;                /* blue primary */
+    --ring: 221 83% 53%;                /* blue primary #2563EB */
 
     /* ── Radius base ── */
     --radius: 0.375rem;                 /* 6px — Frappe uses small radii */
@@ -82,12 +82,12 @@ body {
     /* ── Sidebar (ERPNext Desk) ── */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 213 7% 32%;   /* gray-600 */
-    --sidebar-primary: 209 73% 46%;     /* blue-600 link text */
+    --sidebar-primary: 221 83% 44%;     /* blue-700 #1D4ED8 link text */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 100% 97%;     /* blue-100 active bg */
-    --sidebar-accent-foreground: 209 73% 34%;
+    --sidebar-accent: 214 100% 97%;     /* blue-50 #EFF6FF active bg */
+    --sidebar-accent-foreground: 221 83% 36%;
     --sidebar-border: 210 10% 90%;
-    --sidebar-ring: 209 86% 54%;
+    --sidebar-ring: 221 83% 53%;
     --sidebar-muted: 210 6% 59%;
   }
 
@@ -101,7 +101,7 @@ body {
     --popover: 216 9% 13%;
     --popover-foreground: 216 14% 96%;
 
-    --primary: 209 86% 54%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 216 11% 16%;
@@ -111,7 +111,7 @@ body {
     --muted-foreground: 213 7% 58%;
 
     --accent: 216 11% 16%;
-    --accent-foreground: 209 86% 68%;
+    --accent-foreground: 221 83% 68%;
 
     --destructive: 0 73% 59%;
     --destructive-foreground: 0 0% 100%;
@@ -122,21 +122,21 @@ body {
     --warning: 36 92% 55%;
     --warning-foreground: 0 0% 0%;
 
-    --info: 209 86% 54%;
+    --info: 221 83% 53%;
     --info-foreground: 0 0% 100%;
 
     --border: 216 11% 19%;
     --input: 216 11% 19%;
-    --ring: 209 86% 54%;
+    --ring: 221 83% 53%;
 
     --sidebar-background: 216 9% 13%;
     --sidebar-foreground: 213 7% 66%;
-    --sidebar-primary: 209 86% 68%;
+    --sidebar-primary: 221 83% 68%;
     --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 213 52% 22%;
-    --sidebar-accent-foreground: 209 86% 78%;
+    --sidebar-accent: 221 52% 22%;
+    --sidebar-accent-foreground: 221 83% 78%;
     --sidebar-border: 216 11% 19%;
-    --sidebar-ring: 209 86% 54%;
+    --sidebar-ring: 221 83% 53%;
     --sidebar-muted: 213 7% 45%;
   }
 }

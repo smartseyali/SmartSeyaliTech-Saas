@@ -262,7 +262,7 @@ export function PermissionsProvider({ children }: { children: React.ReactNode })
     };
 
     const hasModule = (moduleName: string) => {
-        if (!moduleName) return true;
+        if (!moduleName) return false;
         // Super Admins ALWAYS have all modules
         if (isSuperAdmin) return true;
 

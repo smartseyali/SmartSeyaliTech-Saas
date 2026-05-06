@@ -56,15 +56,16 @@ export function TemplatePreviewIframe({
         if (deployment.status === "deployed" && deployment.deployed_url) {
             return deployment.deployed_url;
         }
-        // Local preview from public/templates/ via the Storefront route.
-        // Falls back to direct entry_path if no subdomain is available yet.
-        const slug = companySubdomain || `company-${deployment.company_id}`;
-        const templateSlug = deployment.template?.slug ?? deployment.template_slug;
-        if (slug && templateSlug) {
-            return `/store/${encodeURIComponent(slug)}?preview_template=${encodeURIComponent(templateSlug)}`;
+        // Use the deployment's custom_domain (platform subdomain or custom domain).
+        // Falls back to direct template entry_path for local dev where subdomains don't resolve.
+        if (deployment.custom_domain) {
+            const domain = deployment.custom_domain.replace(/^https?:\/\//, "");
+            const templateSlug = deployment.template?.slug ?? deployment.template_slug;
+            const suffix = templateSlug ? `?preview_template=${encodeURIComponent(templateSlug)}` : "";
+            return `https://${domain}${suffix}`;
         }
         return deployment.template?.entry_path ?? null;
-    }, [deployment, companySubdomain]);
+    }, [deployment]);
 
     const containerClass = cn(
         "rounded-lg border border-border bg-card overflow-hidden",

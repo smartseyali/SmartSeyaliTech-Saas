@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout - Pattikadai</title>
+  <title>Checkout - Organic Store</title>
   <link rel="icon" href="assets/img/favicon/favicon.png">
   <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/vendor/remixicon.css">
@@ -217,6 +217,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/config.js?v=2.4"></script>
+  <script src="/templates/shared/analytics.js"></script>
+  <script src="/templates/shared/events.js"></script>
   <script src="assets/js/supabase-client.js?v=2.4"></script>
   <script src="assets/js/api.js?v=2.4"></script>
   <script src="assets/js/auth.js?v=2.4"></script>
@@ -243,6 +245,18 @@
       loadSavedAddresses();
       populateStates();
       prefillNewAddressFields(user);
+
+      // begin_checkout event
+      if (typeof window.trackEvent === 'function') {
+        const total = items.reduce(function(s, i) { return s + (i.price * i.quantity); }, 0);
+        window.trackEvent('begin_checkout', {
+          value: total,
+          currency: (window.STORE_CONFIG && window.STORE_CONFIG.currency === '₹') ? 'INR' : (window.STORE_CONFIG && window.STORE_CONFIG.currency) || 'INR',
+          items: items.map(function(i) {
+            return { item_id: i.product_id, item_name: i.name, price: i.price, quantity: i.quantity };
+          })
+        });
+      }
     });
 
     let currentDeliveryCharge = 0;
@@ -751,6 +765,17 @@
     }
 
     function showOrderSuccess(order) {
+      const cartItems = Cart.getItems();
+      if (typeof window.trackEvent === 'function') {
+        window.trackEvent('purchase', {
+          transaction_id: order.order_number || order.id,
+          value: order.grand_total || 0,
+          currency: (window.STORE_CONFIG && window.STORE_CONFIG.currency === '₹') ? 'INR' : (window.STORE_CONFIG && window.STORE_CONFIG.currency) || 'INR',
+          items: cartItems.map(function(i) {
+            return { item_id: i.product_id, item_name: i.name, price: i.price, quantity: i.quantity };
+          })
+        });
+      }
       Cart.clear();
       sessionStorage.removeItem('applied_coupon');
       const orderNumEl = document.getElementById('order-number');

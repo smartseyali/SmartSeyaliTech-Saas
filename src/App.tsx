@@ -43,6 +43,7 @@ const MarketingProducts = lazy(() => import("./pages/marketing/Products"));
 const MarketingModuleDetail = lazy(() => import("./pages/marketing/ModuleDetail"));
 const MarketingContact = lazy(() => import("./pages/marketing/Contact"));
 const MarketingPolicy = lazy(() => import("./pages/marketing/License"));
+const MarketingTerms = lazy(() => import("./pages/marketing/Terms"));
 
 // ── Per-module route arrays (each file lazy-imports its own pages) ──
 import { ecomAdminRoutes } from "./routes/ecomRoutes";
@@ -60,6 +61,11 @@ import { superAdminRoutes } from "./routes/superAdminRoutes";
 
 // ── Query Client ──
 const queryClient = new QueryClient();
+
+// Detect if the app is being served from a custom client domain (not the platform host).
+// When true, unmatched routes render the storefront instead of NotFound.
+const PLATFORM_HOST = (import.meta.env.VITE_PLATFORM_HOST as string) || "localhost";
+const isCustomDomain = window.location.hostname !== PLATFORM_HOST && window.location.hostname !== "localhost";
 
 // ── Route Guards ──
 
@@ -139,6 +145,7 @@ const App = () => (
                                                 <Route path="/products/:slug" element={<MarketingModuleDetail />} />
                                                 <Route path="/contact" element={<MarketingContact />} />
                                                 <Route path="/policy" element={<MarketingPolicy />} />
+                                                <Route path="/terms" element={<MarketingTerms />} />
                                             </Route>
 
                                             {/* ── Auth ── */}
@@ -175,13 +182,12 @@ const App = () => (
                                             </Route>
 
                                             {/* ── Storefront Customer Pages (public) ── */}
+                                            {/* Accessible on client subdomains: pattikadai.smartseyali.com/store/login etc. */}
                                             <Route path="/store/login" element={<StorefrontLogin />} />
                                             <Route path="/store/track" element={<OrderTracking />} />
                                             <Route path="/store/track/:orderNumber" element={<OrderTracking />} />
                                             <Route path="/store/my-orders" element={<MyOrders />} />
                                             <Route path="/store/verify" element={<VerifyEmail />} />
-                                            {/* Dynamic storefront — resolves tenant by subdomain slug */}
-                                            <Route path="/store/:slug" element={<Storefront />} />
 
                                             {/* Backward compat: /ecommerce → /apps/ecommerce */}
                                             <Route path="/ecommerce" element={<Navigate to="/apps/ecommerce" replace />} />
@@ -246,7 +252,7 @@ const App = () => (
                                                 ))}
                                             </Route>
 
-                                            <Route path="*" element={<NotFound />} />
+                                            <Route path="*" element={isCustomDomain ? <Storefront /> : <NotFound />} />
                                         </Routes>
                                     </Suspense>
                                 </BrowserRouter>

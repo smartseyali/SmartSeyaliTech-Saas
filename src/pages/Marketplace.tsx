@@ -183,7 +183,7 @@ export default function Marketplace() {
             await supabase.from("ecom_settings").insert([{
                 company_id: activeCompany!.id,
                 store_name: activeCompany!.name,
-                primary_color: "#2490EF",
+                primary_color: "#2563EB",
             }]).then(() => {});
         }
 

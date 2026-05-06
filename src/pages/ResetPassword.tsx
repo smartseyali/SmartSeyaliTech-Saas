@@ -75,7 +75,7 @@ export default function ResetPassword() {
             {/* Background blobs */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 -left-4 w-[600px] h-[600px] bg-primary-100/50 rounded-full blur-[150px] opacity-40 animate-blob" />
-                <div className="absolute bottom-0 -right-4 w-[600px] h-[600px] bg-teal-100/40 rounded-full blur-[150px] opacity-30 animate-blob animation-delay-2000" />
+                <div className="absolute bottom-0 -right-4 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[150px] opacity-30 animate-blob animation-delay-2000" />
             </div>
 
             <div className="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-2xl overflow-hidden relative z-10">

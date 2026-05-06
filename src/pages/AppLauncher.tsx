@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, ExternalLink, ShoppingBag, Grid3X3, Plus, Trash2, MoreVertical, X, LogOut, Clock } from "lucide-react";
+import {
+    Search, ExternalLink, Grid3X3, Plus, Trash2, MoreVertical, X, LogOut, Clock,
+    ShoppingCart, Monitor, Target, TrendingUp, Package, ShoppingBag, Users,
+    BarChart3, MessageCircle, Globe, Database, type LucideIcon,
+} from "lucide-react";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +12,20 @@ import { supabase } from "@/lib/supabase";
 import PLATFORM_CONFIG from "@/config/platform";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+const MODULE_ICONS: Record<string, LucideIcon> = {
+    ecommerce:  ShoppingCart,
+    pos:        Monitor,
+    crm:        Target,
+    sales:      TrendingUp,
+    inventory:  Package,
+    purchase:   ShoppingBag,
+    hrms:       Users,
+    finance:    BarChart3,
+    whatsapp:   MessageCircle,
+    website:    Globe,
+    masters:    Database,
+};
 
 interface InstalledModule {
     id: string;
@@ -243,11 +261,11 @@ export default function AppLauncher() {
                                     className="w-full bg-white rounded-2xl border border-gray-200 p-5 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                 >
                                     <div className={cn(
-                                        "w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br shadow-sm mx-auto mb-3 group-hover:scale-110 transition-transform",
+                                        "w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-md mx-auto mb-3 group-hover:scale-110 transition-transform",
                                         mod.color_from || "from-blue-500",
                                         mod.color_to || "to-blue-600"
                                     )}>
-                                        {mod.icon}
+                                        {(() => { const Icon = MODULE_ICONS[mod.slug]; return Icon ? <Icon className="w-7 h-7 text-white" strokeWidth={1.75} /> : <span className="text-2xl">{mod.icon}</span>; })()}
                                     </div>
                                     <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                                         {mod.name}

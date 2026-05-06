@@ -118,7 +118,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 setCompanies(companiesData);
 
                 // Persistence: Check localStorage for previously selected company
-                const savedId = localStorage.getItem('last_company_id');
+                let savedId: string | null = null;
+                try { savedId = localStorage.getItem('last_company_id'); } catch {}
                 const savedCompany = companiesData.find(c => String(c.id) === savedId);
 
                 setActiveCompany(savedCompany || companiesData[0] || null);
@@ -140,9 +141,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
                 .eq('user_id', user.id);
 
             let companiesData = (mappings || [])
-                .map(m => m.companies)
-                .flat()
-                .filter(Boolean) as unknown as Company[];
+                .flatMap(m => m.companies ? [m.companies].flat() : [])
+                .filter((c): c is Company => !!c && typeof (c as any).id !== 'undefined') as Company[];
 
             // Merge with owned companies (deduplicate by ID)
             (ownedCompanies || []).forEach(oc => {
@@ -186,7 +186,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         const company = companies.find(c => c.id === id);
         if (company) {
             setActiveCompany(company);
-            localStorage.setItem('last_company_id', String(id));
+            try { localStorage.setItem('last_company_id', String(id)); } catch {}
         }
     };
 

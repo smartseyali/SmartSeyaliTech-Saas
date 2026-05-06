@@ -537,6 +537,9 @@ export default function Onboarding() {
             setStep(2);
           }
           // If data is null (user not in public.users yet), stay on step 1
+        })
+        .catch(() => {
+          // Network error — stay on current step, user can retry
         });
     }
   }, [user?.id, tenantLoading, needsOnboarding, companies.length]);
@@ -605,6 +608,9 @@ export default function Onboarding() {
       return;
     }
 
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+    }
     pollRef.current = setInterval(async () => {
       try {
         if (!user || verifiedLatchRef.current) return;
@@ -621,7 +627,9 @@ export default function Onboarding() {
           toast.success("Email verified successfully!");
           setStep(3);
         }
-      } catch {}
+      } catch (pollErr: any) {
+        if (!import.meta.env.PROD) console.warn("Verification poll error:", pollErr?.message);
+      }
     }, 5000);
 
     return () => {
@@ -670,6 +678,9 @@ export default function Onboarding() {
         .maybeSingle()
         .then(({ data }) => {
           if (data) setPlatformSettings(data);
+        })
+        .catch(() => {
+          // Platform settings unavailable — payment step will display config error to guide admin
         });
     }
   }, [step]);
@@ -1051,7 +1062,7 @@ export default function Onboarding() {
       let activeUser = user;
       if (!activeUser) {
         const { data, error: getUserErr } = await supabase.auth.getUser();
-        if (getUserErr) {
+        if (getUserErr && !import.meta.env.PROD) {
           console.warn("getUser() during deploy failed:", getUserErr.message);
         }
         activeUser = data?.user ?? null;
@@ -1116,14 +1127,17 @@ export default function Onboarding() {
         newCompany = fallback;
       }
 
+      if (!newCompany) throw new Error("Failed to create company. Please try again.");
+
       // Link user to company
-      await supabase.from("company_users").insert([
+      const { error: cuErr } = await supabase.from("company_users").insert([
         {
           company_id: newCompany.id,
           user_id: activeUser.id,
           role: "admin",
         },
       ]);
+      if (cuErr) throw new Error(`Failed to link user to company: ${cuErr.message}`);
 
       // ── Template deployment requests ────────────────────────
       // For each selected module with needsTemplate, create a request row so the
@@ -1141,7 +1155,7 @@ export default function Onboarding() {
           });
         } catch (err) {
           // Non-blocking — tenant can still redo from /apps/:moduleId/setup/template
-          console.warn(`Template request for ${moduleId} failed:`, err);
+          if (!import.meta.env.PROD) console.warn(`Template request for ${moduleId} failed:`, err);
         }
       }
 
@@ -1180,13 +1194,16 @@ export default function Onboarding() {
 
       if (cmErr) {
         // Fallback for older schemas that don't have trial_ends_at / billing_status columns
-        await supabase.from("company_modules").insert(
+        const { error: cmFallbackErr } = await supabase.from("company_modules").insert(
           allModuleSlugs.map((s) => ({
             company_id: newCompany.id,
             module_slug: s,
             is_active: true,
           }))
         );
+        if (cmFallbackErr && !import.meta.env.PROD) {
+          console.warn("Module install fallback also failed:", cmFallbackErr.message);
+        }
       }
 
       // Insert user_modules
@@ -1200,7 +1217,7 @@ export default function Onboarding() {
       const { error: umErr } = await supabase
         .from("user_modules")
         .insert(userModulesPayload);
-      if (umErr) {
+      if (umErr && !import.meta.env.PROD) {
         console.warn("user_modules insert skipped:", umErr.message);
       }
 
@@ -1237,7 +1254,7 @@ export default function Onboarding() {
       setCreatedCompanyName(companyName);
       setSetupDone(true);
     } catch (err: any) {
-      console.error("Onboarding error:", err);
+      if (!import.meta.env.PROD) console.error("Onboarding error:", err);
       setError(err.message || "Setup failed. Please try again.");
       setStep(3);
       toast.error(err.message || "Setup failed.");
@@ -1258,7 +1275,7 @@ export default function Onboarding() {
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+          <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain" />
         </div>
         <div className="flex items-center gap-4">
           {step <= 4 && <StepIndicator current={step} />}

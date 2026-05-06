@@ -47,13 +47,30 @@ const Cart = {
 
     this.save(items);
     showToast(`${product.item_name || product.name} added to cart!`, 'success');
+    if (typeof window.trackEvent === 'function') {
+      const currency = (window.STORE_CONFIG && window.STORE_CONFIG.currency === '₹') ? 'INR' : (window.STORE_CONFIG && window.STORE_CONFIG.currency) || 'INR';
+      window.trackEvent('add_to_cart', {
+        currency,
+        value: (variant ? (variant.selling_price || basePrice) : basePrice) * quantity,
+        items: [{ item_id: pid, item_name: product.item_name || product.name, price: variant ? (variant.selling_price || basePrice) : basePrice, quantity }]
+      });
+    }
     return items;
   },
 
   removeItem(key) {
-    let items = this.getItems();
-    items = items.filter(i => i.key !== key);
+    const before = this.getItems();
+    const removed = before.find(i => i.key === key);
+    let items = before.filter(i => i.key !== key);
     this.save(items);
+    if (removed && typeof window.trackEvent === 'function') {
+      const currency = (window.STORE_CONFIG && window.STORE_CONFIG.currency === '₹') ? 'INR' : (window.STORE_CONFIG && window.STORE_CONFIG.currency) || 'INR';
+      window.trackEvent('remove_from_cart', {
+        currency,
+        value: removed.price * removed.quantity,
+        items: [{ item_id: removed.product_id, item_name: removed.name, price: removed.price, quantity: removed.quantity }]
+      });
+    }
     return items;
   },
 

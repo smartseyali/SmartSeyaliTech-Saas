@@ -1,831 +1,709 @@
-
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { usePermissions } from "@/contexts/PermissionsContext";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTenant } from "@/contexts/TenantContext";
-import { supabase } from "@/lib/supabase";
-import { Check, ArrowRight, ArrowLeft, Loader2, Rocket, X, Mail, Lock, User as UserIcon, LogOut, Layers } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import PLATFORM_CONFIG from "@/config/platform";
-import { PLATFORM_MODULES, type PlatformModule } from "@/config/modules";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PlatformLoader } from "@/components/PlatformLoader";
+import { supabase } from "@/lib/supabase";
+import { listTemplates, setActiveTemplateForCompany } from "@/lib/services/storefrontTemplateService";
+import { createDeploymentRequest } from "@/lib/services/deploymentRequestService";
+import {
+    registerSubdomain,
+    addExternalDomain,
+    deployTemplateFiles,
+} from "@/lib/services/hostingerService";
+import type { StorefrontTemplate, TemplateConfigOverrides } from "@/types/storefront";
+import {
+    Check, ChevronRight, Copy, ExternalLink, Globe, Loader2,
+    Zap, ShoppingCart, Wifi, ShieldCheck, ArrowLeft,
+    Store, Eye, CheckCircle2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-// ── Types ──────────────────────────────────────────────────
-interface PlanEntry {
-    id: string;
-    name: string;
-    slug: string;
-    price_monthly: number;
-    features: string[];
+const PLATFORM_BASE_DOMAIN =
+    (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
+
+function slugify(s: string) {
+    return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-// ── Local Fallbacks ────────────────────────────────────────
-const LOCAL_PLANS: PlanEntry[] = [
-    { id: '1', name: 'Standard', slug: 'standard', price_monthly: 29.00, features: ["Up to 5 Projects", "Basic Analytics", "Standard Templates", "Email Support"] },
-    { id: '2', name: 'Professional', slug: 'professional', price_monthly: 99.00, features: ["Up to 20 Projects", "Advanced Analytics", "Premium Templates", "Priority Support", "Custom Domain"] },
-    { id: '3', name: 'Enterprise', slug: 'enterprise', price_monthly: 299.00, features: ["Unlimited Projects", "Full White-label", "Custom Integrations", "Dedicated Account Manager", "SLA Guarantee"] }
+function isValidDomain(d: string) {
+    return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i.test(
+        d.trim().replace(/^https?:\/\//, "").replace(/\/$/, ""),
+    );
+}
+
+type DomainOption = "free" | "buy" | "existing";
+
+const DEPLOY_PHASES = [
+    "Saving configuration...",
+    "Fetching template files...",
+    "Building deployment package...",
+    "Uploading to hosting...",
 ];
 
-const LOCAL_MODULE_REGISTRY = [
-    { id: 'ecommerce', slug: 'ecommerce', name: 'Ecommerce', category: 'commerce', tagline: 'Unified Online Selling Engine', icon: '🛒', is_core: true },
-    { id: 'crm', slug: 'crm', name: 'CRM', category: 'commerce', tagline: 'Industrial Relationship Manager', icon: '🤝', is_core: false },
-    { id: 'inventory', slug: 'inventory', name: 'Inventory', category: 'operations', tagline: 'Strategic Stock Controller', icon: '📦', is_core: false },
-    { id: 'landing-page', slug: 'landing-page', name: 'Website Manager', category: 'commerce', tagline: 'Clinical Content Orchestrator', icon: '🌐', is_core: true }
-];
+// ── Step indicator ────────────────────────────────────────────────────────────
 
-// ─── Step Indicator ────────────────────────────────────────
-// ─── Step Indicator ────────────────────────────────────────
-function StepDots({ current, steps }: { current: number, steps: string[] }) {
+function Stepper({ current }: { current: number }) {
+    const steps = ["Choose Domain", "Select Template", "Configure & Deploy"];
     return (
-        <div className="flex items-center gap-2 mb-2 overflow-x-auto pb-1 scrollbar-hide">
-            {steps.map((label, i) => {
-                const stepNum = i + 1;
-                const isActive = stepNum === current;
-                const isDone = stepNum < current;
-                return (
-                    <div key={i} className="flex items-center gap-2 flex-shrink-0">
-                        <div className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 border-2",
-                            isActive ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/20 scale-110" :
-                                isDone ? "bg-emerald-500 border-emerald-500 text-white" :
-                                    "bg-white border-slate-100 text-slate-500"
-                        )}>
-                            {isDone ? <Check className="w-4 h-4 stroke-[3]" /> : stepNum}
+        <div className="flex items-center justify-center gap-0 mb-8">
+            {steps.map((label, i) => (
+                <div key={i} className="flex items-center">
+                    <div className="flex flex-col items-center gap-1.5">
+                        <div
+                            className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all",
+                                i < current
+                                    ? "bg-primary border-primary text-white"
+                                    : i === current
+                                        ? "border-primary text-primary bg-primary/10"
+                                        : "border-border text-muted-foreground bg-background",
+                            )}
+                        >
+                            {i < current ? <Check className="w-3.5 h-3.5" /> : i + 1}
                         </div>
-                        {isActive && (
-                            <span className="text-xs font-bold  tracking-widest text-slate-900 mr-2">
-                                {label}
-                            </span>
-                        )}
-                        {i < steps.length - 1 && (
-                            <div className={cn(
-                                "w-4 h-px",
-                                isDone ? "bg-emerald-500" : "bg-slate-100"
-                            )} />
-                        )}
+                        <span
+                            className={cn(
+                                "text-[11px] font-medium hidden sm:block whitespace-nowrap",
+                                i <= current ? "text-foreground" : "text-muted-foreground",
+                            )}
+                        >
+                            {label}
+                        </span>
                     </div>
-                );
-            })}
+                    {i < steps.length - 1 && (
+                        <div
+                            className={cn(
+                                "h-px w-16 sm:w-24 mx-2 mb-5 transition-colors",
+                                i < current ? "bg-primary" : "bg-border",
+                            )}
+                        />
+                    )}
+                </div>
+            ))}
         </div>
     );
 }
 
-export default function Onboarding() {
-    const { user, signOut } = useAuth();
-    const { isSuperAdmin, loading: pLoading } = usePermissions();
-    const { refreshTenant } = useTenant();
+// ── Domain option card ────────────────────────────────────────────────────────
+
+function OptionCard({
+    active, onClick, icon, title, subtitle, badge, badgeClass,
+}: {
+    active: boolean; onClick: () => void;
+    icon: React.ReactNode; title: string; subtitle: string;
+    badge: string; badgeClass: string;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cn(
+                "text-left p-4 rounded-xl border-2 transition-all w-full",
+                active
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                    : "border-border bg-card hover:border-muted-foreground/30",
+            )}
+        >
+            <div className="flex items-center justify-between mb-2.5">
+                {icon}
+                {active && <Check className="w-4 h-4 text-primary" />}
+            </div>
+            <p className="text-sm font-semibold text-foreground leading-tight">{title}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
+            <span className={cn("inline-block mt-2 text-[10px] px-1.5 py-0.5 rounded font-semibold", badgeClass)}>
+                {badge}
+            </span>
+        </button>
+    );
+}
+
+// ── Template card ────────────────────────────────────────────────────────────
+
+function TemplateCard({
+    template, selected, onSelect,
+}: {
+    template: StorefrontTemplate; selected: boolean; onSelect: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onSelect}
+            className={cn(
+                "text-left rounded-xl border-2 overflow-hidden transition-all group w-full",
+                selected
+                    ? "border-primary ring-1 ring-primary/20"
+                    : "border-border hover:border-muted-foreground/40",
+            )}
+        >
+            {/* Thumbnail */}
+            <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                {template.thumbnail_url ? (
+                    <img
+                        src={template.thumbnail_url}
+                        alt={template.name}
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <Store className="w-10 h-10 text-muted-foreground/30" />
+                    </div>
+                )}
+                {selected && (
+                    <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                            <Check className="w-5 h-5 text-white" />
+                        </div>
+                    </div>
+                )}
+                {template.is_premium && (
+                    <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 bg-amber-500 text-white rounded font-semibold">
+                        Premium
+                    </span>
+                )}
+            </div>
+
+            {/* Info */}
+            <div className="p-3 space-y-1.5">
+                <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-foreground leading-tight">{template.name}</p>
+                    {template.preview_url && (
+                        <a
+                            href={template.preview_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-muted-foreground hover:text-primary transition-colors"
+                            title="Preview"
+                        >
+                            <Eye className="w-3.5 h-3.5" />
+                        </a>
+                    )}
+                </div>
+                {template.description && (
+                    <p className="text-[11px] text-muted-foreground line-clamp-2">{template.description}</p>
+                )}
+                {template.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                        {template.tags.slice(0, 3).map((tag) => (
+                            <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </button>
+    );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+export default function EcomOnboarding() {
+    const { activeCompany } = useTenant();
     const navigate = useNavigate();
 
-    // If user is already logged in and has a company → skip to app
-    // IF Super Admin → skip to super admin panel
+    const [step, setStep] = useState(0);
+
+    // Step 1
+    const [domainOption, setDomainOption] = useState<DomainOption>("free");
+    const [brandName, setBrandName] = useState("");
+    const [existingDomain, setExistingDomain] = useState("");
+    const [chosenDomain, setChosenDomain] = useState("");
+    const [step1Loading, setStep1Loading] = useState(false);
+    const [slugError, setSlugError] = useState("");
+
+    // Step 2
+    const [templates, setTemplates] = useState<StorefrontTemplate[]>([]);
+    const [templatesLoading, setTemplatesLoading] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<StorefrontTemplate | null>(null);
+
+    // Step 3
+    const [configValues, setConfigValues] = useState<TemplateConfigOverrides>({});
+    const [deploying, setDeploying] = useState(false);
+    const [deployPhaseIdx, setDeployPhaseIdx] = useState(0);
+    const [storeUrl, setStoreUrl] = useState("");
+    const phaseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const brandSlug = useMemo(() => slugify(brandName), [brandName]);
+    const subdomainUrl = `${brandSlug || "yourstore"}.${PLATFORM_BASE_DOMAIN}`;
+
+    // Pre-fill brand name / subdomain from company
     useEffect(() => {
-        if (user && !pLoading) {
-            if (isSuperAdmin) {
-                navigate('/super-admin', { replace: true });
-                return;
-            }
-
-            supabase.from('companies').select('id').eq('user_id', user.id).limit(1).maybeSingle().then(({ data }) => {
-                if (data) {
-                    navigate('/apps', { replace: true });
-                } else {
-                    setIsRedirecting(false);
-                }
-            }).catch(() => setIsRedirecting(false));
-        } else if (!pLoading && !user) {
-            setIsRedirecting(false);
+        if (!activeCompany) return;
+        if (activeCompany.subdomain) {
+            setBrandName(activeCompany.subdomain);
+            setChosenDomain(`${activeCompany.subdomain}.${PLATFORM_BASE_DOMAIN}`);
+        } else if (activeCompany.name) {
+            setBrandName(slugify(activeCompany.name));
         }
-    }, [user, isSuperAdmin, pLoading]);
+    }, [activeCompany?.id]);
 
-    // ── State ─────────────────────────────────────────────────
-    const [step, setStep] = useState(1);
-    const [storeName, setStoreName] = useState("");
-    const [industryType, setIndustryType] = useState<'retail' | 'education' | 'services'>('retail');
-    const [selectedPlan, setSelectedPlan] = useState<string>("");
-    const [plans, setPlans] = useState<PlanEntry[]>([]);
-
-    // Step 5 — Account creation fields
-    const [fullName, setFullName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [selectedModules, setSelectedModules] = useState<string[]>([]);
-    const [availableSystemModules, setAvailableSystemModules] = useState<any[]>([]);
-
-    // Deployment
-    const [deploymentStep, setDeploymentStep] = useState(0);
-    const [deploymentStatus, setDeploymentStatus] = useState("");
-    const [slug, setSlug] = useState("");
-
-    const [loading, setLoading] = useState(false);
-    const [initializing, setInitializing] = useState(true);
-    const [isRedirecting, setIsRedirecting] = useState(!!user); // Assume redirecting if logged in until proven otherwise
-    const [error, setError] = useState("");
-
-    // Background Carousel State
-    const [bgImageIndex, setBgImageIndex] = useState(0);
-    const brandingContent = [
-        {
-            image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&q=80",
-            title: "Launch your digital future today.",
-            subtitle: "Join thousands of enterprises building their custom cloud ecosystem.",
-            stats: [
-                { val: "Instantly", label: "Provisioning" },
-                { val: "Secure", label: "Military-Grade" }
-            ]
-        },
-        {
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80",
-            title: "Scalable Infrastructure for Growth.",
-            subtitle: "Built on high-performance that scales with your business.",
-            stats: [
-                { val: "99.9%", label: "Uptime" },
-                { val: "Global", label: "Edge Network" }
-            ]
-        },
-        {
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80",
-            title: "Advanced Data Intelligence.",
-            subtitle: "Turn raw data into actionable insights with our integrated BI tools.",
-            stats: [
-                { val: "Real-time", label: "Analytics" },
-                { val: "AI-Ready", label: "Processing" }
-            ]
-        }
-    ];
-
+    // Load templates when reaching step 2
     useEffect(() => {
-        const interval = setInterval(() => {
-            setBgImageIndex((prev) => (prev + 1) % brandingContent.length);
-        }, 7000);
-        return () => clearInterval(interval);
-    }, []);
+        if (step !== 1) return;
+        setTemplatesLoading(true);
+        listTemplates({ moduleId: "ecommerce", activeOnly: true })
+            .then(setTemplates)
+            .catch((e) => toast.error(e.message))
+            .finally(() => setTemplatesLoading(false));
+    }, [step]);
 
-    const dynamicSteps = ["Business", "Plan", "Account", "Confirm"];
-
-    // ── Data Fetching ─────────────────────────────────────────
+    // Auto-select single template
     useEffect(() => {
-        async function loadContent() {
-            try {
-                const { data: pData } = await supabase
-                    .from("system_plans")
-                    .select("*")
-                    .eq("is_active", true)
-                    .order("sort_order", { ascending: true });
-
-                if (pData && pData.length > 0) {
-                    const mapped = pData.map(p => ({
-                        id: p.id,
-                        name: p.name,
-                        slug: p.slug,
-                        price_monthly: p.price_monthly,
-                        features: typeof p.features === 'string' ? JSON.parse(p.features) : (p.features || [])
-                    }));
-                    setPlans(mapped);
-                    setSelectedPlan(mapped[0].id);
-                } else {
-                    setPlans(LOCAL_PLANS);
-                    setSelectedPlan(LOCAL_PLANS[0].id);
-                }
-
-                // Fetch System Modules for selection
-                const { data: mData } = await supabase.from('system_modules').select('*').eq('is_active', true);
-                const modulesToUse = (mData && mData.length > 0) ? mData : LOCAL_MODULE_REGISTRY;
-                setAvailableSystemModules(modulesToUse);
-
-                // Pre-select module from URL if exists
-                const params = new URLSearchParams(window.location.search);
-                const urlModule = params.get('module');
-                if (urlModule) {
-                    const mod = modulesToUse.find(m => m.slug === urlModule || m.id.toString() === urlModule);
-                    if (mod) {
-                        setSelectedModules([mod.id.toString()]);
-                        if (mod.category === 'commerce') setIndustryType('retail');
-                        else if (mod.category === 'operations') setIndustryType('services');
-                        else if (mod.category.includes('people') || mod.category === 'education') setIndustryType('education');
-                    }
-                }
-                // No auto-selection — user must explicitly choose modules
-            } catch (err) {
-                console.warn("Database sync deficit detected. Operating under Clinical Autonomy Mode (Local Fallbacks).");
-                setPlans(LOCAL_PLANS);
-                setSelectedPlan(LOCAL_PLANS[0].id);
-                setAvailableSystemModules(LOCAL_MODULE_REGISTRY);
-                // No auto-selection in fallback mode either
-            } finally {
-                setTimeout(() => setInitializing(false), 800);
-            }
+        if (templates.length === 1 && !selectedTemplate) {
+            setSelectedTemplate(templates[0]);
         }
-        loadContent();
-    }, []);
+    }, [templates]);
 
-    // ── Components ─────────────────────────────────────────────
-    // Internal legacy loader replaced by clinical PlatformLoader
-
-    // ── Helpers ───────────────────────────────────────────────
-    const goNext = () => {
-        setError("");
-        // Skip step 3 (removed template step) — go from 2 to 4
-        if (step === 2) {
-            setStep(4);
-        } else {
-            setStep(s => s + 1);
+    // Pre-fill config defaults when template selected
+    useEffect(() => {
+        if (!selectedTemplate) return;
+        const initial: TemplateConfigOverrides = {};
+        for (const [key, field] of Object.entries(selectedTemplate.config_schema || {})) {
+            if (key === "storeName" && activeCompany?.name) initial[key] = activeCompany.name;
+            else if (field?.default !== undefined) initial[key] = field.default;
         }
-    };
-    const goBack = () => {
-        setError("");
-        // Skip step 3 (removed template step) — go from 4 back to 2
-        if (step === 4) {
-            setStep(2);
-        } else {
-            setStep(s => s - 1);
+        setConfigValues(initial);
+    }, [selectedTemplate?.id]);
+
+    // Cleanup phase timer on unmount
+    useEffect(() => () => { if (phaseTimerRef.current) clearInterval(phaseTimerRef.current); }, []);
+
+    // ── Step 1: proceed with domain choice
+    const handleDomainContinue = async () => {
+        if (domainOption === "buy") {
+            navigate("/apps/ecommerce/domain");
+            return;
         }
-    };
-
-    // ── Step 5: Create Auth Account + Deploy ──────────────────
-    const handleDeploy = async () => {
-        setError("");
-        if (!fullName.trim()) return setError("Full name is required.");
-        if (!email.trim()) return setError("Email is required.");
-        if (password.length < 6) return setError("Password must be at least 6 characters.");
-        if (password !== confirmPassword) return setError("Passwords do not match.");
-
-        setLoading(true);
-
-        const runProgress = async (val: number, msg: string, delay: number) => {
-            setDeploymentStep(val);
-            setDeploymentStatus(msg);
-            await new Promise(r => setTimeout(r, delay));
-        };
+        if (!activeCompany?.id) return;
+        setStep1Loading(true);
+        setSlugError("");
 
         try {
-            // If we already have a user from useAuth, skip signUp
-            let activeUser = user;
+            if (domainOption === "free") {
+                if (brandSlug.length < 2) { setSlugError("Must be at least 2 characters."); return; }
 
-            if (!activeUser) {
-                const { data: authData, error: signUpErr } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: { data: { full_name: fullName } }
-                });
-
-                if (signUpErr) {
-                    // Check specifically for user already registered
-                    if (signUpErr.message.toLowerCase().includes("already registered") || signUpErr.message.toLowerCase().includes("already exists")) {
-                        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-                        if (signInErr) throw new Error("Account already exists with a different password. Please login normally.");
-                        activeUser = signInData?.user;
-                    } else {
-                        throw signUpErr;
-                    }
-                } else {
-                    activeUser = authData?.user;
-                }
-            }
-
-            if (!activeUser) throw new Error("Account verification failed. Please try again.");
-
-            setStep(5); // Go to deployment screen immediately (was 6)
-
-            await runProgress(10, "Creating Your Account...", 800);
-
-            // Wait for auth session to be fully established
-            let retries = 0;
-            while (retries < 10) {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.access_token) break;
-                await new Promise(r => setTimeout(r, 500));
-                retries++;
-            }
-
-            await runProgress(25, "Saving Your Profile...", 800);
-
-            // 2. Create user profile record (trigger may have already created it)
-            try {
-                await supabase.from('users').upsert({
-                    id: activeUser.id,
-                    username: activeUser.email || email,
-                    full_name: fullName || activeUser.user_metadata?.full_name || email.split('@')[0],
-                    is_super_admin: false
-                });
-            } catch {
-                // Trigger handle_new_user may have already created the row — safe to ignore
-            }
-
-            await runProgress(40, "Setting up Your Business...", 1000);
-
-            // 3. Create company
-            const newSlug = storeName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
-            setSlug(newSlug);
-
-            let insertPayload: any = {
-                name: storeName,
-                subdomain: newSlug,
-                contact_email: email || activeUser.email,
-                user_id: activeUser.id,
-                plan: plans.find(p => p.id === selectedPlan)?.name || 'starter'
-            };
-
-            // Try to include new columns if they exist in state/registry
-            if (industryType) insertPayload.industry_type = industryType;
-            const pSlug = plans.find(p => p.id === selectedPlan)?.slug;
-            if (pSlug) insertPayload.plan_slug = pSlug;
-
-            let { data: newCompany, error: cErr } = await supabase
-                .from("companies")
-                .insert([insertPayload])
-                .select()
-                .single();
-
-            if (cErr) {
-                console.warn("Full company insert failed, attempting legacy fallback...", cErr);
-                // Fallback: Try without industry_type and plan_slug if DB isn't updated
-                const { data: fallbackCompany, error: fErr } = await supabase
+                const { data: taken } = await supabase
                     .from("companies")
-                    .insert([{
-                        name: storeName,
-                        subdomain: newSlug,
-                        contact_email: email || activeUser.email,
-                        user_id: activeUser.id
-                    }])
-                    .select()
-                    .single();
-                if (fErr) throw fErr;
-                newCompany = fallbackCompany;
-            }
+                    .select("id")
+                    .eq("subdomain", brandSlug)
+                    .neq("id", Number(activeCompany.id))
+                    .maybeSingle();
+                if (taken) { setSlugError("This name is already taken. Please choose another."); return; }
 
-            await runProgress(60, "Configuring Workspace...", 1200);
-
-            await runProgress(80, "Finalizing Smart Seyali...", 1000);
-
-            // 5. Link user to company
-            await supabase.from("company_users").insert([{
-                company_id: newCompany.id,
-                user_id: activeUser.id,
-                role: 'admin'
-            }]);
-
-            // 6. Link selected modules to company (Company Modules)
-            if (selectedModules.length > 0) {
-                const modulesPayload = selectedModules.map(modId => {
-                    const mod = availableSystemModules.find(m => m.id.toString() === modId.toString());
-                    return {
-                        company_id: newCompany.id,
-                        module_slug: mod?.slug || modId,
-                        is_active: true
-                    };
-                });
-                const { error: mErr } = await supabase.from("company_modules").insert(modulesPayload);
-                
-                if (mErr) {
-                    console.warn("Module slug insert failed, attempting legacy module_id fallback...", mErr);
-                    const legacyPayload = selectedModules.map(modId => ({
-                        company_id: newCompany.id,
-                        module_id: parseInt(modId.toString()) || modId,
-                        is_active: true
-                    }));
-                    await supabase.from("company_modules").insert(legacyPayload);
-                }
-
-                // 7. Link selected modules to user (User Modules - New Architecture)
-                const userModulesPayload = selectedModules.map(modId => {
-                    const mod = availableSystemModules.find(m => m.id.toString() === modId.toString());
-                    return {
-                        company_id: newCompany.id,
-                        user_id: activeUser.id,
-                        module_slug: mod?.slug || modId,
-                        is_active: true
-                    };
-                });
-                const { error: umErr } = await supabase.from("user_modules").insert(userModulesPayload);
-                if (umErr) {
-                    console.warn("User modules table induction bypassed (Legacy Environment)", umErr);
-                    // Legacy fallback: some systems might use a different mapping, but if it doesn't exist, we move on
-                }
+                await registerSubdomain(brandSlug, Number(activeCompany.id));
+                setChosenDomain(`${brandSlug}.${PLATFORM_BASE_DOMAIN}`);
+                toast.success(`Subdomain registered: ${brandSlug}.${PLATFORM_BASE_DOMAIN}`);
             } else {
-                // No modules selected — only install the "masters" core module
-                await supabase.from("company_modules").insert([{
-                    company_id: newCompany.id,
-                    module_slug: 'masters',
-                    is_active: true
-                }]);
-                await supabase.from("user_modules").insert([{
-                    company_id: newCompany.id,
-                    user_id: activeUser.id,
-                    module_slug: 'masters',
-                    is_active: true
-                }]);
+                const clean = existingDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
+                if (!isValidDomain(clean)) { toast.error("Enter a valid domain name."); return; }
+                await addExternalDomain(clean, Number(activeCompany.id));
+                setChosenDomain(clean);
+                toast.success("Domain registered. Configure DNS as shown above.");
             }
-
-            // Sync with ecommerce settings if ecommerce is selected
-            if (selectedModules.some(id => {
-                const mod = availableSystemModules.find(m => m.id.toString() === id);
-                return mod?.slug === 'ecommerce';
-            })) {
-                await supabase.from("ecom_settings").insert([{
-                    company_id: newCompany.id,
-                    store_name: storeName,
-                    primary_color: "#2563eb" // Default Blue since they might skip theme
-                }]);
-            }
-
-            await runProgress(100, "Setup Complete!", 800);
-
-            setStep(6); // Success screen (was 7)
+            setStep(1);
         } catch (err: any) {
-            setStep(5);
-            setError(err.message || "Setup failed. Please try again.");
-            setLoading(false);
+            toast.error(err.message || "Domain setup failed.");
         } finally {
-            setLoading(false);
+            setStep1Loading(false);
         }
     };
 
-    // ── UI Styles ──────────────────────────────────────────────
-    // ── UI Styles ──────────────────────────────────────────────
-    const nextBtnCls = "w-full h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold  tracking-widest text-xs flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary-600/10";
-    const backBtnCls = "h-14 px-6 border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-bold  text-xs tracking-widest flex items-center justify-center gap-2 transition-all border shadow-sm";
+    // ── Step 3: deploy template to Hostinger
+    const handleDeploy = async () => {
+        if (!activeCompany?.id || !selectedTemplate || !chosenDomain) return;
+        setDeploying(true);
+        setDeployPhaseIdx(0);
 
-    // Orchestration Guard: If auth is loading, a redirect is imminent, or system is initializing
-    if (initializing || pLoading || isRedirecting) {
-        return <PlatformLoader message="Initializing Workspace" subtext="Clinical Resource Orchestration" />;
-    }
+        phaseTimerRef.current = setInterval(() => {
+            setDeployPhaseIdx((i) => Math.min(i + 1, DEPLOY_PHASES.length - 1));
+        }, 2800);
+
+        try {
+            await setActiveTemplateForCompany(activeCompany.id, selectedTemplate.id, configValues);
+
+            await createDeploymentRequest({
+                companyId: activeCompany.id,
+                moduleId: "ecommerce",
+                templateId: selectedTemplate.id,
+                customDomain: chosenDomain,
+                configOverrides: configValues,
+            });
+
+            const result = await deployTemplateFiles({
+                domain: chosenDomain,
+                templateSlug: selectedTemplate.slug,
+                configOverrides: configValues as Record<string, unknown>,
+                companyId: Number(activeCompany.id),
+                platformBaseUrl: window.location.origin,
+            });
+
+            clearInterval(phaseTimerRef.current!);
+            phaseTimerRef.current = null;
+            setStoreUrl(result.deployed_url || `https://${chosenDomain}`);
+            toast.success("Your store is live!");
+        } catch (err: any) {
+            clearInterval(phaseTimerRef.current!);
+            phaseTimerRef.current = null;
+            toast.error(err.message || "Deployment failed.");
+            setDeploying(false);
+        }
+    };
+
+    const configFields = useMemo(
+        () => Object.entries(selectedTemplate?.config_schema || {}).filter(([, f]) => f && typeof f === "object"),
+        [selectedTemplate?.id],
+    );
+
+    const isDone = storeUrl !== "";
+
+    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <div className="min-h-screen flex bg-white font-sans selection:bg-primary-600/10 overflow-hidden">
+        <div className="p-6 md:p-8 max-w-3xl mx-auto animate-in fade-in duration-400">
 
-            {/* Left Side: Visual/Branding */}
-            <div className="hidden lg:flex w-1/3 relative overflow-hidden bg-slate-900">
-                <AnimatePresence mode="popLayout">
-                    <motion.img
-                        key={brandingContent[bgImageIndex].image}
-                        src={brandingContent[bgImageIndex].image}
-                        initial={{ opacity: 0, scale: 1.1, x: 20 }}
-                        animate={{ opacity: 0.6, scale: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, x: -20 }}
-                        transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-                        className="absolute inset-0 w-full h-full object-cover"
-                    />
-                </AnimatePresence>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
-
-                <div className="relative z-10 p-8 lg:p-12 flex flex-col justify-between h-full">
-                    <Link to="/" className="flex items-center gap-4">
-                        <img src="/logo.png" alt="Logo" className="h-16 lg:h-20 w-auto brightness-0 invert" />
-                        <span className="text-lg lg:text-xl font-bold text-white tracking-tight">{PLATFORM_CONFIG.name}</span>
-                    </Link>
-
-                    <div className="space-y-4 lg:space-y-6">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={bgImageIndex}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.8 }}
-                                className="space-y-4 lg:space-y-6"
-                            >
-                                <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-                                    {brandingContent[bgImageIndex].title.split(' ').map((word, i, arr) => (
-                                        i === arr.length - 1 
-                                            ? <React.Fragment key={i}><br /><span className="text-primary-400">{word}</span></React.Fragment> 
-                                            : <span key={i}>{word} </span>
-                                    ))}
-                                </h2>
-                                <p className="text-base lg:text-lg text-slate-300 max-w-sm leading-relaxed">
-                                    {brandingContent[bgImageIndex].subtitle}
-                                </p>
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
-
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={bgImageIndex}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
-                            transition={{ duration: 0.8 }}
-                            className="flex items-center gap-4 lg:gap-8 text-white"
-                        >
-                            {brandingContent[bgImageIndex].stats.map((stat, i) => (
-                                <div key={i} className="flex items-center gap-4 lg:gap-8">
-                                    <div className="space-y-1">
-                                        <p className="text-xl lg:text-2xl font-bold">{stat.val}</p>
-                                        <p className="text-xs font-bold text-slate-500  tracking-widest">{stat.label}</p>
-                                    </div>
-                                    {i < brandingContent[bgImageIndex].stats.length - 1 && (
-                                        <div className="w-px h-8 bg-slate-700" />
-                                    )}
-                                </div>
-                            ))}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
+            {/* Page header */}
+            <div className="mb-6">
+                <button
+                    onClick={() =>
+                        step > 0 && !deploying
+                            ? setStep(step - 1)
+                            : navigate("/apps/ecommerce/billing")
+                    }
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+                >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    {step > 0 ? "Back" : "Back to Billing"}
+                </button>
+                <h1 className="text-xl font-semibold text-foreground">Set Up Your Online Store</h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                    Complete 3 quick steps to launch your storefront.
+                </p>
             </div>
 
-            {/* Right Side: Form */}
-            <div className="flex-1 flex flex-col bg-white relative overflow-y-auto">
-                {/* Header for mobile or as top nav */}
-                <div className="p-2 lg:px-4 lg:py-2 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-50/50">
-                    <div className="lg:hidden">
-                        <Link to="/" className="flex items-center gap-3">
-                            <img src="/logo.png" alt="Logo" className="h-14 w-auto" />
-                            <span className="text-lg font-bold text-gray-900">{PLATFORM_CONFIG.name}</span>
-                        </Link>
+            <Stepper current={step} />
+
+            {/* ─── Step 1: Domain ─────────────────────────────────────── */}
+            {step === 0 && (
+                <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+                    <div>
+                        <h2 className="text-base font-semibold text-foreground">Choose your store address</h2>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                            How would you like to publish your storefront?
+                        </p>
                     </div>
-                    <div className="hidden lg:block text-xs font-bold text-slate-500  tracking-widest">
-                        Project Configuration Environment
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <OptionCard
+                            active={domainOption === "free"}
+                            onClick={() => setDomainOption("free")}
+                            icon={<Zap className="w-5 h-5 text-primary" />}
+                            title="Free URL"
+                            subtitle={`yourname.${PLATFORM_BASE_DOMAIN}`}
+                            badge="Instant · Free"
+                            badgeClass="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                        />
+                        <OptionCard
+                            active={domainOption === "buy"}
+                            onClick={() => setDomainOption("buy")}
+                            icon={<ShoppingCart className="w-5 h-5 text-orange-500" />}
+                            title="Buy a Domain"
+                            subtitle=".com, .in, .store and more"
+                            badge="From ₹299/yr"
+                            badgeClass="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400"
+                        />
+                        <OptionCard
+                            active={domainOption === "existing"}
+                            onClick={() => setDomainOption("existing")}
+                            icon={<Wifi className="w-5 h-5 text-sky-500" />}
+                            title="Existing Domain"
+                            subtitle="Connect a domain you own"
+                            badge="DNS setup needed"
+                            badgeClass="bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400"
+                        />
                     </div>
-                    <div className="flex items-center gap-4">
-                        {user && (
-                            <button
-                                onClick={async () => { await signOut(); navigate('/login'); }}
-                                className="text-xs font-bold  tracking-widest text-red-500 hover:text-red-600 transition-colors"
-                            >
-                                Sign Out
-                            </button>
-                        )}
-                        <Link to="/login" className="text-xs font-bold  tracking-widest text-primary-600 hover:underline">
-                            Login Support →
-                        </Link>
+
+                    {/* Free URL form */}
+                    {domainOption === "free" && (
+                        <div className="space-y-2">
+                            <Label className="text-xs">Your store name</Label>
+                            <div className="flex items-stretch rounded-lg border border-border overflow-hidden focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary bg-background">
+                                <input
+                                    type="text"
+                                    value={brandName}
+                                    onChange={(e) => { setBrandName(e.target.value); setSlugError(""); }}
+                                    placeholder="yourbrand"
+                                    className="flex-1 px-3 py-2 text-sm bg-transparent outline-none font-mono"
+                                    spellCheck={false}
+                                    autoComplete="off"
+                                />
+                                <span className="px-3 py-2 bg-muted/60 text-muted-foreground text-sm border-l border-border font-mono select-none">
+                                    .{PLATFORM_BASE_DOMAIN}
+                                </span>
+                            </div>
+                            {brandSlug.length >= 2 && (
+                                <p className="text-[11px] text-muted-foreground">
+                                    Your store URL:{" "}
+                                    <code className="text-primary font-medium">{subdomainUrl}</code>
+                                </p>
+                            )}
+                            {slugError && <p className="text-[11px] text-destructive">{slugError}</p>}
+                        </div>
+                    )}
+
+                    {/* Buy domain info */}
+                    {domainOption === "buy" && (
+                        <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/20 p-4 space-y-2">
+                            <p className="text-sm font-semibold text-foreground">Purchase your custom domain</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                Search and buy a domain (e.g. <code>myshop.in</code>) on the Domain &amp; Hosting
+                                page. Once purchased, come back here to choose a template and deploy your store.
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                                Clicking <strong>Continue</strong> will open the Domain Manager.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Existing domain form */}
+                    {domainOption === "existing" && (
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <Label className="text-xs">Your domain name</Label>
+                                <Input
+                                    value={existingDomain}
+                                    onChange={(e) => setExistingDomain(e.target.value)}
+                                    placeholder="shop.yourcompany.com"
+                                    className="font-mono text-sm"
+                                    spellCheck={false}
+                                    autoComplete="off"
+                                />
+                            </div>
+                            <div className="rounded-xl border border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/20 p-4 space-y-2.5">
+                                <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-sky-600" /> DNS configuration required
+                                </p>
+                                <p className="text-[11px] text-muted-foreground">
+                                    Add the following record at your domain registrar before continuing:
+                                </p>
+                                <div className="grid grid-cols-3 gap-2 font-mono text-[10px]">
+                                    {[
+                                        { label: "Type", value: "CNAME" },
+                                        { label: "Name / Host", value: "@ or www" },
+                                        { label: "Points To", value: `app.${PLATFORM_BASE_DOMAIN}` },
+                                    ].map(({ label, value }) => (
+                                        <div key={label} className="bg-background border border-border rounded-lg p-2">
+                                            <p className="text-muted-foreground text-[9px] uppercase tracking-wide mb-0.5">{label}</p>
+                                            <p className="font-medium text-foreground break-all">{value}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-[11px] text-muted-foreground">
+                                    DNS changes can take up to 24 hours to propagate. Our team will verify and activate your domain.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-end pt-1">
+                        <Button
+                            onClick={handleDomainContinue}
+                            disabled={
+                                step1Loading ||
+                                (domainOption === "free" && brandSlug.length < 2) ||
+                                (domainOption === "existing" && !isValidDomain(existingDomain))
+                            }
+                        >
+                            {step1Loading ? (
+                                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Please wait…</>
+                            ) : domainOption === "buy" ? (
+                                <>Go to Domain Manager <ChevronRight className="w-3.5 h-3.5" /></>
+                            ) : (
+                                <>Continue <ChevronRight className="w-3.5 h-3.5" /></>
+                            )}
+                        </Button>
                     </div>
                 </div>
+            )}
 
-                <div className="flex-1 flex flex-col items-start px-4 lg:px-6 pt-0 pb-6 overflow-x-hidden">
-                    <div className={cn(
-                        "w-full transition-all duration-500",
-                        (step === 2 || step === 3) ? "max-w-[1200px]" : "max-w-[900px]"
-                    )}>
-                        {/* Step indicator */}
-                        {step <= 5 && <StepDots current={step <= 2 ? step : step - 1} steps={dynamicSteps} />}
+            {/* ─── Step 2: Template ────────────────────────────────────── */}
+            {step === 1 && (
+                <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+                    <div>
+                        <h2 className="text-base font-semibold text-foreground">Choose your store template</h2>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                            Select the design for your online store.
+                        </p>
+                    </div>
 
-                        <AnimatePresence mode="wait">
+                    {templatesLoading ? (
+                        <div className="flex items-center justify-center py-16">
+                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : templates.length === 0 ? (
+                        <div className="text-center py-12 text-muted-foreground">
+                            <Store className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                            <p className="text-sm">No templates available yet.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            {templates.map((t) => (
+                                <TemplateCard
+                                    key={t.id}
+                                    template={t}
+                                    selected={selectedTemplate?.id === t.id}
+                                    onSelect={() => setSelectedTemplate(t)}
+                                />
+                            ))}
+                        </div>
+                    )}
 
-                            {/* ── STEP 1: Project Name ─────────────────────────────── */}
-                            {step === 1 && (
-                                <motion.div key="s1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-4">
-                                    <div className="space-y-1">
-                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Tell us about your project</h1>
-                                        <p className="text-gray-500 font-medium">Define your workspace and select the core modules to get started.</p>
-                                    </div>
+                    {selectedTemplate && (
+                        <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <Check className="w-4 h-4 text-primary shrink-0" />
+                            <p className="text-sm text-foreground">
+                                <span className="font-medium">{selectedTemplate.name}</span> selected
+                            </p>
+                            {selectedTemplate.preview_url && (
+                                <a
+                                    href={selectedTemplate.preview_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="ml-auto flex items-center gap-1 text-xs text-primary hover:underline"
+                                >
+                                    <Eye className="w-3 h-3" /> Preview
+                                </a>
+                            )}
+                        </div>
+                    )}
 
-                                    <div className="space-y-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Business Name</label>
-                                            <input
-                                                type="text"
-                                                value={storeName}
-                                                onChange={(e) => setStoreName(e.target.value)}
-                                                placeholder="e.g. Nexus Global"
-                                                className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl px-6 font-bold text-lg text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none"
+                    <div className="flex justify-between pt-1">
+                        <Button variant="ghost" onClick={() => setStep(0)}>
+                            <ArrowLeft className="w-3.5 h-3.5" /> Back
+                        </Button>
+                        <Button onClick={() => setStep(2)} disabled={!selectedTemplate}>
+                            Continue <ChevronRight className="w-3.5 h-3.5" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* ─── Step 3: Configure & Deploy ─────────────────────────── */}
+            {step === 2 && (
+                <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+
+                    {/* Success */}
+                    {isDone ? (
+                        <div className="py-8 text-center space-y-4">
+                            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="text-lg font-semibold text-foreground">Your store is live!</p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Share this link with your customers:
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-4 py-3 max-w-sm mx-auto">
+                                <code className="flex-1 text-sm font-medium text-foreground break-all">{storeUrl}</code>
+                                <button
+                                    onClick={() => { navigator.clipboard.writeText(storeUrl); toast.success("Copied!"); }}
+                                    className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-center gap-3">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(storeUrl, "_blank", "noopener")}
+                                >
+                                    <ExternalLink className="w-3.5 h-3.5" /> Open Store
+                                </Button>
+                                <Button size="sm" onClick={() => navigate("/apps/ecommerce")}>
+                                    <Globe className="w-3.5 h-3.5" /> Go to Dashboard
+                                </Button>
+                            </div>
+                        </div>
+                    ) : deploying ? (
+                        /* Deploying progress */
+                        <div className="py-12 flex flex-col items-center gap-4">
+                            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                            <div className="text-center">
+                                <p className="text-sm font-medium text-foreground">
+                                    {DEPLOY_PHASES[deployPhaseIdx]}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    This may take 30–60 seconds. Please don't close this tab.
+                                </p>
+                            </div>
+                            <div className="flex gap-2 mt-1">
+                                {DEPLOY_PHASES.map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className={cn(
+                                            "w-2 h-2 rounded-full transition-colors duration-500",
+                                            i <= deployPhaseIdx ? "bg-primary" : "bg-border",
+                                        )}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        /* Config form */
+                        <>
+                            <div>
+                                <h2 className="text-base font-semibold text-foreground">Configure your store</h2>
+                                <p className="text-sm text-muted-foreground mt-0.5">
+                                    Customise{" "}
+                                    <span className="font-medium text-foreground">{selectedTemplate?.name}</span>
+                                    {" "}— deploying to{" "}
+                                    <code className="text-primary text-xs">{chosenDomain}</code>
+                                </p>
+                            </div>
+
+                            {configFields.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {configFields.map(([key, field]) => (
+                                        <div key={key} className="space-y-1.5">
+                                            <Label className="text-xs">
+                                                {field.label}
+                                                {field.required && <span className="text-destructive ml-0.5">*</span>}
+                                            </Label>
+                                            <Input
+                                                type={field.type || "text"}
+                                                value={String(configValues[key] ?? "")}
+                                                onChange={(e) =>
+                                                    setConfigValues((v) => ({ ...v, [key]: e.target.value }))
+                                                }
+                                                placeholder={field.placeholder}
+                                                className="text-sm"
                                             />
                                         </div>
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Select Solution Suites</label>
-                                                <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full  tracking-widest">
-                                                    {selectedModules.length} Selected
-                                                </span>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                                                {availableSystemModules.length === 0 ? (
-                                                    Array.from({ length: 4 }).map((_, i) => (
-                                                        <div key={i} className="h-20 bg-slate-50 border border-gray-100 rounded-2xl animate-pulse" />
-                                                    ))
-                                                ) : availableSystemModules.map((mod) => {
-                                                    const isSelected = selectedModules.includes(mod.id.toString());
-                                                    return (
-                                                        <div key={mod.id} onClick={() => {
-                                                            setSelectedModules(prev =>
-                                                                isSelected ? prev.filter(id => id !== mod.id.toString()) : [...prev, mod.id.toString()]
-                                                            );
-                                                            if (!isSelected && selectedModules.length === 0) {
-                                                                if (mod.category === 'commerce') setIndustryType('retail');
-                                                                else if (mod.category === 'operations') setIndustryType('services');
-                                                                else if (mod.category === 'people' || mod.category === 'education') setIndustryType('education');
-                                                            }
-                                                        }}
-                                                            className={cn(
-                                                                "p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4 relative group",
-                                                                isSelected ? "border-primary-600 bg-primary-50/30 ring-1 ring-primary-600 shadow-md" : "border-gray-100 bg-slate-50/50 hover:border-gray-200"
-                                                            )}>
-                                                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-xl border border-gray-100 group-hover:scale-110 transition-transform">
-                                                                {mod.icon || '📦'}
-                                                            </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <h3 className="font-bold text-[13px] text-gray-900 truncate">{mod.name}</h3>
-                                                                <p className="text-[13px] font-bold text-gray-400  tracking-tight truncate">{mod.tagline || 'Essential app'}</p>
-                                                            </div>
-                                                            {isSelected && (
-                                                                <div className="w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center shadow-lg">
-                                                                    <Check className="w-3 h-3 text-white stroke-[3]" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 py-4 rounded-xl border border-red-100">{error}</p>}
-
-                                        <Button onClick={() => {
-                                            if (!storeName.trim()) return setError("Business name required.");
-                                            if (selectedModules.length === 0) return setError("Please select at least one module.");
-                                            goNext();
-                                        }} className={nextBtnCls}>
-                                            Choose Your Plan <ArrowRight className="w-5 h-5 ml-2" />
-                                        </Button>
-                                    </div>
-                                </motion.div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground py-2">
+                                    No additional configuration required for this template.
+                                </p>
                             )}
 
-                            {/* ── STEP 2: Plan ─────────────────────────────────────── */}
-                            {step === 2 && (
-                                <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Select a plan</h1>
-                                        <p className="text-gray-500 font-medium">Scale as you grow. Start with our flexible tier and upgrade anytime.</p>
-                                    </div>
-
-                                    {plans.length === 0 ? (
-                                        <PlatformLoader fullScreen={false} message="Fetching Tiers" subtext="Economic Node Sync" />
-                                    ) : (
-                                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                                            {plans.map((plan) => (
-                                                <div key={plan.id} onClick={() => setSelectedPlan(plan.id)}
-                                                    className={cn(
-                                                        "p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col gap-6 relative group",
-                                                        selectedPlan === plan.id ? "border-primary-600 bg-primary-50/20 ring-1 ring-primary-600 shadow-xl" : "border-gray-100 bg-slate-50/50 hover:border-gray-200"
-                                                    )}>
-                                                    {selectedPlan === plan.id && (
-                                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-[13px] font-bold px-4 py-1.5 rounded-full  tracking-widest shadow-lg">Most Popular</div>
-                                                    )}
-                                                    <div className="space-y-1">
-                                                        <h3 className="font-bold text-xs  tracking-widest text-slate-500 group-hover:text-primary-600">{plan.name}</h3>
-                                                        <p className="text-3xl font-bold text-slate-900 tracking-tight">${plan.price_monthly}<span className="text-sm font-bold text-slate-500 ml-1">/mo</span></p>
-                                                    </div>
-                                                    <ul className="space-y-3 flex-1">
-                                                        {plan.features.slice(0, 5).map((feat, i) => (
-                                                            <li key={i} className="flex items-start gap-2.5 text-xs font-medium text-slate-600">
-                                                                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                                                                {feat}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-4 pt-6">
-                                        <button onClick={goBack} className={backBtnCls}>Back</button>
-                                        <Button onClick={goNext} className={nextBtnCls}>Continue Design <ArrowRight className="w-5 h-5 ml-2" /></Button>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* ── STEP 3: Create Account ────────────────────────────── */}
-                            {step === 4 && (
-                                <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
-                                    <div className="space-y-3">
-                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Finalize your account</h1>
-                                        <p className="text-gray-500 font-medium">Create your administrative credentials to manage your workspace.</p>
-                                    </div>
-
-                                    <div className="space-y-5 max-w-2xl">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Full Name</label>
-                                            <div className="relative group">
-                                                <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
-                                                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Natesh Kumar"
-                                                    className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Work Email</label>
-                                            <div className="relative group">
-                                                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
-                                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@company.com"
-                                                    className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Password</label>
-                                                <div className="relative group">
-                                                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
-                                                    <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
-                                                        className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-12 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
-                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-600 transition-colors">
-                                                        {showPassword ? <Eye className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-gray-400  tracking-widest ml-1">Confirm</label>
-                                                <div className="relative group">
-                                                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-primary-600" />
-                                                    <input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••"
-                                                        className="w-full h-14 bg-slate-50/50 border-b-2 border-transparent border-t-0 border-x-0 rounded-t-xl pl-14 pr-4 font-bold text-gray-900 placeholder:text-gray-300 focus:bg-slate-100/50 focus:border-primary-600 transition-all text-sm outline-none" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {error && <p className="text-red-500 text-xs font-bold text-center bg-red-50 py-4 rounded-xl border border-red-100">{error}</p>}
-
-                                        <div className="flex gap-4 pt-6">
-                                            <button onClick={goBack} className={backBtnCls}>Back</button>
-                                            <Button onClick={handleDeploy} disabled={loading} className={nextBtnCls}>
-                                                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Rocket className="w-5 h-5" />}
-                                                {loading ? "Launching Enterprise..." : "Deploy Workspace"}
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    <p className="text-xs text-gray-400 font-bold  tracking-widest text-center pt-10 border-t border-gray-50 grayscale opacity-50">
-                                        Secured by {PLATFORM_CONFIG.name} Identity Protocol
-                                    </p>
-                                </motion.div>
-                            )}
-
-                            {/* ── STEP 5: Progress ──────────────────────── */}
-                            {step === 5 && (
-                                <motion.div key="s5" 
-                                    initial={{ opacity: 0 }} 
-                                    animate={{ opacity: 1 }} 
-                                    className="fixed inset-0 z-[200]"
-                                >
-                                    <PlatformLoader 
-                                        message={deploymentStatus} 
-                                        subtext={`Industrial Provisioning: ${deploymentStep}% Complete`} 
-                                    />
-                                </motion.div>
-                            )}
-
-                            {/* ── STEP 7: Success ───────────────────────────────────── */}
-                            {step === 6 && (
-                                <motion.div key="s6" initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="text-center space-y-8 py-4">
-                                    <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto shadow-inner border border-emerald-100">
-                                        <Check className="w-10 h-10 stroke-[4]" />
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <h1 className="text-xs font-bold text-emerald-500  tracking-[0.8em]">Deployment Complete</h1>
-                                        <h2 className="text-4xl font-bold text-gray-900 tracking-tighter ">
-                                            Ready to <span className="text-primary-600">Scale</span>
-                                        </h2>
-                                        <p className="text-gray-500 font-medium max-w-sm mx-auto">
-                                            Your enterprise workspace <b className="text-gray-900">{storeName}</b> has been successfully provisioned.
-                                        </p>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-lg mx-auto pt-6">
-                                        <Button onClick={() => window.location.href = `/stores/${slug}/index.html`}
-                                            className="h-16 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold  tracking-widest text-xs shadow-2xl transition-all">
-                                            <Rocket className="w-4 h-4 mr-2" /> View Shop
-                                        </Button>
-                                        <Button onClick={async () => {
-                                            await refreshTenant();
-                                            navigate("/apps");
-                                        }}
-                                            className="h-16 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl font-bold  tracking-widest text-xs shadow-2xl shadow-primary-600/20 transition-all">
-                                            <Layers className="w-4 h-4 mr-2" /> Launch Console
-                                        </Button>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                        </AnimatePresence>
-                    </div>
+                            <div className="flex justify-between pt-2">
+                                <Button variant="ghost" onClick={() => setStep(1)}>
+                                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                                </Button>
+                                <Button onClick={handleDeploy}>
+                                    <Zap className="w-3.5 h-3.5" /> Deploy My Store
+                                </Button>
+                            </div>
+                        </>
+                    )}
                 </div>
-
-                <div className="p-6 border-t border-gray-50 flex justify-center gap-10 opacity-30 grayscale pointer-events-none mt-auto">
-                    <div className="flex flex-col items-center">
-                        <Check className="w-6 h-6 mb-1" />
-                        <span className="text-xs font-bold  tracking-widest">Enterprise</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <Lock className="w-6 h-6 mb-1" />
-                        <span className="text-xs font-bold  tracking-widest">Encrypted</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <Rocket className="w-6 h-6 mb-1" />
-                        <span className="text-xs font-bold  tracking-widest">Global</span>
-                    </div>
-                </div>
-            </div>
-
+            )}
         </div>
     );
 }
-

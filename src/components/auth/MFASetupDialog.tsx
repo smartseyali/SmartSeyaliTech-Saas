@@ -119,10 +119,13 @@ export function MFASetupDialog({
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <div
-                            className="mx-auto w-48 h-48 bg-white p-2 rounded-md border border-gray-200 flex items-center justify-center"
-                            dangerouslySetInnerHTML={{ __html: enrollment.qrCodeSvg }}
-                        />
+                        <div className="mx-auto w-48 h-48 bg-white p-2 rounded-md border border-gray-200 flex items-center justify-center">
+                            <img
+                                src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(enrollment.qrCodeSvg)}`}
+                                alt="QR code for two-factor authentication"
+                                className="w-full h-full"
+                            />
+                        </div>
 
                         <div className="text-[11px] text-gray-500 text-center space-y-1">
                             <p>Can't scan? Enter this secret manually:</p>

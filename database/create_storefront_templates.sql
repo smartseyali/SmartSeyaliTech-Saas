@@ -106,13 +106,13 @@ INSERT INTO storefront_templates
      tags, features, config_schema, is_active, is_premium, price, sort_order)
 VALUES
     ('pattikadai',
-     'Pattikadai — Retail Storefront',
-     'Vibrant single-page storefront for retail brands with WhatsApp checkout, product variants, and dynamic shipping zones. Built for South-Indian F&B brands.',
+     'Organic — Retail Storefront',
+     'Clean organic-retail storefront with WhatsApp checkout, product variants, shoppable videos, and dynamic shipping zones. Ideal for food, wellness, and natural-product brands.',
      'ecommerce',
      'ecommerce',
      '/templates/ecommerce/pattikadai/index.html',
-     '/templates/ecommerce/pattikadai/assets/img/logo/logo.gif',
-     ARRAY['retail', 'f-and-b', 'whatsapp', 'india'],
+     '/templates/ecommerce/pattikadai/assets/img/favicon/favicon.png',
+     ARRAY['retail', 'organic', 'whatsapp', 'food', 'wellness'],
      ARRAY['Product Catalog', 'Variants & Stock', 'WhatsApp Checkout', 'Razorpay', 'Dynamic Shipping', 'Cart & Wishlist', 'Mobile-first'],
      '{
         "storeName": { "type": "text", "label": "Store Name", "required": true },

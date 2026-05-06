@@ -84,9 +84,9 @@ export function useCheckout() {
             }
 
             // 2. Calculate totals
-            const subtotal = cartTotal;
+            const subtotal = Math.round(cartTotal * 100) / 100;
             const taxAmount = taxRate > 0 ? Math.round((subtotal * taxRate / 100) * 100) / 100 : 0;
-            const grandTotal = subtotal + taxAmount;
+            const grandTotal = Math.round((subtotal + taxAmount) * 100) / 100;
 
             const isPaid = formData.paymentMethod !== "cod";
             const initialStatus = isPaid && autoConfirm ? "confirmed" : "pending";
@@ -195,12 +195,22 @@ export function useCheckout() {
                         }]);
                     }
                 } catch (payErr: any) {
-                    // Payment failed — log failure, order stays pending
-                    await logPaymentTransaction(activeCompany.id, order.id, "razorpay", grandTotal, "failed", undefined, { error: payErr.message });
+                    const isCancelled = payErr.message === "Payment cancelled by customer";
+                    if (isCancelled) {
+                        // User closed the modal — delete the ghost order so it doesn't pollute the order list
+                        await supabase.from("ecom_order_items").delete().eq("order_id", order.id);
+                        await supabase.from("ecom_orders").delete().eq("id", order.id);
+                        throw new Error("Payment was cancelled.");
+                    }
+                    // Payment gateway error — keep order so merchant/customer can retry
+                    try {
+                        await logPaymentTransaction(activeCompany.id, order.id, "razorpay", grandTotal, "failed", undefined, { error: payErr.message });
+                    } catch {}
+                    await supabase.from("ecom_orders").update({ payment_status: "payment_failed" }).eq("id", order.id);
                     toast({
                         variant: "destructive",
                         title: "Payment Failed",
-                        description: "Your order has been created. You can retry payment from My Orders.",
+                        description: "Your order has been saved. You can retry payment from My Orders.",
                     });
                 }
             } else if (formData.paymentMethod === "cod") {

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,201 +5,220 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  Send,
-  MessageSquare,
-  ArrowRight,
-  Sparkles,
-  CheckCircle,
-  Globe,
+  Mail, Phone, MapPin, Clock, Send, MessageSquare,
+  ArrowRight, CheckCircle, Globe,
 } from "lucide-react";
 import PLATFORM_CONFIG from "@/config/platform";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+const PRIMARY = "#2563EB";
+
+const CONTACT_INFO = [
+  {
+    icon: Mail,
+    label: "Email",
+    value: `support@${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, "")}.com`,
+    sub: "We reply within 24 hours",
+  },
+  {
+    icon: Phone,
+    label: "Phone",
+    value: "+91 90477 36612",
+    sub: "Mon–Sat, available on WhatsApp",
+  },
+  {
+    icon: MapPin,
+    label: "Office",
+    value: "SR Nagar, Tiruppur, TN",
+    sub: "Nethaji Third Street, India",
+  },
+  {
+    icon: Clock,
+    label: "Hours",
+    value: "Mon–Sat: 6pm – 10pm",
+    sub: "Limited weekend support",
+  },
+];
+
+const WHY_US = [
+  "Customised solution architecture",
+  "Transparent pricing — no hidden fees",
+  "Direct access to senior engineers",
+  "Rapid prototype & demo delivery",
+  "Post-launch support included",
+  "Dedicated WhatsApp account manager",
+];
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    subject: "",
-    message: ""
+    name: "", email: "", company: "", subject: "", message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast({
-      title: "Message Received",
-      description: "Our team will review your inquiry and get back to you shortly.",
-    });
+    await new Promise((r) => setTimeout(r, 900));
+    toast({ title: "Message received", description: "We'll get back to you within 24 hours." });
     setFormData({ name: "", email: "", company: "", subject: "", message: "" });
     setIsSubmitting(false);
   };
 
-  const contactInfo = [
-    { icon: Mail, title: "Email", value: `support@${PLATFORM_CONFIG.name.toLowerCase().replace(/\s+/g, '')}.com`, description: "Send us a detailed inquiry anytime.", color: "from-blue-500 to-cyan-500" },
-    { icon: Phone, title: "Phone", value: "+91 90477 36612", description: "Available Mon-Sun for urgent queries.", color: "from-green-500 to-emerald-500" },
-    { icon: MapPin, title: "Office", value: "Tiruppur, TN, India", description: "Nethaji Third St, SR Nagar", color: "from-violet-500 to-purple-500" },
-    { icon: Clock, title: "Hours", value: "Mon - Sat: 6pm - 10pm", description: "Limited weekend availability.", color: "from-orange-500 to-red-500" },
-  ];
-
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative pt-32 lg:pt-40 pb-24 bg-gradient-to-br from-gray-950 via-gray-900 to-primary-950 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <motion.div className="absolute top-20 right-[20%] w-72 h-72 bg-primary-600/20 rounded-full blur-[100px]" animate={{ y: [0, -20, 0], scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+    <div className="min-h-screen bg-white">
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="space-y-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-primary-300 text-sm font-medium">
-              <MessageSquare className="w-4 h-4" /> Get In Touch
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative bg-white pt-32 pb-16 lg:pt-40 lg:pb-20 border-b border-gray-100">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[400px] bg-gradient-to-bl from-blue-50 to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <span className="text-xs font-semibold uppercase tracking-widest mb-4 block" style={{ color: PRIMARY }}>
+              Get In Touch
             </span>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
               Let's Start a
               <br />
-              <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">Conversation</span>
+              <span style={{ color: PRIMARY }}>Conversation</span>
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Ready to take your business to the next level? Our specialists are here to help you navigate your technical journey.
+            <p className="text-lg text-gray-500 leading-relaxed">
+              Ready to modernise your business operations? Our specialists will map out the right
+              platform for your exact workflow — no obligation.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Contact Info Cards */}
-      <section className="relative -mt-12 z-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
+      {/* ── Contact info strip ───────────────────────────────────────────── */}
+      <section className="py-10 bg-gray-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {contactInfo.map((info, index) => (
+            {CONTACT_INFO.map((info, i) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xl shadow-black/[0.04] hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group"
+                transition={{ delay: i * 0.08 }}
+                className="flex items-start gap-3 bg-white border border-gray-200 rounded-xl p-4"
               >
-                <div className={`w-11 h-11 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <info.icon className="h-5 w-5 text-white" />
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(37,99,235,0.08)" }}>
+                  <info.icon className="w-4 h-4" style={{ color: PRIMARY }} />
                 </div>
-                <p className="text-xs font-medium text-gray-400 mb-0.5">{info.title}</p>
-                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600 transition-colors">{info.value}</p>
-                <p className="text-xs text-gray-400 mt-1 hidden sm:block">{info.description}</p>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">{info.label}</p>
+                  <p className="text-sm font-semibold text-gray-900">{info.value}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5 hidden sm:block">{info.sub}</p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Form Section */}
-      <section className="py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-5 gap-16">
-            {/* Contact Form */}
+      {/* ── Form + Sidebar ───────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-5 gap-12">
+
+            {/* Form */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="lg:col-span-3"
             >
-              <div className="bg-gray-50 rounded-3xl p-8 lg:p-12 border border-gray-100">
-                <div className="mb-8">
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-600 text-sm font-semibold mb-4">
-                    <Send className="w-4 h-4" /> Send Inquiry
-                  </span>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">How can we help?</h2>
-                  <p className="text-gray-500 mt-2">Fill out the form below and we'll respond within 24 hours.</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 lg:p-10">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(37,99,235,0.1)" }}>
+                    <Send className="w-4 h-4" style={{ color: PRIMARY }} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Send us a message</h2>
+                    <p className="text-sm text-gray-500">We'll respond within 24 hours.</p>
+                  </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Full Name</Label>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name <span className="text-red-400">*</span></Label>
                       <Input
-                        id="name"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="h-12 rounded-xl bg-white border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 font-medium transition-all"
+                        id="name" name="name" required
+                        value={formData.name} onChange={handleChange}
                         placeholder="John Doe"
+                        className="h-11 rounded border-gray-200 bg-white text-sm focus:border-blue-300 focus:ring-blue-200"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address <span className="text-red-400">*</span></Label>
                       <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="h-12 rounded-xl bg-white border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 font-medium transition-all"
+                        id="email" name="email" type="email" required
+                        value={formData.email} onChange={handleChange}
                         placeholder="john@company.com"
+                        className="h-11 rounded border-gray-200 bg-white text-sm"
                       />
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="company" className="text-sm font-semibold text-gray-700">Company</Label>
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="company" className="text-sm font-medium text-gray-700">Company</Label>
                       <Input
-                        id="company"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                        className="h-12 rounded-xl bg-white border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 font-medium transition-all"
+                        id="company" name="company"
+                        value={formData.company} onChange={handleChange}
                         placeholder="Acme Corp"
+                        className="h-11 rounded border-gray-200 bg-white text-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-sm font-semibold text-gray-700">Subject</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="subject" className="text-sm font-medium text-gray-700">Subject <span className="text-red-400">*</span></Label>
                       <Input
-                        id="subject"
-                        name="subject"
-                        required
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        className="h-12 rounded-xl bg-white border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 font-medium transition-all"
-                        placeholder="Project Consultation"
+                        id="subject" name="subject" required
+                        value={formData.subject} onChange={handleChange}
+                        placeholder="Demo Request"
+                        className="h-11 rounded border-gray-200 bg-white text-sm"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-sm font-semibold text-gray-700">Message</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="message" className="text-sm font-medium text-gray-700">Message <span className="text-red-400">*</span></Label>
                     <Textarea
-                      id="message"
-                      name="message"
-                      required
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      className="min-h-[140px] rounded-xl bg-white border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 font-medium resize-none transition-all"
-                      placeholder="Tell us about your requirements..."
+                      id="message" name="message" required
+                      value={formData.message} onChange={handleChange}
+                      placeholder="Tell us about your business and what you'd like to achieve..."
+                      className="min-h-[130px] rounded border-gray-200 bg-white text-sm resize-none"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-13 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-semibold text-base shadow-lg shadow-primary-600/25 hover:shadow-primary-600/40 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+                    className="w-full h-11 rounded font-semibold text-sm text-white shadow-md disabled:opacity-60"
+                    style={{ background: PRIMARY }}
                   >
                     {isSubmitting ? (
-                      <span className="flex items-center gap-2">Sending... <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" /></span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Sending...
+                      </span>
                     ) : (
-                      <span className="flex items-center gap-2">Send Message <ArrowRight className="w-4 h-4" /></span>
+                      <span className="flex items-center gap-2">
+                        Send Message <ArrowRight className="w-4 h-4" />
+                      </span>
                     )}
                   </Button>
                 </form>
@@ -209,63 +227,58 @@ const Contact = () => {
 
             {/* Sidebar */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-2 space-y-6"
+              className="lg:col-span-2 space-y-5"
             >
-              {/* Why Consult Us */}
-              <div className="bg-gradient-to-br from-gray-900 to-primary-900 rounded-3xl p-8 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/20 blur-3xl" />
-                <div className="relative z-10">
-                  <h3 className="text-xl font-bold mb-6">Why Choose Us?</h3>
-                  <ul className="space-y-4">
-                    {[
-                      "Customized solution architecture",
-                      "Transparent pricing models",
-                      "Direct access to lead engineers",
-                      "Rapid prototype delivery",
-                      "Post-launch support included",
-                    ].map((item, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="flex items-center gap-3 text-sm text-gray-300"
-                      >
-                        <CheckCircle className="w-4 h-4 text-primary-400 shrink-0" />
-                        {item}
-                      </motion.li>
-                    ))}
-                  </ul>
+              {/* Why choose us */}
+              <div className="bg-gray-900 rounded-xl p-7 text-white">
+                <h3 className="font-bold text-base mb-5">Why Choose {PLATFORM_CONFIG.name}?</h3>
+                <ul className="space-y-3">
+                  {WHY_US.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: PRIMARY }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Location */}
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(37,99,235,0.1)" }}>
+                  <Globe className="w-5 h-5" style={{ color: PRIMARY }} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">Based in Tiruppur</h3>
+                  <p className="text-sm" style={{ color: PRIMARY }}>SR Nagar, Tamil Nadu, India</p>
+                  <p className="text-xs text-gray-400 mt-1">Serving clients across India and beyond.</p>
                 </div>
               </div>
 
-              {/* Location Card */}
-              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 text-center">
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Globe className="w-12 h-12 text-primary-600 mx-auto mb-4" />
-                </motion.div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Strategic Location</h3>
-                <p className="text-sm font-semibold text-primary-600 mb-2">SR Nagar, Tiruppur, Tamil Nadu</p>
-                <p className="text-xs text-gray-400">
-                  Providing high-end software solutions from our regional development node.
+              {/* WhatsApp quick connect */}
+              <div className="border rounded-xl p-6" style={{ borderColor: "rgba(37,99,235,0.2)", background: "rgba(37,99,235,0.04)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageSquare className="w-5 h-5" style={{ color: PRIMARY }} />
+                  <h3 className="font-bold text-gray-900">Quick Connect</h3>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  Prefer a direct conversation? Chat with us on WhatsApp for instant support.
                 </p>
-              </div>
-
-              {/* Quick Connect */}
-              <div className="bg-primary-50 rounded-3xl p-8 border border-primary-100">
-                <Sparkles className="w-8 h-8 text-primary-600 mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Quick Connect</h3>
-                <p className="text-sm text-gray-500 mb-4">Prefer a direct conversation? Reach out via WhatsApp for instant support.</p>
-                <Button asChild variant="outline" className="w-full rounded-xl border-primary-200 text-primary-600 hover:bg-primary-100 font-semibold">
-                  <a href="https://wa.me/919047736612?text=Hello!%20I%20would%20like%20to%20chat." target="_blank" rel="noopener noreferrer">
-                    Chat on WhatsApp <ArrowRight className="ml-2 w-4 h-4" />
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full h-10 rounded border font-semibold text-sm"
+                  style={{ borderColor: PRIMARY, color: PRIMARY }}
+                >
+                  <a
+                    href="https://wa.me/919047736612?text=Hello!%20I%20would%20like%20to%20chat."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    Chat on WhatsApp <ArrowRight className="w-4 h-4" />
                   </a>
                 </Button>
               </div>
@@ -274,35 +287,35 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-28 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-primary-900 rounded-[2.5rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px]" />
-              <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-[100px]" />
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-              <div className="relative z-10 space-y-8">
-                <h2 className="text-3xl lg:text-5xl font-bold leading-tight">
-                  Start Your
-                  <br />
-                  <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">Journey Today</span>
-                </h2>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                  Creating modern solutions for complex business problems. Let's discuss your roadmap.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                  <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary-600 hover:bg-primary-500 text-white font-semibold shadow-2xl shadow-primary-600/30 group transition-all duration-300 hover:-translate-y-0.5">
-                    <Link to="/products">
-                      Explore Products <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-white/40 bg-white/5 text-white hover:bg-white/10 font-semibold backdrop-blur-sm transition-all">
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                </div>
-              </div>
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="py-20 bg-[#EFF6FF] border-t border-blue-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Start Your Journey Today
+            </h2>
+            <p className="text-gray-500 text-lg mb-10 max-w-xl mx-auto">
+              Explore our full product lineup and see how SmartSeyali fits your business.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                asChild size="lg"
+                className="bg-[#2563EB] hover:bg-blue-700 text-white h-12 px-8 rounded font-semibold text-sm shadow-md"
+              >
+                <Link to="/products">
+                  Explore Products <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild variant="outline" size="lg"
+                className="border-blue-200 text-[#2563EB] hover:bg-blue-50 h-12 px-8 rounded font-semibold text-sm"
+              >
+                <Link to="/login">Sign In to Dashboard</Link>
+              </Button>
             </div>
           </motion.div>
         </div>

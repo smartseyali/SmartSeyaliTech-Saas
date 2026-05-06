@@ -1,42 +1,51 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Box,
-  Search,
-  ArrowRight,
-  Settings,
-  X,
-  SlidersHorizontal,
-  ListFilter,
-  Sparkles,
-  Package,
+  Box, Search, ArrowRight, X, SlidersHorizontal, ListFilter,
+  ShoppingCart, Monitor, Target, TrendingUp, Package, ShoppingBag,
+  Users, BarChart3, MessageCircle, Globe, Database,
+  type LucideIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetFooter,
-  SheetClose,
+  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
+  SheetTrigger, SheetFooter, SheetClose,
 } from "@/components/ui/sheet";
 
+/* ── Same icon map as AppLauncher ─────────────────────────────────────── */
+const MODULE_ICONS: Record<string, LucideIcon> = {
+  ecommerce: ShoppingCart,
+  pos:       Monitor,
+  crm:       Target,
+  sales:     TrendingUp,
+  inventory: Package,
+  purchase:  ShoppingBag,
+  hrms:      Users,
+  finance:   BarChart3,
+  whatsapp:  MessageCircle,
+  website:   Globe,
+  masters:   Database,
+};
+
+/* Category icons */
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  commerce:   ShoppingCart,
+  finance:    BarChart3,
+  operations: ShoppingBag,
+  people:     Users,
+  customer:   Target,
+  analytics:  BarChart3,
+};
+
 const CATEGORIES = ["commerce", "finance", "operations", "people", "customer", "analytics"];
-const STATUSES = ["All", "Operational", "Beta", "Coming Soon"];
+const STATUSES   = ["All", "Operational", "Beta", "Coming Soon"];
 
 const Products = () => {
   const [modules, setModules] = useState<any[]>([]);
@@ -59,410 +68,322 @@ const Products = () => {
           .select("*")
           .eq("is_active", true)
           .order("sort_order", { ascending: true });
-
         if (error) throw error;
         setModules(data || []);
-      } catch (err) {
-        console.error("Error fetching modules:", err);
+      } catch {
+        /* noop */
       } finally {
         setLoading(false);
       }
     };
-
     fetchModules();
   }, []);
 
-  const filteredModules = useMemo(() => {
-    return modules.filter((m) => {
-      const matchesCategory = selectedCategory === "All" || m.category === selectedCategory;
-      const matchesStatus = selectedStatus === "All" || (m.status || "Operational") === selectedStatus;
-      const matchesSearch =
-        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.tagline?.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesCategory && matchesStatus && matchesSearch;
-    });
-  }, [modules, selectedCategory, selectedStatus, searchTerm]);
+  const filteredModules = useMemo(() => modules.filter((m) => {
+    const matchCat    = selectedCategory === "All" || m.category === selectedCategory;
+    const matchStatus = selectedStatus === "All"   || (m.status || "Operational") === selectedStatus;
+    const q           = searchTerm.toLowerCase();
+    const matchSearch = !q || m.name.toLowerCase().includes(q)
+      || m.category?.toLowerCase().includes(q)
+      || m.tagline?.toLowerCase().includes(q);
+    return matchCat && matchStatus && matchSearch;
+  }), [modules, selectedCategory, selectedStatus, searchTerm]);
 
-  const modulesByCategory = useMemo(() => {
-    return CATEGORIES.reduce((acc: any, cat) => {
-      const filtered = filteredModules.filter((m) => m.category === cat);
-      if (filtered.length > 0) acc[cat] = filtered;
-      return acc;
-    }, {});
-  }, [filteredModules]);
+  const modulesByCategory = useMemo(() => CATEGORIES.reduce((acc: any, cat) => {
+    const filtered = filteredModules.filter((m) => m.category === cat);
+    if (filtered.length > 0) acc[cat] = filtered;
+    return acc;
+  }, {}), [filteredModules]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    if (category === "All") {
-      searchParams.delete("category");
-    } else {
-      searchParams.set("category", category);
-    }
+    if (category === "All") searchParams.delete("category");
+    else searchParams.set("category", category);
     setSearchParams(searchParams);
   };
 
-  const hasActiveFilters = selectedCategory !== "All" || selectedStatus !== "All" || searchTerm !== "";
+  const hasActiveFilters  = selectedCategory !== "All" || selectedStatus !== "All" || searchTerm !== "";
   const activeFilterCount = (selectedCategory !== "All" ? 1 : 0) + (selectedStatus !== "All" ? 1 : 0);
-
-  const clearAllFilters = () => {
-    setSelectedCategory("All");
-    setSelectedStatus("All");
-    setSearchTerm("");
-    searchParams.delete("category");
-    setSearchParams(searchParams);
+  const clearAllFilters   = () => {
+    setSelectedCategory("All"); setSelectedStatus("All"); setSearchTerm("");
+    searchParams.delete("category"); setSearchParams(searchParams);
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative pt-32 lg:pt-40 pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-primary-950 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <motion.div className="absolute top-20 right-[15%] w-72 h-72 bg-primary-600/20 rounded-full blur-[100px]" animate={{ y: [0, -20, 0], scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+    <div className="min-h-screen bg-white">
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative bg-white pt-32 pb-16 lg:pt-40 lg:pb-20 border-b border-gray-100">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[400px] bg-gradient-to-bl from-blue-50 to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl space-y-6"
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-primary-300 text-sm font-medium">
-              <Package className="w-4 h-4" /> Product Catalog
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] mb-4 block">
+              Product Catalog
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
               Explore Our
               <br />
-              <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">Product Lineup</span>
+              <span className="text-[#2563EB]">Module Lineup</span>
             </h1>
-            <p className="text-xl text-gray-400 leading-relaxed max-w-xl">
-              Powerful, modular software solutions designed to scale your business and automate your workflows.
+            <p className="text-lg text-gray-500 leading-relaxed max-w-xl">
+              Powerful, modular software solutions — each designed to solve a specific business
+              challenge and integrate seamlessly with the rest.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Sticky Filters Section */}
-      <section className="py-4 bg-white/80 backdrop-blur-xl sticky top-0 z-40 border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-              <div className="relative flex-grow group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-600 transition-colors" />
+      {/* ── Sticky filters ───────────────────────────────────────────────── */}
+      <section className="py-3 bg-white/90 backdrop-blur-xl sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3">
+            {/* Search + status row */}
+            <div className="flex gap-3 items-center">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder="Search modules and capabilities..."
+                  placeholder="Search modules..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-primary-200 focus:ring-2 focus:ring-primary-600/10 shadow-none transition-all text-base"
+                  className="pl-9 h-10 rounded border-gray-200 bg-gray-50 focus:bg-white text-sm"
                 />
               </div>
 
-              <div className="flex gap-3 items-center">
-                <div className="hidden lg:flex items-center gap-3">
-                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="w-[180px] h-12 rounded-xl border-transparent bg-gray-50 focus:bg-white text-sm font-medium">
-                      <div className="flex items-center gap-2">
-                        <ListFilter className="w-4 h-4 text-gray-400" />
-                        <span>Status: <SelectValue placeholder="All" /></span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      {STATUSES.map((status) => (
-                        <SelectItem key={status} value={status} className="rounded-lg py-2">
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="hidden lg:block">
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger className="w-44 h-10 rounded border-gray-200 bg-gray-50 text-sm">
+                    <div className="flex items-center gap-2">
+                      <ListFilter className="w-3.5 h-3.5 text-gray-400" />
+                      <SelectValue placeholder="Status" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUSES.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <Sheet open={showFilters} onOpenChange={setShowFilters}>
-                  <SheetTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="lg:hidden h-12 rounded-xl px-4 border-transparent bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <SlidersHorizontal className="w-5 h-5 mr-2" />
-                      Filters
-                      {activeFilterCount > 0 && (
-                        <span className="ml-2 px-2 py-0.5 min-w-[1.25rem] h-5 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center font-bold">
-                          {activeFilterCount}
-                        </span>
-                      )}
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="flex flex-col h-full w-[300px] sm:w-[400px]">
-                    <SheetHeader className="text-left pb-6 border-b">
-                      <SheetTitle className="text-2xl font-bold">Filters</SheetTitle>
-                      <SheetDescription>Refine the module list to find exactly what you need.</SheetDescription>
-                    </SheetHeader>
-
-                    <div className="flex-grow overflow-y-auto py-6 space-y-8">
-                      <div className="space-y-3">
-                        <label className="text-sm font-semibold text-gray-700 block">Search</label>
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <Input
-                            type="text"
-                            placeholder="Search modules..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 h-10 rounded-lg bg-gray-50 border-transparent"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="text-sm font-semibold text-gray-700">Status</div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {STATUSES.map((status) => (
-                            <button
-                              key={status}
-                              onClick={() => setSelectedStatus(status)}
-                              className={cn(
-                                "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border",
-                                selectedStatus === status
-                                  ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
-                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
-                              )}
-                            >
-                              {status}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="text-sm font-semibold text-gray-700">Categories</div>
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            onClick={() => handleCategoryChange("All")}
-                            className={cn(
-                              "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border",
-                              selectedCategory === "All"
-                                ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
-                                : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
-                            )}
-                          >
-                            All Categories
-                          </button>
-                          {CATEGORIES.map((category) => (
-                            <button
-                              key={category}
-                              onClick={() => handleCategoryChange(category)}
-                              className={cn(
-                                "px-4 py-2.5 rounded-xl text-sm font-medium transition-all border capitalize",
-                                selectedCategory === category
-                                  ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25"
-                                  : "bg-gray-50 border-transparent text-gray-700 hover:border-primary-200"
-                              )}
-                            >
-                              {category}
-                            </button>
-                          ))}
-                        </div>
+              {/* Mobile sheet */}
+              <Sheet open={showFilters} onOpenChange={setShowFilters}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="lg:hidden h-10 rounded border-gray-200 bg-gray-50 text-sm px-3">
+                    <SlidersHorizontal className="w-4 h-4 mr-1.5" />
+                    Filters
+                    {activeFilterCount > 0 && (
+                      <span className="ml-1.5 w-4 h-4 rounded-full bg-[#2563EB] text-white text-[10px] flex items-center justify-center font-bold">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[380px] flex flex-col">
+                  <SheetHeader className="pb-4 border-b">
+                    <SheetTitle>Filters</SheetTitle>
+                    <SheetDescription>Refine the module list.</SheetDescription>
+                  </SheetHeader>
+                  <div className="flex-1 overflow-y-auto py-5 space-y-6">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Status</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {STATUSES.map((s) => (
+                          <button key={s} onClick={() => setSelectedStatus(s)}
+                            className={cn("px-3 py-2 rounded text-sm font-medium border transition-all",
+                              selectedStatus === s
+                                ? "bg-[#2563EB] border-[#2563EB] text-white"
+                                : "bg-gray-50 border-gray-200 text-gray-600 hover:border-blue-200"
+                            )}>{s}</button>
+                        ))}
                       </div>
                     </div>
-
-                    <SheetFooter className="pt-6 border-t mt-auto">
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <button onClick={clearAllFilters} className="text-sm font-semibold text-gray-500 hover:text-primary-600 transition-colors px-4 py-2">
-                          Clear All
-                        </button>
-                        <SheetClose asChild>
-                          <Button className="flex-grow rounded-xl h-11 font-semibold bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-600/25">
-                            Apply Filters
-                          </Button>
-                        </SheetClose>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Category</p>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => handleCategoryChange("All")}
+                          className={cn("px-3 py-1.5 rounded text-sm font-medium border transition-all",
+                            selectedCategory === "All"
+                              ? "bg-[#2563EB] border-[#2563EB] text-white"
+                              : "bg-gray-50 border-gray-200 text-gray-600"
+                          )}>All</button>
+                        {CATEGORIES.map((cat) => (
+                          <button key={cat} onClick={() => handleCategoryChange(cat)}
+                            className={cn("px-3 py-1.5 rounded text-sm font-medium border capitalize transition-all",
+                              selectedCategory === cat
+                                ? "bg-[#2563EB] border-[#2563EB] text-white"
+                                : "bg-gray-50 border-gray-200 text-gray-600"
+                            )}>{cat}</button>
+                        ))}
                       </div>
-                    </SheetFooter>
-                  </SheetContent>
-                </Sheet>
-              </div>
+                    </div>
+                  </div>
+                  <SheetFooter className="border-t pt-4">
+                    <div className="flex gap-3 w-full">
+                      <button onClick={clearAllFilters} className="text-sm text-gray-500 hover:text-[#2563EB] font-medium px-3">
+                        Clear All
+                      </button>
+                      <SheetClose asChild>
+                        <Button className="flex-1 rounded bg-[#2563EB] hover:bg-blue-700 text-white h-10 font-semibold text-sm">
+                          Apply
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
             </div>
 
-            {/* Desktop Categories */}
-            <div className="hidden lg:flex items-center gap-4">
-              <span className="text-sm font-semibold text-gray-400 whitespace-nowrap">Categories:</span>
-              <div className="flex gap-2 pb-1 overflow-x-auto no-scrollbar scroll-smooth">
+            {/* Desktop category pills */}
+            <div className="hidden lg:flex items-center gap-3">
+              <span className="text-xs font-semibold text-gray-400 whitespace-nowrap uppercase tracking-wide">
+                Category:
+              </span>
+              <div className="flex gap-1.5 overflow-x-auto">
                 <button
                   onClick={() => handleCategoryChange("All")}
-                  className={cn(
-                    "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300",
+                  className={cn("shrink-0 px-4 py-1 rounded text-xs font-semibold transition-all",
                     selectedCategory === "All"
-                      ? "bg-primary-600 text-white shadow-lg shadow-primary-600/25"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                      ? "bg-[#2563EB] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   )}
-                >
-                  All
-                </button>
-                {CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category)}
-                    className={cn(
-                      "shrink-0 px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 capitalize",
-                      selectedCategory === category
-                        ? "bg-primary-600 text-white shadow-lg shadow-primary-600/25"
-                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                    )}
-                  >
-                    {category}
-                  </button>
-                ))}
+                >All</button>
+                {CATEGORIES.map((cat) => {
+                  const CatIcon = CATEGORY_ICONS[cat] || Package;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => handleCategoryChange(cat)}
+                      className={cn(
+                        "shrink-0 flex items-center gap-1.5 px-4 py-1 rounded text-xs font-semibold capitalize transition-all",
+                        selectedCategory === cat
+                          ? "bg-[#2563EB] text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      )}
+                    >
+                      <CatIcon className="w-3 h-3" />
+                      {cat}
+                    </button>
+                  );
+                })}
               </div>
-
               {hasActiveFilters && (
-                <button
-                  onClick={clearAllFilters}
-                  className="ml-auto text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1.5 transition-colors"
-                >
-                  <X className="w-4 h-4" /> Reset
+                <button onClick={clearAllFilters} className="ml-auto text-xs font-semibold text-[#2563EB] flex items-center gap-1">
+                  <X className="w-3 h-3" /> Reset
                 </button>
               )}
             </div>
-
-            {/* Mobile Filter Tags */}
-            {activeFilterCount > 0 && (
-              <div className="flex items-center gap-3 lg:hidden">
-                <div className="flex flex-wrap gap-2">
-                  {selectedCategory !== "All" && (
-                    <div className="px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 border border-primary-100 flex items-center gap-1.5 text-xs font-semibold capitalize">
-                      {selectedCategory}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => handleCategoryChange("All")} />
-                    </div>
-                  )}
-                  {selectedStatus !== "All" && (
-                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 border border-orange-100 flex items-center gap-1.5 text-xs font-semibold">
-                      {selectedStatus}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedStatus("All")} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
 
-      {/* Modules Grid */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-8">
-            <p className="text-gray-500">
-              Showing <span className="font-semibold text-gray-900">{filteredModules.length}</span> modules
-            </p>
-          </div>
+      {/* ── Modules Grid ─────────────────────────────────────────────────── */}
+      <section className="py-14 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-sm text-gray-400 mb-8">
+            Showing <span className="font-semibold text-gray-700">{filteredModules.length}</span> module{filteredModules.length !== 1 ? "s" : ""}
+          </p>
 
           {loading ? (
-            <div className="text-center py-40">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-6"
-              />
-              <p className="text-gray-500 font-medium">Loading module inventory...</p>
+            <div className="flex justify-center py-24">
+              <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : Object.keys(modulesByCategory).length > 0 ? (
-            <div className="space-y-20">
-              {Object.entries(modulesByCategory).map(([category, items]: [string, any]) => (
-                <div key={category} className="space-y-8">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-xl shadow-lg shadow-primary-600/25">
-                        <Settings className="w-5 h-5 text-white" />
-                      </div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 capitalize">
-                        {category} <span className="text-primary-600 font-medium">Solutions</span>
-                      </h2>
-                    </div>
-                    <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-4 py-1.5 rounded-full">
-                      {items.length} {items.length === 1 ? "Module" : "Modules"}
-                    </span>
-                  </motion.div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    {items.map((mod: any, i: number) => (
-                      <motion.div
-                        key={mod.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.08 }}
-                        className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/[0.06] hover:-translate-y-1 transition-all duration-500 overflow-hidden"
-                      >
-                        <Link to={`/products/${mod.slug}`} className="block flex-1">
-                          <div className="aspect-[1.8/1] bg-gradient-to-br from-gray-50 to-primary-50/30 relative overflow-hidden">
-                            {mod.screenshots?.[0] || mod.image_url ? (
-                              <img
-                                src={mod.screenshots?.[0] || mod.image_url}
-                                alt={mod.name}
-                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <motion.div
-                                  whileHover={{ scale: 1.1, rotate: 3 }}
-                                  className="p-5 bg-white rounded-2xl shadow-lg border border-gray-100"
-                                >
-                                  <span className="text-4xl">{mod.icon || "📦"}</span>
-                                </motion.div>
-                              </div>
-                            )}
-                            <div className="absolute top-3 left-3">
-                              <div className={cn(
-                                "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
-                                (mod.status || "Operational") === "Operational"
-                                  ? "bg-green-100 text-green-700"
-                                  : (mod.status || "Operational") === "Beta"
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-gray-100 text-gray-600"
-                              )}>
-                                {mod.status || "Operational"}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="p-5 space-y-2">
-                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
-                              {mod.name}
-                            </h3>
-                            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider line-clamp-1">
-                              {mod.tagline || category + " Engine"}
-                            </p>
-                          </div>
-                        </Link>
-
-                        <div className="p-5 pt-0 mt-auto">
-                          <Button
-                            onClick={() => navigate(`/login?module=${mod.slug}`)}
-                            className="w-full h-10 rounded-xl bg-gray-50 text-gray-700 border border-gray-100 font-semibold text-sm hover:bg-primary-600 hover:text-white hover:border-primary-600 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 group/btn"
-                          >
-                            Get Started <ArrowRight className="ml-1.5 w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                          </Button>
+            <div className="space-y-16">
+              {Object.entries(modulesByCategory).map(([category, items]: [string, any]) => {
+                const CatIcon = CATEGORY_ICONS[category] || Package;
+                return (
+                  <div key={category}>
+                    {/* Category header */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                          <CatIcon className="w-4.5 h-4.5 text-[#2563EB]" />
                         </div>
-                      </motion.div>
-                    ))}
+                        <h2 className="text-xl font-bold text-gray-900 capitalize">
+                          {category} Solutions
+                        </h2>
+                      </div>
+                      <span className="text-xs font-semibold text-[#2563EB] bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                        {items.length} {items.length === 1 ? "Module" : "Modules"}
+                      </span>
+                    </motion.div>
+
+                    {/* Cards — AppLauncher style */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                      {items.map((mod: any, i: number) => {
+                        const Icon = MODULE_ICONS[mod.slug] || Package;
+                        const statusColor =
+                          (mod.status || "Operational") === "Operational" ? "bg-green-100 text-green-700"
+                          : (mod.status || "Operational") === "Beta"        ? "bg-amber-100 text-amber-700"
+                          : "bg-gray-100 text-gray-600";
+                        return (
+                          <motion.div
+                            key={mod.id}
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.06 }}
+                            className="group"
+                          >
+                            <div className="bg-white border border-gray-200 rounded-2xl p-5 text-center hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300 transition-all duration-200 flex flex-col items-center">
+                              {/* Gradient icon — identical to AppLauncher */}
+                              <div className={cn(
+                                "w-14 h-14 rounded-2xl flex items-center justify-center shadow-md mb-3 bg-gradient-to-br group-hover:scale-110 transition-transform duration-200",
+                                mod.color_from || "from-blue-500",
+                                mod.color_to || "to-blue-600"
+                              )}>
+                                <Icon className="w-7 h-7 text-white" strokeWidth={1.75} />
+                              </div>
+
+                              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-[#2563EB] transition-colors mb-0.5 line-clamp-1">
+                                {mod.name}
+                              </h3>
+                              <p className="text-[11px] text-gray-400 line-clamp-1 mb-3">
+                                {mod.tagline || category + " module"}
+                              </p>
+
+                              <span className={cn("text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-4", statusColor)}>
+                                {mod.status || "Operational"}
+                              </span>
+
+                              <Button
+                                size="sm"
+                                onClick={() => navigate(`/login?module=${mod.slug}`)}
+                                className="w-full h-8 rounded-xl bg-gray-50 text-gray-700 border border-gray-100 font-semibold text-xs hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-200"
+                              >
+                                Get Started <ArrowRight className="ml-1 w-3 h-3" />
+                              </Button>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-40 border-2 border-dashed border-gray-100 rounded-3xl"
+              className="text-center py-32 border-2 border-dashed border-gray-100 rounded-xl"
             >
-              <Box className="w-16 h-16 mx-auto text-gray-200 mb-6" />
-              <h3 className="text-2xl font-bold text-gray-900">No Modules Found</h3>
-              <p className="text-gray-500 mt-2">Try adjusting your search filters to find what you're looking for.</p>
-              <Button variant="link" onClick={clearAllFilters} className="mt-4 text-primary-600 font-semibold">
+              <Box className="w-12 h-12 mx-auto text-gray-200 mb-4" />
+              <h3 className="text-lg font-bold text-gray-900 mb-1">No Modules Found</h3>
+              <p className="text-sm text-gray-400">Try adjusting your filters.</p>
+              <Button variant="link" onClick={clearAllFilters} className="mt-3 text-[#2563EB] font-semibold text-sm">
                 Clear all filters
               </Button>
             </motion.div>
@@ -470,35 +391,33 @@ const Products = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-28 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-primary-900 rounded-[2.5rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px]" />
-              <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-[100px]" />
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-              <div className="relative z-10 space-y-8">
-                <h2 className="text-3xl lg:text-5xl font-bold leading-tight">
-                  Ready to Experience
-                  <br />
-                  <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">the Dashboard?</span>
-                </h2>
-                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                  Contact our team for a personalized demo or start your journey today.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                  <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary-600 hover:bg-primary-500 text-white font-semibold shadow-2xl shadow-primary-600/30 group transition-all duration-300 hover:-translate-y-0.5">
-                    <Link to="/contact">
-                      Book a Demo <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-white/40 bg-white/5 text-white hover:bg-white/10 font-semibold backdrop-blur-sm transition-all">
-                    <Link to="/services">View Services</Link>
-                  </Button>
-                </div>
-              </div>
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-[#EFF6FF] border-t border-blue-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Ready to Experience the Platform?
+            </h2>
+            <p className="text-gray-500 text-lg mb-10 max-w-xl mx-auto">
+              Book a personalized demo and see exactly how each module fits your business.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                asChild size="lg"
+                className="bg-[#2563EB] hover:bg-blue-700 text-white h-12 px-8 rounded font-semibold text-sm shadow-md"
+              >
+                <Link to="/contact">Book a Demo <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+              <Button
+                asChild variant="outline" size="lg"
+                className="border-blue-200 text-[#2563EB] hover:bg-blue-50 h-12 px-8 rounded font-semibold text-sm"
+              >
+                <Link to="/services">View Services</Link>
+              </Button>
             </div>
           </motion.div>
         </div>

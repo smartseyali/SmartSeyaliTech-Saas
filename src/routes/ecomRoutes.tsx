@@ -21,8 +21,10 @@ const Analytics = lazy(() => import("@/pages/modules/ecommerce/Analytics"));
 const Reports = lazy(() => import("@/pages/modules/ecommerce/Reports"));
 const APIIntegrations = lazy(() => import("@/pages/modules/ecommerce/APIIntegrations"));
 const Settings = lazy(() => import("@/pages/modules/ecommerce/Settings"));
+const DomainHosting = lazy(() => import("@/pages/modules/ecommerce/DomainHosting"));
 const Customers = lazy(() => import("@/pages/modules/ecommerce/Customers"));
 const OrderTracking = lazy(() => import("@/pages/modules/ecommerce/OrderTracking"));
+const EcomOnboarding = lazy(() => import("@/pages/modules/ecommerce/Onboarding"));
 
 /** Admin routes rendered inside AppLayout with ProtectedRoute */
 export const ecomAdminRoutes = [
@@ -47,6 +49,8 @@ export const ecomAdminRoutes = [
     { path: "/apps/ecommerce/reports", element: <Reports /> },
     { path: "/apps/ecommerce/api-integrations", element: <APIIntegrations /> },
     { path: "/apps/ecommerce/settings", element: <Settings /> },
+    { path: "/apps/ecommerce/domain", element: <DomainHosting /> },
     { path: "/apps/ecommerce/track", element: <OrderTracking /> },
     { path: "/apps/ecommerce/track/:orderNumber", element: <OrderTracking /> },
+    { path: "/apps/ecommerce/onboarding", element: <EcomOnboarding /> },
 ];

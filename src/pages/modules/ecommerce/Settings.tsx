@@ -4,11 +4,12 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import {
   Settings as SettingsIcon, Save, Palette, MessageCircle, Loader2,
-  ShoppingBag, RotateCcw, Mail, Building2, Image, Globe, Hash,
-  FileText, Truck, Search,
+  ShoppingBag, RotateCcw, Mail, Building2, Globe, Hash,
+  FileText, Truck, Search, BarChart2, Code2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { ImageUploadField } from "@/components/common/ImageUploadField";
 
 const inputCls = "w-full h-11 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-900 placeholder:text-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/8 outline-none transition-all";
 const textareaCls = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium placeholder:text-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/8 outline-none transition-all resize-none";
@@ -109,6 +110,8 @@ export default function Settings() {
 
   const set = (k: string, v: any) => setFormData((f: any) => ({ ...f, [k]: v }));
   const setC = (k: string, v: any) => setCompanyData((f: any) => ({ ...f, [k]: v }));
+  const setIntegration = (k: string, v: string) =>
+    setFormData((f: any) => ({ ...f, integrations: { ...(f.integrations || {}), [k]: v } }));
 
   if (loading) return (
     <div className="p-8 flex items-center justify-center h-[400px] gap-3">
@@ -174,16 +177,20 @@ export default function Settings() {
                 className={inputCls} placeholder="India" />
             </Field>
           </Row>
-          <Row>
-            <Field label="GSTIN" hint="Goods & Services Tax Identification Number">
-              <input value={companyData.gst_no || ""} onChange={e => setC("gst_no", e.target.value)}
-                className={inputCls} placeholder="22AAAAA0000A1Z5" />
-            </Field>
-            <Field label="Company Logo URL" hint="Used on invoices and print formats">
-              <input value={companyData.logo_url || ""} onChange={e => setC("logo_url", e.target.value)}
-                className={inputCls} placeholder="https://..." />
-            </Field>
-          </Row>
+          <Field label="GSTIN" hint="Goods & Services Tax Identification Number">
+            <input value={companyData.gst_no || ""} onChange={e => setC("gst_no", e.target.value)}
+              className={inputCls} placeholder="22AAAAA0000A1Z5" />
+          </Field>
+          <ImageUploadField
+            value={companyData.logo_url || ""}
+            onChange={v => setC("logo_url", v)}
+            label="COMPANY LOGO"
+            hint="Used on invoices and print formats. Recommended: transparent PNG, min 200px wide."
+            bucket="ecommerce"
+            folder="logos/company"
+            shape="rounded"
+            previewSize="md"
+          />
         </Section>
 
         {/* ── Store Branding ──────────────────────────────── */}
@@ -218,16 +225,26 @@ export default function Settings() {
               </div>
             </Field>
           </Row>
-          <Row>
-            <Field label="Store Logo URL">
-              <input value={formData.logo_url || ""} onChange={e => set("logo_url", e.target.value)}
-                className={inputCls} placeholder="https://your-logo.png" />
-            </Field>
-            <Field label="Favicon URL">
-              <input value={formData.favicon_url || ""} onChange={e => set("favicon_url", e.target.value)}
-                className={inputCls} placeholder="https://your-favicon.ico" />
-            </Field>
-          </Row>
+          <ImageUploadField
+            value={formData.logo_url || ""}
+            onChange={v => set("logo_url", v)}
+            label="STORE LOGO"
+            hint="Displayed in your storefront header. Recommended: transparent PNG, max 400×100px."
+            bucket="ecommerce"
+            folder="logos/store"
+            shape="rounded"
+            previewSize="md"
+          />
+          <ImageUploadField
+            value={formData.favicon_url || ""}
+            onChange={v => set("favicon_url", v)}
+            label="FAVICON"
+            hint="Browser tab icon. Use a square PNG or .ico, 32×32px or 64×64px."
+            bucket="ecommerce"
+            folder="favicons"
+            shape="square"
+            previewSize="sm"
+          />
           <Field label="Footer Text">
             <input value={formData.footer_text || ""} onChange={e => set("footer_text", e.target.value)}
               className={inputCls} placeholder="© 2025 Your Store. All rights reserved." />
@@ -370,6 +387,63 @@ export default function Settings() {
               className={`${textareaCls} h-24`} placeholder="Brief description for search engines..." />
           </Field>
         </Section>
+
+        {/* ── Analytics & Tracking ─────────────────────────── */}
+        <div className="md:col-span-2">
+          <Section icon={BarChart2} title="Analytics & Tracking" description="Connect third-party analytics to track store performance and conversions. Matches Shopify / WooCommerce native integrations.">
+            <Row>
+              <Field label="Google Analytics 4 — Measurement ID" hint="Format: G-XXXXXXXXXX. Leave blank to disable.">
+                <input
+                  value={formData.integrations?.ga4_measurement_id || ""}
+                  onChange={e => setIntegration("ga4_measurement_id", e.target.value)}
+                  className={inputCls} placeholder="G-XXXXXXXXXX" />
+              </Field>
+              <Field label="Google Tag Manager — Container ID" hint="Format: GTM-XXXXXXX. When set, GTM loads GA4 — no need to set both.">
+                <input
+                  value={formData.integrations?.gtm_container_id || ""}
+                  onChange={e => setIntegration("gtm_container_id", e.target.value)}
+                  className={inputCls} placeholder="GTM-XXXXXXX" />
+              </Field>
+            </Row>
+            <Row>
+              <Field label="Meta Pixel ID" hint="15-digit Facebook / Instagram Pixel ID for conversion tracking.">
+                <input
+                  value={formData.integrations?.meta_pixel_id || ""}
+                  onChange={e => setIntegration("meta_pixel_id", e.target.value)}
+                  className={inputCls} placeholder="123456789012345" />
+              </Field>
+              <Field label="Microsoft Clarity — Project ID" hint="Free session recording & heatmaps. Find ID in Clarity dashboard.">
+                <input
+                  value={formData.integrations?.clarity_project_id || ""}
+                  onChange={e => setIntegration("clarity_project_id", e.target.value)}
+                  className={inputCls} placeholder="xxxxxxxxxx" />
+              </Field>
+            </Row>
+            <div className="pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Code2 className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-bold tracking-widest text-slate-500">CUSTOM SCRIPT INJECTION</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Field label="Custom &lt;head&gt; Scripts" hint="Paste raw HTML/JS — e.g. Pinterest Tag, TikTok Pixel, Snapchat Pixel, verification codes.">
+                  <textarea
+                    value={formData.custom_head_scripts || ""}
+                    onChange={e => set("custom_head_scripts", e.target.value)}
+                    className={`${textareaCls} h-32 font-mono text-xs`}
+                    placeholder={"<!-- Example: Pinterest Tag -->\n<script>\n  !function(e,t,n,...){...}(window,document);\n</script>"} />
+                </Field>
+                <Field label="Custom &lt;body&gt; Scripts" hint="Paste raw HTML/JS — e.g. Hotjar, Tidio live chat, Intercom widgets.">
+                  <textarea
+                    value={formData.custom_body_scripts || ""}
+                    onChange={e => set("custom_body_scripts", e.target.value)}
+                    className={`${textareaCls} h-32 font-mono text-xs`}
+                    placeholder={"<!-- Example: Hotjar -->\n<script>\n  (function(h,o,t,j,a,r){...})(window,document);\n</script>"} />
+                </Field>
+              </div>
+            </div>
+          </Section>
+        </div>
+
       </div>
     </div>
   );

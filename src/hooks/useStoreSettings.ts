@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 
+export interface AnalyticsIntegrations {
+    ga4_measurement_id?: string;
+    gtm_container_id?: string;
+    meta_pixel_id?: string;
+    clarity_project_id?: string;
+}
+
 export interface StoreSettings {
     id: number;
     company_id: number;
@@ -23,6 +30,9 @@ export interface StoreSettings {
     auto_confirm_paid_orders?: boolean;
     tax_rate?: number;
     return_policy?: string;
+    integrations?: AnalyticsIntegrations;
+    custom_head_scripts?: string;
+    custom_body_scripts?: string;
 }
 
 const defaultSettings: Partial<StoreSettings> = {

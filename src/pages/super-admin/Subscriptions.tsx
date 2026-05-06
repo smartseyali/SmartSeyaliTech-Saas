@@ -336,7 +336,7 @@ export default function Subscriptions() {
                     { label: "Active", value: stats.active, icon: CheckCircle2, bg: "bg-emerald-50", fg: "text-emerald-600" },
                     { label: "Expiring Soon", value: stats.expiring, icon: AlertTriangle, bg: "bg-amber-50", fg: "text-amber-600" },
                     { label: "Expired", value: stats.expired, icon: XCircle, bg: "bg-red-50", fg: "text-red-600" },
-                    { label: "Monthly Revenue", value: `\u20B9${stats.totalRevenue.toLocaleString("en-IN")}`, icon: TrendingUp, bg: "bg-teal-50", fg: "text-teal-600" },
+                    { label: "Monthly Revenue", value: `\u20B9${stats.totalRevenue.toLocaleString("en-IN")}`, icon: TrendingUp, bg: "bg-blue-50", fg: "text-teal-600" },
                 ].map((card, i) => (
                     <div key={i} className="bg-white border border-slate-200 rounded-lg p-4">
                         <div className={`p-1.5 rounded-lg ${card.bg} inline-flex mb-2`}>

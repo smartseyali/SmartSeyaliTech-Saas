@@ -5,11 +5,28 @@ import { usePermissions } from "@/contexts/PermissionsContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
-    Check, Download, Trash2, X, CreditCard, Calendar,
-    Loader2, Plus, Clock, Shield, FileText
+    Check, Trash2, CreditCard, Calendar,
+    Loader2, Plus, Clock, Shield, FileText,
+    ShoppingCart, Monitor, Target, TrendingUp, Package, ShoppingBag,
+    Users, BarChart3, MessageCircle, Globe, Database, type LucideIcon,
 } from "lucide-react";
+
+const MODULE_ICONS: Record<string, LucideIcon> = {
+    ecommerce:  ShoppingCart,
+    pos:        Monitor,
+    crm:        Target,
+    sales:      TrendingUp,
+    inventory:  Package,
+    purchase:   ShoppingBag,
+    hrms:       Users,
+    finance:    BarChart3,
+    whatsapp:   MessageCircle,
+    website:    Globe,
+    masters:    Database,
+};
 
 interface ActiveApp {
     module: PlatformModule;
@@ -158,6 +175,12 @@ export default function Billing() {
             toast.success(`${mod.name} installed`);
             refreshPermissions();
 
+            // E-Commerce gets an onboarding wizard to set up domain + storefront
+            if (mod.id === "ecommerce") {
+                navigate("/apps/ecommerce/onboarding");
+                return;
+            }
+
             // Refresh company modules
             const { data } = await supabase
                 .from("company_modules")
@@ -276,7 +299,13 @@ export default function Billing() {
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-xl">{app.module.icon}</span>
+                                                <div className={cn(
+                                                    "w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm flex-shrink-0",
+                                                    app.module.colorFrom || "from-blue-500",
+                                                    app.module.colorTo || "to-blue-700"
+                                                )}>
+                                                    {(() => { const Icon = MODULE_ICONS[app.module.id]; return Icon ? <Icon className="w-[18px] h-[18px] text-white" strokeWidth={1.75} /> : <span className="text-sm">{app.module.icon}</span>; })()}
+                                                </div>
                                                 <span className="font-medium text-slate-900">
                                                     {app.module.name}
                                                 </span>
@@ -351,10 +380,12 @@ export default function Billing() {
                                 key={mod.id}
                                 className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4 hover:border-blue-200 hover:shadow-sm transition-all"
                             >
-                                <div
-                                    className={`w-12 h-12 rounded-xl bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} flex items-center justify-center text-2xl shadow-sm flex-shrink-0`}
-                                >
-                                    {mod.icon}
+                                <div className={cn(
+                                    "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm flex-shrink-0",
+                                    mod.colorFrom || "from-blue-500",
+                                    mod.colorTo || "to-blue-700"
+                                )}>
+                                    {(() => { const Icon = MODULE_ICONS[mod.id]; return Icon ? <Icon className="w-6 h-6 text-white" strokeWidth={1.75} /> : <span className="text-2xl">{mod.icon}</span>; })()}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium text-slate-900 text-sm truncate">
@@ -403,8 +434,12 @@ export default function Billing() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-xl">
-                                {uninstallTarget.icon}
+                            <div className={cn(
+                                "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm flex-shrink-0",
+                                uninstallTarget.colorFrom || "from-blue-500",
+                                uninstallTarget.colorTo || "to-blue-700"
+                            )}>
+                                {(() => { const Icon = MODULE_ICONS[uninstallTarget.id]; return Icon ? <Icon className="w-5 h-5 text-white" strokeWidth={1.75} /> : <span className="text-lg">{uninstallTarget.icon}</span>; })()}
                             </div>
                             <h3 className="text-lg font-semibold text-slate-900">
                                 Uninstall {uninstallTarget.name}?

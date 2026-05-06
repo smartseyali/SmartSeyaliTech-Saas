@@ -123,7 +123,7 @@ export default function VerifyEmailPending() {
             {/* Header */}
             <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
                 <Link to="/" className="flex items-center gap-2">
-                    <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+                    <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain" />
                 </Link>
                 <button
                     onClick={handleLogout}

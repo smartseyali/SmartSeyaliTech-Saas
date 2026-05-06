@@ -14,6 +14,7 @@ import {
   Loader2,
   CheckCircle,
   AlertTriangle,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ interface PlatformSettings {
   billing_mode: "monthly" | "yearly" | "both";
   currency: string;
   currency_symbol: string;
+  hostinger_platform_cname: string;
 }
 
 const DEFAULTS: PlatformSettings = {
@@ -33,6 +35,7 @@ const DEFAULTS: PlatformSettings = {
   billing_mode: "both",
   currency: "INR",
   currency_symbol: "₹",
+  hostinger_platform_cname: "",
 };
 
 export default function PlatformSettingsPage() {
@@ -66,6 +69,7 @@ export default function PlatformSettingsPage() {
           billing_mode: data.billing_mode || "both",
           currency: data.currency || "INR",
           currency_symbol: data.currency_symbol || "₹",
+          hostinger_platform_cname: data.hostinger_platform_cname || "",
         };
         setSettings(loaded);
         setSavedSettings(loaded);
@@ -316,6 +320,52 @@ export default function PlatformSettingsPage() {
                   className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Hostinger Domain Hosting ────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+                <Globe className="w-5 h-5 text-sky-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Hostinger Domain Hosting</h2>
+                <p className="text-xs text-gray-500">Platform CNAME that client domains should point to</p>
+              </div>
+            </div>
+            {settings.hostinger_platform_cname ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                <CheckCircle className="w-3.5 h-3.5" /> Configured
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <AlertTriangle className="w-3.5 h-3.5" /> Not Set
+              </span>
+            )}
+          </div>
+
+          <div className="p-6 space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 block">Platform CNAME</label>
+              <p className="text-xs text-gray-500">
+                After a client purchases a domain, DNS is auto-configured to point here via CNAME.
+                Set this to your platform's public hostname (e.g. <code className="font-mono bg-gray-100 px-1 rounded">app.smartseyali.com</code>).
+              </p>
+              <input
+                type="text"
+                value={settings.hostinger_platform_cname}
+                onChange={(e) => updateField("hostinger_platform_cname", e.target.value.toLowerCase().trim())}
+                placeholder="app.smartseyali.com"
+                className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all font-mono"
+              />
+            </div>
+            <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 text-xs text-blue-700 space-y-1">
+              <p className="font-semibold">Deployment setup (one-time CLI commands):</p>
+              <p className="font-mono bg-blue-100 rounded px-2 py-1 mt-1">supabase functions deploy hostinger-proxy --no-verify-jwt</p>
+              <p className="font-mono bg-blue-100 rounded px-2 py-1">supabase secrets set HOSTINGER_API_KEY=&lt;your-key&gt;</p>
             </div>
           </div>
         </div>

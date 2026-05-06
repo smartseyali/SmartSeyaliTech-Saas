@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { MFASection } from "@/components/auth/MFASection";
+import { ImageUploadField } from "@/components/common/ImageUploadField";
 
 /**
  * ERPNext v16-style user profile — identity card + tabs for
@@ -193,13 +194,12 @@ export default function Profile() {
                   userInitial
                 )}
               </div>
-              <label
-                htmlFor="avatar-url-input"
-                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-50 dark:border-border dark:hover:bg-accent"
-                title="Change avatar"
+              <div
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card border border-gray-200 flex items-center justify-center dark:border-border"
+                title="Edit avatar in the About tab"
               >
                 <Camera className="w-3 h-3 text-gray-600" />
-              </label>
+              </div>
             </div>
 
             <div className="min-w-0 flex-1">
@@ -254,9 +254,18 @@ export default function Profile() {
                   <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" type="tel" />
                 </Field>
 
-                <Field label="Avatar URL" icon={<Camera className="w-3 h-3" />}>
-                  <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…/avatar.jpg" />
-                </Field>
+                <div className="flex flex-col gap-1 md:col-span-2">
+                  <ImageUploadField
+                    value={avatarUrl}
+                    onChange={setAvatarUrl}
+                    label="Profile Avatar"
+                    hint="Recommended: square image, min 200×200px"
+                    bucket="ecommerce"
+                    folder="avatars"
+                    shape="circle"
+                    previewSize="md"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end pt-1 border-t border-gray-100 dark:border-border">

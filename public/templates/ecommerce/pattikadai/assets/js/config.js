@@ -1,10 +1,11 @@
 /**
- * Pattikadai Storefront — Runtime-configurable Smartseyali template.
+ * Organic Store — Retail Storefront — Runtime-configurable SmartSeyali template.
  *
  * When loaded inside /store/:slug (SaaS), config values come from URL query
  * params (company_id, supabase_url, anon_key, overrides).
  *
- * When opened standalone (preview/demo), the hard-coded defaults below apply.
+ * When opened standalone (preview/template mode), the defaults below apply.
+ * companyId is intentionally null so no company data is pre-loaded.
  */
 
 (function () {
@@ -19,26 +20,26 @@
     if (raw) qsOverrides = JSON.parse(decodeURIComponent(raw));
   } catch (_) { qsOverrides = {}; }
 
-  // ── 2. Defaults (used when running standalone) ──────────────────
+  // ── 2. Defaults (used when running in standalone/preview mode) ──
   const DEFAULTS = {
     supabaseUrl: 'https://supabase.smartseyali.tech',
     supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1MjAwNTc2LCJleHAiOjIwOTA1NjA1NzZ9.AdbwGkMtZ-aOXM4wlIQ_ZzRTFsJV3i_bIGoTvGb_iDo',
-    companyId: 16,
-    razorpayKey: 'rzp_test_Scr7jEl5ILW9Rz',
+    companyId: null,       // null = no data loaded in standalone/preview mode
+    razorpayKey: '',
 
-    storeName: 'Pattikadai',
-    storeTagline: 'A Brand of Thandatti Foods',
-    logoUrl: 'assets/img/logo/logo.gif',
+    storeName: 'Organic Store',
+    storeTagline: 'Fresh & Natural Products',
+    logoUrl: '',
     currency: '₹',
 
-    contactPhone: '+91 9150444595',
-    contactEmail: 'pattikadaiofficial@gmail.com',
-    contactAddress: 'No.206, V.G.V Garden, Kangeyam Road, Rakkiyapalayam, Tiruppur, Tamil Nadu, 641606',
-    whatsappNumber: '919150444595',
+    contactPhone: '',
+    contactEmail: '',
+    contactAddress: '',
+    whatsappNumber: '',
 
-    facebookUrl: 'https://www.facebook.com/share/19riyqAvB9/?mibextid=wwXIfr',
-    youtubeUrl: 'https://youtube.com/@countryfoodcooking2613?si=mj0BeUdac_IQElB3',
-    instagramUrl: 'https://www.instagram.com/countryfoodcooking?igsh=bDNod2JyM2x6OTk1',
+    facebookUrl: '#',
+    youtubeUrl: '#',
+    instagramUrl: '#',
 
     delivery: {
       freeDeliveryAbove: 999,
@@ -47,9 +48,9 @@
     },
 
     productsPerPage: 12,
-    cartStorageKey: 'pattikadai_cart',
-    wishlistStorageKey: 'pattikadai_wishlist',
-    authStorageKey: 'pattikadai_auth',
+    cartStorageKey: 'organic_cart',
+    wishlistStorageKey: 'organic_wishlist',
+    authStorageKey: 'organic_auth',
   };
 
   // ── 3. Merge: query-param overrides win over defaults ───────────
@@ -66,8 +67,6 @@
     STORE_CONFIG.authStorageKey = `ss_auth_${qsCompanyId}`;
   }
 
-  // Legacy top-level const kept for any inline <script> that references it
-  // before window.STORE_CONFIG is assigned.
   window.STORE_CONFIG = STORE_CONFIG;
   if (typeof globalThis !== 'undefined') globalThis.STORE_CONFIG = STORE_CONFIG;
 })();

@@ -127,15 +127,18 @@ function TemplateSelectInner() {
     };
 
     const handlePreview = (template: StorefrontTemplate) => {
-        if (!activeCompany?.subdomain) {
-            window.open(template.entry_path, "_blank", "noopener");
+        const subdomain = (activeCompany as any)?.subdomain as string | undefined;
+        const baseDomain = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "";
+        if (subdomain && baseDomain) {
+            window.open(
+                `https://${subdomain}.${baseDomain}?preview_template=${encodeURIComponent(template.slug)}`,
+                "_blank",
+                "noopener",
+            );
             return;
         }
-        window.open(
-            `/store/${activeCompany.subdomain}?preview_template=${template.slug}`,
-            "_blank",
-            "noopener",
-        );
+        // Fallback: open template directly (works on localhost where subdomains don't resolve)
+        window.open(template.entry_path, "_blank", "noopener");
     };
 
     return (
@@ -353,6 +356,7 @@ function TemplateSelectInner() {
                 template={deployFor}
                 companyId={activeCompany?.id ?? null}
                 companyName={activeCompany?.name || ""}
+                companySubdomain={(activeCompany as any)?.subdomain || ""}
                 moduleId={moduleId}
                 initialOverrides={initialOverrides}
                 initialCustomDomain={activeDeployment?.custom_domain ?? ""}

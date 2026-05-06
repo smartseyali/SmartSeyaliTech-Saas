@@ -1,33 +1,43 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Code,
-  Smartphone,
-  Monitor,
-  Zap,
-  Users,
-  Award,
   CheckCircle,
   ShoppingCart,
   DollarSign,
   Settings,
-  UserCheck,
+  Users,
   BarChart3,
-  Sparkles,
+  UserCheck,
   Shield,
   Globe,
   TrendingUp,
+  Zap,
+  ChevronRight,
+  Star,
   Play,
+  Building2,
+  Layers,
+  Lock,
+  HeadphonesIcon,
+  Award,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import PLATFORM_CONFIG from "@/config/platform";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 /* ── Animated Counter ────────────────────────────────────────────────────── */
-const AnimatedCounter = ({ target, suffix = "", label }: { target: number; suffix?: string; label: string }) => {
+const AnimatedCounter = ({
+  target,
+  suffix = "",
+  label,
+}: {
+  target: number;
+  suffix?: string;
+  label: string;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const [count, setCount] = useState(0);
@@ -35,13 +45,12 @@ const AnimatedCounter = ({ target, suffix = "", label }: { target: number; suffi
   useEffect(() => {
     if (!isInView) return;
     let start = 0;
-    const end = target;
     const duration = 2000;
-    const increment = end / (duration / 16);
+    const increment = target / (duration / 16);
     const timer = setInterval(() => {
       start += increment;
-      if (start >= end) {
-        setCount(end);
+      if (start >= target) {
+        setCount(target);
         clearInterval(timer);
       } else {
         setCount(Math.floor(start));
@@ -52,545 +61,726 @@ const AnimatedCounter = ({ target, suffix = "", label }: { target: number; suffi
 
   return (
     <div ref={ref} className="text-center">
-      <div className="text-4xl lg:text-5xl font-bold text-white mb-2">
-        {count}{suffix}
+      <div className="text-3xl lg:text-4xl font-bold text-gray-900 mb-1">
+        {count}
+        {suffix}
       </div>
-      <div className="text-sm font-medium text-white/60 uppercase tracking-wider">{label}</div>
+      <div className="text-sm text-gray-500 font-medium">{label}</div>
     </div>
   );
 };
 
-/* ── Floating Orb ────────────────────────────────────────────────────────── */
-const FloatingOrb = ({ className, delay = 0 }: { className: string; delay?: number }) => (
-  <motion.div
-    className={className}
-    animate={{
-      y: [0, -20, 0],
-      x: [0, 10, 0],
-      scale: [1, 1.1, 1],
-    }}
-    transition={{
-      duration: 6,
-      repeat: Infinity,
-      repeatType: "reverse",
-      delay,
-      ease: "easeInOut",
-    }}
-  />
-);
+/* ── Module Tabs ─────────────────────────────────────────────────────────── */
+const MODULE_TABS = [
+  {
+    id: "commerce",
+    label: "Commerce",
+    icon: ShoppingCart,
+    color: "text-teal-600",
+    bg: "bg-blue-50",
+    accent: "border-teal-500",
+    title: "Unified Commerce Platform",
+    description:
+      "Manage your online store, point-of-sale, and inventory from a single dashboard. Real-time sync across all channels.",
+    bullets: [
+      "Multi-channel order management",
+      "Live inventory tracking",
+      "Integrated POS & storefront",
+      "Smart discount & pricing rules",
+    ],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    icon: DollarSign,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    accent: "border-emerald-500",
+    title: "Finance & Accounting",
+    description:
+      "Automate invoicing, expense tracking, and financial reporting. Close books faster with AI-powered reconciliation.",
+    bullets: [
+      "Automated invoicing & billing",
+      "Real-time P&L dashboards",
+      "GST & tax compliance",
+      "Multi-currency support",
+    ],
+  },
+  {
+    id: "operations",
+    label: "Operations",
+    icon: Settings,
+    color: "text-orange-600",
+    bg: "bg-orange-50",
+    accent: "border-orange-500",
+    title: "Supply Chain & Logistics",
+    description:
+      "Streamline procurement, warehousing, and vendor management. Reduce lead times and optimize stock levels automatically.",
+    bullets: [
+      "Purchase order automation",
+      "Vendor performance tracking",
+      "Warehouse management",
+      "Demand forecasting",
+    ],
+  },
+  {
+    id: "people",
+    label: "HRMS",
+    icon: Users,
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    accent: "border-violet-500",
+    title: "Human Resource Management",
+    description:
+      "From hiring to payroll, manage your entire workforce in one place. Compliant with Indian labour laws.",
+    bullets: [
+      "Payroll & attendance automation",
+      "Leave & policy management",
+      "Employee self-service portal",
+      "Performance appraisals",
+    ],
+  },
+  {
+    id: "customer",
+    label: "CRM",
+    icon: UserCheck,
+    color: "text-pink-600",
+    bg: "bg-pink-50",
+    accent: "border-pink-500",
+    title: "Customer Relationship Management",
+    description:
+      "Track leads, manage pipelines, and close deals faster with built-in sales automation and customer insights.",
+    bullets: [
+      "Visual sales pipeline",
+      "Lead scoring & nurturing",
+      "WhatsApp & email integration",
+      "Customer lifetime analytics",
+    ],
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: BarChart3,
+    color: "text-cyan-600",
+    bg: "bg-cyan-50",
+    accent: "border-cyan-500",
+    title: "Business Intelligence & Reports",
+    description:
+      "Turn raw data into actionable insights. Build custom dashboards and schedule automated reports for every team.",
+    bullets: [
+      "Drag-and-drop dashboard builder",
+      "Scheduled email reports",
+      "Cross-module data views",
+      "Export to Excel / PDF",
+    ],
+  },
+];
 
-/* ── Categories Section ─────────────────────────────────────────────────── */
+const DUMMY_LOGOS = [
+  "Ramraj Cotton",
+  "Sri Kumaran",
+  "Nithyasree",
+  "Bharath Mills",
+  "Annai Stores",
+  "Vetrivel Tex",
+];
 
-const CATEGORY_CONFIG: Record<string, { icon: any; color: string; gradient: string; description: string }> = {
-  commerce: { icon: ShoppingCart, color: "text-blue-600", gradient: "from-blue-500 to-blue-600", description: "E-commerce, POS & inventory" },
-  finance: { icon: DollarSign, color: "text-emerald-600", gradient: "from-emerald-500 to-emerald-600", description: "Accounting & billing" },
-  operations: { icon: Settings, color: "text-orange-600", gradient: "from-orange-500 to-orange-600", description: "Supply chain & logistics" },
-  people: { icon: Users, color: "text-violet-600", gradient: "from-violet-500 to-violet-600", description: "HR & payroll management" },
-  customer: { icon: UserCheck, color: "text-pink-600", gradient: "from-pink-500 to-pink-600", description: "CRM & support tools" },
-  analytics: { icon: BarChart3, color: "text-cyan-600", gradient: "from-cyan-500 to-cyan-600", description: "Reports & data insights" },
-};
-
-const CategoriesSection = () => {
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const { data } = await supabase
-          .from("system_modules")
-          .select("category")
-          .eq("is_active", true);
-        if (data) {
-          const counts: Record<string, number> = {};
-          data.forEach((m) => {
-            if (m.category) counts[m.category] = (counts[m.category] || 0) + 1;
-          });
-          setCategoryCounts(counts);
-        }
-      } catch {}
-    };
-    fetchCounts();
-  }, []);
-
-  return (
-    <section className="py-28 bg-white relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-primary-50/50 to-transparent rounded-full blur-3xl" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-600 text-sm font-semibold mb-6">
-            <Sparkles className="w-4 h-4" /> Browse Categories
-          </span>
-          <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-4">
-            Solutions for Every <span className="text-primary-600">Business Need</span>
-          </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            Explore our modules organized by function to find the perfect fit
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-5">
-          {Object.entries(CATEGORY_CONFIG).map(([key, config], index) => {
-            const Icon = config.icon;
-            const count = categoryCounts[key] || 0;
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
-              >
-                <Link
-                  to={`/products?category=${key}`}
-                  className="group flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 p-6 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/[0.06] hover:-translate-y-2 transition-all duration-500"
-                >
-                  <div className={`bg-gradient-to-br ${config.gradient} p-4 rounded-2xl mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-sm font-bold text-gray-900 capitalize mb-1 group-hover:text-primary-600 transition-colors">
-                    {key}
-                  </h3>
-                  <p className="text-[11px] text-gray-400 leading-tight mb-2 hidden md:block">
-                    {config.description}
-                  </p>
-                  {count > 0 && (
-                    <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2.5 py-0.5 rounded-full">
-                      {count} modules
-                    </span>
-                  )}
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mt-14"
-        >
-          <Button asChild variant="outline" size="lg" className="rounded-full h-12 px-8 font-semibold border-gray-200 hover:border-primary-300 hover:text-primary-600 transition-all">
-            <Link to="/products">
-              View All Products <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+const TESTIMONIALS = [
+  {
+    quote:
+      "SmartSeyali replaced 4 different tools we were juggling. Our team onboarded in a week and we cut operational overhead by 35%.",
+    author: "Rajan K.",
+    role: "Managing Director",
+    company: "Ramraj Cotton",
+    rating: 5,
+  },
+  {
+    quote:
+      "The inventory and POS modules alone were worth the switch. Real-time stock sync across 3 outlets changed everything for us.",
+    author: "Priya M.",
+    role: "Operations Head",
+    company: "Annai Stores",
+    rating: 5,
+  },
+  {
+    quote:
+      "Finance reporting used to take 2 days every month. With SmartSeyali it's automated and ready in minutes — accurate every time.",
+    author: "Suresh V.",
+    role: "CFO",
+    company: "Bharath Mills",
+    rating: 5,
+  },
+];
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
-
 const Index = () => {
-  const [services, setServices] = useState<any[]>([]);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const [activeTab, setActiveTab] = useState("commerce");
+  const [modules, setModules] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchServices = async () => {
+    const fetchModules = async () => {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("system_modules")
           .select("*")
           .eq("is_active", true)
           .order("sort_order", { ascending: true })
-          .limit(3);
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setServices(data.map(mod => ({
-            icon: Code,
-            title: mod.name,
-            description: mod.tagline || mod.description
-          })));
-        } else {
-          setServices(STATIC_SERVICES);
-        }
-      } catch (err) {
-        setServices(STATIC_SERVICES);
-      }
+          .limit(6);
+        if (data && data.length > 0) setModules(data);
+      } catch {}
     };
-    fetchServices();
+    fetchModules();
   }, []);
 
-  const STATIC_SERVICES = [
-    { icon: Code, title: "Web Development", description: "Modern, responsive web applications built with cutting-edge technologies." },
-    { icon: Smartphone, title: "Mobile Development", description: "Native and cross-platform mobile apps for iOS and Android." },
-    { icon: Monitor, title: "Desktop Applications", description: "Powerful Windows desktop applications for enterprise solutions." },
-  ];
-
-  const features = [
-    { icon: Zap, title: "Lightning Fast", description: "Optimized performance with instant load times" },
-    { icon: Shield, title: "Enterprise Security", description: "Bank-grade encryption and security protocols" },
-    { icon: Globe, title: "Global Scale", description: "Multi-tenant architecture for worldwide ops" },
-    { icon: TrendingUp, title: "Smart Analytics", description: "AI-powered insights and reporting dashboards" },
-  ];
+  const activeModule = MODULE_TABS.find((m) => m.id === activeTab) || MODULE_TABS[0];
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-950 via-gray-900 to-primary-950 overflow-hidden">
-        {/* Animated background elements */}
-        <FloatingOrb className="absolute top-20 right-[20%] w-72 h-72 bg-primary-600/20 rounded-full blur-[100px]" />
-        <FloatingOrb className="absolute bottom-20 left-[10%] w-96 h-96 bg-primary-500/10 rounded-full blur-[120px]" delay={2} />
-        <FloatingOrb className="absolute top-1/2 right-[5%] w-48 h-48 bg-blue-500/10 rounded-full blur-[80px]" delay={4} />
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative bg-white pt-32 pb-20 lg:pt-40 lg:pb-28">
+        {/* Subtle grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute top-0 right-0 w-[700px] h-[500px] bg-gradient-to-bl from-blue-50 to-transparent" />
 
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 relative z-10 w-full"
-        >
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-primary-300 text-sm font-medium mb-6">
-                  <Sparkles className="w-4 h-4" /> Next-Gen Business Platform
-                </span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight"
-              >
-                Build Smarter
-                <br />
-                <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">
-                  Business Systems
-                </span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-lg sm:text-xl text-gray-400 max-w-lg leading-relaxed"
-              >
-                {PLATFORM_CONFIG.name} delivers enterprise-grade modular software that transforms how businesses operate, scale, and compete globally.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 pt-4"
-              >
-                <Button asChild size="lg" className="bg-primary-600 hover:bg-primary-500 h-14 px-8 rounded-full shadow-2xl shadow-primary-600/30 text-white font-semibold text-base group transition-all duration-300 hover:-translate-y-0.5">
-                  <Link to="/contact">
-                    Start Free Trial
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="h-14 px-8 rounded-full border-white/40 bg-white/5 text-white hover:bg-white/10 font-semibold text-base backdrop-blur-sm transition-all duration-300">
-                  <Link to="/products" className="flex items-center gap-2">
-                    <Play className="h-4 w-4" /> Explore Products
-                  </Link>
-                </Button>
-              </motion.div>
-
-              {/* Trust badges */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 1.2 }}
-                className="flex items-center gap-6 pt-8"
-              >
-                <div className="flex -space-x-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-cyan-400 border-2 border-gray-900 flex items-center justify-center text-xs font-bold text-white">
-                      {String.fromCharCode(65 + i)}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm">
-                  <span className="text-white font-semibold">Trusted by 50+ </span>
-                  <span className="text-gray-500">businesses worldwide</span>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Hero visual */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Badge */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, x: 50 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.6 }}
-              className="hidden lg:block relative"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-[#2563EB] text-xs font-semibold uppercase tracking-wide mb-8"
             >
-              <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary-600/20 to-cyan-600/20 rounded-3xl blur-2xl" />
-                <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 shadow-2xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop"
-                    alt="Software development workspace"
-                    className="rounded-2xl w-full"
-                  />
-                  {/* Floating stat card */}
-                  <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">Growth</p>
-                        <p className="text-lg font-bold text-gray-900">+127%</p>
-                      </div>
-                    </div>
-                  </motion.div>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-pulse" />
+              All-in-One Business Platform for Indian Enterprises
+            </motion.div>
 
-                  {/* Floating notification */}
-                  <motion.div
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-primary-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">Modules</p>
-                        <p className="text-lg font-bold text-gray-900">20+</p>
-                      </div>
-                    </div>
-                  </motion.div>
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6"
+            >
+              Run Your Entire Business
+              <br />
+              <span className="text-[#2563EB]">From One Platform</span>
+            </motion.h1>
+
+            {/* Sub */}
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed mb-10"
+            >
+              {PLATFORM_CONFIG.name} unifies commerce, finance, HR, CRM, and analytics into a
+              single, deeply integrated platform — built for growing businesses in India.
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-3 justify-center mb-12"
+            >
+              <Button
+                asChild
+                size="lg"
+                className="bg-[#2563EB] hover:bg-blue-700 h-12 px-8 rounded font-semibold text-sm shadow-lg shadow-blue-500/20 text-white"
+              >
+                <Link to="/contact">
+                  Request a Demo <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-12 px-8 rounded border-gray-200 text-gray-700 hover:border-blue-200 hover:text-[#2563EB] font-semibold text-sm"
+              >
+                <Link to="/products" className="flex items-center gap-2">
+                  <Play className="h-3.5 w-3.5" /> View All Modules
+                </Link>
+              </Button>
+            </motion.div>
+
+            {/* Trust badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-gray-400"
+            >
+              {[
+                { icon: Shield, text: "SOC 2 Compliant" },
+                { icon: Lock, text: "Data Encrypted" },
+                { icon: HeadphonesIcon, text: "24/7 Support" },
+                { icon: Globe, text: "99.9% Uptime SLA" },
+              ].map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-1.5">
+                  <Icon className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>{text}</span>
                 </div>
-              </div>
+              ))}
             </motion.div>
           </div>
-        </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
+          {/* Dashboard preview */}
           <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-1.5"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mt-16 relative"
           >
-            <motion.div className="w-1.5 h-1.5 bg-white/60 rounded-full" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="relative -mt-16 z-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl p-8 lg:p-10 grid grid-cols-2 lg:grid-cols-4 gap-8 shadow-2xl shadow-primary-600/30"
-          >
-            <AnimatedCounter target={50} suffix="+" label="Active Clients" />
-            <AnimatedCounter target={20} suffix="+" label="Modules Built" />
-            <AnimatedCounter target={99} suffix="%" label="Uptime SLA" />
-            <AnimatedCounter target={24} suffix="/7" label="Support Hours" />
+            <div className="absolute -inset-x-4 top-8 bottom-0 bg-gradient-to-b from-blue-50/50 to-transparent rounded-3xl" />
+            <div className="relative bg-white border border-gray-200 rounded-xl shadow-2xl shadow-gray-900/10 overflow-hidden mx-auto max-w-5xl">
+              {/* Fake browser chrome */}
+              <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 mx-4 h-6 bg-gray-200 rounded text-xs text-gray-400 flex items-center px-3">
+                  app.smartseyali.com/dashboard
+                </div>
+              </div>
+              {/* Dashboard content mockup */}
+              <div className="bg-gray-50 p-6 min-h-[320px] flex gap-4">
+                {/* Sidebar */}
+                <div className="w-40 shrink-0 bg-white rounded-lg border border-gray-100 p-3 space-y-1">
+                  {["Dashboard", "Orders", "Inventory", "Finance", "CRM", "Reports"].map(
+                    (item, i) => (
+                      <div
+                        key={item}
+                        className={`px-3 py-2 rounded text-xs font-medium ${
+                          i === 0
+                            ? "bg-[#2563EB] text-white"
+                            : "text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        {item}
+                      </div>
+                    )
+                  )}
+                </div>
+                {/* Main content */}
+                <div className="flex-1 space-y-4">
+                  {/* Stat cards */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { label: "Total Revenue", value: "₹12.4L", change: "+18%", up: true },
+                      { label: "Orders Today", value: "248", change: "+7%", up: true },
+                      { label: "Active Users", value: "1,842", change: "+12%", up: true },
+                      { label: "Pending Bills", value: "₹3.1L", change: "-4%", up: false },
+                    ].map(({ label, value, change, up }) => (
+                      <div
+                        key={label}
+                        className="bg-white rounded-lg border border-gray-100 p-3"
+                      >
+                        <p className="text-[10px] text-gray-400 mb-1">{label}</p>
+                        <p className="text-lg font-bold text-gray-900">{value}</p>
+                        <p
+                          className={`text-[10px] font-semibold mt-1 ${
+                            up ? "text-emerald-600" : "text-red-500"
+                          }`}
+                        >
+                          {change} vs last month
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Chart placeholder */}
+                  <div className="bg-white rounded-lg border border-gray-100 p-4 h-36 flex items-end gap-2">
+                    {[40, 65, 45, 80, 55, 90, 70, 85, 60, 95, 75, 88].map((h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 bg-blue-100 rounded-sm"
+                        style={{ height: `${h}%` }}
+                      >
+                        <div
+                          className="w-full bg-[#2563EB] rounded-sm"
+                          style={{ height: `${h * 0.6}%`, marginTop: `${h * 0.4}%` }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Services Overview */}
-      <section className="py-28 bg-white">
+      {/* ── Client Logos ─────────────────────────────────────────────────── */}
+      <section className="py-14 border-y border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">
+            Trusted by 50+ businesses across Tamil Nadu
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            {DUMMY_LOGOS.map((name) => (
+              <span key={name} className="text-sm font-semibold text-gray-300 tracking-wide">
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats ────────────────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+            <AnimatedCounter target={50} suffix="+" label="Active Clients" />
+            <AnimatedCounter target={20} suffix="+" label="Business Modules" />
+            <AnimatedCounter target={99} suffix="%" label="Uptime SLA" />
+            <AnimatedCounter target={24} suffix="/7" label="Expert Support" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Module Feature Tabs ───────────────────────────────────────────── */}
+      <section className="py-24 bg-gray-50 border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] mb-3 block">
+              Platform Modules
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Everything Your Business Needs
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              One platform, all departments. Each module works standalone or deeply integrated with
+              the rest — no plugins, no hidden fees.
+            </p>
+          </motion.div>
+
+          {/* Tab bar */}
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {MODULE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium transition-all border ${
+                    isActive
+                      ? "bg-white border-[#2563EB] text-[#2563EB] shadow-sm"
+                      : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Tab content */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid lg:grid-cols-2 gap-10 items-center bg-white border border-gray-200 rounded-xl p-8 lg:p-12 shadow-sm"
+          >
+            <div>
+              <div
+                className={`inline-flex items-center justify-center w-12 h-12 ${activeModule.bg} rounded-lg mb-6`}
+              >
+                <activeModule.icon className={`w-6 h-6 ${activeModule.color}`} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{activeModule.title}</h3>
+              <p className="text-gray-500 leading-relaxed mb-8">{activeModule.description}</p>
+              <ul className="space-y-3">
+                {activeModule.bullets.map((bullet) => (
+                  <li key={bullet} className="flex items-center gap-3 text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-[#2563EB] shrink-0" />
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-10">
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-[#2563EB] hover:bg-blue-700 text-white rounded px-5 h-9 text-sm font-semibold"
+                >
+                  <Link to="/products">
+                    Explore {activeModule.label} <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Module visual mockup */}
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-6 min-h-[280px]">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-gray-700">{activeModule.title}</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${activeModule.bg} ${activeModule.color}`}>
+                  Live
+                </span>
+              </div>
+              <div className="space-y-3">
+                {activeModule.bullets.map((bullet, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white border border-gray-100 rounded-lg p-3">
+                    <div className={`w-2 h-2 rounded-full ${activeModule.bg.replace("bg-", "bg-").replace("50", "400")}`} style={{ background: activeModule.color.includes("blue") ? "#3b82f6" : activeModule.color.includes("emerald") ? "#10b981" : activeModule.color.includes("orange") ? "#f97316" : activeModule.color.includes("violet") ? "#7c3aed" : activeModule.color.includes("pink") ? "#ec4899" : "#06b6d4" }} />
+                    <span className="text-xs text-gray-600">{bullet}</span>
+                    <CheckCircle className="w-3 h-3 text-gray-300 ml-auto" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Why SmartSeyali ──────────────────────────────────────────────── */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-600 text-sm font-semibold mb-6">
-              <Code className="w-4 h-4" /> Our Services
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] mb-3 block">
+              Why Choose Us
             </span>
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-4">
-              What We <span className="text-primary-600">Deliver</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Built for Scale. Designed for Simplicity.
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Comprehensive software solutions tailored to your unique business requirements
+            <p className="text-gray-500 max-w-xl mx-auto">
+              Enterprise-grade capabilities without enterprise complexity. Get started in days, not
+              months.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {services.map((service, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Layers,
+                title: "Modular Architecture",
+                description:
+                  "Buy only what you need. Each module is fully functional standalone and integrates seamlessly with others as your needs grow.",
+              },
+              {
+                icon: Zap,
+                title: "Rapid Deployment",
+                description:
+                  "Go live in under a week. Our onboarding team configures the platform to match your existing workflows with zero disruption.",
+              },
+              {
+                icon: Building2,
+                title: "Multi-Branch Ready",
+                description:
+                  "Built for businesses with multiple locations. Consolidate data, manage permissions, and report across all branches in real time.",
+              },
+              {
+                icon: Shield,
+                title: "Enterprise Security",
+                description:
+                  "Role-based access control, audit logs, and end-to-end encryption. Your data stays private and compliant at all times.",
+              },
+              {
+                icon: TrendingUp,
+                title: "Actionable Analytics",
+                description:
+                  "AI-powered insights surface trends before they become problems. Custom dashboards for every role — from CEO to warehouse staff.",
+              },
+              {
+                icon: HeadphonesIcon,
+                title: "Dedicated Support",
+                description:
+                  "A real human account manager, not a ticket queue. Priority support via WhatsApp, email, and phone — included in every plan.",
+              },
+            ].map((item, index) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
+                key={item.title}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
+                transition={{ delay: index * 0.08 }}
+                className="group border border-gray-100 rounded-xl p-6 hover:border-blue-100 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 bg-white"
               >
-                <Link
-                  to="/services"
-                  className="group block bg-white rounded-2xl border border-gray-100 p-8 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-600/[0.06] transition-all duration-500 h-full"
-                >
-                  <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-2xl mb-6 shadow-lg shadow-primary-600/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                    <service.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                    {service.description}
-                  </p>
-                  <span className="inline-flex items-center text-primary-600 text-sm font-semibold group-hover:gap-3 gap-1.5 transition-all">
-                    Learn More <ArrowRight className="h-4 w-4" />
-                  </span>
-                </Link>
+                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#2563EB] transition-colors duration-300">
+                  <item.icon className="w-5 h-5 text-[#2563EB] group-hover:text-white transition-colors duration-300" />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <CategoriesSection />
+      {/* ── Testimonials ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] mb-3 block">
+              Customer Stories
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+              Businesses That Made the Switch
+            </h2>
+          </motion.div>
 
-      {/* Features Section */}
-      <section className="py-28 bg-gray-50 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-100/30 rounded-full blur-[120px]" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-8">
+          <div className="grid md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t, i) => (
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="space-y-4"
+                transition={{ delay: i * 0.1 }}
+                className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col"
               >
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-600 text-sm font-semibold">
-                  <Award className="w-4 h-4" /> Why Choose Us
-                </span>
-                <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                  Built for <span className="text-primary-600">Modern</span> Enterprises
-                </h2>
-                <p className="text-lg text-gray-500 max-w-lg">
-                  We combine technical expertise with deep business insight to deliver solutions that drive real results.
+                <div className="flex gap-0.5 mb-4">
+                  {[...Array(t.rating)].map((_, si) => (
+                    <Star key={si} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-6">
+                  &ldquo;{t.quote}&rdquo;
                 </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                  <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center text-sm font-bold text-[#2563EB]">
+                    {t.author[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t.author}</p>
+                    <p className="text-xs text-gray-400">
+                      {t.role}, {t.company}
+                    </p>
+                  </div>
+                </div>
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              <div className="grid gap-4">
-                {features.map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group flex items-start gap-4 bg-white p-5 rounded-2xl border border-gray-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-primary-600 transition-colors duration-300">
-                      <feature.icon className="h-5 w-5 text-primary-600 group-hover:text-white transition-colors duration-300" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 mb-0.5">{feature.title}</h4>
-                      <p className="text-sm text-gray-500">{feature.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Feature visual grid */}
+      {/* ── Integration strip ────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="grid grid-cols-2 gap-5"
+            >
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] mb-3 block">
+                Integrations
+              </span>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Works with Your Existing Tools
+              </h2>
+              <p className="text-gray-500 leading-relaxed mb-8">
+                Connect SmartSeyali to the services you already use. Native integrations with payment
+                gateways, logistics partners, WhatsApp Business, and more — all configured in
+                minutes.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  "Razorpay, Stripe, PayU payment gateways",
+                  "Shiprocket, Delhivery, BlueDart logistics",
+                  "WhatsApp Business API",
+                  "Tally & GST filing portals",
+                  "Custom REST API & webhooks",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-[#2563EB] shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="grid grid-cols-3 gap-4"
             >
               {[
-                { icon: Zap, label: "Fast Delivery", color: "from-orange-500 to-red-500", delay: 0 },
-                { icon: Award, label: "Quality Assured", color: "from-violet-500 to-purple-500", delay: 0.1 },
-                { icon: Users, label: "Expert Team", color: "from-blue-500 to-cyan-500", delay: 0.2 },
-                { icon: Code, label: "Modern Tech", color: "from-primary-500 to-cyan-500", delay: 0.3 },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: item.delay }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className={`bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-500 text-center ${i % 2 === 1 ? "mt-8" : ""}`}
+                { name: "Razorpay", icon: DollarSign, color: "text-teal-600 bg-blue-50" },
+                { name: "WhatsApp", icon: Globe, color: "text-green-600 bg-green-50" },
+                { name: "Shiprocket", icon: Zap, color: "text-orange-600 bg-orange-50" },
+                { name: "GST Portal", icon: Shield, color: "text-violet-600 bg-violet-50" },
+                { name: "Tally", icon: BarChart3, color: "text-red-600 bg-red-50" },
+                { name: "REST API", icon: Settings, color: "text-cyan-600 bg-cyan-50" },
+              ].map(({ name, icon: Icon, color }) => (
+                <div
+                  key={name}
+                  className="flex flex-col items-center justify-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-5 text-center hover:border-blue-100 hover:bg-white transition-all"
                 >
-                  <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                    <item.icon className="h-7 w-7 text-white" />
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-gray-900 text-lg">{item.label}</h3>
-                </motion.div>
+                  <span className="text-xs font-medium text-gray-600">{name}</span>
+                </div>
               ))}
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-28 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-[#EFF6FF] border-t border-blue-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative"
           >
-            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-primary-900 rounded-[2.5rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
-              {/* Animated background elements */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px]" />
-              <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-[100px]" />
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-              <div className="relative z-10 space-y-8">
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="text-3xl lg:text-5xl font-bold leading-tight"
-                >
-                  Ready to Transform
-                  <br />
-                  <span className="bg-gradient-to-r from-primary-400 to-cyan-300 bg-clip-text text-transparent">
-                    Your Business?
-                  </span>
-                </motion.h2>
-                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                  Let's discuss how our innovative solutions can help your business grow and succeed in today's competitive market.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                  <Button asChild size="lg" className="bg-primary-600 hover:bg-primary-500 h-14 px-10 rounded-full font-semibold text-base shadow-2xl shadow-primary-600/30 text-white group transition-all duration-300 hover:-translate-y-0.5">
-                    <Link to="/contact">
-                      Start Your Project <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="border-white/40 bg-white/5 text-white hover:bg-white/10 h-14 px-10 rounded-full font-semibold text-base backdrop-blur-sm transition-all duration-300">
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                </div>
-              </div>
+            <Award className="w-10 h-10 text-blue-400 mx-auto mb-6" />
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Ready to Modernize Your Operations?
+            </h2>
+            <p className="text-gray-500 text-lg mb-10 max-w-xl mx-auto">
+              Book a free 30-minute demo and see exactly how SmartSeyali fits your business —
+              no obligation, no credit card required.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-[#2563EB] hover:bg-blue-700 text-white h-12 px-8 rounded font-semibold text-sm shadow-md"
+              >
+                <Link to="/contact">
+                  Book a Free Demo <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-blue-200 text-[#2563EB] hover:bg-blue-50 h-12 px-8 rounded font-semibold text-sm"
+              >
+                <Link to="/login">Sign In to Your Account</Link>
+              </Button>
             </div>
+            <p className="text-gray-500 text-xs mt-6">
+              Already using SmartSeyali?{" "}
+              <Link to="/login" className="text-[#2563EB] font-medium underline underline-offset-2 hover:text-blue-700">
+                Sign in here →
+              </Link>
+            </p>
           </motion.div>
         </div>
       </section>

@@ -80,7 +80,7 @@ export function HeroEditor({ banner, onChange, onDelete }: { banner: any, onChan
                     <div className="relative aspect-[16/9] bg-[#f8fafc] rounded-[32px] border border-border shadow-2xl overflow-hidden group/viz">
                         <img
                             src={banner?.image_url || "https://images.unsplash.com/photo-1549439602-43ebca2327af?w=1600"}
-                            className="w-full h-full object-cover group-hover/viz:scale-105 transition-transform duration-[4000ms]"
+                            className="w-full h-full object-cover group-hover/viz:scale-105 transition-transform [transition-duration:4000ms]"
                         />
                         <div className="absolute inset-0 bg-[#0a2e18]/40 p-8 md:p-16 flex flex-col justify-end">
                             <div className="max-w-xl space-y-6">

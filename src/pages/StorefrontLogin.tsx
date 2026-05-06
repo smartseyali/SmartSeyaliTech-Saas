@@ -25,21 +25,30 @@ export default function StorefrontLogin() {
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
 
-    // Company context (from URL param ?store=slug)
+    // Company context — resolved from hostname (subdomain) first, then ?store= param
     const companySlug = searchParams.get("store") || "";
     const [companyId, setCompanyId] = useState<number | null>(null);
     const [storeName, setStoreName] = useState("Store");
 
     const redirect = searchParams.get("redirect") || "/store/my-orders";
 
-    // Resolve company from slug or load first available
     useEffect(() => {
         const loadCompany = async () => {
+            // 1. Hostname-based resolution (subdomain routing)
+            const hostname = window.location.hostname;
+            const platformHost = (import.meta.env.VITE_PLATFORM_HOST as string) || "localhost";
+            const baseDomain = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "";
+            if (hostname !== platformHost && hostname !== "localhost" && baseDomain && hostname.endsWith(`.${baseDomain}`)) {
+                const sub = hostname.slice(0, -(baseDomain.length + 1));
+                const { data } = await supabase.from("companies").select("id, name").eq("subdomain", sub).maybeSingle();
+                if (data) { setCompanyId(data.id); setStoreName(data.name); return; }
+            }
+            // 2. ?store=slug param (legacy / platform-domain access)
             if (companySlug) {
                 const { data } = await supabase.from("companies").select("id, name").eq("subdomain", companySlug).maybeSingle();
                 if (data) { setCompanyId(data.id); setStoreName(data.name); return; }
             }
-            // Fallback: load first active company (single-tenant mode)
+            // 3. Fallback: first active company
             const { data } = await supabase.from("companies").select("id, name").eq("is_active", true).limit(1).maybeSingle();
             if (data) { setCompanyId(data.id); setStoreName(data.name); }
         };

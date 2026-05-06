@@ -233,7 +233,7 @@ export const PLATFORM_MODULES: PlatformModule[] = [
         description: 'Full-featured accounting module — journal entries, general ledger, trial balance, P&L, balance sheet, bank reconciliation, and tax configuration.',
         icon: '💰',
         color: '#0D9488',
-        colorFrom: 'from-teal-500',
+        colorFrom: 'from-blue-500',
         colorTo: 'to-teal-700',
         route: '/apps/finance',
         dashboardRoute: '/apps/finance',

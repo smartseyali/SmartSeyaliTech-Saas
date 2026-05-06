@@ -66,6 +66,10 @@ export async function initiateRazorpayPayment(options: RazorpayOptions): Promise
             },
             theme: { color: "#2563eb" },
             handler: function (response: RazorpayResult) {
+                if (!response?.razorpay_payment_id) {
+                    reject(new Error("Invalid payment response: missing payment ID"));
+                    return;
+                }
                 resolve(response);
             },
             modal: {
@@ -94,7 +98,7 @@ export async function logPaymentTransaction(
     transactionId?: string,
     gatewayResponse?: Record<string, any>
 ) {
-    await supabase.from("payment_transactions").insert([{
+    const { error } = await supabase.from("payment_transactions").insert([{
         company_id: companyId,
         order_id: orderId,
         gateway,
@@ -103,6 +107,7 @@ export async function logPaymentTransaction(
         transaction_id: transactionId || null,
         gateway_response: gatewayResponse || {},
     }]);
+    if (error) throw new Error(`Failed to log payment transaction: ${error.message}`);
 }
 
 // ─── Refund via Gateway ─────────────────────────────────────────────────────
