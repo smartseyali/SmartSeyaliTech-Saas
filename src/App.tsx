@@ -11,11 +11,6 @@ import { CartProvider } from "@/contexts/CartContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PlatformLoader } from "@/components/PlatformLoader";
 import { SessionTimeoutHandler } from "@/components/auth/SessionTimeoutHandler";
-import { ThemeProvider } from "@/components/ThemeProvider";
-
-// ── Eagerly loaded layouts (needed immediately for route structure) ──
-import { MarketingLayout } from "./components/marketing/MarketingLayout";
-
 // ── Lazy-loaded standalone pages (not part of any module) ──
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Login = lazy(() => import("./pages/Login"));
@@ -35,16 +30,6 @@ const VerifyEmail = lazy(() => import("./pages/modules/ecommerce/VerifyEmail"));
 const Storefront = lazy(() => import("./pages/Storefront"));
 const TemplateSelect = lazy(() => import("./pages/modules/TemplateSelect"));
 
-// ── Lazy-loaded marketing pages ──
-const MarketingIndex = lazy(() => import("./pages/marketing/Index"));
-const MarketingAbout = lazy(() => import("./pages/marketing/About"));
-const MarketingServices = lazy(() => import("./pages/marketing/Services"));
-const MarketingProducts = lazy(() => import("./pages/marketing/Products"));
-const MarketingModuleDetail = lazy(() => import("./pages/marketing/ModuleDetail"));
-const MarketingContact = lazy(() => import("./pages/marketing/Contact"));
-const MarketingPolicy = lazy(() => import("./pages/marketing/License"));
-const MarketingTerms = lazy(() => import("./pages/marketing/Terms"));
-
 // ── Per-module route arrays (each file lazy-imports its own pages) ──
 import { ecomAdminRoutes } from "./routes/ecomRoutes";
 import { salesRoutes } from "./routes/salesRoutes";
@@ -57,6 +42,7 @@ import { financeRoutes } from "./routes/financeRoutes";
 import { mastersRoutes } from "./routes/mastersRoutes";
 import { whatsappRoutes } from "./routes/whatsappRoutes";
 import { websiteRoutes } from "./routes/websiteRoutes";
+import { supportRoutes } from "./routes/supportRoutes";
 import { superAdminRoutes } from "./routes/superAdminRoutes";
 
 // ── Query Client ──
@@ -64,7 +50,7 @@ const queryClient = new QueryClient();
 
 // Detect if the app is being served from a custom client domain (not the platform host).
 // When true, unmatched routes render the storefront instead of NotFound.
-const PLATFORM_HOST = (import.meta.env.VITE_PLATFORM_HOST as string) || "localhost";
+const PLATFORM_HOST = (process.env.NEXT_PUBLIC_PLATFORM_HOST as string) || "localhost";
 const isCustomDomain = window.location.hostname !== PLATFORM_HOST && window.location.hostname !== "localhost";
 
 // ── Route Guards ──
@@ -123,8 +109,7 @@ const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
 // ── App ──
 
 const App = () => (
-    <ThemeProvider attribute="class" defaultTheme="system" storageKey="ecom-suite-theme">
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
             <TooltipProvider>
                 <Toaster />
                 <Sonner />
@@ -136,19 +121,7 @@ const App = () => (
                                 <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                                     <Suspense fallback={<PlatformLoader />}>
                                         <Routes>
-                                            {/* ── Marketing Site ── */}
-                                            <Route element={<MarketingLayout />}>
-                                                <Route path="/" element={<MarketingIndex />} />
-                                                <Route path="/about" element={<MarketingAbout />} />
-                                                <Route path="/services" element={<MarketingServices />} />
-                                                <Route path="/products" element={<MarketingProducts />} />
-                                                <Route path="/products/:slug" element={<MarketingModuleDetail />} />
-                                                <Route path="/contact" element={<MarketingContact />} />
-                                                <Route path="/policy" element={<MarketingPolicy />} />
-                                                <Route path="/terms" element={<MarketingTerms />} />
-                                            </Route>
-
-                                            {/* ── Auth ── */}
+                                                            {/* ── Auth ── */}
                                             <Route path="/login" element={<Login />} />
                                             <Route path="/ecommerce-login" element={<Login />} />
                                             <Route path="/reset-password" element={<ResetPassword />} />
@@ -250,6 +223,11 @@ const App = () => (
                                                 {mastersRoutes.map((r) => (
                                                     <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
                                                 ))}
+
+                                                {/* Support & Help */}
+                                                {supportRoutes.map((r) => (
+                                                    <Route key={r.path} path={r.path} element={<ProtectedRoute>{r.element}</ProtectedRoute>} />
+                                                ))}
                                             </Route>
 
                                             <Route path="*" element={isCustomDomain ? <Storefront /> : <NotFound />} />
@@ -261,8 +239,7 @@ const App = () => (
                     </TenantProvider>
                 </AuthProvider>
             </TooltipProvider>
-        </QueryClientProvider>
-    </ThemeProvider>
+    </QueryClientProvider>
 );
 
 export default App;

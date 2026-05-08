@@ -111,8 +111,8 @@ export async function sendVerificationEmail(
  * callers with the generic "Edge Function returned a non-2xx status code".
  */
 async function sendPlatformEmail(payload: EmailPayload): Promise<void> {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
     if (!supabaseUrl || !supabaseAnonKey) {
         throw new Error("[send-email] Supabase URL/anon key not configured (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).");

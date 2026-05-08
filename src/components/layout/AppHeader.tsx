@@ -235,12 +235,13 @@ export function AppHeader({ onMobileMenuToggle }: { onMobileMenuToggle?: () => v
                     </Popover>
 
                     {/* Help */}
-                    <button
+                    <Link
+                        to="/apps/support"
                         className="hidden md:inline-flex w-8 h-8 rounded-md items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors dark:hover:bg-accent dark:hover:text-foreground"
-                        title="Help"
+                        title="Support & Help"
                     >
                         <HelpCircle className="w-4 h-4" />
-                    </button>
+                    </Link>
 
                     {/* Theme Toggle */}
                     <ThemeToggle />

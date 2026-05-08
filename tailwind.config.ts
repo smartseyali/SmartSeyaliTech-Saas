@@ -149,6 +149,7 @@ export default {
         '4.5': '1.125rem',
         '13':  '3.25rem',
         '18':  '4.5rem',
+        '22':  '5.5rem',
         header: 'var(--header-height)',
         sidebar: 'var(--sidebar-width)',
         'sidebar-collapsed': 'var(--sidebar-width-collapsed)',
@@ -178,6 +179,10 @@ export default {
           from: { opacity: "0", transform: "scale(0.98)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
+        "marquee": {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.18s ease-out",
@@ -186,6 +191,7 @@ export default {
         "slide-in-left":  "slide-in-left 0.22s ease-out",
         "slide-in-up":    "slide-in-up 0.28s ease-out",
         "scale-in":       "scale-in 0.18s ease-out",
+        "marquee":        "marquee 25s linear infinite",
       },
     },
   },

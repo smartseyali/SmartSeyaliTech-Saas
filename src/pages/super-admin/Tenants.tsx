@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
@@ -417,9 +417,8 @@ export default function Tenants() {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filtered.map((company) => (
-                                <>
+                                <React.Fragment key={company.id}>
                                     <tr
-                                        key={company.id}
                                         className="hover:bg-slate-50/50 transition-colors group"
                                     >
                                         <td className="px-4 py-2.5">
@@ -712,7 +711,7 @@ export default function Tenants() {
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </React.Fragment>
                             ))}
                             {filtered.length === 0 && (
                                 <tr>

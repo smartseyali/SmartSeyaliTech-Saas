@@ -41,7 +41,7 @@ export default function ShippingZones() {
     // ── search
     const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => { if (activeCompany) loadAll(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) loadAll(); }, [activeCompany?.id]);
 
     const loadAll = async () => {
         if (!activeCompany) return;

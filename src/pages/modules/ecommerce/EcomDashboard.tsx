@@ -58,7 +58,7 @@ export default function EcomDashboard() {
     const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

@@ -18,21 +18,21 @@ export const PLATFORM_CONFIG = {
     // This email bypasses standard tenant checks and provides full access to the platform.
     // Must be set via VITE_SUPER_ADMIN_EMAIL environment variable — no default to prevent
     // accidental super admin access if the env var is missing in production.
-    superAdminEmail: import.meta.env.VITE_SUPER_ADMIN_EMAIL || "",
+    superAdminEmail: process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || "",
 
     // 3. Database & Connection Knowledge
     // This helps the application know how it's communicating with the backend.
-    dbProvider: (import.meta.env.VITE_DB_PROVIDER as 'supabase' | 'postgres' | 'api') || 'supabase',
+    dbProvider: (process.env.NEXT_PUBLIC_DB_PROVIDER as 'supabase' | 'postgres' | 'api') || 'supabase',
 
     // 4. API Endpoints (If using a custom backend instead of Supabase client directly)
-    apiUrl: import.meta.env.VITE_API_URL || "",
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || "",
 
     // 5. Security & Session
     sessionTimeout: 15 * 60 * 1000, // 15 minutes
 
     // 6. Environment Helpers
     isSupabase: () => PLATFORM_CONFIG.dbProvider === 'supabase',
-    isProduction: import.meta.env.PROD,
+    isProduction: process.env.NODE_ENV === 'production',
 };
 
 export default PLATFORM_CONFIG;

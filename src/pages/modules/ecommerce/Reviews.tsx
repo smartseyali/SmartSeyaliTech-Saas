@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Star, Check, X, Search, ThumbsUp, ThumbsDown, Filter, RefreshCw, MessageSquare, Clock } from "lucide-react";
+import { Star, Check, Search, ThumbsUp, ThumbsDown, RefreshCw, MessageSquare, Clock, Reply } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -24,8 +24,10 @@ export default function Reviews() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("pending");
     const [search, setSearch] = useState("");
+    const [replyingId, setReplyingId] = useState<number | null>(null);
+    const [replyText, setReplyText] = useState("");
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;
@@ -38,7 +40,16 @@ export default function Reviews() {
 
     const updateStatus = async (id: number, status: "approved" | "rejected") => {
         await supabase.from("ecom_product_reviews").update({ status }).eq("id", id);
-        toast({ title: status === "approved" ? "Review approved ✅" : "Review rejected" });
+        toast({ title: status === "approved" ? "Review approved" : "Review rejected" });
+        load();
+    };
+
+    const saveReply = async (id: number) => {
+        if (!replyText.trim()) return;
+        await supabase.from("ecom_product_reviews").update({ admin_reply: replyText.trim() }).eq("id", id);
+        toast({ title: "Reply saved" });
+        setReplyingId(null);
+        setReplyText("");
         load();
     };
 
@@ -190,11 +201,44 @@ export default function Reviews() {
                                         {r.title && <h4 className="text-lg font-bold text-slate-900 leading-tight">{r.title}</h4>}
                                         {r.review && <p className="text-sm font-medium text-slate-500 leading-relaxed max-w-4xl">{r.review}</p>}
                                     </div>
+                                    {/* Admin reply block */}
+                                    {r.admin_reply && replyingId !== r.id && (
+                                        <div className="bg-blue-50 border-l-2 border-blue-400 rounded-lg px-4 py-3 text-sm">
+                                            <p className="font-bold text-blue-800 text-xs mb-1">Store Response</p>
+                                            <p className="text-slate-600">{r.admin_reply}</p>
+                                        </div>
+                                    )}
+                                    {replyingId === r.id && (
+                                        <div className="space-y-2">
+                                            <textarea
+                                                value={replyText}
+                                                onChange={(e) => setReplyText(e.target.value)}
+                                                placeholder="Write your response to this review…"
+                                                rows={3}
+                                                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                                                autoFocus
+                                            />
+                                            <div className="flex gap-2">
+                                                <Button size="sm" onClick={() => saveReply(r.id)} disabled={!replyText.trim()}>Save Reply</Button>
+                                                <Button size="sm" variant="outline" onClick={() => { setReplyingId(null); setReplyText(""); }}>Cancel</Button>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="pt-4 border-t border-slate-50 flex items-center gap-6">
-                                        {r.product_id && (
-                                            <Link to={`/masters/products`} className="text-xs font-bold text-blue-600 hover:text-blue-700 underline underline-offset-4 decoration-2">View Associated Product</Link>
+                                        {r.status === "approved" && replyingId !== r.id && (
+                                            <button
+                                                onClick={() => { setReplyingId(r.id); setReplyText(r.admin_reply || ""); }}
+                                                className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800"
+                                            >
+                                                <Reply className="w-3.5 h-3.5" />
+                                                {r.admin_reply ? "Edit Reply" : "Reply"}
+                                            </button>
                                         )}
-                                        <div className="flex items-center gap-2 text-xs font-bold  tracking-widest text-slate-500">
+                                        {r.product_id && (
+                                            <Link to={`/masters/products`} className="text-xs font-bold text-blue-600 hover:text-blue-700 underline underline-offset-4 decoration-2">View Product</Link>
+                                        )}
+                                        <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-slate-500">
                                             <Clock className="w-3.5 h-3.5" />
                                             {new Date(r.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </div>

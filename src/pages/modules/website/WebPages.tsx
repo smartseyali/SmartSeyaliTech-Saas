@@ -309,7 +309,7 @@ export default function WebPages() {
                                                     {activeCompany.subdomain && (
                                                         <Button size="xs" variant="ghost" asChild title="View live">
                                                             <a
-                                                                href={`https://${activeCompany.subdomain}.${(import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com"}${p.slug === "home" ? "" : `?preview_page=${p.slug}`}`}
+                                                                href={`https://${activeCompany.subdomain}.${(process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com"}${p.slug === "home" ? "" : `?preview_page=${p.slug}`}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                             >

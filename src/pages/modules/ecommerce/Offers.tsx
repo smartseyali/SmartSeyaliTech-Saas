@@ -43,7 +43,7 @@ export default function Offers() {
     const [editingItem, setEditingItem] = useState<any | null>(null);
     const [filterType, setFilterType] = useState("all");
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

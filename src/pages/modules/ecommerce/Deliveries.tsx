@@ -10,7 +10,7 @@ export default function Deliveries() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

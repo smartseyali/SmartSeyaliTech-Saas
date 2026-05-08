@@ -1,0 +1,87 @@
+name: Storefront — Build & Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/storefront/**"
+  workflow_dispatch:
+    inputs:
+      tenant:
+        description: "Tenant slug to build (leave empty for all)"
+        required: false
+        default: ""
+
+jobs:
+  build-and-deploy:
+    name: Build ${{ matrix.tenant }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Add new tenants here — each gets its own parallel job
+        tenant:
+          - pattikadai
+
+    steps:
+      - name: Skip if manual run targets different tenant
+        if: ${{ github.event.inputs.tenant != '' && github.event.inputs.tenant != matrix.tenant }}
+        run: echo "Skipping ${{ matrix.tenant }} — manual run targets ${{ github.event.inputs.tenant }}" && exit 0
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/storefront/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/storefront
+        run: npm ci --no-audit --no-fund
+
+      - name: Build — ${{ matrix.tenant }}
+        working-directory: apps/storefront
+        env:
+          TENANT_SLUG: ${{ matrix.tenant }}
+          # ── Supabase build-time (server-only) ──────────────────────────────
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # ── Supabase client-side (safe to expose) ──────────────────────────
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # ── Per-tenant env — use GitHub Environments for per-slug secrets ──
+          NEXT_PUBLIC_SITE_URL: ${{ secrets[format('{0}_SITE_URL', upper(matrix.tenant))] || secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GTM_ID: ${{ secrets[format('{0}_GTM_ID', upper(matrix.tenant))] || secrets.NEXT_PUBLIC_GTM_ID }}
+          NEXT_PUBLIC_META_PIXEL_ID: ${{ secrets[format('{0}_META_PIXEL_ID', upper(matrix.tenant))] || '' }}
+          NEXT_PUBLIC_COMPANY_ID: ${{ secrets[format('{0}_COMPANY_ID', upper(matrix.tenant))] || '' }}
+          NEXT_PUBLIC_ORDER_PREFIX: ${{ secrets[format('{0}_ORDER_PREFIX', upper(matrix.tenant))] || matrix.tenant }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets[format('{0}_RAZORPAY_KEY_ID', upper(matrix.tenant))] || '' }}
+          NEXT_PUBLIC_WEB3FORMS_KEY: ${{ secrets.NEXT_PUBLIC_WEB3FORMS_KEY }}
+          NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets[format('{0}_GSC_KEY', upper(matrix.tenant))] || '' }}
+        run: npm run build
+
+      - name: Deploy to Hostinger via FTP — ${{ matrix.tenant }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          username: ${{ secrets.HOSTINGER_FTP_USER }}
+          password: ${{ secrets.HOSTINGER_FTP_PASS }}
+          local-dir: apps/storefront/out/
+          server-dir: /public_html/tenants/${{ matrix.tenant }}/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ ${{ matrix.tenant }} deployed to /public_html/tenants/${{ matrix.tenant }}/"
+          echo "🌐 URL: https://${{ matrix.tenant }}.smartseyali.com"
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "❌ Deploy failed for ${{ matrix.tenant }}"

@@ -50,9 +50,12 @@ Deno.serve(async (req) => {
         return json({ error: "Invalid JSON body" }, 400);
     }
 
-    const { company_id, to, subject, html } = payload || {};
-    if (!to || !subject) {
-        return json({ error: "Missing 'to' or 'subject'" }, 400);
+    const { company_id, to, subject, html, template_key, merge_tags } = payload || {};
+    if (!to) {
+        return json({ error: "Missing 'to'" }, 400);
+    }
+    if (!subject && !template_key) {
+        return json({ error: "Missing 'subject' or 'template_key'" }, 400);
     }
 
     let smtpHost: string;
@@ -105,6 +108,49 @@ Deno.serve(async (req) => {
             fromEmail = Deno.env.get("PLATFORM_SMTP_FROM_EMAIL") || envUser;
         }
 
+        // Resolve template if template_key provided
+        let finalSubject = subject;
+        let finalHtml = html;
+        if (template_key) {
+            const supabase = createClient(supabaseUrl, supabaseServiceKey);
+            // Try company template first, then default
+            let templateData: { subject: string; html_body: string } | null = null;
+            if (company_id) {
+                const { data: ct } = await supabase
+                    .from("ecom_email_templates")
+                    .select("subject, html_body")
+                    .eq("company_id", company_id)
+                    .eq("template_key", template_key)
+                    .eq("is_active", true)
+                    .maybeSingle();
+                if (ct) templateData = ct;
+            }
+            if (!templateData) {
+                const { data: dt } = await supabase
+                    .from("ecom_email_template_defaults")
+                    .select("subject, html_body")
+                    .eq("template_key", template_key)
+                    .maybeSingle();
+                if (dt) templateData = dt;
+            }
+            if (!templateData) {
+                return json({ error: `No template found for key: ${template_key}` }, 400);
+            }
+            finalSubject = templateData.subject;
+            finalHtml = templateData.html_body;
+            // Substitute merge tags: {{key}} → value
+            if (merge_tags && typeof merge_tags === "object") {
+                for (const [key, val] of Object.entries(merge_tags)) {
+                    const re = new RegExp(`\\{\\{${key}\\}\\}`, "g");
+                    finalSubject = finalSubject.replace(re, String(val ?? ""));
+                    finalHtml = finalHtml.replace(re, String(val ?? ""));
+                }
+            }
+        }
+        if (!finalSubject || !finalHtml) {
+            return json({ error: "Email subject or body could not be resolved" }, 400);
+        }
+
         // 587 = STARTTLS (secure:false), 465 = implicit TLS (secure:true)
         const transporter = nodemailer.createTransport({
             host: smtpHost,
@@ -116,8 +162,8 @@ Deno.serve(async (req) => {
         await transporter.sendMail({
             from: `"${fromName}" <${fromEmail}>`,
             to,
-            subject,
-            html,
+            subject: finalSubject,
+            html: finalHtml,
         });
 
         return json({ success: true });

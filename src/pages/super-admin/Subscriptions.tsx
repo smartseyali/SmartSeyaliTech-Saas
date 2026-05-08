@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -80,9 +80,10 @@ export default function Subscriptions() {
 
     const loadPlans = async () => {
         const { data } = await supabase
-            .from("subscription_plans")
+            .from("pricing_plans")
             .select("id, name")
-            .eq("is_active", true);
+            .eq("is_published", true)
+            .order("sort_order", { ascending: true });
         if (data) setPlans(data);
     };
 
@@ -99,7 +100,7 @@ export default function Subscriptions() {
             // 2. Subscriptions with plan name
             const { data: subs } = await supabase
                 .from("subscriptions")
-                .select("company_id, plan_id, status, current_period_start, current_period_end, subscription_plans(name)");
+                .select("company_id, plan_id, status, current_period_start, current_period_end, pricing_plans(name)");
 
             // 3. All system modules (for name/icon/price lookup by slug)
             const { data: sysModules } = await supabase
@@ -156,7 +157,7 @@ export default function Subscriptions() {
                     company_id: c.id,
                     company_name: c.name,
                     is_active: c.is_active !== false,
-                    plan_name: sub?.subscription_plans?.name || null,
+                    plan_name: sub?.pricing_plans?.name || null,
                     plan_id: sub?.plan_id || null,
                     sub_status: status,
                     current_period_start: sub?.current_period_start || null,
@@ -400,15 +401,14 @@ export default function Subscriptions() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {filtered.map((sub) => {
+                            {filtered.map((sub, idx) => {
                                 const statusConf = STATUS_CONFIG[sub.sub_status] || STATUS_CONFIG.active;
                                 const StatusIcon = statusConf.icon;
                                 const isExpanded = expandedId === sub.company_id;
 
                                 return (
-                                    <>
+                                    <React.Fragment key={sub.company_id != null ? `sub-${sub.company_id}` : `sub-idx-${idx}`}>
                                         <tr
-                                            key={sub.company_id}
                                             className={`hover:bg-slate-50/50 transition-colors ${
                                                 sub.is_expired ? "bg-red-50/30" : sub.is_expiring_soon ? "bg-amber-50/30" : ""
                                             }`}
@@ -529,7 +529,7 @@ export default function Subscriptions() {
 
                                         {/* ── Expanded detail row ────────────────────────── */}
                                         {isExpanded && (
-                                            <tr key={`detail-${sub.company_id}`}>
+                                            <tr>
                                                 <td colSpan={9} className="bg-slate-50/80 px-6 py-4">
                                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -637,7 +637,7 @@ export default function Subscriptions() {
                                                 </td>
                                             </tr>
                                         )}
-                                    </>
+                                    </React.Fragment>
                                 );
                             })}
                             {filtered.length === 0 && (

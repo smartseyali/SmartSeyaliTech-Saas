@@ -5,7 +5,7 @@ import { useStoreSettings } from "@/hooks/useStoreSettings";
 import {
   Settings as SettingsIcon, Save, Palette, MessageCircle, Loader2,
   ShoppingBag, RotateCcw, Mail, Building2, Globe, Hash,
-  FileText, Truck, Search, BarChart2, Code2,
+  FileText, Truck, Search, BarChart2, Code2, MailOpen, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -45,12 +45,21 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">{children}</div>;
 }
 
+const EMAIL_TEMPLATE_KEYS = [
+  { key: "order_confirmation", label: "Order Confirmation", desc: "Sent immediately after checkout. Tags: {{order_number}}, {{customer_name}}, {{items_rows}}, {{total}}" },
+  { key: "order_shipped", label: "Order Shipped", desc: "Sent when shipping status updates to 'shipped'. Tags: {{order_number}}, {{customer_name}}, {{courier_name}}, {{tracking_number}}, {{tracking_link}}" },
+  { key: "order_delivered", label: "Order Delivered", desc: "Sent when order is marked delivered. Tags: {{customer_name}}, {{order_number}}, {{store_name}}" },
+  { key: "abandoned_cart", label: "Abandoned Cart Recovery", desc: "Sent ~1h after cart abandonment. Tags: {{customer_name}}, {{cart_items}}, {{recovery_url}}" },
+];
+
 export default function Settings() {
   const { activeCompany } = useTenant();
   const { settings, loading, refreshSettings } = useStoreSettings();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [companyData, setCompanyData] = useState<any>({});
+  const [templates, setTemplates] = useState<Record<string, { subject: string; html_body: string }>>({});
+  const [expandedTemplate, setExpandedTemplate] = useState<string | null>(null);
 
   // Load ecom_settings
   useEffect(() => {
@@ -67,6 +76,21 @@ export default function Settings() {
       .single()
       .then(({ data }) => {
         if (data) setCompanyData(data);
+      });
+  }, [activeCompany?.id]);
+
+  // Load email templates
+  useEffect(() => {
+    if (!activeCompany) return;
+    supabase
+      .from("ecom_email_templates")
+      .select("template_key, subject, html_body")
+      .eq("company_id", activeCompany.id)
+      .then(({ data }) => {
+        if (!data?.length) return;
+        const map: Record<string, { subject: string; html_body: string }> = {};
+        for (const row of data) map[row.template_key] = { subject: row.subject, html_body: row.html_body };
+        setTemplates(map);
       });
   }, [activeCompany?.id]);
 
@@ -98,6 +122,15 @@ export default function Settings() {
         })
         .eq("id", activeCompany.id);
       if (companyErr) throw companyErr;
+
+      // Save email templates
+      for (const [template_key, tpl] of Object.entries(templates)) {
+        if (!tpl.subject && !tpl.html_body) continue;
+        await supabase.from("ecom_email_templates").upsert(
+          { company_id: activeCompany.id, template_key, subject: tpl.subject, html_body: tpl.html_body },
+          { onConflict: "company_id,template_key" }
+        );
+      }
 
       toast.success("All settings saved successfully");
       refreshSettings();
@@ -440,6 +473,53 @@ export default function Settings() {
                     placeholder={"<!-- Example: Hotjar -->\n<script>\n  (function(h,o,t,j,a,r){...})(window,document);\n</script>"} />
                 </Field>
               </div>
+            </div>
+          </Section>
+        </div>
+
+        {/* ── Email Templates ─────────────────────────────── */}
+        <div className="md:col-span-2">
+          <Section icon={MailOpen} title="Email Templates" description="Customize transactional emails. Use {{merge_tags}} — system defaults are used when left blank.">
+            <div className="space-y-3">
+              {EMAIL_TEMPLATE_KEYS.map(({ key, label, desc }) => {
+                const isOpen = expandedTemplate === key;
+                const tpl = templates[key] ?? { subject: "", html_body: "" };
+                return (
+                  <div key={key} className="rounded-xl border border-slate-200 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedTemplate(isOpen ? null : key)}
+                      className="w-full flex items-center justify-between px-5 py-3.5 bg-slate-50 hover:bg-slate-100 transition-colors text-left"
+                    >
+                      <div>
+                        <p className="text-sm font-bold text-slate-800">{label}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
+                      </div>
+                      {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
+                    </button>
+                    {isOpen && (
+                      <div className="p-5 space-y-4 bg-white">
+                        <Field label="Subject Line">
+                          <input
+                            value={tpl.subject}
+                            onChange={e => setTemplates(t => ({ ...t, [key]: { ...tpl, subject: e.target.value } }))}
+                            className={inputCls}
+                            placeholder="e.g. Your order #{{order_number}} is confirmed!"
+                          />
+                        </Field>
+                        <Field label="HTML Body" hint="Full HTML email. Use {{merge_tags}} for dynamic values.">
+                          <textarea
+                            value={tpl.html_body}
+                            onChange={e => setTemplates(t => ({ ...t, [key]: { ...tpl, html_body: e.target.value } }))}
+                            className={`${textareaCls} h-64 font-mono text-xs`}
+                            placeholder="<p>Hi {{customer_name}},</p>..."
+                          />
+                        </Field>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </Section>
         </div>

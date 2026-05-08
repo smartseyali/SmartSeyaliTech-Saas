@@ -6,7 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader2, CheckCircle, ShieldCheck, Zap, HeadphonesIcon } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ArrowLeft,
+  Loader2,
+  CheckCircle,
+  ShieldCheck,
+  Zap,
+  HeadphonesIcon,
+} from "lucide-react";
 import PLATFORM_CONFIG from "@/config/platform";
 import { PlatformLoader } from "@/components/PlatformLoader";
 import { MFAChallenge } from "@/components/auth/MFAChallenge";
@@ -16,7 +26,7 @@ const PRIMARY = "#2563EB";
 
 const TRUST_POINTS = [
   { icon: ShieldCheck, text: "Enterprise-grade security & encryption" },
-  { icon: Zap,         text: "Real-time sync across all modules" },
+  { icon: Zap, text: "Real-time sync across all modules" },
   { icon: HeadphonesIcon, text: "24/7 dedicated support included" },
   { icon: CheckCircle, text: "Trusted by 50+ businesses in India" },
 ];
@@ -44,17 +54,31 @@ export default function Login() {
     setRedirecting(true);
     try {
       const isSuperAdminByEmail =
-        user.email?.toLowerCase() === PLATFORM_CONFIG.superAdminEmail.toLowerCase();
-      if (isSuperAdminByEmail) { navigate("/super-admin", { replace: true }); return; }
+        user.email?.toLowerCase() ===
+        PLATFORM_CONFIG.superAdminEmail.toLowerCase();
+      if (isSuperAdminByEmail) {
+        navigate("/super-admin", { replace: true });
+        return;
+      }
 
       const { data: localUser } = await supabase
-        .from("users").select("is_super_admin").ilike("username", user.email || "").maybeSingle();
-      if (localUser?.is_super_admin) { navigate("/super-admin", { replace: true }); return; }
+        .from("users")
+        .select("is_super_admin")
+        .ilike("username", user.email || "")
+        .maybeSingle();
+      if (localUser?.is_super_admin) {
+        navigate("/super-admin", { replace: true });
+        return;
+      }
 
       const { data: profile, error: profileErr } = await supabase
-        .from("users").select("email_verified").eq("id", user.id).maybeSingle();
+        .from("users")
+        .select("email_verified")
+        .eq("id", user.id)
+        .maybeSingle();
       if (!profileErr && profile && profile.email_verified === false) {
-        navigate("/verify-email-pending", { replace: true }); return;
+        navigate("/verify-email-pending", { replace: true });
+        return;
       }
 
       const [{ data: mappings }, { data: ownedCompanies }] = await Promise.all([
@@ -62,8 +86,12 @@ export default function Login() {
         supabase.from("companies").select("id").eq("user_id", user.id).limit(1),
       ]);
       const hasCompany =
-        (mappings && mappings.length > 0) || (ownedCompanies && ownedCompanies.length > 0);
-      if (!hasCompany) { navigate(`/onboarding${window.location.search}`, { replace: true }); return; }
+        (mappings && mappings.length > 0) ||
+        (ownedCompanies && ownedCompanies.length > 0);
+      if (!hasCompany) {
+        navigate(`/onboarding${window.location.search}`, { replace: true });
+        return;
+      }
       navigate("/apps", { replace: true });
     } catch {
       navigate("/apps", { replace: true });
@@ -74,11 +102,18 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) throw error;
       toast({ title: "Welcome back", description: "Signed in successfully." });
     } catch (err: any) {
-      toast({ variant: "destructive", title: "Login failed", description: err?.message });
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: err?.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -92,10 +127,17 @@ export default function Login() {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      toast({ title: "Email sent", description: "Password reset link sent to your email." });
+      toast({
+        title: "Email sent",
+        description: "Password reset link sent to your email.",
+      });
       setMode("login");
     } catch (err: any) {
-      toast({ variant: "destructive", title: "Error", description: err?.message });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err?.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -109,8 +151,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex">
-
+    <div className="light-forced min-h-screen flex">
       {/* ── Left brand panel ─────────────────────────────────────────────── */}
       <div
         className="hidden lg:flex lg:w-[45%] xl:w-[40%] flex-col justify-between p-12 relative overflow-hidden"
@@ -122,9 +163,13 @@ export default function Login() {
 
         <div className="relative z-10">
           {/* Logo */}
-          <Link to="/" className="inline-block mb-14">
-            <img src="/logo.png" alt={PLATFORM_CONFIG.name} className="h-28 w-auto object-contain" />
-          </Link>
+          <a href="/" className="inline-block mb-14">
+            <img
+              src="/logo.png"
+              alt={PLATFORM_CONFIG.name}
+              className="h-11 w-auto object-contain"
+            />
+          </a>
 
           <h2 className="text-3xl xl:text-4xl font-bold text-blue-900 leading-tight mb-4">
             One Platform.
@@ -132,13 +177,16 @@ export default function Login() {
             Every Department.
           </h2>
           <p className="text-blue-700/70 text-base leading-relaxed mb-12 max-w-sm">
-            Sign in to manage your commerce, finance, HR, CRM, and analytics — all from a single,
-            beautifully unified dashboard.
+            Sign in to manage your commerce, finance, HR, CRM, and analytics —
+            all from a single, beautifully unified dashboard.
           </p>
 
           <ul className="space-y-4">
             {TRUST_POINTS.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-3 text-sm text-blue-800">
+              <li
+                key={text}
+                className="flex items-center gap-3 text-sm text-blue-800"
+              >
                 <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-blue-600" />
                 </div>
@@ -150,7 +198,8 @@ export default function Login() {
 
         <div className="relative z-10">
           <p className="text-xs text-blue-400">
-            &copy; {new Date().getFullYear()} {PLATFORM_CONFIG.name} Tech. All rights reserved.
+            &copy; {new Date().getFullYear()} {PLATFORM_CONFIG.name} Tech. All
+            rights reserved.
           </p>
         </div>
       </div>
@@ -158,31 +207,36 @@ export default function Login() {
       {/* ── Right form panel ─────────────────────────────────────────────── */}
       <div className="flex-1 flex items-center justify-center bg-white p-6 sm:p-10">
         <div className="w-full max-w-[420px]">
-
           {/* Mobile back link */}
-          <Link
-            to="/"
+          <a
+            href="/"
             className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors mb-8 lg:hidden"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to home
-          </Link>
+          </a>
 
           {/* Mobile logo */}
           <div className="flex justify-center mb-8 lg:hidden">
-            <img src="/logo.png" alt={PLATFORM_CONFIG.name} className="h-28 w-auto object-contain" />
+            <img
+              src="/logo.png"
+              alt={PLATFORM_CONFIG.name}
+              className="h-9 w-auto object-contain"
+            />
           </div>
 
           {/* Desktop back link */}
-          <Link
-            to="/"
+          <a
+            href="/"
             className="hidden lg:inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors mb-10"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to site
-          </Link>
+          </a>
 
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
-              {mode === "login" ? "Sign in to your account" : "Reset your password"}
+              {mode === "login"
+                ? "Sign in to your account"
+                : "Reset your password"}
             </h1>
             <p className="text-sm text-gray-500">
               {mode === "login"
@@ -199,7 +253,10 @@ export default function Login() {
             >
               {/* Email */}
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Email address
                 </Label>
                 <Input
@@ -218,7 +275,10 @@ export default function Login() {
               {mode === "login" && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="password"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Password
                     </Label>
                     <button
@@ -246,9 +306,11 @@ export default function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
-                      {showPassword
-                        ? <EyeOff className="w-3.5 h-3.5" />
-                        : <Eye className="w-3.5 h-3.5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-3.5 h-3.5" />
+                      ) : (
+                        <Eye className="w-3.5 h-3.5" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -261,16 +323,39 @@ export default function Login() {
                 style={{ background: PRIMARY }}
               >
                 {loading ? (
-                  <><Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
                     {mode === "login" ? "Signing in…" : "Sending link…"}
                   </>
                 ) : (
-                  <>{mode === "login" ? "Sign In" : "Send Reset Link"}
+                  <>
+                    {mode === "login" ? "Sign In" : "Send Reset Link"}
                     <ArrowRight className="w-3.5 h-3.5 ml-2" />
                   </>
                 )}
               </Button>
             </form>
+          </div>
+
+          {/* Social proof */}
+          <div className="mt-4 flex items-center justify-center gap-2.5 text-xs text-gray-400">
+            <div className="flex -space-x-1.5">
+              {["R", "P", "S", "A"].map((initial) => (
+                <div
+                  key={initial}
+                  className="w-5 h-5 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[9px] font-bold text-blue-700"
+                >
+                  {initial}
+                </div>
+              ))}
+            </div>
+            <span>
+              Trusted by{" "}
+              <span className="font-semibold text-gray-600">
+                50+ businesses
+              </span>{" "}
+              across India
+            </span>
           </div>
 
           {/* Below form */}
@@ -297,7 +382,8 @@ export default function Login() {
           </div>
 
           <p className="text-[11px] text-gray-300 text-center mt-8">
-            &copy; {new Date().getFullYear()} {PLATFORM_CONFIG.name} Tech. All rights reserved.
+            &copy; {new Date().getFullYear()} {PLATFORM_CONFIG.name} Tech. All
+            rights reserved.
           </p>
         </div>
       </div>

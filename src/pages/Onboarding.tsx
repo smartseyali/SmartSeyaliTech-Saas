@@ -60,8 +60,7 @@ function generateSlug(name: string): string {
     name
       .toLowerCase()
       .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "") +
-    Math.random().toString(36).slice(2, 6)
+      .replace(/[^a-z0-9-]/g, "") + Math.random().toString(36).slice(2, 6)
   );
 }
 
@@ -135,8 +134,8 @@ function StepIndicator({ current }: { current: number }) {
                   done
                     ? "bg-primary text-white"
                     : active
-                    ? "bg-primary text-white ring-4 ring-primary-100"
-                    : "bg-gray-100 text-gray-400"
+                      ? "bg-primary text-white ring-4 ring-primary-100"
+                      : "bg-gray-100 text-gray-400"
                 }`}
               >
                 {done ? <Check className="w-3.5 h-3.5" /> : step}
@@ -146,8 +145,8 @@ function StepIndicator({ current }: { current: number }) {
                   active
                     ? "text-gray-800 dark:text-foreground"
                     : done
-                    ? "text-gray-500"
-                    : "text-gray-400"
+                      ? "text-gray-500"
+                      : "text-gray-400"
                 }`}
               >
                 {label}
@@ -246,14 +245,20 @@ function ModuleCard({
           <div className="flex items-center gap-2">
             {selected ? (
               <button
-                onClick={(e) => { e.stopPropagation(); onRemove(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
                 className="text-xs text-red-500 hover:text-red-600 font-medium transition"
               >
                 Remove
               </button>
             ) : (
               <button
-                onClick={(e) => { e.stopPropagation(); onInstall(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInstall();
+                }}
                 className="px-3.5 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
               >
                 Install
@@ -291,7 +296,9 @@ function AppDetailPanel({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Hero gradient */}
-        <div className={`h-36 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} relative`}>
+        <div
+          className={`h-36 bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo} relative`}
+        >
           <div className="absolute inset-0 bg-black/10" />
           <button
             onClick={onClose}
@@ -311,7 +318,9 @@ function AppDetailPanel({
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xl font-bold text-slate-900">{mod.name}</h2>
                 {mod.status === "beta" && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">Beta</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">
+                    Beta
+                  </span>
                 )}
                 {selected && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 inline-flex items-center gap-1">
@@ -330,10 +339,14 @@ function AppDetailPanel({
                 <span className="text-lg font-bold text-emerald-600">Free</span>
               ) : (
                 <div>
-                  <span className="text-lg font-bold text-slate-900">₹{mod.priceMonthly}</span>
+                  <span className="text-lg font-bold text-slate-900">
+                    ₹{mod.priceMonthly}
+                  </span>
                   <span className="text-sm text-slate-500">/month</span>
                   {mod.trialDays > 0 && (
-                    <p className="text-xs text-blue-600 font-medium mt-0.5">{mod.trialDays}-day free trial</p>
+                    <p className="text-xs text-blue-600 font-medium mt-0.5">
+                      {mod.trialDays}-day free trial
+                    </p>
                   )}
                 </div>
               )}
@@ -357,16 +370,25 @@ function AppDetailPanel({
 
           {/* Description */}
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-slate-800 mb-2">About this app</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">{mod.description}</p>
+            <h3 className="text-sm font-semibold text-slate-800 mb-2">
+              About this app
+            </h3>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              {mod.description}
+            </p>
           </div>
 
           {/* Features */}
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-slate-800 mb-3">Features & Capabilities</h3>
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">
+              Features & Capabilities
+            </h3>
             <div className="space-y-2">
               {mod.features.map((f, i) => (
-                <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100"
+                >
                   <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-3 h-3 text-emerald-600" />
                   </div>
@@ -378,29 +400,51 @@ function AppDetailPanel({
 
           {/* Specs */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-800 mb-3">Specifications</h3>
+            <h3 className="text-sm font-semibold text-slate-800 mb-3">
+              Specifications
+            </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
               <div>
-                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Category</dt>
-                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.category}</dd>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  Category
+                </dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">
+                  {mod.category}
+                </dd>
               </div>
               <div>
-                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Status</dt>
-                <dd className="text-slate-800 font-medium mt-0.5 capitalize">{mod.status}</dd>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  Status
+                </dt>
+                <dd className="text-slate-800 font-medium mt-0.5 capitalize">
+                  {mod.status}
+                </dd>
               </div>
               <div>
-                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">License</dt>
-                <dd className="text-slate-800 font-medium mt-0.5">{mod.isFree ? "Free" : "Subscription"}</dd>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  License
+                </dt>
+                <dd className="text-slate-800 font-medium mt-0.5">
+                  {mod.isFree ? "Free" : "Subscription"}
+                </dd>
               </div>
               {mod.trialDays > 0 && (
                 <div>
-                  <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Trial Period</dt>
-                  <dd className="text-slate-800 font-medium mt-0.5">{mod.trialDays} days</dd>
+                  <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                    Trial Period
+                  </dt>
+                  <dd className="text-slate-800 font-medium mt-0.5">
+                    {mod.trialDays} days
+                  </dd>
                 </div>
               )}
               <div>
-                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Requires</dt>
-                <dd className="text-slate-800 font-medium mt-0.5">Master Data Hub</dd>
+                <dt className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  Requires
+                </dt>
+                <dd className="text-slate-800 font-medium mt-0.5">
+                  Master Data Hub
+                </dd>
               </div>
             </dl>
           </div>
@@ -415,7 +459,12 @@ function AppDetailPanel({
 // ══════════════════════════════════════════════════════════════
 export default function Onboarding() {
   const { user, signOut } = useAuth();
-  const { refreshTenant, needsOnboarding, companies, loading: tenantLoading } = useTenant();
+  const {
+    refreshTenant,
+    needsOnboarding,
+    companies,
+    loading: tenantLoading,
+  } = useTenant();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -455,21 +504,39 @@ export default function Onboarding() {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [detailModule, setDetailModule] = useState<PlatformModule | null>(null);
+  const appPreselectedRef = useRef(false);
+
+  // Plan pre-selection (from ?plan_id= param set by pricing page CTA)
+  const [selectedPlan, setSelectedPlan] = useState<{
+    id: string;
+    name: string;
+    price_monthly: number;
+    price_yearly: number;
+    modules_included: string[];
+  } | null>(null);
+  const planLoadedRef = useRef(false);
 
   // Step 3b: Template + custom-domain picker for modules with needsTemplate=true.
   // Active only while onTemplateModuleIdx !== null; null means we're on the app-store view.
-  const [onTemplateModuleIdx, setOnTemplateModuleIdx] = useState<number | null>(null);
+  const [onTemplateModuleIdx, setOnTemplateModuleIdx] = useState<number | null>(
+    null,
+  );
   const [templateChoices, setTemplateChoices] = useState<
     Record<string, { templateId: number; customDomain: string }>
   >({});
-  const [availableTemplates, setAvailableTemplates] = useState<StorefrontTemplate[]>([]);
+  const [availableTemplates, setAvailableTemplates] = useState<
+    StorefrontTemplate[]
+  >([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
-  const [previewTemplate, setPreviewTemplate] = useState<StorefrontTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] =
+    useState<StorefrontTemplate | null>(null);
   const modulesNeedingTemplates = selectedModules.filter(
     (id) => PLATFORM_MODULES.find((m) => m.id === id)?.needsTemplate,
   );
   const currentTemplateModuleId =
-    onTemplateModuleIdx !== null ? modulesNeedingTemplates[onTemplateModuleIdx] : null;
+    onTemplateModuleIdx !== null
+      ? modulesNeedingTemplates[onTemplateModuleIdx]
+      : null;
   const currentTemplateChoice = currentTemplateModuleId
     ? templateChoices[currentTemplateModuleId]
     : undefined;
@@ -525,14 +592,17 @@ export default function Onboarding() {
             setStep(3); // Verified → app store
           } else if (data && data.email_verified === false) {
             // User exists but not verified → show verification step
-            generateAndSendVerification(user.id, user.email || "", user.user_metadata?.full_name || "")
-              .catch((verifyErr: any) => {
-                toast.error(
-                  verifyErr?.message
-                    ? `Couldn't send verification email: ${verifyErr.message}`
-                    : "Couldn't send verification email. You can resend from the next screen."
-                );
-              });
+            generateAndSendVerification(
+              user.id,
+              user.email || "",
+              user.user_metadata?.full_name || "",
+            ).catch((verifyErr: any) => {
+              toast.error(
+                verifyErr?.message
+                  ? `Couldn't send verification email: ${verifyErr.message}`
+                  : "Couldn't send verification email. You can resend from the next screen.",
+              );
+            });
             setResendCooldown(60);
             setStep(2);
           }
@@ -628,7 +698,8 @@ export default function Onboarding() {
           setStep(3);
         }
       } catch (pollErr: any) {
-        if (!import.meta.env.PROD) console.warn("Verification poll error:", pollErr?.message);
+        if (process.env.NODE_ENV !== "production")
+          console.warn("Verification poll error:", pollErr?.message);
       }
     }, 5000);
 
@@ -647,9 +718,56 @@ export default function Onboarding() {
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
+  // ── Pre-select app from ?app=slug when pricing page individual CTA is used ──
+  useEffect(() => {
+    if (step !== 3 || appPreselectedRef.current) return;
+    appPreselectedRef.current = true;
+    const appSlug = searchParams.get("app");
+    if (!appSlug) return;
+    const exists = PLATFORM_MODULES.find(
+      (m) => m.id === appSlug && m.id !== "masters" && (m.status === "live" || m.status === "beta"),
+    );
+    if (exists) {
+      setSelectedModules((prev) => (prev.includes(appSlug) ? prev : [...prev, appSlug]));
+    }
+  }, [step]);
+
+  // ── Pre-select modules from ?plan_id= when pricing page bundle CTA is used ──
+  useEffect(() => {
+    if (step !== 3 || planLoadedRef.current) return;
+    const planId = searchParams.get("plan_id");
+    if (!planId) return;
+    planLoadedRef.current = true;
+
+    supabase
+      .from("pricing_plans")
+      .select("id, name, price_monthly, price_yearly, modules_included")
+      .eq("id", planId)
+      .single()
+      .then(({ data }) => {
+        if (!data) return;
+        const included: string[] = Array.isArray(data.modules_included) ? data.modules_included : [];
+        setSelectedPlan({
+          id: data.id,
+          name: data.name,
+          price_monthly: data.price_monthly ?? 0,
+          price_yearly: data.price_yearly ?? 0,
+          modules_included: included,
+        });
+        // Auto-select all valid slugs from the plan
+        const valid = included.filter((slug) =>
+          PLATFORM_MODULES.some(
+            (m) => m.id === slug && m.id !== "masters" && m.status !== "planned",
+          ),
+        );
+        setSelectedModules((prev) => Array.from(new Set([...prev, ...valid])));
+      })
+      .catch(() => {});
+  }, [step]);
+
   // ── Modules data ────────────────────────────────────────────
   const selectableModules = PLATFORM_MODULES.filter(
-    (m) => m.id !== "masters" && (m.status === "live" || m.status === "beta")
+    (m) => m.id !== "masters" && (m.status === "live" || m.status === "beta"),
   );
 
   const filteredModules = searchQuery.trim()
@@ -658,8 +776,8 @@ export default function Onboarding() {
           m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           m.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
           m.features.some((f) =>
-            f.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+            f.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
       )
     : selectableModules;
 
@@ -693,7 +811,7 @@ export default function Onboarding() {
   // ── Toggle module ───────────────────────────────────────────
   function toggleModule(id: string) {
     setSelectedModules((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   }
 
@@ -742,13 +860,17 @@ export default function Onboarding() {
         } else {
           // Need to verify — generate token & send email
           try {
-            await generateAndSendVerification(user.id, user.email || loginEmail, fullName);
+            await generateAndSendVerification(
+              user.id,
+              user.email || loginEmail,
+              fullName,
+            );
             toast.success("Verification email sent. Check your inbox.");
           } catch (verifyErr: any) {
             toast.error(
               verifyErr?.message
                 ? `Couldn't send verification email: ${verifyErr.message}`
-                : "Couldn't send verification email. You can resend from the next screen."
+                : "Couldn't send verification email. You can resend from the next screen.",
             );
           }
           setResendCooldown(60);
@@ -765,9 +887,20 @@ export default function Onboarding() {
     try {
       // Save form data to localStorage (for cross-tab redirect recovery)
       saveDraft({
-        companyName, industry, addressLine1, addressLine2,
-        city, state, pincode, country, fullName,
-        companyEmail, loginEmail, phone, mobile, gstNo,
+        companyName,
+        industry,
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+        pincode,
+        country,
+        fullName,
+        companyEmail,
+        loginEmail,
+        phone,
+        mobile,
+        gstNo,
       });
 
       const { data: authData, error: signUpErr } = await supabase.auth.signUp({
@@ -786,7 +919,7 @@ export default function Onboarding() {
           signUpErr.message.toLowerCase().includes("already exists")
         ) {
           setError(
-            "An account with this email already exists. Please log in instead."
+            "An account with this email already exists. Please log in instead.",
           );
           setLoading(false);
           return;
@@ -800,28 +933,38 @@ export default function Onboarding() {
         throw new Error("Sign-up returned no user. Please try again.");
       }
 
-      const { error: upsertErr } = await supabase.from("users").upsert({
-        id: signedUpUser.id,
-        username: loginEmail,
-        full_name: fullName || loginEmail.split("@")[0],
-        is_super_admin: false,
-        email_verified: false,
-      }, { onConflict: "id" });
+      const { error: upsertErr } = await supabase.from("users").upsert(
+        {
+          id: signedUpUser.id,
+          username: loginEmail,
+          full_name: fullName || loginEmail.split("@")[0],
+          is_super_admin: false,
+          email_verified: false,
+        },
+        { onConflict: "id" },
+      );
       if (upsertErr) {
         // Typically RLS failure when Supabase email-confirm is ON and no session was returned.
         // The handle_new_user trigger should have already created the row, so this is best-effort.
-        console.warn("users upsert blocked (expected if no session yet):", upsertErr.message);
+        console.warn(
+          "users upsert blocked (expected if no session yet):",
+          upsertErr.message,
+        );
       }
 
       // Generate verification token & send email — surface any failure so the user knows what broke
       try {
-        await generateAndSendVerification(signedUpUser.id, loginEmail, fullName);
+        await generateAndSendVerification(
+          signedUpUser.id,
+          loginEmail,
+          fullName,
+        );
         toast.success("Verification email sent. Check your inbox.");
       } catch (verifyErr: any) {
         toast.error(
           verifyErr?.message
             ? `Couldn't send verification email: ${verifyErr.message}`
-            : "Couldn't send verification email. You can resend from the next screen."
+            : "Couldn't send verification email. You can resend from the next screen.",
         );
       }
 
@@ -840,7 +983,11 @@ export default function Onboarding() {
   // Throws on failure so the caller can surface the specific reason to the user.
   // Always stashes the resulting verify URL in state so the UI can offer a
   // "click to verify" fallback when SMTP delivery is down.
-  async function generateAndSendVerification(userId: string, email: string, name: string) {
+  async function generateAndSendVerification(
+    userId: string,
+    email: string,
+    name: string,
+  ) {
     const { data, error } = await supabase.rpc("tenant_generate_verification", {
       p_user_id: userId,
     });
@@ -854,14 +1001,20 @@ export default function Onboarding() {
       return;
     }
     if (!data?.token) {
-      throw new Error("Verification token was not returned. Check that tenant_email_verification.sql has been run.");
+      throw new Error(
+        "Verification token was not returned. Check that tenant_email_verification.sql has been run.",
+      );
     }
 
     const verifyUrl = `${window.location.origin}/verify-tenant-email?token=${data.token}`;
     setPendingVerifyUrl(verifyUrl);
 
     try {
-      await sendTenantVerificationEmail(email, name || email.split("@")[0], data.token);
+      await sendTenantVerificationEmail(
+        email,
+        name || email.split("@")[0],
+        data.token,
+      );
       setEmailSendError(null);
     } catch (sendErr: any) {
       setEmailSendError(sendErr?.message || "Email could not be sent");
@@ -897,12 +1050,14 @@ export default function Onboarding() {
           await sendTenantVerificationEmail(
             data.email || loginEmail,
             data.full_name || fullName || loginEmail.split("@")[0],
-            data.token
+            data.token,
           );
           setEmailSendError(null);
           toast.success("Verification email sent again!");
         } catch (sendErr: any) {
-          const msg = sendErr?.message || "Failed to send email. Please check platform SMTP settings.";
+          const msg =
+            sendErr?.message ||
+            "Failed to send email. Please check platform SMTP settings.";
           setEmailSendError(msg);
           toast.error(msg);
         }
@@ -950,7 +1105,10 @@ export default function Onboarding() {
     }
   }
 
-  function setTemplateChoice(moduleId: string, patch: Partial<{ templateId: number; customDomain: string }>) {
+  function setTemplateChoice(
+    moduleId: string,
+    patch: Partial<{ templateId: number; customDomain: string }>,
+  ) {
     setTemplateChoices((prev) => ({
       ...prev,
       [moduleId]: {
@@ -961,8 +1119,13 @@ export default function Onboarding() {
   }
 
   function isDomainValid(d: string): boolean {
-    const clean = d.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
-    return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i.test(clean);
+    const clean = d
+      .trim()
+      .replace(/^https?:\/\//, "")
+      .replace(/\/$/, "");
+    return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i.test(
+      clean,
+    );
   }
 
   async function handleTemplateStepNext() {
@@ -1039,7 +1202,9 @@ export default function Onboarding() {
       handleDeploy();
     } catch (err: any) {
       if (err.message?.includes("cancelled")) {
-        toast.info("Payment cancelled. You can try again or start a free trial.");
+        toast.info(
+          "Payment cancelled. You can try again or start a free trial.",
+        );
       } else {
         toast.error(err.message || "Payment failed. Please try again.");
       }
@@ -1062,13 +1227,15 @@ export default function Onboarding() {
       let activeUser = user;
       if (!activeUser) {
         const { data, error: getUserErr } = await supabase.auth.getUser();
-        if (getUserErr && !import.meta.env.PROD) {
+        if (getUserErr && process.env.NODE_ENV !== "production") {
           console.warn("getUser() during deploy failed:", getUserErr.message);
         }
         activeUser = data?.user ?? null;
       }
       if (!activeUser) {
-        throw new Error("You must be signed in to complete setup. Please refresh and try again.");
+        throw new Error(
+          "You must be signed in to complete setup. Please refresh and try again.",
+        );
       }
 
       // ── Progress: Setting up workspace ──────────────────────
@@ -1087,7 +1254,9 @@ export default function Onboarding() {
       });
 
       const slug = generateSlug(companyName);
-      const fullAddress = [addressLine1, addressLine2].filter(Boolean).join(", ");
+      const fullAddress = [addressLine1, addressLine2]
+        .filter(Boolean)
+        .join(", ");
 
       let insertPayload: Record<string, any> = {
         name: companyName,
@@ -1127,7 +1296,8 @@ export default function Onboarding() {
         newCompany = fallback;
       }
 
-      if (!newCompany) throw new Error("Failed to create company. Please try again.");
+      if (!newCompany)
+        throw new Error("Failed to create company. Please try again.");
 
       // Link user to company
       const { error: cuErr } = await supabase.from("company_users").insert([
@@ -1137,7 +1307,8 @@ export default function Onboarding() {
           role: "admin",
         },
       ]);
-      if (cuErr) throw new Error(`Failed to link user to company: ${cuErr.message}`);
+      if (cuErr)
+        throw new Error(`Failed to link user to company: ${cuErr.message}`);
 
       // ── Template deployment requests ────────────────────────
       // For each selected module with needsTemplate, create a request row so the
@@ -1150,12 +1321,16 @@ export default function Onboarding() {
             companyId: newCompany.id,
             moduleId,
             templateId: choice.templateId,
-            customDomain: choice.customDomain.trim().replace(/^https?:\/\//, "").replace(/\/$/, ""),
+            customDomain: choice.customDomain
+              .trim()
+              .replace(/^https?:\/\//, "")
+              .replace(/\/$/, ""),
             configOverrides: {},
           });
         } catch (err) {
           // Non-blocking — tenant can still redo from /apps/:moduleId/setup/template
-          if (!import.meta.env.PROD) console.warn(`Template request for ${moduleId} failed:`, err);
+          if (process.env.NODE_ENV !== "production")
+            console.warn(`Template request for ${moduleId} failed:`, err);
         }
       }
 
@@ -1173,7 +1348,8 @@ export default function Onboarding() {
       const buildModuleRow = (slug: string) => {
         const cfg = PLATFORM_MODULES.find((m) => m.id === slug);
         const isPaid = !!cfg && !cfg.isCore && !cfg.isFree;
-        const startsTrial = isPaid && launchMode !== "live" && (cfg?.trialDays ?? 0) > 0;
+        const startsTrial =
+          isPaid && launchMode !== "live" && (cfg?.trialDays ?? 0) > 0;
         return {
           company_id: newCompany.id,
           module_slug: slug,
@@ -1181,7 +1357,7 @@ export default function Onboarding() {
           installed_at: new Date(nowMs).toISOString(),
           billing_status: startsTrial ? "trial" : "active",
           trial_ends_at: startsTrial
-            ? new Date(nowMs + (cfg!.trialDays * 86400000)).toISOString()
+            ? new Date(nowMs + cfg!.trialDays * 86400000).toISOString()
             : null,
         };
       };
@@ -1194,15 +1370,20 @@ export default function Onboarding() {
 
       if (cmErr) {
         // Fallback for older schemas that don't have trial_ends_at / billing_status columns
-        const { error: cmFallbackErr } = await supabase.from("company_modules").insert(
-          allModuleSlugs.map((s) => ({
-            company_id: newCompany.id,
-            module_slug: s,
-            is_active: true,
-          }))
-        );
-        if (cmFallbackErr && !import.meta.env.PROD) {
-          console.warn("Module install fallback also failed:", cmFallbackErr.message);
+        const { error: cmFallbackErr } = await supabase
+          .from("company_modules")
+          .insert(
+            allModuleSlugs.map((s) => ({
+              company_id: newCompany.id,
+              module_slug: s,
+              is_active: true,
+            })),
+          );
+        if (cmFallbackErr && process.env.NODE_ENV !== "production") {
+          console.warn(
+            "Module install fallback also failed:",
+            cmFallbackErr.message,
+          );
         }
       }
 
@@ -1217,7 +1398,7 @@ export default function Onboarding() {
       const { error: umErr } = await supabase
         .from("user_modules")
         .insert(userModulesPayload);
-      if (umErr && !import.meta.env.PROD) {
+      if (umErr && process.env.NODE_ENV !== "production") {
         console.warn("user_modules insert skipped:", umErr.message);
       }
 
@@ -1248,13 +1429,14 @@ export default function Onboarding() {
 
       // Determine first route
       const firstMod = PLATFORM_MODULES.find(
-        (m) => selectedModules.includes(m.id) && m.id !== "masters"
+        (m) => selectedModules.includes(m.id) && m.id !== "masters",
       );
       setFirstRoute(firstMod?.dashboardRoute || "/apps");
       setCreatedCompanyName(companyName);
       setSetupDone(true);
     } catch (err: any) {
-      if (!import.meta.env.PROD) console.error("Onboarding error:", err);
+      if (process.env.NODE_ENV !== "production")
+        console.error("Onboarding error:", err);
       setError(err.message || "Setup failed. Please try again.");
       setStep(3);
       toast.error(err.message || "Setup failed.");
@@ -1275,7 +1457,11 @@ export default function Onboarding() {
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain" />
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="h-11 w-auto object-contain"
+          />
         </div>
         <div className="flex items-center gap-4">
           {step <= 4 && <StepIndicator current={step} />}
@@ -1349,33 +1535,76 @@ export default function Onboarding() {
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
                         Address Line 1
                       </label>
-                      <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Building, street" className={inputClass} />
+                      <input
+                        type="text"
+                        value={addressLine1}
+                        onChange={(e) => setAddressLine1(e.target.value)}
+                        placeholder="Building, street"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
                         Address Line 2
                       </label>
-                      <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Area, landmark" className={inputClass} />
+                      <input
+                        type="text"
+                        value={addressLine2}
+                        onChange={(e) => setAddressLine2(e.target.value)}
+                        placeholder="Area, landmark"
+                        className={inputClass}
+                      />
                     </div>
                   </div>
 
                   {/* City, State, Pincode, Country */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">City</label>
-                      <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Mumbai" className={inputClass} />
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="Mumbai"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">State</label>
-                      <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="Maharashtra" className={inputClass} />
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        placeholder="Maharashtra"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Pincode</label>
-                      <input type="text" value={pincode} onChange={(e) => setPincode(e.target.value)} placeholder="400001" className={inputClass} />
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        Pincode
+                      </label>
+                      <input
+                        type="text"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
+                        placeholder="400001"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Country</label>
-                      <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} className={inputClass} />
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        className={inputClass}
+                      />
                     </div>
                   </div>
 
@@ -1386,22 +1615,47 @@ export default function Onboarding() {
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">
                       Contact Person <span className="text-red-400">*</span>
                     </label>
-                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Jane Smith" className={inputClass} />
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Jane Smith"
+                      className={inputClass}
+                    />
                   </div>
 
                   {/* Emails */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Company Email</label>
-                      <input type="email" value={companyEmail} onChange={(e) => setCompanyEmail(e.target.value)} placeholder="info@company.com" className={inputClass} />
-                      <p className="text-xs text-slate-400 mt-1">Public contact email for your business</p>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        Company Email
+                      </label>
+                      <input
+                        type="email"
+                        value={companyEmail}
+                        onChange={(e) => setCompanyEmail(e.target.value)}
+                        placeholder="info@company.com"
+                        className={inputClass}
+                      />
+                      <p className="text-xs text-slate-400 mt-1">
+                        Public contact email for your business
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
                         Login Email <span className="text-red-400">*</span>
                       </label>
-                      <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="you@email.com" disabled={!!user} className={`${inputClass} disabled:bg-slate-50 disabled:text-slate-500`} />
-                      <p className="text-xs text-slate-400 mt-1">Used to sign in to your account</p>
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        placeholder="you@email.com"
+                        disabled={!!user}
+                        className={`${inputClass} disabled:bg-slate-50 disabled:text-slate-500`}
+                      />
+                      <p className="text-xs text-slate-400 mt-1">
+                        Used to sign in to your account
+                      </p>
                     </div>
                   </div>
 
@@ -1411,18 +1665,40 @@ export default function Onboarding() {
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
                         Phone <span className="text-red-400">*</span>
                       </label>
-                      <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" className={inputClass} />
+                      <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">Mobile</label>
-                      <input type="text" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="+91 98765 43210" className={inputClass} />
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        Mobile
+                      </label>
+                      <input
+                        type="text"
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className={inputClass}
+                      />
                     </div>
                   </div>
 
                   {/* GST */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">GST number</label>
-                    <input type="text" value={gstNo} onChange={(e) => setGstNo(e.target.value)} placeholder="22AAAAA0000A1Z5" className={`${inputClass} sm:max-w-xs`} />
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                      GST number
+                    </label>
+                    <input
+                      type="text"
+                      value={gstNo}
+                      onChange={(e) => setGstNo(e.target.value)}
+                      placeholder="22AAAAA0000A1Z5"
+                      className={`${inputClass} sm:max-w-xs`}
+                    />
                   </div>
 
                   {/* Password (only if not logged in) */}
@@ -1441,8 +1717,16 @@ export default function Onboarding() {
                             placeholder="Min. 6 characters"
                             className={`${inputClass} pr-10`}
                           />
-                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1476,7 +1760,8 @@ export default function Onboarding() {
                 </div>
 
                 <p className="text-xs text-slate-400 mt-6">
-                  By continuing you agree to our Terms of Service and Privacy Policy.
+                  By continuing you agree to our Terms of Service and Privacy
+                  Policy.
                 </p>
               </div>
             </div>
@@ -1485,24 +1770,40 @@ export default function Onboarding() {
             <div className="hidden lg:flex lg:col-span-2 items-start">
               <div className="w-full rounded-lg bg-card border border-gray-200 p-6 min-h-[480px] flex flex-col justify-between dark:border-border">
                 <div>
-                  <div className="text-lg font-semibold text-gray-900 mb-1 dark:text-foreground">{PLATFORM_CONFIG.name}</div>
+                  <div className="text-lg font-semibold text-gray-900 mb-1 dark:text-foreground">
+                    {PLATFORM_CONFIG.name}
+                  </div>
                   <p className="text-gray-500 text-xs leading-relaxed">
-                    All-in-one business platform. Sales, inventory, HR, accounting — a single workspace.
+                    All-in-one business platform. Sales, inventory, HR,
+                    accounting — a single workspace.
                   </p>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { title: "Ready in seconds", desc: "Workspace provisioned instantly" },
-                    { title: "Multi-tenant secure", desc: "Your data is isolated and encrypted" },
-                    { title: "Install only what you need", desc: "Pay per app, scale as you grow" },
+                    {
+                      title: "Ready in seconds",
+                      desc: "Workspace provisioned instantly",
+                    },
+                    {
+                      title: "Multi-tenant secure",
+                      desc: "Your data is isolated and encrypted",
+                    },
+                    {
+                      title: "Install only what you need",
+                      desc: "Pay per app, scale as you grow",
+                    },
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-2.5">
                       <div className="w-5 h-5 rounded-full bg-success-100 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-3 h-3 text-success-700" />
                       </div>
                       <div>
-                        <div className="text-xs font-medium text-gray-800 dark:text-foreground">{item.title}</div>
-                        <div className="text-[11px] text-gray-500">{item.desc}</div>
+                        <div className="text-xs font-medium text-gray-800 dark:text-foreground">
+                          {item.title}
+                        </div>
+                        <div className="text-[11px] text-gray-500">
+                          {item.desc}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1535,7 +1836,8 @@ export default function Onboarding() {
 
               <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 mb-6">
                 <p className="text-sm text-blue-700">
-                  Click the link in your email to verify your account and continue setting up your workspace.
+                  Click the link in your email to verify your account and
+                  continue setting up your workspace.
                 </p>
               </div>
 
@@ -1554,7 +1856,8 @@ export default function Onboarding() {
                     </div>
                   </div>
                   <p className="text-xs text-amber-700 mb-2">
-                    You can verify directly using the link below while we look into the email setup:
+                    You can verify directly using the link below while we look
+                    into the email setup:
                   </p>
                   <a
                     href={pendingVerifyUrl}
@@ -1585,7 +1888,9 @@ export default function Onboarding() {
                   disabled={resendCooldown > 0}
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
                 >
-                  <RefreshCw className={`w-4 h-4 ${resendCooldown > 0 ? "" : "group-hover:rotate-180 transition-transform"}`} />
+                  <RefreshCw
+                    className={`w-4 h-4 ${resendCooldown > 0 ? "" : "group-hover:rotate-180 transition-transform"}`}
+                  />
                   {resendCooldown > 0
                     ? `Resend in ${resendCooldown}s`
                     : "Resend verification email"}
@@ -1611,174 +1916,203 @@ export default function Onboarding() {
       )}
 
       {/* ─── Step 3b: Template + custom domain picker (shown for modules with needsTemplate=true) ─── */}
-      {step === 3 && onTemplateModuleIdx !== null && currentTemplateModuleId && (() => {
-        const mod = PLATFORM_MODULES.find((m) => m.id === currentTemplateModuleId);
-        const cleanDomain = (currentTemplateChoice?.customDomain ?? "").trim();
-        const domainOk = isDomainValid(cleanDomain);
-        return (
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-32">
-            <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
-              <span>Step {onTemplateModuleIdx + 1} of {modulesNeedingTemplates.length}</span>
-              <span>·</span>
-              <span className="capitalize">{mod?.name || currentTemplateModuleId}</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-              <div>
-                <h1 className="text-2xl font-semibold text-slate-800 mb-1 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  Choose a template for {mod?.name || currentTemplateModuleId}
-                </h1>
-                <p className="text-sm text-slate-500">
-                  Pick a storefront design and enter the custom domain where it will live.
+      {step === 3 &&
+        onTemplateModuleIdx !== null &&
+        currentTemplateModuleId &&
+        (() => {
+          const mod = PLATFORM_MODULES.find(
+            (m) => m.id === currentTemplateModuleId,
+          );
+          const cleanDomain = (
+            currentTemplateChoice?.customDomain ?? ""
+          ).trim();
+          const domainOk = isDomainValid(cleanDomain);
+          return (
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-32">
+              <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
+                <span>
+                  Step {onTemplateModuleIdx + 1} of{" "}
+                  {modulesNeedingTemplates.length}
+                </span>
+                <span>·</span>
+                <span className="capitalize">
+                  {mod?.name || currentTemplateModuleId}
+                </span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div>
+                  <h1 className="text-2xl font-semibold text-slate-800 mb-1 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Choose a template for {mod?.name || currentTemplateModuleId}
+                  </h1>
+                  <p className="text-sm text-slate-500">
+                    Pick a storefront design and enter the custom domain where
+                    it will live.
+                  </p>
+                </div>
+              </div>
+
+              {/* Custom domain */}
+              <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 max-w-xl">
+                <label className="text-xs font-medium text-slate-700 inline-flex items-center gap-1.5 mb-1">
+                  <Globe2 className="w-3.5 h-3.5" /> Custom domain{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={cleanDomain}
+                  onChange={(e) =>
+                    setTemplateChoice(currentTemplateModuleId, {
+                      customDomain: e.target.value,
+                    })
+                  }
+                  placeholder="shop.yourcompany.com"
+                  className={inputClass}
+                  spellCheck={false}
+                  autoComplete="off"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Point this domain's DNS to our deployment server before
+                  launch. No http:// prefix.
                 </p>
+                {!domainOk && cleanDomain.length > 0 && (
+                  <p className="text-[11px] text-red-600 mt-1">
+                    Enter a valid domain like <code>shop.example.com</code>.
+                  </p>
+                )}
               </div>
-            </div>
 
-            {/* Custom domain */}
-            <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 max-w-xl">
-              <label className="text-xs font-medium text-slate-700 inline-flex items-center gap-1.5 mb-1">
-                <Globe2 className="w-3.5 h-3.5" /> Custom domain <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={cleanDomain}
-                onChange={(e) =>
-                  setTemplateChoice(currentTemplateModuleId, { customDomain: e.target.value })
-                }
-                placeholder="shop.yourcompany.com"
-                className={inputClass}
-                spellCheck={false}
-                autoComplete="off"
-              />
-              <p className="text-[11px] text-slate-400 mt-1">
-                Point this domain's DNS to our deployment server before launch. No http:// prefix.
-              </p>
-              {!domainOk && cleanDomain.length > 0 && (
-                <p className="text-[11px] text-red-600 mt-1">Enter a valid domain like <code>shop.example.com</code>.</p>
-              )}
-            </div>
-
-            {/* Template grid */}
-            {templatesLoading ? (
-              <div className="py-24 flex justify-center">
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              </div>
-            ) : availableTemplates.length === 0 ? (
-              <div className="py-12 text-center text-sm text-slate-500">
-                No templates available for this module yet. Contact support.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {availableTemplates.map((t) => {
-                  const selected = currentTemplateChoice?.templateId === t.id;
-                  return (
-                    <div
-                      key={t.id}
-                      className={`group bg-white rounded-xl border overflow-hidden transition-all ${
-                        selected
-                          ? "border-primary ring-2 ring-primary/30 shadow-md"
-                          : "border-slate-200 hover:border-slate-300 hover:shadow-md"
-                      }`}
-                    >
-                      {/* Thumbnail — clicking it previews */}
-                      <button
-                        type="button"
-                        onClick={() => setPreviewTemplate(t)}
-                        className="block w-full aspect-[16/10] bg-slate-100 relative overflow-hidden cursor-zoom-in"
-                        title="Preview template"
+              {/* Template grid */}
+              {templatesLoading ? (
+                <div className="py-24 flex justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                </div>
+              ) : availableTemplates.length === 0 ? (
+                <div className="py-12 text-center text-sm text-slate-500">
+                  No templates available for this module yet. Contact support.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {availableTemplates.map((t) => {
+                    const selected = currentTemplateChoice?.templateId === t.id;
+                    return (
+                      <div
+                        key={t.id}
+                        className={`group bg-white rounded-xl border overflow-hidden transition-all ${
+                          selected
+                            ? "border-primary ring-2 ring-primary/30 shadow-md"
+                            : "border-slate-200 hover:border-slate-300 hover:shadow-md"
+                        }`}
                       >
-                        {t.thumbnail_url ? (
-                          <img
-                            src={t.thumbnail_url}
-                            alt={t.name}
-                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-slate-300" />
+                        {/* Thumbnail — clicking it previews */}
+                        <button
+                          type="button"
+                          onClick={() => setPreviewTemplate(t)}
+                          className="block w-full aspect-[16/10] bg-slate-100 relative overflow-hidden cursor-zoom-in"
+                          title="Preview template"
+                        >
+                          {t.thumbnail_url ? (
+                            <img
+                              src={t.thumbnail_url}
+                              alt={t.name}
+                              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                              onError={(e) => {
+                                (
+                                  e.currentTarget as HTMLImageElement
+                                ).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Sparkles className="w-6 h-6 text-slate-300" />
+                            </div>
+                          )}
+                          {selected && (
+                            <div className="absolute top-2 right-2 h-7 px-2.5 rounded-full bg-primary text-white text-xs font-semibold inline-flex items-center gap-1 shadow-sm">
+                              <Check className="w-3 h-3" /> Selected
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
+                            <span className="h-7 px-2.5 rounded-full bg-white/95 text-slate-700 text-[11px] font-semibold inline-flex items-center gap-1 shadow-sm">
+                              <Eye className="w-3 h-3" /> Preview
+                            </span>
                           </div>
-                        )}
-                        {selected && (
-                          <div className="absolute top-2 right-2 h-7 px-2.5 rounded-full bg-primary text-white text-xs font-semibold inline-flex items-center gap-1 shadow-sm">
-                            <Check className="w-3 h-3" /> Selected
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors flex items-end justify-center pb-2 opacity-0 group-hover:opacity-100">
-                          <span className="h-7 px-2.5 rounded-full bg-white/95 text-slate-700 text-[11px] font-semibold inline-flex items-center gap-1 shadow-sm">
-                            <Eye className="w-3 h-3" /> Preview
-                          </span>
-                        </div>
-                      </button>
+                        </button>
 
-                      <div className="p-3 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-sm font-semibold text-slate-800">{t.name}</h3>
-                        </div>
-                        {t.description && (
-                          <p className="text-xs text-slate-500 leading-snug line-clamp-2">{t.description}</p>
-                        )}
-                        <div className="flex items-center gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => setPreviewTemplate(t)}
-                            className="flex-1 h-8 px-3 text-xs font-medium rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-1.5"
-                          >
-                            <Eye className="w-3.5 h-3.5" /> Preview
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setTemplateChoice(currentTemplateModuleId, { templateId: t.id })
-                            }
-                            className={`flex-1 h-8 px-3 text-xs font-semibold rounded-md transition inline-flex items-center justify-center gap-1.5 ${
-                              selected
-                                ? "bg-primary/10 text-primary border border-primary/30"
-                                : "bg-blue-600 hover:bg-blue-700 text-white"
-                            }`}
-                          >
-                            {selected ? (
-                              <><Check className="w-3.5 h-3.5" /> Selected</>
-                            ) : (
-                              "Select"
-                            )}
-                          </button>
+                        <div className="p-3 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-sm font-semibold text-slate-800">
+                              {t.name}
+                            </h3>
+                          </div>
+                          {t.description && (
+                            <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+                              {t.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewTemplate(t)}
+                              className="flex-1 h-8 px-3 text-xs font-medium rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 transition inline-flex items-center justify-center gap-1.5"
+                            >
+                              <Eye className="w-3.5 h-3.5" /> Preview
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setTemplateChoice(currentTemplateModuleId, {
+                                  templateId: t.id,
+                                })
+                              }
+                              className={`flex-1 h-8 px-3 text-xs font-semibold rounded-md transition inline-flex items-center justify-center gap-1.5 ${
+                                selected
+                                  ? "bg-primary/10 text-primary border border-primary/30"
+                                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                              }`}
+                            >
+                              {selected ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5" /> Selected
+                                </>
+                              ) : (
+                                "Select"
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
+              )}
 
-            {/* Bottom bar */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 z-50">
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-                <button
-                  onClick={handleTemplateStepBack}
-                  className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-50 transition flex items-center gap-2"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-                <button
-                  onClick={handleTemplateStepNext}
-                  disabled={!currentTemplateChoice?.templateId || !domainOk}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition flex items-center gap-2"
-                >
-                  {onTemplateModuleIdx + 1 < modulesNeedingTemplates.length
-                    ? "Next module"
-                    : hasNonFreeApps
-                      ? "Continue to payment"
-                      : "Continue"}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+              {/* Bottom bar */}
+              <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 z-50">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+                  <button
+                    onClick={handleTemplateStepBack}
+                    className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-50 transition flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button
+                    onClick={handleTemplateStepNext}
+                    disabled={!currentTemplateChoice?.templateId || !domainOk}
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition flex items-center gap-2"
+                  >
+                    {onTemplateModuleIdx + 1 < modulesNeedingTemplates.length
+                      ? "Next module"
+                      : hasNonFreeApps
+                        ? "Continue to payment"
+                        : "Continue"}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* ─── Step 3: App Store ────────────────────────────────── */}
       {step === 3 && onTemplateModuleIdx === null && (
@@ -1802,27 +2136,119 @@ export default function Onboarding() {
                 className="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-300 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
           </div>
 
+          {/* Plan bundle banner (from pricing page plan CTA) */}
+          {selectedPlan && (
+            <div className="mb-5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl px-5 py-4">
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-xs font-bold uppercase tracking-widest text-blue-600">
+                      Selected Plan
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {selectedPlan.name}
+                    <span className="ml-2 text-sm font-normal text-slate-500">
+                      — ₹{selectedPlan.price_monthly.toLocaleString("en-IN")}/mo
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {selectedPlan.modules_included.length} apps auto-selected · you can still add or remove individual apps below
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedPlan(null);
+                    setSelectedModules([]);
+                    planLoadedRef.current = false;
+                    searchParams.delete("plan_id");
+                    setSearchParams(searchParams, { replace: true });
+                  }}
+                  className="text-slate-400 hover:text-slate-600 shrink-0 mt-0.5"
+                  title="Clear plan selection"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedPlan.modules_included.map((slug) => {
+                  const mod = PLATFORM_MODULES.find((m) => m.id === slug);
+                  if (!mod) return null;
+                  return (
+                    <span
+                      key={slug}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium bg-white border border-blue-200 text-slate-700 px-2.5 py-1 rounded-full"
+                    >
+                      <span>{mod.icon}</span>
+                      {mod.name}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Single-app pre-selection banner (from pricing page individual app CTA) */}
+          {!selectedPlan && (() => {
+            const appSlug = searchParams.get("app");
+            if (!appSlug) return null;
+            const preselected = PLATFORM_MODULES.find((m) => m.id === appSlug);
+            if (!preselected) return null;
+            return (
+              <div className="mb-5 flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base bg-gradient-to-br from-blue-500 to-blue-700 shrink-0">
+                  {preselected.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-blue-900">{preselected.name} is ready to install</p>
+                  <p className="text-xs text-blue-600">Pre-selected from the pricing page — you can add more apps below.</p>
+                </div>
+                <span className="flex items-center gap-1 text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded-full shrink-0">
+                  <Check className="w-3 h-3" /> Selected
+                </span>
+              </div>
+            );
+          })()}
+
           {/* Core module notice */}
           <div className="mb-6 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm bg-gradient-to-br from-slate-700 to-slate-900">🗄️</div>
-            <div className="flex-1">
-              <span className="text-sm font-medium text-slate-700">Master Data Hub</span>
-              <span className="text-sm text-slate-500 ml-2">— always included with every workspace</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm bg-gradient-to-br from-slate-700 to-slate-900">
+              🗄️
             </div>
-            <span className="text-xs font-medium text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">Included</span>
+            <div className="flex-1">
+              <span className="text-sm font-medium text-slate-700">
+                Master Data Hub
+              </span>
+              <span className="text-sm text-slate-500 ml-2">
+                — always included with every workspace
+              </span>
+            </div>
+            <span className="text-xs font-medium text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">
+              Included
+            </span>
           </div>
 
           {/* Module grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredModules.map((mod) => (
-              <ModuleCard key={mod.id} mod={mod} selected={selectedModules.includes(mod.id)} onInstall={() => toggleModule(mod.id)} onRemove={() => toggleModule(mod.id)} onViewDetails={() => setDetailModule(mod)} />
+              <ModuleCard
+                key={mod.id}
+                mod={mod}
+                selected={selectedModules.includes(mod.id)}
+                onInstall={() => toggleModule(mod.id)}
+                onRemove={() => toggleModule(mod.id)}
+                onViewDetails={() => setDetailModule(mod)}
+              />
             ))}
           </div>
 
@@ -1831,15 +2257,21 @@ export default function Onboarding() {
             <AppDetailPanel
               mod={detailModule}
               selected={selectedModules.includes(detailModule.id)}
-              onInstall={() => { toggleModule(detailModule.id); }}
-              onRemove={() => { toggleModule(detailModule.id); }}
+              onInstall={() => {
+                toggleModule(detailModule.id);
+              }}
+              onRemove={() => {
+                toggleModule(detailModule.id);
+              }}
               onClose={() => setDetailModule(null)}
             />
           )}
 
           {filteredModules.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-sm text-slate-500">No apps match your search.</p>
+              <p className="text-sm text-slate-500">
+                No apps match your search.
+              </p>
             </div>
           )}
 
@@ -1847,7 +2279,10 @@ export default function Onboarding() {
           <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 z-50">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
               <button
-                onClick={() => { setStep(user ? 1 : 2); setError(""); }}
+                onClick={() => {
+                  setStep(user ? 1 : 2);
+                  setError("");
+                }}
                 className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-50 transition flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
@@ -1855,16 +2290,27 @@ export default function Onboarding() {
 
               <div className="hidden sm:flex items-center gap-4 text-sm text-slate-600">
                 <span>
-                  Selected: <span className="font-semibold text-slate-800">{selectedModules.length} app{selectedModules.length !== 1 ? "s" : ""}</span>
+                  Selected:{" "}
+                  <span className="font-semibold text-slate-800">
+                    {selectedModules.length} app
+                    {selectedModules.length !== 1 ? "s" : ""}
+                  </span>
                 </span>
                 <span className="text-slate-300">|</span>
                 <span>
-                  Monthly: <span className="font-semibold text-blue-600">{monthlyTotal === 0 ? "Free" : `₹${monthlyTotal.toLocaleString("en-IN")}/mo`}</span>
+                  Monthly:{" "}
+                  <span className="font-semibold text-blue-600">
+                    {monthlyTotal === 0
+                      ? "Free"
+                      : `₹${monthlyTotal.toLocaleString("en-IN")}/mo`}
+                  </span>
                 </span>
                 {hasNonFreeApps && (
                   <>
                     <span className="text-slate-300">|</span>
-                    <span className="text-xs text-slate-400">14-day free trial</span>
+                    <span className="text-xs text-slate-400">
+                      14-day free trial
+                    </span>
                   </>
                 )}
               </div>
@@ -1885,8 +2331,12 @@ export default function Onboarding() {
       {/* ─── Step 4: Choose Trial or Go Live ────────────────── */}
       {step === 4 && (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
-          <h1 className="text-2xl font-semibold text-slate-800 mb-1">How would you like to start?</h1>
-          <p className="text-sm text-slate-500 mb-8">Choose your launch mode. You can upgrade anytime.</p>
+          <h1 className="text-2xl font-semibold text-slate-800 mb-1">
+            How would you like to start?
+          </h1>
+          <p className="text-sm text-slate-500 mb-8">
+            Choose your launch mode. You can upgrade anytime.
+          </p>
 
           <div className="grid sm:grid-cols-2 gap-4 mb-8">
             <button
@@ -1905,9 +2355,15 @@ export default function Onboarding() {
                   </span>
                 )}
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-1">Start Free Trial</h3>
-              <p className="text-sm text-slate-500 mb-3">Try all selected apps free for 14 days. No payment required now.</p>
-              <div className="bg-emerald-50 text-emerald-700 text-xs font-medium px-3 py-1.5 rounded-md inline-block">14 days free — No credit card needed</div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                Start Free Trial
+              </h3>
+              <p className="text-sm text-slate-500 mb-3">
+                Try all selected apps free for 14 days. No payment required now.
+              </p>
+              <div className="bg-emerald-50 text-emerald-700 text-xs font-medium px-3 py-1.5 rounded-md inline-block">
+                14 days free — No credit card needed
+              </div>
             </button>
 
             <button
@@ -1926,37 +2382,59 @@ export default function Onboarding() {
                   </span>
                 )}
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-1">Go Live Now</h3>
-              <p className="text-sm text-slate-500 mb-3">Pay now and activate all apps immediately with full features.</p>
-              <div className="bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-md inline-block">₹{monthlyTotal.toLocaleString("en-IN")}/month — Instant activation</div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                Go Live Now
+              </h3>
+              <p className="text-sm text-slate-500 mb-3">
+                Pay now and activate all apps immediately with full features.
+              </p>
+              <div className="bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-md inline-block">
+                ₹{monthlyTotal.toLocaleString("en-IN")}/month — Instant
+                activation
+              </div>
             </button>
           </div>
 
           {/* Order summary */}
           <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-6">
             <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
-              <h3 className="text-sm font-semibold text-slate-700">Selected Apps</h3>
+              <h3 className="text-sm font-semibold text-slate-700">
+                Selected Apps
+              </h3>
             </div>
             <table className="w-full text-sm">
               <tbody>
                 <tr className="border-b border-slate-100">
                   <td className="px-4 py-2.5 text-slate-600 flex items-center gap-2">
-                    <span className="w-6 h-6 rounded flex items-center justify-center text-[10px] bg-gradient-to-br from-slate-700 to-slate-900">🗄️</span>
+                    <span className="w-6 h-6 rounded flex items-center justify-center text-[10px] bg-gradient-to-br from-slate-700 to-slate-900">
+                      🗄️
+                    </span>
                     Masters
                   </td>
-                  <td className="px-4 py-2.5 text-right text-slate-400 text-xs">Included</td>
+                  <td className="px-4 py-2.5 text-right text-slate-400 text-xs">
+                    Included
+                  </td>
                 </tr>
                 {selectedModules.map((id) => {
                   const mod = PLATFORM_MODULES.find((m) => m.id === id);
                   if (!mod) return null;
                   return (
-                    <tr key={id} className="border-b border-slate-100 last:border-0">
+                    <tr
+                      key={id}
+                      className="border-b border-slate-100 last:border-0"
+                    >
                       <td className="px-4 py-2.5 text-slate-600 flex items-center gap-2">
-                        <span className={`w-6 h-6 rounded flex items-center justify-center text-[10px] bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo}`}>{mod.icon}</span>
+                        <span
+                          className={`w-6 h-6 rounded flex items-center justify-center text-[10px] bg-gradient-to-br ${mod.colorFrom} ${mod.colorTo}`}
+                        >
+                          {mod.icon}
+                        </span>
                         {mod.name}
                       </td>
                       <td className="px-4 py-2.5 text-right text-slate-700 text-xs">
-                        {mod.isFree ? "Free" : `₹${mod.priceMonthly.toLocaleString("en-IN")}/mo`}
+                        {mod.isFree
+                          ? "Free"
+                          : `₹${mod.priceMonthly.toLocaleString("en-IN")}/mo`}
                       </td>
                     </tr>
                   );
@@ -1964,8 +2442,12 @@ export default function Onboarding() {
               </tbody>
               <tfoot>
                 <tr className="bg-slate-50 border-t border-slate-200">
-                  <td className="px-4 py-3 font-semibold text-slate-800 text-sm">Monthly Total</td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-800 text-sm">₹{monthlyTotal.toLocaleString("en-IN")}/mo</td>
+                  <td className="px-4 py-3 font-semibold text-slate-800 text-sm">
+                    Monthly Total
+                  </td>
+                  <td className="px-4 py-3 text-right font-semibold text-slate-800 text-sm">
+                    ₹{monthlyTotal.toLocaleString("en-IN")}/mo
+                  </td>
                 </tr>
               </tfoot>
             </table>
@@ -1973,18 +2455,27 @@ export default function Onboarding() {
 
           {launchMode === "live" && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
-              <h3 className="text-sm font-semibold text-amber-800 mb-2">Payment Required</h3>
+              <h3 className="text-sm font-semibold text-amber-800 mb-2">
+                Payment Required
+              </h3>
               <p className="text-sm text-amber-700 mb-2">
-                You will be charged {platformSettings?.currency_symbol || "₹"}{monthlyTotal.toLocaleString("en-IN")} now for the first month.
+                You will be charged {platformSettings?.currency_symbol || "₹"}
+                {monthlyTotal.toLocaleString("en-IN")} now for the first month.
               </p>
               {platformSettings?.razorpay_key_id ? (
                 <div className="bg-white border border-amber-200 rounded-lg p-4 flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-blue-600 shrink-0" />
-                  <p className="text-xs text-slate-600 font-medium">Secure payment via Razorpay. You'll be redirected to complete the payment when you click "Pay & Launch".</p>
+                  <p className="text-xs text-slate-600 font-medium">
+                    Secure payment via Razorpay. You'll be redirected to
+                    complete the payment when you click "Pay & Launch".
+                  </p>
                 </div>
               ) : (
                 <div className="bg-white border border-amber-200 rounded-lg p-4">
-                  <p className="text-xs text-slate-500 font-medium">Payment gateway is not configured. Please contact the administrator or start with a free trial.</p>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Payment gateway is not configured. Please contact the
+                    administrator or start with a free trial.
+                  </p>
                 </div>
               )}
             </div>
@@ -1993,9 +2484,12 @@ export default function Onboarding() {
           {launchMode === "trial" && (
             <div className="bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 mb-6 space-y-1">
               <p className="text-sm text-blue-800">
-                Your 14-day free trial starts today. No charges until <span className="font-semibold">{getTrialEndDate()}</span>.
+                Your 14-day free trial starts today. No charges until{" "}
+                <span className="font-semibold">{getTrialEndDate()}</span>.
               </p>
-              <p className="text-xs text-blue-600">You can upgrade to a paid plan anytime from Settings.</p>
+              <p className="text-xs text-blue-600">
+                You can upgrade to a paid plan anytime from Settings.
+              </p>
             </div>
           )}
 
@@ -2018,7 +2512,11 @@ export default function Onboarding() {
                 </>
               ) : (
                 <>
-                  {launchMode === "live" ? "Pay & Launch" : launchMode === "trial" ? "Start Free Trial" : "Select an option above"}
+                  {launchMode === "live"
+                    ? "Pay & Launch"
+                    : launchMode === "trial"
+                      ? "Start Free Trial"
+                      : "Select an option above"}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -2035,8 +2533,12 @@ export default function Onboarding() {
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
                 <div className="mb-8">
                   <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4" />
-                  <h2 className="text-2xl font-semibold text-slate-800 mb-1">Setting things up</h2>
-                  <p className="text-sm text-slate-500">This will only take a moment.</p>
+                  <h2 className="text-2xl font-semibold text-slate-800 mb-1">
+                    Setting things up
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    This will only take a moment.
+                  </p>
                 </div>
                 <div className="space-y-3 text-left">
                   {SETUP_MESSAGES.map((msg, i) => {
@@ -2046,7 +2548,11 @@ export default function Onboarding() {
                       <div
                         key={i}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-300 ${
-                          done ? "bg-emerald-50" : active ? "bg-blue-50" : "bg-slate-50"
+                          done
+                            ? "bg-emerald-50"
+                            : active
+                              ? "bg-blue-50"
+                              : "bg-slate-50"
                         }`}
                       >
                         {done ? (
@@ -2058,7 +2564,9 @@ export default function Onboarding() {
                         ) : (
                           <div className="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0" />
                         )}
-                        <span className={`text-sm ${done ? "text-emerald-700" : active ? "text-blue-700 font-medium" : "text-slate-400"}`}>
+                        <span
+                          className={`text-sm ${done ? "text-emerald-700" : active ? "text-blue-700 font-medium" : "text-slate-400"}`}
+                        >
                           {msg}
                         </span>
                       </div>
@@ -2071,9 +2579,14 @@ export default function Onboarding() {
                 <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5">
                   <Check className="w-7 h-7 text-emerald-600" />
                 </div>
-                <h2 className="text-2xl font-semibold text-slate-800 mb-1">You're all set</h2>
+                <h2 className="text-2xl font-semibold text-slate-800 mb-1">
+                  You're all set
+                </h2>
                 <p className="text-sm text-slate-500 mb-8">
-                  <span className="font-medium text-slate-700">{createdCompanyName}</span> is ready to go.
+                  <span className="font-medium text-slate-700">
+                    {createdCompanyName}
+                  </span>{" "}
+                  is ready to go.
                 </p>
                 <button
                   onClick={() => navigate(firstRoute, { replace: true })}
@@ -2110,7 +2623,9 @@ export default function Onboarding() {
                 <h3 className="text-sm font-semibold text-slate-800 truncate inline-flex items-center gap-2">
                   <Eye className="w-4 h-4 text-primary" />
                   {previewTemplate.name}
-                  <span className="text-[11px] font-normal text-slate-400">· preview</span>
+                  <span className="text-[11px] font-normal text-slate-400">
+                    · preview
+                  </span>
                 </h3>
               </div>
               <a
@@ -2126,7 +2641,9 @@ export default function Onboarding() {
                 <button
                   type="button"
                   onClick={() => {
-                    setTemplateChoice(currentTemplateModuleId, { templateId: previewTemplate.id });
+                    setTemplateChoice(currentTemplateModuleId, {
+                      templateId: previewTemplate.id,
+                    });
                     setPreviewTemplate(null);
                   }}
                   className="h-8 px-3 text-xs font-semibold rounded-md bg-blue-600 hover:bg-blue-700 text-white transition inline-flex items-center gap-1.5"
@@ -2154,18 +2671,26 @@ export default function Onboarding() {
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                   loading="eager"
                   onError={() => {
-                    console.warn("Template preview iframe failed:", previewTemplate.entry_path);
+                    console.warn(
+                      "Template preview iframe failed:",
+                      previewTemplate.entry_path,
+                    );
                   }}
                 />
               ) : (
                 <div className="h-full flex items-center justify-center text-center p-6">
                   <div className="max-w-md space-y-2">
-                    <p className="text-sm font-semibold text-slate-800">Preview unavailable</p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      Preview unavailable
+                    </p>
                     <p className="text-xs text-slate-500">
-                      This template has no <code>entry_path</code> set in the database. Seed
-                      <code className="mx-1">database/create_storefront_templates.sql</code>
-                      (and optionally <code>seed_more_templates.sql</code>) against your Supabase
-                      project so the preview can load.
+                      This template has no <code>entry_path</code> set in the
+                      database. Seed
+                      <code className="mx-1">
+                        database/create_storefront_templates.sql
+                      </code>
+                      (and optionally <code>seed_more_templates.sql</code>)
+                      against your Supabase project so the preview can load.
                     </p>
                   </div>
                 </div>

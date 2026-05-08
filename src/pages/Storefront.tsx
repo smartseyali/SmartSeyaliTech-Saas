@@ -22,10 +22,10 @@ type ResolvedTenant = {
     analyticsConfig: AnalyticsConfig;
 };
 
-const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || "";
-const ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "";
-const PLATFORM_HOST = (import.meta.env.VITE_PLATFORM_HOST as string) || "localhost";
-const PLATFORM_BASE_DOMAIN = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "";
+const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL as string) || "";
+const ANON_KEY = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string) || "";
+const PLATFORM_HOST = (process.env.NEXT_PUBLIC_PLATFORM_HOST as string) || "localhost";
+const PLATFORM_BASE_DOMAIN = (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "";
 
 /**
  * Public storefront renderer — resolves tenant from hostname only.

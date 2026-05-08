@@ -25,6 +25,8 @@ const DomainHosting = lazy(() => import("@/pages/modules/ecommerce/DomainHosting
 const Customers = lazy(() => import("@/pages/modules/ecommerce/Customers"));
 const OrderTracking = lazy(() => import("@/pages/modules/ecommerce/OrderTracking"));
 const EcomOnboarding = lazy(() => import("@/pages/modules/ecommerce/Onboarding"));
+const GiftCards = lazy(() => import("@/pages/modules/ecommerce/GiftCards"));
+const InventoryAdmin = lazy(() => import("@/pages/modules/ecommerce/Inventory"));
 
 /** Admin routes rendered inside AppLayout with ProtectedRoute */
 export const ecomAdminRoutes = [
@@ -35,6 +37,7 @@ export const ecomAdminRoutes = [
     { path: "/apps/ecommerce/orders/:id", element: <EcomOrderDetail /> },
     { path: "/apps/ecommerce/customers", element: <Customers /> },
     { path: "/apps/ecommerce/coupons", element: <Coupons /> },
+    { path: "/apps/ecommerce/gift-cards", element: <GiftCards /> },
     { path: "/apps/ecommerce/offers", element: <Offers /> },
     { path: "/apps/ecommerce/refunds", element: <Refunds /> },
     { path: "/apps/ecommerce/payment-gateways", element: <PaymentGateways /> },
@@ -53,4 +56,5 @@ export const ecomAdminRoutes = [
     { path: "/apps/ecommerce/track", element: <OrderTracking /> },
     { path: "/apps/ecommerce/track/:orderNumber", element: <OrderTracking /> },
     { path: "/apps/ecommerce/onboarding", element: <EcomOnboarding /> },
+    { path: "/apps/ecommerce/inventory", element: <InventoryAdmin /> },
 ];

@@ -24,6 +24,7 @@ interface PrintFormat {
   margin_bottom: number;
   margin_left: number;
   margin_right: number;
+  is_default?: boolean;
 }
 
 interface PrintPreviewProps {

@@ -122,9 +122,9 @@ export default function VerifyEmailPending() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
             {/* Header */}
             <header className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
-                <Link to="/" className="flex items-center gap-2">
+                <a href="/" className="flex items-center gap-2">
                     <img src="/logo.png" alt="Logo" className="h-28 w-auto object-contain" />
-                </Link>
+                </a>
                 <button
                     onClick={handleLogout}
                     className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"

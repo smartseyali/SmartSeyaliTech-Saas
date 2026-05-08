@@ -13,7 +13,7 @@ import {
   Clock, Layers, ListTree, Ruler, DollarSign, Percent, Share2,
   Landmark, BookOpen, PieChart, ArrowLeftRight, Receipt, TrendingUp,
   UserPlus, Award, Palette, CalendarDays, Languages, GraduationCap,
-  FileText, Bot, MessageCircle, Megaphone, Mail, Eye,
+  FileText, Bot, MessageCircle, Megaphone, Mail, Eye, LifeBuoy,
 } from "lucide-react";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
@@ -53,6 +53,7 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
       icon: ShoppingBag,
       items: [
         { title: "E-comm Orders", url: "/apps/ecommerce/orders", icon: EcomCart, resource: "orders" },
+        { title: "Inventory", url: "/apps/ecommerce/inventory", icon: Boxes, resource: "products" },
         { title: "Customers", url: "/apps/ecommerce/customers", icon: Users, resource: "orders" },
         { title: "Delivery Challans", url: "/apps/ecommerce/deliveries", icon: Truck, resource: "orders" },
         { title: "Sales Returns", url: "/apps/ecommerce/refunds", icon: RotateCcw, resource: "orders" },
@@ -321,6 +322,13 @@ export const MODULE_NAV: Record<string, NavGroup[]> = {
 /* ── Core Navigation (always visible) ──────────────────────────────────────── */
 
 export const CORE_NAV: NavGroup[] = [
+  {
+    label: "Support",
+    icon: LifeBuoy,
+    items: [
+      { title: "Support & Help", url: "/apps/support", icon: LifeBuoy, resource: "support" },
+    ],
+  },
   {
     label: "Master Data",
     module: "masters",

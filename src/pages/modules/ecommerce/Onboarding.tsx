@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const PLATFORM_BASE_DOMAIN =
-    (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
+    (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
 
 function slugify(s: string) {
     return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");

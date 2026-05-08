@@ -10,6 +10,7 @@ export type FieldType =
   | "number"
   | "date"
   | "select"
+  | "multiselect"
   | "checkbox"
   | "datetime-local"
   | "textarea"

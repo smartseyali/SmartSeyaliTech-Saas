@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
     ArrowLeft, Package, Truck, CheckCircle2, Clock, XCircle,
     RotateCcw, Printer, ShoppingBag, RefreshCw,
-    Ban, Undo2, AlertTriangle, CreditCard
+    Ban, Undo2, AlertTriangle, CreditCard, Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,7 @@ export default function EcomOrderDetail() {
     const [refundType, setRefundType] = useState<"full" | "partial">("full");
     const [refundMethod, setRefundMethod] = useState("original_payment");
     const [refundNote, setRefundNote] = useState("");
+    const [creatingShipment, setCreatingShipment] = useState(false);
 
     useEffect(() => { if (id && activeCompany) load(); }, [id, activeCompany?.id]);
 
@@ -205,6 +206,30 @@ export default function EcomOrderDetail() {
         load();
     };
 
+    const createShipment = async () => {
+        if (!order || !activeCompany) return;
+        setCreatingShipment(true);
+        try {
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+            const res = await fetch(`${supabaseUrl}/functions/v1/create-shipment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''}`,
+                },
+                body: JSON.stringify({ order_id: order.id, company_id: activeCompany.id }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Shipment creation failed");
+            toast({ title: `Shipment created! AWB: ${data.awb || "—"}` });
+            load();
+        } catch (err: any) {
+            toast({ variant: "destructive", title: "Shipment Error", description: err.message });
+        } finally {
+            setCreatingShipment(false);
+        }
+    };
+
     const fmt = (n: number) => `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 
     if (loading) return (
@@ -307,6 +332,12 @@ export default function EcomOrderDetail() {
             {hasActiveReturn && (
                 <Button className="h-9 px-4 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs tracking-widest gap-2" onClick={advanceReturnStatus} disabled={updating}>
                     Return → {RETURN_LABELS[order.return_status]}
+                </Button>
+            )}
+            {["confirmed", "packed"].includes(order.status) && !order.tracking_number && !isCancelled && (
+                <Button className="h-9 px-4 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs tracking-widest gap-2" onClick={createShipment} disabled={creatingShipment}>
+                    <Send className="w-3.5 h-3.5" />
+                    {creatingShipment ? "Creating..." : "Create Shipment"}
                 </Button>
             )}
             {nextStatus && !isCancelled && !hasActiveReturn && (

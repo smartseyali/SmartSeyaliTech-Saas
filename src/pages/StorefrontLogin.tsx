@@ -36,8 +36,8 @@ export default function StorefrontLogin() {
         const loadCompany = async () => {
             // 1. Hostname-based resolution (subdomain routing)
             const hostname = window.location.hostname;
-            const platformHost = (import.meta.env.VITE_PLATFORM_HOST as string) || "localhost";
-            const baseDomain = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "";
+            const platformHost = (process.env.NEXT_PUBLIC_PLATFORM_HOST as string) || "localhost";
+            const baseDomain = (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "";
             if (hostname !== platformHost && hostname !== "localhost" && baseDomain && hostname.endsWith(`.${baseDomain}`)) {
                 const sub = hostname.slice(0, -(baseDomain.length + 1));
                 const { data } = await supabase.from("companies").select("id, name").eq("subdomain", sub).maybeSingle();

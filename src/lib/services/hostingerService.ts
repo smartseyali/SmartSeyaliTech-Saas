@@ -7,7 +7,7 @@
 
 import { supabase } from "@/lib/supabase";
 
-const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/hostinger-proxy`;
+const EDGE_FN_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/hostinger-proxy`;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -198,7 +198,7 @@ export interface SubdomainResult {
 }
 
 const PLATFORM_BASE_DOMAIN =
-    (typeof import.meta !== "undefined" && (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string)) ||
+    (typeof import.meta !== "undefined" && (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string)) ||
     "smartseyali.com";
 
 /**

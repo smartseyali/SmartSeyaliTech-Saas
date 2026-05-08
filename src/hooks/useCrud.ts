@@ -102,11 +102,17 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
         if (error) {
             toast({ variant: "destructive", title: "Create Error", description: error.message });
             throw error;
-        } else {
-            toast({ title: "Created successfully" });
-            setData(prev => [result[0], ...prev]);
-            return result[0];
         }
+
+        if (!result || result.length === 0) {
+            const msg = "Record was not created — you may not have permission.";
+            toast({ variant: "destructive", title: "Create Failed", description: msg });
+            throw new Error(msg);
+        }
+
+        toast({ title: "Created successfully" });
+        setData(prev => [result[0], ...prev]);
+        return result[0];
     };
 
     const updateItem = async (id: number | string, payload: any) => {
@@ -114,13 +120,13 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
 
         const cleanedPayload = cleanPayload(payload);
 
-        const query = supabase
+        let query = supabase
             .from(tableName)
             .update(cleanedPayload)
             .eq("id", id);
 
         if (activeCompany && !options.isGlobal) {
-            query.eq("company_id", activeCompany.id);
+            query = query.eq("company_id", activeCompany.id);
         }
 
         const { data: result, error } = await query.select();
@@ -128,11 +134,17 @@ export function useCrud(tableName: string, selectQuery: string = "*", options: {
         if (error) {
             toast({ variant: "destructive", title: "Update Error", description: error.message });
             throw error;
-        } else {
-            toast({ title: "Updated successfully" });
-            setData(prev => prev.map(item => item.id === id ? result[0] : item));
-            return result[0];
         }
+
+        if (!result || result.length === 0) {
+            const msg = "No rows updated — you may not have permission to edit this record.";
+            toast({ variant: "destructive", title: "Update Failed", description: msg });
+            throw new Error(msg);
+        }
+
+        toast({ title: "Updated successfully" });
+        setData(prev => prev.map(item => item.id === id ? result[0] : item));
+        return result[0];
     };
 
     const deleteItem = async (id: number | string) => {

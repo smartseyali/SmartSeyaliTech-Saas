@@ -117,7 +117,7 @@ export default function DomainHosting() {
     useEffect(() => {
         if (!activeCompany) return;
         setLoading(true);
-        const baseDomain = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
+        const baseDomain = (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
         const subdomain = (activeCompany as any).subdomain || String(activeCompany.id);
         Promise.all([
             listCompanyDomains(activeCompany.id),

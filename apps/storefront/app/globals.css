@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Tenant theme injected at build time via inline style on <html> */
+    --brand: #1a472a;
+    --brand-dark: #0f2e1c;
+    --accent: #ff8e1a;
+
+    --background: 60 20% 99%;
+    --foreground: 150 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 150 30% 12%;
+
+    --primary: 145 47% 19%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 60 15% 96%;
+    --secondary-foreground: 150 30% 12%;
+
+    --muted: 60 15% 96%;
+    --muted-foreground: 150 8% 40%;
+
+    --destructive: 0 73% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 60 12% 90%;
+    --input: 60 12% 90%;
+    --ring: 145 47% 19%;
+
+    --radius: 10px;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html, body {
+    @apply bg-background text-foreground;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .container-tight {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}

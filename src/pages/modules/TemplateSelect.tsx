@@ -128,7 +128,7 @@ function TemplateSelectInner() {
 
     const handlePreview = (template: StorefrontTemplate) => {
         const subdomain = (activeCompany as any)?.subdomain as string | undefined;
-        const baseDomain = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "";
+        const baseDomain = (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "";
         if (subdomain && baseDomain) {
             window.open(
                 `https://${subdomain}.${baseDomain}?preview_template=${encodeURIComponent(template.slug)}`,

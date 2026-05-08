@@ -94,10 +94,10 @@ export default function DocForm({
       ...((tabFields as any)?.custom || []),
       ...(itemFields || []),
     ];
-    const lookupsNeeded = allFields.filter((f) => f.type === "select" && f.lookupTable);
+    const lookupsNeeded = allFields.filter((f) => (f.type === "select" || f.type === "multiselect") && f.lookupTable);
 
     const fetchLookups = async () => {
-      const globalTables = new Set(["system_modules", "subscription_plans", "users", "companies"]);
+      const globalTables = new Set(["system_modules", "pricing_plans", "users", "companies"]);
       for (const field of lookupsNeeded) {
         try {
           let query = db
@@ -263,6 +263,43 @@ export default function DocForm({
       );
     }
 
+    if (field.type === "multiselect") {
+      const opts = field.lookupTable
+        ? (lookupData[field.key] || []).map((d: any) => ({
+            label: d[field.lookupLabel || "name"],
+            value: String(d[field.lookupValue || "id"]),
+          }))
+        : (field.options || []).map((o) => ({ label: o.label, value: String(o.value) }));
+
+      const selected: string[] = Array.isArray(value) ? value.map(String) : [];
+
+      const toggle = (val: string) => {
+        const next = selected.includes(val)
+          ? selected.filter((v) => v !== val)
+          : [...selected, val];
+        onChange(next);
+      };
+
+      return (
+        <div className="border border-gray-200 dark:border-border rounded-lg p-3 grid grid-cols-2 sm:grid-cols-3 gap-y-2 gap-x-4 max-h-48 overflow-y-auto">
+          {opts.length === 0 && (
+            <span className="col-span-3 text-xs text-gray-400">Loading modules…</span>
+          )}
+          {opts.map((opt) => (
+            <label key={opt.value} className="flex items-center gap-2 cursor-pointer text-sm text-slate-700 dark:text-foreground hover:text-slate-900 select-none">
+              <input
+                type="checkbox"
+                checked={selected.includes(opt.value)}
+                onChange={() => toggle(opt.value)}
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 shrink-0"
+              />
+              <span className="truncate">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      );
+    }
+
     if (field.type === "select") {
       const options = field.lookupTable
         ? (lookupData[field.key] || []).map((d) => ({
@@ -368,7 +405,7 @@ export default function DocForm({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3.5 px-4 py-4">
         {visible.map((f) => {
-          const isFullWidth = f.type === "textarea" || f.width === "full" || f.colSpan === 2;
+          const isFullWidth = f.type === "textarea" || f.type === "multiselect" || f.width === "full" || f.colSpan === 2;
           return (
             <div key={f.key} className={cn("flex flex-col gap-1", isFullWidth && "md:col-span-2")}>
               <label className="text-xs font-medium text-gray-500">

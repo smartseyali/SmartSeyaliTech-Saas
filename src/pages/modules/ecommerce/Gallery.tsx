@@ -725,7 +725,7 @@ export default function Gallery() {
     const [tab, setTab] = useState<Tab>("images");
     const [counts, setCounts] = useState({ banners: 0, images: 0, videos: 0 });
 
-    useEffect(() => { if (activeCompany) loadCounts(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) loadCounts(); }, [activeCompany?.id]);
 
     const loadCounts = async () => {
         if (!activeCompany) return;

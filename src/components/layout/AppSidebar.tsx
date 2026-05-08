@@ -9,7 +9,7 @@ import {
     PanelLeftClose, PanelLeftOpen,
     LayoutGrid, Globe2, CalendarDays, CreditCard, Users, Zap,
     DollarSign, Languages, Factory, Percent, Mail, Megaphone, ToggleRight, History, Database,
-    FileText, Clock,
+    FileText, Clock, LifeBuoy,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -27,7 +27,6 @@ const superAdminNavGroups: NavGroup[] = [
         label: "Platform",
         icon: ShieldCheck,
         items: [
-            { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
             { title: "Tenants", url: "/super-admin/tenants", icon: Globe2 },
             { title: "Subscriptions", url: "/super-admin/subscriptions", icon: CalendarDays },
             { title: "Quotations", url: "/super-admin/quotations", icon: FileText },
@@ -55,6 +54,7 @@ const superAdminNavGroups: NavGroup[] = [
         items: [
             { title: "Email Templates", url: "/super-admin/email-templates", icon: Mail },
             { title: "Announcements", url: "/super-admin/announcements", icon: Megaphone },
+            { title: "Support", url: "/super-admin/support", icon: LifeBuoy },
         ],
     },
     {
@@ -175,7 +175,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     return (
         <aside
             className={cn(
-                "h-full flex flex-col shrink-0 border-r border-sidebar-border bg-sidebar overflow-y-auto overflow-x-hidden select-none transition-all duration-200 ease-out erp-scrollbar",
+                "h-full flex flex-col shrink-0 border-r border-sidebar-border bg-sidebar overflow-hidden select-none transition-all duration-200 ease-out",
                 collapsed ? "w-[56px]" : "w-[256px]",
             )}
         >
@@ -292,12 +292,12 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
 
             {/* ── Navigation ─────────────────────────────────────── */}
-            <div className="flex-1 flex flex-col px-1.5 py-1.5 overflow-y-auto erp-scrollbar">
+            <div className="flex-1 flex flex-col px-1.5 py-1.5 overflow-y-auto erp-scrollbar min-h-0">
                 {/* Dashboard Link */}
                 <NavLink
                     to={isSuperAdminView ? "/super-admin" : `/apps/${activeModule}`}
                     className={cn(
-                        "group flex items-center gap-2.5 px-2.5 h-8 rounded text-sm text-sidebar-foreground hover:text-gray-900 hover:bg-gray-100 transition-colors relative dark:hover:text-foreground dark:hover:bg-accent",
+                        "group flex items-center gap-2.5 px-2.5 h-8 shrink-0 rounded text-sm text-sidebar-foreground hover:text-gray-900 hover:bg-gray-100 transition-colors relative dark:hover:text-foreground dark:hover:bg-accent",
                         collapsed ? "justify-center" : "justify-start",
                     )}
                     activeClassName="sidebar-item-active"

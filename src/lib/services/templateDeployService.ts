@@ -3,8 +3,8 @@ import { saveAs } from "file-saver";
 
 import type { StorefrontTemplate, TemplateConfigOverrides } from "@/types/storefront";
 
-const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || "";
-const ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "";
+const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL as string) || "";
+const ANON_KEY = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string) || "";
 
 type Manifest = {
     slug: string;

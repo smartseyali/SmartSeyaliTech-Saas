@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Hostinger shared hosting — Apache .htaccess for Next.js static export
+# ─────────────────────────────────────────────────────────────────────────────
+
+Options -Indexes
+
+# ── HTTPS redirect ────────────────────────────────────────────────────────────
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── www → non-www (adjust if you prefer www) ─────────────────────────────────
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+# ── Clean URLs: serve /path/index.html for /path/ requests ───────────────────
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.+[^/])$ /$1/index.html [L]
+
+# ── Fallback 404 ─────────────────────────────────────────────────────────────
+ErrorDocument 404 /404/index.html
+
+# ── Security headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# ── Gzip compression ──────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE text/javascript application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/xml font/woff2
+</IfModule>
+
+# ── Browser caching ───────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Next.js hashed assets — cache forever
+  <FilesMatch "\.(js|css|woff2?|ttf|eot)$">
+    ExpiresDefault "access plus 1 year"
+    Header append Cache-Control "public, immutable"
+  </FilesMatch>
+
+  # Images
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    ExpiresDefault "access plus 30 days"
+    Header append Cache-Control "public"
+  </FilesMatch>
+
+  # HTML — short cache so updates propagate quickly
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 1 hour"
+    Header set Cache-Control "public, must-revalidate"
+  </FilesMatch>
+
+  # Merchant feed and sitemap — daily
+  <FilesMatch "(merchant-feed\.xml|sitemap\.xml|robots\.txt)$">
+    ExpiresDefault "access plus 1 day"
+    Header set Cache-Control "public"
+  </FilesMatch>
+</IfModule>
+
+# ── CORS for fonts ────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  <FilesMatch "\.(woff2?|ttf|eot|otf)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>

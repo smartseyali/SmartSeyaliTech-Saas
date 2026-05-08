@@ -24,7 +24,7 @@ export default function Banners() {
     const [view, setView] = useState<"list" | "form">("list");
     const [editingItem, setEditingItem] = useState<any | null>(null);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

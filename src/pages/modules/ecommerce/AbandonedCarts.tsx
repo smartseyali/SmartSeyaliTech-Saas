@@ -13,7 +13,7 @@ export default function AbandonedCarts() {
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState<number | null>(null);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

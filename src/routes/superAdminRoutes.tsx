@@ -22,6 +22,7 @@ const PlatformFeatureFlags   = lazy(() => import("@/pages/super-admin/FeatureFla
 const PlatformAuditLogs      = lazy(() => import("@/pages/super-admin/AuditLogs"));
 const PlatformTemplates      = lazy(() => import("@/pages/super-admin/Templates"));
 const PlatformDeployments    = lazy(() => import("@/pages/super-admin/Deployments"));
+const PlatformSupport        = lazy(() => import("@/pages/super-admin/Support"));
 
 export const superAdminRoutes = [
     { path: "/super-admin", element: <SuperAdminDashboard /> },
@@ -46,4 +47,5 @@ export const superAdminRoutes = [
     { path: "/super-admin/audit-logs",      element: <PlatformAuditLogs /> },
     { path: "/super-admin/templates",       element: <PlatformTemplates /> },
     { path: "/super-admin/deployments",      element: <PlatformDeployments /> },
+    { path: "/super-admin/support",          element: <PlatformSupport /> },
 ];

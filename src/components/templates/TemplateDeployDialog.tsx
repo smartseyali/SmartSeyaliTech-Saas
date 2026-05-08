@@ -36,7 +36,7 @@ type Props = {
     onRequested?: () => void;
 };
 
-const PLATFORM_BASE_DOMAIN = (import.meta.env.VITE_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
+const PLATFORM_BASE_DOMAIN = (process.env.NEXT_PUBLIC_PLATFORM_BASE_DOMAIN as string) || "smartseyali.com";
 
 function slugify(str: string): string {
     return str.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");

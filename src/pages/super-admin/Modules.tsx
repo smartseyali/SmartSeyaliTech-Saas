@@ -1,30 +1,19 @@
-import { useState, useEffect } from "react";
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import { useCrud } from "@/hooks/useCrud";
 import DocForm from "@/components/modules/DocForm";
 import DocList from "@/components/modules/DocList";
 import { getDocType } from "@/registry";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { PLATFORM_MODULES } from "@/config/modules";
 
 export default function PlatformModules() {
   const def = getDocType("platformModule");
-  const { toast } = useToast();
   const [view, setView] = useState<"list" | "form">("list");
   const [editing, setEditing] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [syncing, setSyncing] = useState(false);
 
   const { data, loading, fetchItems, createItem, updateItem, deleteItem, deleteItems } =
     useCrud(def.tableName, "*", { isGlobal: true });
 
-  // Auto-sync modules from config on page load
-  useEffect(() => {
-    handleSyncFromConfig(true);
-  }, []);
 
   /* ── Array ↔ string helpers ─────────────────────────────────────────────── */
 
@@ -43,7 +32,6 @@ export default function PlatformModules() {
   const toPayload = (header: any) => {
     const p = { ...header };
 
-    // CSV → arrays
     const csvFields = ["features", "screenshots", "technologies", "included_in_plans"];
     csvFields.forEach((f) => {
       if (typeof p[f] === "string") {
@@ -51,69 +39,19 @@ export default function PlatformModules() {
       }
     });
 
-    // JSON field
     if (typeof p.use_cases === "string") {
       try { p.use_cases = JSON.parse(p.use_cases); } catch { p.use_cases = []; }
     }
 
-    // Boolean selects
-    ["is_active", "is_core", "is_free", "needs_template"].forEach((f) => {
+    ["is_active", "is_core", "needs_template", "is_free"].forEach((f) => {
       if (p[f] === "true") p[f] = true;
       if (p[f] === "false") p[f] = false;
     });
 
+    if (p.price_monthly !== undefined) p.price_monthly = parseInt(p.price_monthly, 10) || 0;
+    if (p.price_yearly  !== undefined) p.price_yearly  = parseInt(p.price_yearly,  10) || 0;
+
     return p;
-  };
-
-  /* ── Sync from config ───────────────────────────────────────────────────── */
-
-  const handleSyncFromConfig = async (silent = false) => {
-    if (!silent && !confirm("This will import all modules from config/modules.ts into the database. Existing records with same IDs will be updated. Continue?")) return;
-
-    setSyncing(true);
-    try {
-      const payloads = PLATFORM_MODULES.map((mod, index) => ({
-        slug: mod.id,
-        name: mod.name,
-        tagline: mod.tagline,
-        description: mod.description,
-        icon: mod.icon,
-        color: mod.color,
-        color_from: mod.colorFrom,
-        color_to: mod.colorTo,
-        route: mod.route,
-        dashboard_route: mod.dashboardRoute,
-        category: mod.category,
-        status: mod.status,
-        features: mod.features,
-        included_in_plans: mod.includedInPlans,
-        needs_template: mod.needsTemplate,
-        is_core: mod.isCore,
-        is_active: true,
-        is_free: mod.isFree,
-        price_monthly: mod.priceMonthly,
-        price_yearly: mod.priceYearly || null,
-        trial_days: mod.trialDays,
-        sort_order: index,
-      }));
-
-      const { error } = await supabase
-        .from("system_modules")
-        .upsert(payloads, { onConflict: "slug" });
-
-      if (error) console.error("Module sync error:", error);
-
-      if (!silent) {
-        toast({ title: "Synchronization Complete", description: "Platform modules imported from local config." });
-      }
-      fetchItems();
-    } catch (err: any) {
-      if (!silent) {
-        toast({ title: "Sync Failed", description: err.message, variant: "destructive" });
-      }
-    } finally {
-      setSyncing(false);
-    }
   };
 
   /* ── Handlers ───────────────────────────────────────────────────────────── */
@@ -209,17 +147,6 @@ export default function PlatformModules() {
       primaryKey="id"
       statusField="status"
       newLabel="New Module"
-      headerActions={
-        <Button
-          variant="outline"
-          onClick={handleSyncFromConfig}
-          disabled={syncing}
-          className="h-9 px-4 text-xs font-semibold"
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Syncing..." : "Sync from Config"}
-        </Button>
-      }
     />
   );
 }

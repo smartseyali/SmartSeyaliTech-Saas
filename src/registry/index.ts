@@ -116,7 +116,6 @@ import { platformEmailTemplate } from "./doctypes/platform-email-template";
 import { platformAnnouncement } from "./doctypes/platform-announcement";
 import { platformFeatureFlag } from "./doctypes/platform-feature-flag";
 import { platformAuditLog } from "./doctypes/platform-audit-log";
-
 // ── Registry Object ────────────────────────────────────────────────────────
 
 export const REGISTRY: Record<string, DocTypeDef> = {

@@ -15,6 +15,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Globe,
+  Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,9 @@ interface PlatformSettings {
   currency: string;
   currency_symbol: string;
   hostinger_platform_cname: string;
+  tax_label: string;
+  tax_rate: number;
+  tax_included: boolean;
 }
 
 const DEFAULTS: PlatformSettings = {
@@ -36,6 +40,9 @@ const DEFAULTS: PlatformSettings = {
   currency: "INR",
   currency_symbol: "₹",
   hostinger_platform_cname: "",
+  tax_label: "GST",
+  tax_rate: 18,
+  tax_included: false,
 };
 
 export default function PlatformSettingsPage() {
@@ -70,6 +77,9 @@ export default function PlatformSettingsPage() {
           currency: data.currency || "INR",
           currency_symbol: data.currency_symbol || "₹",
           hostinger_platform_cname: data.hostinger_platform_cname || "",
+          tax_label: data.tax_label || "GST",
+          tax_rate: data.tax_rate ?? 18,
+          tax_included: data.tax_included ?? false,
         };
         setSettings(loaded);
         setSavedSettings(loaded);
@@ -320,6 +330,81 @@ export default function PlatformSettingsPage() {
                   className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Tax Configuration ───────────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                <Percent className="w-5 h-5 text-violet-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Tax Configuration</h2>
+                <p className="text-xs text-gray-500">Controls how tax is displayed on the pricing page for plans and modules</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {/* Tax Label + Rate */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 block">Tax Label</label>
+                <p className="text-xs text-gray-500">Displayed next to prices (e.g. GST, VAT, Tax)</p>
+                <input
+                  type="text"
+                  value={settings.tax_label}
+                  onChange={(e) => updateField("tax_label", e.target.value.toUpperCase())}
+                  placeholder="GST"
+                  maxLength={10}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 block">Tax Rate (%)</label>
+                <p className="text-xs text-gray-500">Applied when tax is not included in price</p>
+                <div className="relative">
+                  <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    value={settings.tax_rate}
+                    onChange={(e) => updateField("tax_rate", parseFloat(e.target.value) || 0)}
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Tax Included Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Prices Include Tax</p>
+                  <p className="text-xs text-gray-500">
+                    {settings.tax_included
+                      ? `Displayed prices already include ${settings.tax_label} — shown as "incl. ${settings.tax_label}"`
+                      : `${settings.tax_label} is added on top of displayed prices — shown as "+ ${settings.tax_rate}% ${settings.tax_label}"`}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => updateField("tax_included", !settings.tax_included)}
+                className="shrink-0"
+              >
+                {settings.tax_included ? (
+                  <ToggleRight className="w-10 h-10 text-blue-600" />
+                ) : (
+                  <ToggleLeft className="w-10 h-10 text-gray-300" />
+                )}
+              </button>
             </div>
           </div>
         </div>

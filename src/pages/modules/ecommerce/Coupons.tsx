@@ -31,12 +31,12 @@ export default function Coupons() {
     const [view, setView] = useState<"list" | "form">("list");
     const [editingItem, setEditingItem] = useState<any | null>(null);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;
         setLoading(true);
-        const { data } = await supabase.from("coupons").select("*")
+        const { data } = await supabase.from("ecom_coupons").select("*")
             .eq("company_id", activeCompany.id).order("created_at", { ascending: false });
         setCoupons(data || []);
         setLoading(false);
@@ -83,10 +83,10 @@ export default function Coupons() {
                 is_active: formData.is_active,
             };
             if (editingItem?.id) {
-                await supabase.from("coupons").update(payload).eq("id", editingItem.id);
+                await supabase.from("ecom_coupons").update(payload).eq("id", editingItem.id);
                 toast({ title: "Coupon updated" });
             } else {
-                await supabase.from("coupons").insert([payload]);
+                await supabase.from("ecom_coupons").insert([payload]);
                 toast({ title: "Coupon created ✅" });
             }
             setView("list");
@@ -97,13 +97,13 @@ export default function Coupons() {
     };
 
     const toggleActive = async (c: any) => {
-        await supabase.from("coupons").update({ is_active: !c.is_active }).eq("id", c.id);
+        await supabase.from("ecom_coupons").update({ is_active: !c.is_active }).eq("id", c.id);
         load();
     };
 
     const deleteCoupon = async (c: any) => {
         if (!confirm(`Delete coupon "${c.code}"?`)) return;
-        await supabase.from("coupons").delete().eq("id", c.id);
+        await supabase.from("ecom_coupons").delete().eq("id", c.id);
         toast({ title: "Coupon deleted" });
         load();
     };

@@ -56,6 +56,7 @@ export default function EcomOrders() {
     const [activeStatus, setActiveStatus] = useState("all");
     const [view, setView] = useState<"list" | "form">("list");
     const [editingOrder, setEditingOrder] = useState<any>(null);
+    const [bulkUpdating, setBulkUpdating] = useState(false);
 
     // Print state
     const [printFormats, setPrintFormats] = useState<PrintFormat[]>([]);
@@ -64,7 +65,7 @@ export default function EcomOrders() {
         docs: Array<{ record: any; items: any[] }>;
     }>(null);
 
-    useEffect(() => { if (activeCompany) { load(); loadPrintFormats(); } }, [activeCompany]);
+    useEffect(() => { if (activeCompany) { load(); loadPrintFormats(); } }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;
@@ -137,6 +138,32 @@ export default function EcomOrders() {
     };
 
     const fmt = (n: number) => `₹${Number(n).toLocaleString("en-IN")}`;
+
+    const bulkUpdateStatus = async (ids: any[], status: string, clear: () => void) => {
+        if (!activeCompany) return;
+        setBulkUpdating(true);
+        try {
+            await supabase.from("ecom_orders")
+                .update({ status, updated_at: new Date().toISOString() })
+                .in("id", ids)
+                .eq("company_id", activeCompany.id);
+            const timelineRows = ids.map((id) => ({
+                order_id: id,
+                company_id: activeCompany.id,
+                status,
+                note: `Bulk status update → ${status}`,
+                created_by: "admin",
+            }));
+            await supabase.from("ecom_order_timeline").insert(timelineRows);
+            toast({ title: `${ids.length} order${ids.length > 1 ? "s" : ""} → ${status}` });
+            load();
+            clear();
+        } catch (err: any) {
+            toast({ variant: "destructive", title: "Bulk update failed", description: err.message });
+        } finally {
+            setBulkUpdating(false);
+        }
+    };
 
     // ─── Order Create Form ──────────────────────────────────────────────
     const orderHeaderFields = {
@@ -419,6 +446,24 @@ export default function EcomOrders() {
                     )
                 }
                 bulkActions={(ids, clear) => (
+                    <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" disabled={bulkUpdating}>
+                                <ArrowRight className="w-3 h-3" /> Status
+                                <ChevronDown className="w-3 h-3" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Set {ids.length} orders to</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {["confirmed","packed","shipped","out_for_delivery","delivered","cancelled"].map((s) => (
+                                <DropdownMenuItem key={s} onClick={() => bulkUpdateStatus(ids, s, clear)}>
+                                    {s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="sm" variant="outline">
@@ -447,6 +492,7 @@ export default function EcomOrders() {
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    </>
                 )}
             />
 

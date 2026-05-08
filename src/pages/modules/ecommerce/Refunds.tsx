@@ -25,7 +25,7 @@ export default function Refunds() {
     const [filter, setFilter] = useState("all");
     const [processing, setProcessing] = useState<string | null>(null);
 
-    useEffect(() => { if (activeCompany) load(); }, [activeCompany]);
+    useEffect(() => { if (activeCompany) load(); }, [activeCompany?.id]);
 
     const load = async () => {
         if (!activeCompany) return;

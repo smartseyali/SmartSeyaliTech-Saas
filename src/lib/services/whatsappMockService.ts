@@ -21,7 +21,7 @@ function mockWaMessageId(): string {
 }
 
 export function isTestMode(): boolean {
-  return import.meta.env.VITE_WHATSAPP_MODE === "test";
+  return process.env.NEXT_PUBLIC_WHATSAPP_MODE === "test";
 }
 
 // ── Mock Send Message ───────────────────────────────────────────────────────
